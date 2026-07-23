@@ -555,6 +555,7 @@
     color:var(--ink-soft); background:var(--card); border:none; border-radius:11px; padding:9px 10px; cursor:pointer; box-shadow:var(--shadow)}
   .sync-btn:hover{color:var(--ink)}
   .sync-btn:active{transform:scale(.99)}
+  .sync-btn.wide{flex:2}
   .sync-ic{font-size:13px; font-weight:800; color:var(--sky)}
   .toast{position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(14px); z-index:90;
     background:var(--ink); color:var(--on-ink); font-size:13px; font-weight:650; padding:10px 16px; border-radius:999px;
@@ -742,8 +743,9 @@
         <button id="resetBtn" type="button">Heute zurücksetzen</button>
       </div>
       <div class="sync-bar">
-        <button class="sync-btn" id="loadBtn" type="button"><span class="sync-ic">↓</span> Laden</button>
-        <button class="sync-btn" id="saveBtn" type="button"><span class="sync-ic">↑</span> Sichern</button>
+        <button class="sync-btn wide" id="syncBtn" type="button"><span class="sync-ic">⟳</span> <span id="syncLabel">Abgleich einrichten</span></button>
+        <button class="sync-btn" id="loadBtn" type="button">↓ Laden</button>
+        <button class="sync-btn" id="saveBtn" type="button">↑ Sichern</button>
       </div>
       <div class="wipe-bar" id="wipeBar" hidden>
         <div class="wipe-title">Aufräumen</div>
@@ -831,7 +833,7 @@
 
   let mem={};
   function read(k,f){ try{const v=localStorage.getItem(k);return v?JSON.parse(v):f;}catch(e){return (k in mem)?mem[k]:f;} }
-  function write(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){mem[k]=v;} }
+  function write(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){mem[k]=v;} scheduleSync(k); }
   function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
 
   /* ---------- Sichern / Laden (iCloud-Datei) ---------- */
@@ -850,7 +852,10 @@
     toDel.forEach(k=>localStorage.removeItem(k));
     Object.keys(obj.data).forEach(k=>{ localStorage.setItem(k, obj.data[k]); });
   }
-  function backupFilename(){ return "heute-sicherung.json"; }
+  function backupFilename(){
+    const d=new Date(), p=n=>String(n).padStart(2,"0");
+    return `heute-${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}.json`;
+  }
   function doBackup(){
     try{
       const json=JSON.stringify(collectState());
@@ -1078,6 +1083,126 @@
     const pt=await subtle().decrypt({name:"AES-GCM", iv:unb64(payload.iv)}, key, unb64(payload.ct));
     return new TextDecoder().decode(pt);
   }
+  /* ---------- Automatischer Abgleich (verschlüsselt, Pantry als Transport) ---------- */
+  const SYNC="ht_sync_v1";
+  const PANTRY_BASE="https://getpantry.cloud/apiv1/pantry/";
+  const SYNC_EXCLUDE=[LOCKTXT, CRYPTO, TAB, SYNC];   // Texte bleiben strikt lokal
+  var syncCfg=null, syncReady=false, syncTimer=null, syncBusy=false, lastPushedPlain="";
+  try{ syncCfg=JSON.parse(localStorage.getItem("ht_sync_v1")||"null"); }catch(e){ syncCfg=null; }
+  function syncOn(){ return !!(syncCfg && syncCfg.pantry && syncCfg.pw); }
+  function syncUrl(){ return PANTRY_BASE+encodeURIComponent(syncCfg.pantry)+"/basket/"+encodeURIComponent(syncCfg.basket||"heute"); }
+  function setSyncStatus(t){ const el=document.getElementById("syncLabel"); if(el) el.textContent=t; }
+  function collectSyncData(){
+    const d={};
+    for(let i=0;i<localStorage.length;i++){
+      const k=localStorage.key(i);
+      if(!k || k.indexOf("ht_")!==0) continue;
+      if(SYNC_EXCLUDE.indexOf(k)>=0) continue;
+      d[k]=localStorage.getItem(k);
+    }
+    return d;
+  }
+  function stripImages(d){
+    const o=Object.assign({},d);
+    try{ const v=JSON.parse(o[VIS]||"null"); if(v){ v.images=[]; o[VIS]=JSON.stringify(v); } }catch(e){}
+    try{ const c=JSON.parse(o[CFG]||"null"); if(c&&c.habits){ c.habits.forEach(h=>{ if(h.challenge) delete h.challenge.image; }); o[CFG]=JSON.stringify(c); } }catch(e){}
+    return o;
+  }
+  function keepLocalImages(d){
+    try{ const lv=JSON.parse(localStorage.getItem(VIS)||"null"), nv=JSON.parse(d[VIS]||"null");
+         if(lv&&nv){ nv.images=lv.images||[]; d[VIS]=JSON.stringify(nv); } }catch(e){}
+    try{ const lc=JSON.parse(localStorage.getItem(CFG)||"null"), nc=JSON.parse(d[CFG]||"null");
+         if(lc&&nc&&nc.habits){ nc.habits.forEach(h=>{ const lh=(lc.habits||[]).find(x=>x.id===h.id);
+           if(lh&&lh.challenge&&lh.challenge.image&&h.challenge) h.challenge.image=lh.challenge.image; });
+           d[CFG]=JSON.stringify(nc); } }catch(e){}
+    return d;
+  }
+  function applySyncData(d){
+    const del=[];
+    for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i);
+      if(k && k.indexOf("ht_")===0 && SYNC_EXCLUDE.indexOf(k)<0) del.push(k); }
+    del.forEach(k=>localStorage.removeItem(k));
+    Object.keys(d).forEach(k=>localStorage.setItem(k,d[k]));
+  }
+  function scheduleSync(k){
+    if(!syncReady) return;
+    if(!syncOn()) return;
+    if(k && SYNC_EXCLUDE.indexOf(k)>=0) return;
+    clearTimeout(syncTimer); syncTimer=setTimeout(()=>{ syncPush(false); },2500);
+  }
+  async function syncPush(force){
+    if(!syncOn()||syncBusy) return;
+    let data=collectSyncData(), noImages=false;
+    let plain=JSON.stringify(data);
+    if(plain.length>1300000){ data=stripImages(data); plain=JSON.stringify(data); noImages=true; }
+    if(!force && plain===lastPushedPlain) return;
+    syncBusy=true; setSyncStatus("sichert …");
+    try{
+      const salt=window.crypto.getRandomValues(new Uint8Array(16));
+      const enc=await encWith(syncCfg.pw, salt, plain);
+      const body={v:1, updatedAt:new Date().toISOString(), noImages:noImages, salt:b64(salt), iv:enc.iv, ct:enc.ct};
+      const r=await fetch(syncUrl(),{method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)});
+      if(!r.ok) throw new Error("HTTP "+r.status);
+      lastPushedPlain=plain;
+      syncCfg.lastAppliedAt=body.updatedAt; localStorage.setItem(SYNC,JSON.stringify(syncCfg));
+      setSyncStatus("aktuell");
+    }catch(e){ setSyncStatus("offline"); }
+    syncBusy=false;
+  }
+  async function syncPull(){
+    if(!syncOn()||syncBusy) return "busy";
+    syncBusy=true; setSyncStatus("prüft …");
+    try{
+      const r=await fetch(syncUrl(),{cache:"no-store"});
+      if(r.status===400||r.status===404){ syncBusy=false; setSyncStatus("leer"); return "empty"; }
+      if(!r.ok) throw new Error("HTTP "+r.status);
+      const body=await r.json();
+      if(!body||!body.ct){ syncBusy=false; setSyncStatus("leer"); return "empty"; }
+      if(syncCfg.lastAppliedAt && body.updatedAt<=syncCfg.lastAppliedAt){ setSyncStatus("aktuell"); syncBusy=false; return "uptodate"; }
+      const plain=await decWith(syncCfg.pw, unb64(body.salt), {iv:body.iv, ct:body.ct});
+      let data=JSON.parse(plain);
+      if(body.noImages) data=keepLocalImages(data);
+      applySyncData(data);
+      syncCfg.lastAppliedAt=body.updatedAt; localStorage.setItem(SYNC,JSON.stringify(syncCfg));
+      setSyncStatus("aktualisiert"); syncBusy=false;
+      setTimeout(()=>location.reload(),400);
+      return "applied";
+    }catch(e){
+      const bad = e && (e.name==="OperationError" || e.name==="InvalidAccessError");
+      setSyncStatus(bad?"Passwort falsch":"offline");
+      syncBusy=false;
+      return bad?"badpw":"offline";
+    }
+  }
+  async function setupSync(){
+    const cur=(syncCfg&&syncCfg.pantry)||"";
+    const id=prompt("Pantry-ID einfügen (kostenlos auf getpantry.cloud).\n\nLeer lassen = Abgleich ausschalten.", cur);
+    if(id===null) return;
+    if(!id.trim()){ syncCfg=null; localStorage.removeItem(SYNC); setSyncStatus("Abgleich einrichten"); return; }
+    const pw=await askPassword({title:"Abgleich-Passwort",
+      note:"Auf beiden Geräten dasselbe Passwort. Damit werden die Daten verschlüsselt, bevor sie hochgeladen werden.",
+      confirm:true});
+    if(!pw) return;
+    const prev=syncCfg;
+    syncCfg={pantry:id.trim(), basket:"heute", pw:pw, lastAppliedAt:null};
+    localStorage.setItem(SYNC,JSON.stringify(syncCfg));
+    syncReady=true; lastPushedPlain="";
+    const res=await syncPull();
+    if(res==="badpw"){
+      // NICHT hochladen - sonst würden die Daten des anderen Geräts überschrieben
+      syncCfg=prev||null;
+      if(syncCfg) localStorage.setItem(SYNC,JSON.stringify(syncCfg)); else localStorage.removeItem(SYNC);
+      setSyncStatus(syncOn()?"aktuell":"Abgleich einrichten");
+      alert("Das Passwort passt nicht zu den bereits abgeglichenen Daten.\n\nNimm auf diesem Gerät dasselbe Passwort wie auf dem anderen. Es wurde nichts überschrieben.");
+      return;
+    }
+    if(res==="offline"){
+      alert("Keine Verbindung zum Abgleich. Prüfe die Pantry-ID und deine Internetverbindung.\n\nEs wurde nichts hochgeladen.");
+      return;
+    }
+    if(res==="empty") await syncPush(true);   // nur wenn dort noch nichts liegt
+  }
+
   function askPassword(opts){
     return new Promise(resolve=>{
       const ov=document.getElementById("pwModal");
@@ -2308,6 +2433,10 @@
   document.getElementById("wipeAll").addEventListener("click",()=>confirmWipe(true));
   document.getElementById("saveBtn").addEventListener("click",doBackup);
   document.getElementById("loadBtn").addEventListener("click",doRestore);
+  document.getElementById("syncBtn").addEventListener("click",()=>{ if(syncOn()) syncPull(); else setupSync(); });
+  syncReady=true;
+  if(syncOn()){ setSyncStatus("prüft …"); syncPull(); }
+  document.addEventListener("visibilitychange",()=>{ if(!document.hidden && syncOn()) syncPull(); });
   document.getElementById("gospelToggle").addEventListener("click",toggleGospel);
   // Evangelium/Papst brauchen den lokalen Server - ohne ihn den Bereich ausblenden
   (function(){

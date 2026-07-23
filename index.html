@@ -1,0 +1,2347 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Heute">
+<meta name="theme-color" content="#F6F8FB" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0C1116" media="(prefers-color-scheme: dark)">
+<meta name="robots" content="noindex, nofollow">
+<title>Heute</title>
+<style>
+  :root{
+    --bg-1:#F6F8FB; --bg-2:#EBEFF5; --card:#FFFFFF;
+    --ink:#0F1720; --on-ink:#FFFFFF; --ink-soft:#5B6675; --ink-faint:#8E98A6;
+    --track:#E3E8EF; --line:#E7EBF1; --hair:#DCE2EA;
+    --mint:#0FA678;  --mint-tint:#E6F6F0;
+    --sky:#3A6FE0;   --sky-tint:#E9F0FE;
+    --amber:#E1901A; --amber-tint:#FDF1DF;
+    --rose:#EF5A72;  --rose-tint:#FDEAEE;
+    --violet:#7C5CF0; --violet-tint:#EEE9FE;
+    --shadow:0 0 0 1px rgba(15,23,32,.05), 0 1px 2px rgba(15,23,32,.04), 0 10px 24px -14px rgba(15,23,32,.22);
+    --radius:14px;
+    --font:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg-1:#0C1116; --bg-2:#070A0E; --card:#141A22;
+      --ink:#F1F5F9; --on-ink:#0C1116; --ink-soft:#98A3B2; --ink-faint:#65707F;
+      --track:#28313C; --line:#1F2731; --hair:#2A333E;
+      --mint:#22C08C; --sky:#5B8DEF; --amber:#F0A93A; --rose:#F1697F; --violet:#9B7DF5;
+      --mint-tint:#0F2620; --sky-tint:#12203A; --amber-tint:#2A2113;
+      --rose-tint:#2A1620; --violet-tint:#1D1836;
+      --shadow:0 0 0 1px rgba(255,255,255,.04), 0 1px 2px rgba(0,0,0,.4), 0 14px 32px -18px rgba(0,0,0,.8);
+    }
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  html,body{height:100%}
+  body{
+    font-family:var(--font); color:var(--ink);
+    background:
+      radial-gradient(1000px 520px at 88% -12%, rgba(58,111,224,.09), transparent 62%),
+      radial-gradient(820px 460px at -12% 112%, rgba(15,166,120,.07), transparent 58%),
+      linear-gradient(180deg, var(--bg-1), var(--bg-2));
+    background-attachment:fixed; min-height:100vh;
+    display:flex; justify-content:center; padding:24px 18px 40px;
+    padding-top:calc(24px + env(safe-area-inset-top));
+    padding-bottom:calc(40px + env(safe-area-inset-bottom));
+    padding-left:calc(18px + env(safe-area-inset-left));
+    padding-right:calc(18px + env(safe-area-inset-right));
+    -webkit-font-smoothing:antialiased; letter-spacing:-.005em;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .app{width:100%; max-width:440px; display:flex; flex-direction:column; gap:14px; transition:max-width .24s ease}
+  body.tab-prios .app{max-width:960px}
+  body.tab-prios .tabs{max-width:440px; width:100%; align-self:center}
+
+  /* Prios: Listen links, Tagesansicht rechts */
+  #view-prios.active{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:14px; align-items:start}
+  #view-prios .timeline{margin-top:0}
+  #view-prios .archiv-link{grid-column:1 / -1}
+  #view-prios.active.single{grid-template-columns:minmax(0,1fr); max-width:440px; margin:0 auto; width:100%}
+  @media (max-width:820px){
+    body.tab-prios .app{max-width:440px}
+    #view-prios.active{grid-template-columns:minmax(0,1fr)}
+  }
+
+  /* ---------- Tabs ---------- */
+  .tabs{display:flex; gap:3px; background:var(--card); border-radius:11px; padding:4px; box-shadow:var(--shadow)}
+  .tabs button{
+    flex:1; font:inherit; font-size:13px; font-weight:660; letter-spacing:-.012em;
+    color:var(--ink-soft); background:transparent; border:none; cursor:pointer;
+    padding:9px 8px; border-radius:8px; transition:background .16s ease, color .16s ease;
+  }
+  .tabs button:hover{color:var(--ink)}
+  .tabs button.active{background:var(--ink); color:var(--on-ink)}
+
+  .view{display:none}
+  .view.active{display:flex; flex-direction:column; gap:14px}
+  #cats{display:flex; flex-direction:column; gap:14px}
+
+  /* ---------- Card shells ---------- */
+  .head,.cat,.panel{background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden}
+
+  /* ---------- Heute: header ---------- */
+  .head{padding:22px 22px 18px}
+  .head-top{display:flex; justify-content:space-between; align-items:center; gap:14px}
+  .greet{font-size:23px; font-weight:760; letter-spacing:-.02em; line-height:1.1}
+  .date{margin-top:5px; font-size:13.5px; color:var(--ink-soft); font-weight:520; text-transform:capitalize}
+  .gospel-toggle{margin-top:13px; width:100%; display:flex; align-items:center; gap:8px; background:transparent; border:none; cursor:pointer; padding:6px 0; font:inherit; text-align:left}
+  .gospel-label{font-size:14px; font-weight:660; color:var(--ink); letter-spacing:-.01em}
+  .gospel-toggle .chev{margin-left:auto; font-size:15px; line-height:1; color:var(--ink-faint); transition:transform .22s ease}
+  .gospel-toggle[aria-expanded="true"] .chev{transform:rotate(180deg)}
+  .gospel-panel{margin-top:6px; border-top:1px solid var(--line); padding-top:12px; max-height:300px; overflow-y:auto}
+  .gospel-ref{font-size:11.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--sky)}
+  .gospel-title{font-size:14.5px; font-weight:680; margin-top:4px; color:var(--ink); line-height:1.3}
+  .gospel-text{margin-top:9px; font-size:14px; line-height:1.62; color:var(--ink-soft); white-space:pre-line}
+  .gospel-text a{color:var(--sky)}
+  .gospel-src{margin-top:10px; font-size:11px; color:var(--ink-faint)}
+  .gospel-src a{color:var(--ink-faint)}
+  .papst{margin-top:16px; padding-top:14px; border-top:1px solid var(--line)}
+  .papst-head{font-size:10.5px; font-weight:800; letter-spacing:.13em; text-transform:uppercase; color:var(--violet); margin-bottom:8px}
+  .papst-text{font-size:14px; line-height:1.62; color:var(--ink-soft); white-space:pre-wrap;
+    border-left:2px solid var(--violet-tint); padding-left:12px}
+  .papst-src{margin-top:8px; padding-left:12px; font-size:10.5px; font-weight:650; color:var(--ink-faint); font-style:italic}
+  .papst-src a{color:var(--ink-faint)}
+
+  /* ---------- Lock In ---------- */
+  .lockin{--c:var(--violet); --c-tint:var(--violet-tint)}
+  .lockin-head{display:flex; align-items:center; gap:12px; width:100%; padding:15px 20px; background:transparent; border:none; cursor:pointer; font:inherit; text-align:left}
+  .lockin-check{width:24px; height:24px; border-radius:50%; flex:0 0 auto; position:relative; border:2.2px solid var(--track); background:transparent; transition:all .2s cubic-bezier(.2,.9,.3,1.4)}
+  .lockin-check svg{position:absolute; inset:0; width:100%; height:100%; stroke:#fff; stroke-width:3.2; fill:none; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:18; stroke-dashoffset:18; transition:stroke-dashoffset .22s ease}
+  .lockin.complete .lockin-check{border-color:var(--c); background:var(--c)}
+  .lockin.complete .lockin-check svg{stroke-dashoffset:0}
+  .lockin-title{flex:1; font-size:16px; font-weight:680; letter-spacing:-.01em}
+  .lockin-meter{font-size:12px; font-weight:700; color:var(--ink-faint); font-variant-numeric:tabular-nums}
+  .lockin-streak{font-size:12.5px; font-weight:720; color:var(--c)}
+  .lockin-head .chev{font-size:15px; line-height:1; color:var(--ink-faint); transition:transform .22s ease}
+  .lockin-head[aria-expanded="true"] .chev{transform:rotate(180deg)}
+  .lockin-panel{padding:2px 14px 10px}
+  .lockin-item{display:flex; align-items:center; gap:12px; width:100%; padding:10px 6px; background:transparent; border:none; border-top:1px solid var(--line); cursor:pointer; font:inherit; text-align:left}
+  .lockin-item .todo-check{border-color:var(--track)}
+  .lockin-item[aria-pressed="true"] .todo-check{border-color:var(--c); background:var(--c)}
+  .lockin-item[aria-pressed="true"] .todo-check svg{stroke-dashoffset:0}
+  .lockin-item-label{flex:1; font-size:15px; font-weight:540; line-height:1.35}
+  .lockin-item[aria-pressed="true"] .lockin-item-label{color:var(--ink-faint); text-decoration:line-through}
+  .lockin-sub{margin:2px 6px 8px 42px; display:flex; flex-direction:column; gap:5px}
+  .lockin-sub div{font-size:13px; color:var(--ink-soft); font-weight:500; padding-left:12px; border-left:2px solid var(--c-tint)}
+  .ring{position:relative; width:96px; height:96px; flex:0 0 auto}
+  .ring svg{display:block}
+  .ring .seg{fill:none; stroke-width:9; stroke-linecap:round; transition:stroke .45s ease}
+  .ring .seg.outer{stroke-width:4}
+  .ring-center{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center}
+  .ring-num{font-size:27px; font-weight:800; letter-spacing:-.04em; font-variant-numeric:tabular-nums; line-height:1}
+  .ring-num small{font-size:14px; color:var(--ink-faint); font-weight:700}
+  .ring-label{font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint); font-weight:700; margin-top:3px}
+  .ring.complete{animation:pulse .7s ease}
+  @keyframes pulse{0%{transform:scale(1)}45%{transform:scale(1.07)}100%{transform:scale(1)}}
+  .strip{margin-top:18px; padding-top:16px; border-top:1px solid var(--line); display:flex; align-items:flex-end; justify-content:space-between; gap:8px}
+  .day{flex:1; display:flex; flex-direction:column; align-items:center; gap:7px}
+  .bar-track{width:100%; max-width:30px; height:42px; border-radius:8px; background:var(--track); position:relative; overflow:hidden}
+  .bar-fill{position:absolute; left:0; right:0; bottom:0; border-radius:8px; background:linear-gradient(180deg,var(--sky),var(--mint)); transition:height .5s cubic-bezier(.2,.8,.2,1)}
+  .day.today .bar-track{outline:2px solid var(--ink); outline-offset:2px}
+  .day-name{font-size:10.5px; color:var(--ink-faint); font-weight:650}
+  .day.today .day-name{color:var(--ink); font-weight:780}
+  .bonus-pip{width:5px; height:5px; border-radius:50%; background:var(--amber); flex:0 0 auto}
+  .bonus-pip.empty{background:transparent}
+  .bonus-tag{font-size:9px; letter-spacing:.1em; text-transform:uppercase; font-weight:800; color:var(--amber); background:var(--amber-tint); padding:3px 7px; border-radius:999px; margin-left:1px}
+
+  /* ---------- Category cards ---------- */
+  .cat-head,.panel-head{display:flex; align-items:center; gap:10px; padding:15px 20px 12px}
+  .dot{width:9px; height:9px; border-radius:50%; background:var(--c); flex:0 0 auto; box-shadow:0 0 0 4px color-mix(in srgb, var(--c) 16%, transparent)}
+  .eyebrow{font-size:11.5px; letter-spacing:.16em; text-transform:uppercase; font-weight:800; color:var(--ink-soft)}
+  .meter{margin-left:auto; font-size:12px; font-weight:700; color:var(--ink-faint); font-variant-numeric:tabular-nums}
+  .cat-title-edit{font:inherit; font-size:13px; font-weight:700; letter-spacing:.04em; color:var(--ink); border:1px solid var(--track); border-radius:9px; padding:5px 9px; background:transparent; width:170px}
+
+  .habit{display:flex; align-items:center; gap:13px; width:100%; text-align:left; padding:13px 20px; border:none; background:transparent; cursor:pointer; font:inherit; color:var(--ink); border-top:1px solid var(--line); transition:background .15s ease}
+  .habit:hover{background:var(--c-tint)}
+  .check{width:26px; height:26px; border-radius:50%; flex:0 0 auto; position:relative; border:2.2px solid var(--track); background:transparent; transition:all .22s cubic-bezier(.2,.9,.3,1.4)}
+  .check svg{position:absolute; inset:0; width:100%; height:100%; stroke:#fff; stroke-width:3; fill:none; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:18; stroke-dashoffset:18; transition:stroke-dashoffset .25s ease .05s}
+  .habit[aria-pressed="true"] .check{border-color:var(--c); background:var(--c); transform:scale(1.04)}
+  .habit[aria-pressed="true"] .check svg{stroke-dashoffset:0}
+  .name{flex:1; font-size:16px; font-weight:560; letter-spacing:-.01em; transition:color .2s}
+  .habit[aria-pressed="true"] .name{color:var(--ink-faint)}
+  .name-edit{flex:1; font:inherit; font-size:16px; font-weight:560; color:var(--ink); border:1px solid var(--track); border-radius:9px; padding:7px 10px; background:transparent}
+  .streak{font-size:12.5px; font-weight:720; color:var(--ink-faint); font-variant-numeric:tabular-nums; white-space:nowrap; opacity:.85}
+  .streak.hot{color:var(--amber)}
+
+  /* ---------- Prios ---------- */
+  .add-row{display:flex; gap:8px; padding:8px 16px 14px}
+  .add-row input{flex:1; font:inherit; font-size:15px; color:var(--ink); background:var(--bg-1); border:1px solid var(--line); border-radius:13px; padding:11px 14px}
+  .add-row input::placeholder{color:var(--ink-faint)}
+  .add-btn{width:44px; flex:0 0 auto; border:none; border-radius:13px; background:var(--ink); color:var(--on-ink); font-size:22px; font-weight:500; cursor:pointer; line-height:1; transition:opacity .15s}
+  .add-btn:disabled{opacity:.35; cursor:default}
+  .cap-note{padding:0 20px 14px; font-size:12.5px; color:var(--ink-faint); font-weight:560}
+  .todo{display:flex; align-items:center; gap:13px; padding:12px 16px 12px 20px; border-top:1px solid var(--line)}
+  .todo-check{width:24px; height:24px; border-radius:50%; flex:0 0 auto; position:relative; border:2.2px solid var(--track); background:transparent; cursor:pointer; transition:all .2s cubic-bezier(.2,.9,.3,1.4)}
+  .todo-check svg{position:absolute; inset:0; width:100%; height:100%; stroke:#fff; stroke-width:3.2; fill:none; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:18; stroke-dashoffset:18; transition:stroke-dashoffset .22s ease}
+  .todo.done .todo-check{border-color:var(--c); background:var(--c)}
+  .todo.done .todo-check svg{stroke-dashoffset:0}
+  .todo-text{flex:1; font-size:15.5px; font-weight:540; cursor:pointer}
+  .todo.done .todo-text{color:var(--ink-faint); text-decoration:line-through}
+  .row-del{border:none; background:transparent; color:var(--ink-faint); cursor:pointer; font-size:18px; line-height:1; padding:5px 7px; border-radius:9px; transition:color .15s, background .15s}
+  .row-del:hover{color:var(--rose); background:var(--rose-tint)}
+
+  /* ---------- Vizija ---------- */
+  .vis-point{display:flex; align-items:center; gap:11px; padding:6px 16px 6px 20px; border-top:1px solid var(--line)}
+  .pt-dot{width:6px; height:6px; border-radius:50%; background:var(--c); flex:0 0 auto}
+  .vis-point input{flex:1; font:inherit; font-size:15.5px; font-weight:520; color:var(--ink); border:none; background:transparent; padding:7px 0}
+  .vis-point input::placeholder{color:var(--ink-faint)}
+  .ghost-add{display:block; width:calc(100% - 32px); margin:8px 16px; text-align:left; font:inherit; font-size:14px; font-weight:640; color:var(--c); background:var(--c-tint); border:none; border-radius:13px; padding:11px 14px; cursor:pointer; transition:filter .15s}
+  .ghost-add:hover{filter:brightness(.97)}
+  .board-head{padding:15px 20px 6px; border-top:1px solid var(--line); display:flex; align-items:center; gap:10px}
+  .board{display:grid; grid-template-columns:repeat(auto-fill, minmax(66px, 1fr)); gap:6px; padding:4px 16px 16px}
+  .thumb{position:relative; aspect-ratio:1; border-radius:10px; overflow:hidden; background:var(--bg-1); border:1px solid var(--line)}
+  .thumb img{width:100%; height:100%; object-fit:cover; display:block; cursor:zoom-in}
+  .thumb-del{position:absolute; top:3px; right:3px; width:18px; height:18px; border:none; border-radius:50%; background:rgba(8,12,18,.62); color:#fff; font-size:11px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity .15s}
+  .thumb:hover .thumb-del{opacity:1}
+  .add-tile{aspect-ratio:1; border:1.5px dashed var(--track); border-radius:10px; background:transparent; color:var(--ink-faint); font-weight:620; font-size:10.5px; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; transition:border-color .15s, color .15s}
+  .add-tile:hover{border-color:var(--c); color:var(--c)}
+  .add-tile .plus{font-size:17px; line-height:1; font-weight:400}
+  .empty{padding:14px 20px 18px; color:var(--ink-faint); font-size:14px; font-weight:500; line-height:1.5}
+
+  /* ---------- Footer (Heute) ---------- */
+  .foot{display:flex; justify-content:center; gap:8px}
+  .foot button{font:inherit; font-size:13px; font-weight:620; color:var(--ink-soft); background:var(--card); border:1px solid var(--line); padding:9px 16px; border-radius:999px; cursor:pointer; box-shadow:var(--shadow); transition:transform .12s ease, color .15s ease}
+  .foot button:hover{transform:translateY(-1px); color:var(--ink)}
+  .foot button.primary{color:var(--on-ink); background:var(--ink); border-color:var(--ink)}
+  body.editing .habit{cursor:default}
+  body.editing .check{opacity:.35}
+
+  /* ---------- Prio-Felder, Untertabs, Parkplatz, Diashow ---------- */
+  .subtabs{margin-left:auto; display:flex; gap:3px; background:var(--bg-1); border-radius:999px; padding:3px}
+  .subtab{font:inherit; font-size:11.5px; font-weight:720; color:var(--ink-soft); background:transparent; border:none; border-radius:999px; padding:5px 11px; cursor:pointer; display:flex; align-items:center; gap:5px}
+  .subtab.active{background:var(--rose-tint); color:var(--rose)}
+  .badge{display:inline-block; min-width:16px; padding:0 4px; border-radius:999px; background:var(--rose); color:#fff; font-size:10px; font-weight:800; line-height:16px; text-align:center}
+  .prio-row{display:flex; align-items:center; gap:12px; padding:11px 16px 11px 20px; border-top:1px solid var(--line); background:var(--mint-tint)}
+  .prio-row .todo-check{border-color:var(--mint)}
+  .prio-row.done .todo-check{background:var(--mint); border-color:var(--mint)}
+  .prio-row.done .todo-check svg{stroke-dashoffset:0}
+  .prio-row input{flex:1; font:inherit; font-size:15.5px; font-weight:560; color:var(--ink); border:none; background:transparent; padding:5px 0}
+  .prio-row input::placeholder{color:var(--ink-faint)}
+  .prio-row.done input{color:var(--ink-faint); text-decoration:line-through}
+  .prio-dot{width:16px; height:16px; flex:0 0 auto; border-radius:50%; border:none; background:var(--mint); cursor:pointer; box-shadow:0 0 0 3px color-mix(in srgb, var(--mint) 16%, transparent)}
+  .prio-dot:hover{filter:brightness(.95)}
+  .ghost-add.mint{color:var(--mint); background:var(--mint-tint)}
+  .park-row{display:flex; align-items:center; gap:10px; padding:11px 16px 11px 20px; border-top:1px solid var(--line)}
+  .park-text{flex:1; font-size:15px; font-weight:520; line-height:1.35}
+  .park-back{font:inherit; font-size:12.5px; font-weight:680; color:var(--mint); background:var(--mint-tint); border:none; border-radius:999px; padding:6px 11px; cursor:pointer; white-space:nowrap}
+  .park-back:hover{filter:brightness(.97)}
+  .park-row.muted{opacity:.62}
+  .park-row.muted .park-text{color:var(--ink-faint)}
+  .slideshow{position:relative; margin:10px 16px 6px; aspect-ratio:16/10; border-radius:16px; overflow:hidden; background:var(--bg-1); border:1px solid var(--line)}
+  .slideshow .slide{position:absolute; inset:0; width:100%; height:100%; object-fit:contain; opacity:0; transition:opacity .8s ease; cursor:zoom-in}
+  .slideshow .slide.active{opacity:1}
+  .vis-images{border-top:1px solid var(--line); margin-top:8px}
+  .sub-label{padding:13px 20px 5px; font-size:11px; letter-spacing:.14em; text-transform:uppercase; font-weight:800; color:var(--ink-faint)}
+  .sub-label.with-line{border-top:1px solid var(--line); margin-top:4px}
+
+  /* ---------- Kalender / Tagesansicht ---------- */
+  .date-row{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+  .cal-btn{font-size:15px; line-height:1; background:var(--bg-1); border:1px solid var(--line); border-radius:9px; padding:3px 7px; cursor:pointer}
+  .cal-btn:hover{filter:brightness(.97)}
+  .today-btn{font:inherit; font-size:12px; font-weight:700; color:var(--sky); background:var(--sky-tint); border:none; border-radius:999px; padding:4px 10px; cursor:pointer}
+  .backfill-btn{font:inherit; font-size:12px; font-weight:700; color:var(--amber); background:var(--amber-tint); border:none; border-radius:999px; padding:4px 10px; cursor:pointer; margin-left:2px}
+  .backfill-btn.on{color:#fff; background:var(--amber)}
+  .date-picker{display:none}
+  .mini-cal{margin-top:12px; background:var(--bg-1); border:1px solid var(--line); border-radius:14px; padding:10px 12px 12px}
+  .cal-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:8px}
+  .cal-month{font-size:13.5px; font-weight:720}
+  .cal-nav{font:inherit; font-size:18px; line-height:1; width:30px; height:30px; border-radius:9px; border:none; background:var(--card); color:var(--ink); cursor:pointer}
+  .cal-nav:disabled{opacity:.3; cursor:default}
+  .cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:3px}
+  .cal-dows{margin-bottom:3px}
+  .cal-dow{text-align:center; font-size:10.5px; font-weight:700; color:var(--ink-faint); padding:2px 0}
+  .cal-cell{position:relative; aspect-ratio:1; display:flex; align-items:center; justify-content:center; font:inherit; font-size:13px; font-weight:600; color:var(--ink); background:transparent; border:none; border-radius:9px; cursor:pointer}
+  .cal-cell.empty{visibility:hidden; cursor:default}
+  .cal-cell:not(.empty):not(:disabled):hover{background:var(--card)}
+  .cal-cell:disabled{color:var(--ink-faint); opacity:.4; cursor:default}
+  .cal-cell.today{box-shadow:inset 0 0 0 1.5px var(--sky)}
+  .cal-cell.sel{background:var(--sky); color:#fff}
+  .cal-dot{position:absolute; bottom:4px; left:50%; transform:translateX(-50%); width:4px; height:4px; border-radius:50%; background:var(--mint)}
+  .cal-cell.sel .cal-dot{background:#fff}
+  .habit:disabled{cursor:default}
+  .day{cursor:pointer}
+  .day.sel .bar-track{outline:2px solid var(--sky); outline-offset:2px; border-radius:6px}
+
+  /* ---------- Lock-In Textfelder + Verschlüsselung ---------- */
+  .lockin-text{margin:0 6px 10px 42px; display:flex; flex-direction:column; gap:6px}
+  .lockin-ta{width:100%; box-sizing:border-box; font:inherit; font-size:14px; line-height:1.45; color:var(--ink); background:var(--bg-1); border:1px solid var(--line); border-radius:10px; padding:9px 11px; resize:vertical; min-height:42px}
+  .lockin-ta:focus{outline:none; border-color:var(--c)}
+  .lockin-ta[readonly]{opacity:.85}
+  .key-btn{align-self:flex-start; font:inherit; font-size:12px; font-weight:680; color:var(--c); background:color-mix(in srgb, var(--c) 12%, transparent); border:none; border-radius:999px; padding:5px 11px; cursor:pointer}
+  .key-btn.open{color:var(--amber); background:var(--amber-tint)}
+  .enc-mask{font-size:13.5px; font-weight:600; color:var(--ink-faint); background:var(--bg-1); border:1px dashed var(--line); border-radius:10px; padding:10px 12px; letter-spacing:.06em}
+
+  /* ---------- Passwort-Fenster ---------- */
+  .pw-modal{position:fixed; inset:0; background:rgba(15,18,26,.55); display:none; align-items:center; justify-content:center; z-index:60; padding:24px}
+  .pw-modal.open{display:flex}
+  .pw-card{background:var(--card); border-radius:18px; padding:20px; width:min(360px,100%); box-shadow:0 18px 50px rgba(0,0,0,.3)}
+  .pw-title{font-size:17px; font-weight:720; margin-bottom:6px}
+  .pw-note{font-size:12.5px; color:var(--ink-soft); line-height:1.4; margin-bottom:12px}
+  .pw-input{width:100%; box-sizing:border-box; font:inherit; font-size:15px; padding:11px 13px; border:1px solid var(--line); border-radius:11px; background:var(--bg-1); color:var(--ink); margin-bottom:9px}
+  .pw-input:focus{outline:none; border-color:var(--sky)}
+  .pw-err{font-size:12.5px; color:var(--rose); min-height:16px; margin-bottom:6px}
+  .pw-actions{display:flex; gap:9px; justify-content:flex-end}
+  .pw-cancel,.pw-ok{font:inherit; font-size:14px; font-weight:680; border:none; border-radius:11px; padding:9px 16px; cursor:pointer}
+  .pw-cancel{background:var(--bg-1); color:var(--ink-soft)}
+  .pw-ok{background:var(--ink); color:var(--card)}
+
+  /* ---------- Tagesansicht (frei ziehbare Blöcke) ---------- */
+  .timeline{margin-top:14px}
+  .tl-hint{margin-left:auto; font-size:10.5px; color:var(--ink-faint); font-weight:650; letter-spacing:.02em}
+  .tl-wrap{padding:10px 14px 14px}
+  .tl-track{position:relative; margin-left:46px; border-left:1px solid var(--hair); border-radius:2px}
+  .tl-track.over{background:linear-gradient(var(--sky-tint),var(--sky-tint))}
+  .tl-line{position:absolute; left:0; right:0; height:0; border-top:1px solid var(--line)}
+  .tl-line.last{border-top-style:dashed}
+  .tl-hour{position:absolute; left:-46px; top:-7px; width:40px; text-align:right; font-size:10px; font-weight:700; color:var(--ink-faint); font-variant-numeric:tabular-nums}
+  .tl-now{position:absolute; left:-4px; right:0; height:2px; background:var(--rose); border-radius:2px; z-index:4}
+  .tl-now::before{content:""; position:absolute; left:-4px; top:-3px; width:8px; height:8px; border-radius:50%; background:var(--rose)}
+  .tl-event{position:absolute; left:4px; right:6px; padding:4px 8px; border-radius:6px; background:var(--sky-tint); border-left:2.5px solid var(--sky); overflow:hidden; z-index:1}
+  .tl-ev-time{display:block; font-size:9.5px; font-weight:800; color:var(--sky); font-variant-numeric:tabular-nums; letter-spacing:.03em}
+  .tl-ev-title{display:block; font-size:12px; font-weight:600; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .tl-block{position:absolute; left:4px; right:6px; display:flex; align-items:flex-start; gap:8px; padding:6px 8px;
+    background:var(--card); border:1px solid var(--hair); border-left:2.5px solid var(--ink-faint);
+    border-radius:7px; box-shadow:0 1px 3px rgba(15,23,32,.06); cursor:grab; touch-action:none; z-index:3; overflow:hidden}
+  .tl-block.prio{border-left-color:var(--mint); background:var(--mint-tint)}
+  .tl-block.dragging{cursor:grabbing; box-shadow:0 8px 20px -6px rgba(15,23,32,.3); z-index:6; opacity:.96}
+  .tl-block.done{opacity:.55}
+  .tl-block.done .tl-b-text{text-decoration:line-through; color:var(--ink-faint)}
+  .tl-b-body{flex:1; min-width:0}
+  .tl-b-text{font-size:12.5px; font-weight:620; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .tl-b-time{font-size:9.5px; font-weight:700; color:var(--ink-faint); font-variant-numeric:tabular-nums; margin-top:1px}
+  .tl-b-x{border:none; background:transparent; color:var(--ink-faint); font-size:14px; line-height:1; cursor:pointer; padding:0 1px}
+  .tl-b-res{position:absolute; left:0; right:0; bottom:0; height:9px; cursor:ns-resize}
+  .tl-b-res::after{content:""; position:absolute; left:50%; bottom:2px; transform:translateX(-50%); width:22px; height:2px; border-radius:2px; background:var(--track)}
+  .todo-check.sm{width:17px; height:17px; border-width:2px; flex:0 0 auto; margin-top:1px}
+  .tl-foot{display:flex; align-items:center; gap:10px; padding:10px 16px 14px; border-top:1px solid var(--line)}
+  .tl-cal-btn{font:inherit; font-size:12px; font-weight:680; color:var(--sky); background:var(--sky-tint); border:none; border-radius:7px; padding:6px 11px; cursor:pointer}
+  .tl-cal-status{font-size:11px; color:var(--ink-faint)}
+
+  /* ---------- Lock In bearbeiten ---------- */
+  .lockin-item.edit{display:flex; gap:8px; align-items:center; padding:9px 6px}
+  .li-name-edit{flex:1; font:inherit; font-size:14.5px; font-weight:560; color:var(--ink); background:var(--bg-1); border:1px solid var(--hair); border-radius:7px; padding:7px 9px}
+  .li-name-edit:focus{outline:none; border-color:var(--c)}
+  .lockin-item.is-date .lockin-item-label{font-weight:740; letter-spacing:-.015em}
+  .li-editbar{display:flex; justify-content:flex-end; padding:6px 6px 2px; border-top:1px solid var(--line); margin-top:6px}
+  .li-edit-btn{font:inherit; font-size:11.5px; font-weight:680; color:var(--ink-faint); background:transparent; border:none; cursor:pointer; padding:4px 6px; border-radius:6px}
+  .li-edit-btn:hover{color:var(--ink)}
+  .li-edit-btn.on{color:var(--violet); background:var(--violet-tint)}
+
+  /* ---------- Vizija: Auftritt & Animationen ---------- */
+  .vizija-panel{position:relative; isolation:isolate}
+  .aurora{position:absolute; inset:0; overflow:hidden; z-index:0; pointer-events:none; opacity:.55}
+  .aurora .orb{position:absolute; border-radius:50%; filter:blur(38px); will-change:transform}
+  .aurora .o1{width:230px; height:230px; left:-60px; top:-70px; background:radial-gradient(circle,#7C5CF0,transparent 70%); animation:drift1 17s ease-in-out infinite}
+  .aurora .o2{width:200px; height:200px; right:-50px; top:40px; background:radial-gradient(circle,#3A6FE0,transparent 70%); animation:drift2 21s ease-in-out infinite}
+  .aurora .o3{width:260px; height:260px; left:30%; bottom:-110px; background:radial-gradient(circle,#0FA678,transparent 70%); animation:drift3 25s ease-in-out infinite}
+  @keyframes drift1{0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(40px,30px) scale(1.15)}}
+  @keyframes drift2{0%,100%{transform:translate(0,0) scale(1.1)} 50%{transform:translate(-34px,42px) scale(.95)}}
+  @keyframes drift3{0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(26px,-36px) scale(1.12)}}
+  .vizija-panel > *:not(.aurora){position:relative; z-index:1}
+
+  #view-vizija.intro .reveal{opacity:0; animation:revealUp .62s cubic-bezier(.16,.84,.28,1) forwards}
+  @keyframes revealUp{from{opacity:0; transform:translateY(14px) scale(.985); filter:blur(4px)} to{opacity:1; transform:none; filter:none}}
+  #view-vizija.intro .quote-feature{animation:revealPop .8s cubic-bezier(.16,.9,.3,1.05) forwards}
+  @keyframes revealPop{from{opacity:0; transform:translateY(22px) scale(.94)} to{opacity:1; transform:none}}
+
+  .slideshow{position:relative; overflow:hidden}
+  .slideshow::after{content:""; position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(180deg,transparent 62%, rgba(8,12,18,.28)); opacity:.9}
+  .slideshow .slide.active{animation:kenburns 9s ease-out both}
+  @keyframes kenburns{from{transform:scale(1.005)} to{transform:scale(1.06)}}
+
+  .quote-feature{position:relative}
+  .quote-feature::before{content:""; position:absolute; inset:0; border-radius:inherit;
+    background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.28) 48%,transparent 66%);
+    background-size:250% 100%; animation:shimmer 5.5s ease-in-out infinite; pointer-events:none}
+  @keyframes shimmer{0%{background-position:170% 0} 55%,100%{background-position:-70% 0}}
+  .quote-row{transition:transform .18s ease}
+  .quote-row:hover{transform:translateX(3px)}
+  .quote-bar{box-shadow:0 0 12px -2px currentColor}
+
+  /* ---------- Vizija: Kaskade (episch, klappbar) ---------- */
+  .vis-hint{margin-left:auto; font-size:10.5px; font-weight:650; color:var(--ink-faint); letter-spacing:.02em}
+  .vflow{position:relative; display:flex; flex-direction:column; gap:14px; padding-left:8px}
+  /* leuchtende Verbindungsader */
+  .vflow::before{content:""; position:absolute; left:25px; top:34px; bottom:34px; width:2.5px; border-radius:3px;
+    background:linear-gradient(180deg,#7C5CF0,#F59E0B 50%,#0EA5A5); opacity:.55;
+    box-shadow:0 0 14px -1px rgba(124,92,240,.5)}
+  .vtier{position:relative; --c:var(--violet); --grad:linear-gradient(120deg,#7C5CF0,#3B1E9A)}
+  .vtier-bar{position:relative; z-index:1; width:100%; display:flex; align-items:center; gap:13px; cursor:pointer;
+    border:none; border-radius:16px; padding:14px 16px; overflow:hidden; text-align:left; color:#fff;
+    background:var(--grad); box-shadow:0 10px 26px -12px var(--c), inset 0 0 0 1px rgba(255,255,255,.08);
+    transition:transform .16s cubic-bezier(.2,.8,.3,1.2), box-shadow .16s}
+  .vtier-bar:hover{transform:translateY(-1px); box-shadow:0 16px 34px -12px var(--c), inset 0 0 0 1px rgba(255,255,255,.14)}
+  .vtier-bar:active{transform:translateY(0) scale(.995)}
+  .vtier-glow{position:absolute; inset:-40%; z-index:0; pointer-events:none; mix-blend-mode:overlay;
+    background:radial-gradient(38% 62% at 18% 25%, rgba(255,255,255,.55), transparent 70%); animation:stGlow 10s ease-in-out infinite}
+  .vtier-sheen{position:absolute; inset:0; z-index:0; pointer-events:none;
+    background:linear-gradient(112deg,transparent 36%,rgba(255,255,255,.22) 50%,transparent 64%);
+    background-size:280% 100%; animation:stSheen 7s ease-in-out infinite}
+  .vtier-num{position:relative; z-index:1; flex:0 0 auto; width:34px; height:34px; display:grid; place-items:center;
+    font-family:Georgia,serif; font-size:15px; font-weight:800; font-style:italic; letter-spacing:.02em;
+    border-radius:11px; background:rgba(255,255,255,.16); box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
+  .vtier-titles{position:relative; z-index:1; flex:1; min-width:0; display:flex; flex-direction:column; gap:1px}
+  .vtier-kicker{font-size:15px; font-weight:820; letter-spacing:-.01em; text-shadow:0 1px 10px rgba(0,0,0,.25)}
+  .vtier-meta{font-size:11px; font-weight:650; opacity:.82}
+  .vtier-chev{position:relative; z-index:1; flex:0 0 auto; font-size:16px; opacity:.9; transition:transform .28s cubic-bezier(.2,.8,.3,1.2)}
+  .vtier.open .vtier-chev{transform:rotate(180deg)}
+  /* Klapp-Mechanik: sanft über grid-rows */
+  .vtier-collapse{display:grid; grid-template-rows:0fr; transition:grid-template-rows .34s cubic-bezier(.16,.86,.28,1)}
+  .vtier.open .vtier-collapse{grid-template-rows:1fr}
+  .vtier-inner{overflow:hidden; min-height:0}
+  .vtier-body-pad{padding:0}
+  .vtier-inner{padding:2px 2px 2px 14px; margin-top:6px; margin-left:24px; border-left:2px solid var(--c-tint)}
+  .vgoal{position:relative; display:flex; align-items:center; gap:10px; padding:8px 0}
+  .vgoal::before{content:""; position:absolute; left:-14px; top:50%; width:10px; height:2px; background:var(--c-tint)}
+  .vgoal-dot{width:10px; height:10px; border-radius:50%; background:var(--card); box-shadow:inset 0 0 0 2.5px var(--c); flex:0 0 auto}
+  .vgoal input{flex:1; min-width:0; font:inherit; font-size:15px; font-weight:560; color:var(--ink); background:transparent; border:none; padding:2px 0}
+  .vgoal input:focus{outline:none}
+  .vgoal input::placeholder{color:var(--ink-faint)}
+  .vtier[data-level="big"] .vgoal input{font-family:Georgia,"Iowan Old Style",serif; font-size:16.5px; font-weight:560; letter-spacing:.002em}
+  .vgoal .row-del{opacity:0; transition:opacity .15s}
+  .vgoal:hover .row-del,.vgoal:focus-within .row-del{opacity:1}
+  .vgoal-link{display:inline-flex; align-items:center; gap:5px; max-width:44%; font:inherit; font-size:11px; font-weight:700;
+    border:none; cursor:pointer; border-radius:999px; padding:4px 10px; background:var(--bg-1); box-shadow:inset 0 0 0 1px var(--hair); color:var(--ink-soft)}
+  .vgoal-link .vl-ic{color:var(--amber); font-weight:800}
+  .vgoal-link .vl-tx{white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:150px}
+  .vgoal-link .vl-tx.muted{color:var(--ink-faint); font-weight:600}
+  .vgoal-link.set{background:var(--amber-tint); box-shadow:inset 0 0 0 1px var(--amber); color:var(--amber)}
+  .vgoal.linked::before{background:linear-gradient(90deg,var(--amber),var(--c)); height:2.5px; box-shadow:0 0 8px -1px var(--amber)}
+  .vgoal.linked .vgoal-dot{box-shadow:inset 0 0 0 2.5px var(--amber), 0 0 12px -2px var(--amber)}
+  .vtier-empty{font-size:13px; color:var(--ink-faint); line-height:1.5; padding:6px 0}
+  .vtier-add{font:inherit; font-size:12.5px; font-weight:750; color:var(--c); background:transparent; border:none; cursor:pointer; padding:7px 0 3px}
+  .couple-pop{position:absolute; top:calc(100% + 6px); right:0; z-index:20; min-width:200px; max-width:260px;
+    background:var(--card); border-radius:12px; box-shadow:var(--shadow); padding:6px; display:flex; flex-direction:column; gap:2px}
+  .cp-item{font:inherit; font-size:13px; font-weight:560; text-align:left; color:var(--ink); background:transparent; border:none; cursor:pointer; padding:8px 10px; border-radius:8px; white-space:normal}
+  .cp-item:hover{background:var(--bg-1)}
+  .cp-item.on{background:var(--amber-tint); color:var(--amber); font-weight:750}
+  .cp-clear{font:inherit; font-size:11.5px; font-weight:650; color:var(--rose); background:transparent; border:none; cursor:pointer; padding:7px 10px; border-top:1px solid var(--line); margin-top:2px; text-align:left}
+  .cp-empty{font-size:12px; color:var(--ink-faint); padding:8px 10px}
+  .vis-hero.q{margin-top:16px; background:linear-gradient(120deg,#22D3EE,#0EA5A5 55%,#0369A1)}
+  @media (prefers-reduced-motion: reduce){ .vtier-glow,.vtier-sheen{animation:none} }
+
+  /* ---------- Vizija: Fortschritts-Hero ---------- */
+  .vis-hero{position:relative; overflow:hidden; border-radius:16px; padding:16px 16px 18px; color:#fff; background:var(--sky)}
+  .vis-hero-glow{position:absolute; inset:-40%; pointer-events:none;
+    background:radial-gradient(40% 60% at 20% 15%, rgba(255,255,255,.5), transparent 70%); mix-blend-mode:overlay; animation:stGlow 9s ease-in-out infinite}
+  .vis-hero-in{position:relative; z-index:1}
+  .vis-hero-top{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px}
+  .vis-hero-label{font-size:15px; font-weight:820; letter-spacing:-.02em}
+  .vis-hero-count{font-size:11.5px; font-weight:750; background:rgba(255,255,255,.22); border-radius:999px; padding:3px 10px}
+  .vis-hero-bar{height:9px; border-radius:999px; background:rgba(255,255,255,.25); overflow:hidden}
+  .vis-hero-bar span{display:block; height:100%; border-radius:999px; background:#fff; box-shadow:0 0 12px rgba(255,255,255,.7); animation:barGrow .9s cubic-bezier(.16,.86,.28,1)}
+  @keyframes barGrow{from{width:0 !important}}
+  .vis-hero-sub{margin-top:8px; font-size:11.5px; font-weight:650; opacity:.92; font-variant-numeric:tabular-nums}
+
+  /* Ebenen-Stimmungen der Aurora */
+  .vizija-panel[data-level="year"] .o1{background:radial-gradient(circle,#F59E0B,transparent 70%)}
+  .vizija-panel[data-level="year"] .o2{background:radial-gradient(circle,#FB923C,transparent 70%)}
+  .vizija-panel[data-level="year"] .o3{background:radial-gradient(circle,#FCD34D,transparent 70%)}
+  .vizija-panel[data-level="quarter"] .o1{background:radial-gradient(circle,#22D3EE,transparent 70%)}
+  .vizija-panel[data-level="quarter"] .o2{background:radial-gradient(circle,#3A6FE0,transparent 70%)}
+  .vizija-panel[data-level="quarter"] .o3{background:radial-gradient(circle,#0EA5A5,transparent 70%)}
+
+  /* ---------- Archiv ---------- */
+  .archiv-link{display:block; margin:12px auto 0; font:inherit; font-size:11.5px; font-weight:600; color:var(--ink-faint); background:transparent; border:none; cursor:pointer; opacity:.7}
+  .archiv-link:hover{opacity:1; text-decoration:underline}
+  .arch-row{display:flex; align-items:center; gap:10px; padding:10px 16px 10px 20px; border-top:1px solid var(--line)}
+  .arch-tag{font-size:10px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-faint); background:var(--bg-1); border-radius:999px; padding:3px 7px; flex:0 0 auto}
+  .arch-tag.prio{color:var(--mint); background:var(--mint-tint)}
+  .arch-text{flex:1; font-size:14.5px; color:var(--ink-soft); text-decoration:line-through}
+  .arch-time{font-size:12px; font-weight:700; color:var(--ink-faint); font-variant-numeric:tabular-nums}
+
+  /* ---------- Zitate ---------- */
+  .quote-feature{margin:10px 16px; border-radius:18px; padding:22px 20px; color:#fff; cursor:pointer; overflow:hidden; position:relative; box-shadow:0 10px 30px rgba(0,0,0,.14)}
+  .quote-feature-inner.in{animation:qfade .6s ease}
+  @keyframes qfade{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
+  .quote-mark{font-size:44px; line-height:.6; opacity:.5; font-family:Georgia,serif}
+  .quote-body{margin-top:8px; font-size:17px; line-height:1.45; font-weight:600; font-family:Georgia,"Iowan Old Style",serif}
+  .quote-author{margin-top:10px; font-size:12.5px; font-weight:700; opacity:.85; letter-spacing:.02em}
+  .quote-row{display:flex; align-items:center; gap:11px; padding:10px 16px 10px 20px; border-top:1px solid var(--line)}
+  .quote-bar{width:4px; align-self:stretch; border-radius:99px; flex:0 0 auto; min-height:28px}
+  .quote-wrap{flex:1}
+  .quote-text{font-size:14.5px; line-height:1.4; font-weight:540}
+  .quote-by{font-size:11.5px; color:var(--ink-faint); font-weight:650; margin-top:2px}
+  .quote-add{gap:6px}
+  .quote-add .qa{max-width:110px; flex:0 0 auto}
+
+  /* ---------- 90-Tage-Challenge ---------- */
+  .chal-toggle{width:34px; height:34px; flex:0 0 auto; border:none; border-radius:9px; cursor:pointer; font-size:15px;
+    background:var(--bg-1); box-shadow:inset 0 0 0 1px var(--hair); filter:grayscale(1) opacity(.5)}
+  .chal-toggle.on{filter:none; background:var(--amber-tint); box-shadow:inset 0 0 0 1.5px var(--amber)}
+  .challenge{background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); padding:16px; position:relative; overflow:hidden}
+  .challenge::before{content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--c)}
+  .challenge.done{box-shadow:var(--shadow), inset 0 0 0 1.5px var(--c)}
+  .chal-head{display:flex; align-items:center; gap:12px}
+  .chal-ring{flex:0 0 auto}
+  .chal-ring-num{font-size:11px; font-weight:800; fill:var(--ink); font-family:var(--font)}
+  .chal-titles{flex:1; min-width:0}
+  .chal-name{font-size:16px; font-weight:740; letter-spacing:-.015em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .chal-sub{font-size:11.5px; font-weight:620; color:var(--ink-faint); margin-top:1px}
+  .chal-day-badge{flex:0 0 auto; font-size:11px; font-weight:750; padding:5px 10px; border-radius:999px; color:var(--ink-faint); background:var(--bg-1); box-shadow:inset 0 0 0 1px var(--hair)}
+  .chal-day-badge.on{color:#fff; background:var(--c); box-shadow:none}
+  .chal-grid{display:grid; grid-template-columns:repeat(18,1fr); gap:3px; margin:14px 0 4px}
+  .chal-cell{aspect-ratio:1; border-radius:3px; background:var(--track)}
+  .chal-cell.done{background:var(--c); box-shadow:0 0 6px -1px var(--c)}
+  .chal-cell.future{background:transparent; box-shadow:inset 0 0 0 1px var(--line)}
+  .chal-cell.today{outline:2px solid var(--ink); outline-offset:1px}
+  .chal-miles{display:flex; justify-content:space-between; gap:6px; margin:12px 2px 4px}
+  .chal-mile{display:flex; align-items:center; gap:5px; font-size:11px; font-weight:750; color:var(--ink-faint)}
+  .chal-mile .cm-dot{width:8px; height:8px; border-radius:50%; background:var(--track)}
+  .chal-mile.hit{color:var(--c)}
+  .chal-mile.hit .cm-dot{background:var(--c); box-shadow:0 0 8px -1px var(--c)}
+  .chal-stats{display:flex; gap:8px; margin-top:12px}
+  .chal-stats .cs{flex:1; text-align:center; background:var(--bg-1); border-radius:11px; padding:9px 4px}
+  .chal-stats .cs b{display:block; font-size:16px; font-weight:800; letter-spacing:-.01em}
+  .chal-stats .cs small{font-size:10px; font-weight:650; color:var(--ink-faint); letter-spacing:.02em}
+  .chal-msg{margin-top:11px; text-align:center; font-size:13px; font-weight:620; color:var(--ink-soft); line-height:1.4}
+  .challenge.done .chal-msg{color:var(--c); font-weight:740}
+
+  /* Inline-Dropdown am Habit */
+  .habit-wrap{display:flex; flex-direction:column}
+  .habit-line{display:flex; gap:6px; align-items:stretch}
+  .habit-line .habit{flex:1}
+  .chal-chev{flex:0 0 auto; display:flex; align-items:center; gap:7px; border:none; cursor:pointer; border-radius:12px;
+    padding:0 12px; background:var(--bg-1); box-shadow:inset 0 0 0 1px var(--hair); color:var(--ink-soft); font:inherit}
+  .chal-chev:hover{color:var(--ink)}
+  .chal-pill{font-size:11.5px; font-weight:800; letter-spacing:-.01em; white-space:nowrap; font-variant-numeric:tabular-nums}
+  .chal-chev.done{background:var(--amber-tint)} .chal-chev.done .chal-pill{color:var(--amber)}
+  .chal-chev-ic{font-size:13px; transition:transform .22s ease}
+  .chal-chev.open .chal-chev-ic{transform:rotate(180deg)}
+  .chal-panel{margin-top:8px; border-radius:16px; overflow:hidden; background:var(--card);
+    box-shadow:inset 0 0 0 1px var(--hair); animation:chalDrop .3s cubic-bezier(.16,.86,.28,1)}
+  @keyframes chalDrop{from{opacity:0; transform:translateY(-8px)} to{opacity:1; transform:none}}
+  .chal-hero{position:relative; min-height:118px; padding:16px; color:#fff; overflow:hidden;
+    background-size:cover !important; background-position:center !important}
+  .chal-hero-glow{position:absolute; inset:-30%; pointer-events:none; mix-blend-mode:overlay;
+    background:radial-gradient(40% 60% at 22% 20%, rgba(255,255,255,.4), transparent 70%); animation:stGlow 9s ease-in-out infinite}
+  .chal-hero-veil{position:absolute; inset:0; background:linear-gradient(180deg, rgba(10,12,20,.12), rgba(10,12,20,.58))}
+  .chal-hero-in{position:relative; z-index:1}
+  .chal-hero-top{display:flex; justify-content:space-between; align-items:center; font-size:12px; font-weight:750}
+  .chal-hero-name{white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:70%}
+  .chal-hero-pct{background:rgba(255,255,255,.22); border-radius:999px; padding:2px 9px; -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px)}
+  .chal-hero-day{display:flex; align-items:baseline; gap:6px; margin-top:4px; text-shadow:0 2px 14px rgba(0,0,0,.4)}
+  .chal-hero-day b{font-size:46px; font-weight:850; letter-spacing:-.03em; line-height:1}
+  .chal-hero-day span{font-size:15px; font-weight:700; opacity:.85}
+  .chal-hero-msg{margin-top:6px; font-size:12.5px; font-weight:600; opacity:.94; max-width:92%; text-shadow:0 1px 8px rgba(0,0,0,.4)}
+  .chal-hero.done .chal-hero-day b{animation:heroPulse 2.2s ease-in-out infinite}
+  @keyframes heroPulse{0%,100%{text-shadow:0 2px 14px rgba(0,0,0,.4)} 50%{text-shadow:0 0 24px rgba(255,255,255,.95)}}
+  .chal-panel .chal-grid{padding:0 14px; margin:14px 0 6px}
+  .chal-panel .chal-cell.done{background:var(--acc); box-shadow:0 0 6px -1px var(--acc)}
+  .chal-cell.pop{animation:cellPop .5s cubic-bezier(.2,.9,.3,1.5)}
+  @keyframes cellPop{0%{transform:scale(.4)} 60%{transform:scale(1.4)} 100%{transform:scale(1)}}
+  .chal-panel .chal-miles{padding:0 14px}
+  .chal-panel .chal-mile.hit{color:var(--acc)}
+  .chal-panel .chal-mile.hit .cm-dot{background:var(--acc); box-shadow:0 0 8px -1px var(--acc)}
+  .chal-panel .chal-stats{padding:0 14px 2px}
+  .chal-design{display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:12px 14px 14px; border-top:1px solid var(--line); margin-top:10px}
+  .chal-swatches{display:flex; gap:6px; flex:1}
+  .chal-sw{width:22px; height:22px; border-radius:50%; border:none; cursor:pointer; box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+  .chal-sw.on{box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--ink)}
+  .chal-imgbtn,.chal-imgrm{font:inherit; font-size:11.5px; font-weight:700; border:none; border-radius:999px; padding:6px 11px; cursor:pointer}
+  .chal-imgbtn{color:var(--ink); background:var(--bg-1); box-shadow:inset 0 0 0 1px var(--hair)}
+  .chal-imgrm{color:var(--rose); background:var(--rose-tint)}
+  @media (prefers-reduced-motion: reduce){ .chal-hero-glow,.chal-hero.done .chal-hero-day b,.chal-cell.pop{animation:none} }
+
+  /* ---------- Sichern / Laden ---------- */
+  .sync-bar{display:flex; gap:8px; margin-top:-4px}
+  .sync-btn{flex:1; display:flex; align-items:center; justify-content:center; gap:6px; font:inherit; font-size:12.5px; font-weight:700;
+    color:var(--ink-soft); background:var(--card); border:none; border-radius:11px; padding:9px 10px; cursor:pointer; box-shadow:var(--shadow)}
+  .sync-btn:hover{color:var(--ink)}
+  .sync-btn:active{transform:scale(.99)}
+  .sync-ic{font-size:13px; font-weight:800; color:var(--sky)}
+  .toast{position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(14px); z-index:90;
+    background:var(--ink); color:var(--on-ink); font-size:13px; font-weight:650; padding:10px 16px; border-radius:999px;
+    box-shadow:0 12px 30px -10px rgba(0,0,0,.5); opacity:0; pointer-events:none; transition:opacity .22s, transform .22s; max-width:86vw; text-align:center}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+
+  /* ---------- Aufräumen (Bearbeiten-Modus) ---------- */
+  .wipe-bar{margin-top:-4px; padding:14px 16px; background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow)}
+  .wipe-title{font-size:12px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint)}
+  .wipe-desc{font-size:12px; line-height:1.45; color:var(--ink-soft); margin:6px 0 12px}
+  .wipe-btns{display:flex; gap:10px}
+  .wipe-btn{flex:1; display:flex; flex-direction:column; gap:2px; align-items:center; font:inherit; cursor:pointer;
+    border:none; border-radius:11px; padding:11px 10px; font-size:13.5px; font-weight:720; line-height:1.15}
+  .wipe-btn small{font-size:10px; font-weight:600; opacity:.8}
+  .wipe-btn.soft{color:var(--sky); background:var(--sky-tint)}
+  .wipe-btn.hard{color:#fff; background:var(--rose)}
+  .wipe-btn:hover{filter:brightness(.96)}
+  .wipe-btn:active{transform:scale(.985)}
+
+  /* ---------- Schatzkammer: Knopf ---------- */
+  .schatz-trigger{
+    position:relative; width:100%; display:flex; align-items:center; gap:14px;
+    padding:18px 18px; border:none; border-radius:var(--radius); cursor:pointer; font:inherit;
+    color:#fff; overflow:hidden; isolation:isolate; text-align:left;
+    background:linear-gradient(118deg,#171E2B 0%,#2A2350 46%,#123A52 100%);
+    box-shadow:0 0 0 1px rgba(255,255,255,.07), 0 14px 34px -16px rgba(20,14,60,.85);
+    transition:transform .18s cubic-bezier(.2,.8,.3,1.2), box-shadow .18s ease;
+  }
+  .schatz-trigger:hover{transform:translateY(-2px); box-shadow:0 0 0 1px rgba(255,255,255,.12), 0 20px 42px -16px rgba(20,14,60,.95)}
+  .schatz-trigger:active{transform:translateY(0) scale(.994)}
+  .st-glow{position:absolute; inset:-40%; z-index:-2; pointer-events:none;
+    background:radial-gradient(38% 60% at 18% 30%, rgba(124,92,240,.75), transparent 70%),
+               radial-gradient(42% 66% at 82% 74%, rgba(14,165,165,.6), transparent 72%);
+    filter:blur(16px); animation:stGlow 9s ease-in-out infinite}
+  @keyframes stGlow{0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(6%,-5%) scale(1.12)}}
+  .st-sheen{position:absolute; inset:0; z-index:-1; pointer-events:none;
+    background:linear-gradient(112deg,transparent 34%,rgba(255,255,255,.22) 50%,transparent 64%);
+    background-size:280% 100%; animation:stSheen 6s ease-in-out infinite}
+  @keyframes stSheen{0%{background-position:190% 0} 60%,100%{background-position:-90% 0}}
+  .st-icon{flex:0 0 auto; width:38px; height:38px; display:grid; place-items:center; font-size:17px;
+    border-radius:11px; background:rgba(255,255,255,.1); box-shadow:inset 0 0 0 1px rgba(255,255,255,.16);
+    text-shadow:0 0 12px rgba(255,255,255,.85); animation:stPulse 3.4s ease-in-out infinite}
+  @keyframes stPulse{0%,100%{opacity:.9; transform:scale(1)} 50%{opacity:1; transform:scale(1.08)}}
+  .st-body{flex:1; min-width:0; display:flex; flex-direction:column; gap:2px}
+  .st-title{font-size:16.5px; font-weight:760; letter-spacing:-.015em}
+  .st-sub{font-size:11.5px; font-weight:600; color:rgba(255,255,255,.68); letter-spacing:.01em}
+  .st-arrow{flex:0 0 auto; font-size:15px; opacity:.6; transition:transform .18s ease, opacity .18s ease}
+  .schatz-trigger:hover .st-arrow{transform:translateX(3px); opacity:1}
+
+  /* ---------- Schatzkammer: Overlay ---------- */
+  .schatz-overlay{position:fixed; inset:0; z-index:70; display:flex; align-items:flex-start; justify-content:center;
+    padding:34px 18px; overflow-y:auto; background:rgba(8,10,18,.62); backdrop-filter:blur(14px);
+    opacity:0; transition:opacity .26s ease}
+  .schatz-overlay[hidden]{display:none !important; pointer-events:none}
+  .schatz-overlay:not(.open){pointer-events:none}
+  .schatz-overlay.open{opacity:1; pointer-events:auto}
+  .schatz-sky{position:fixed; inset:0; z-index:-1; overflow:hidden; pointer-events:none}
+  .schatz-sky .s-orb{position:absolute; border-radius:50%; filter:blur(60px); opacity:.5}
+  .s-orb.a{width:340px; height:340px; left:-90px; top:-90px; background:radial-gradient(circle,#7C5CF0,transparent 70%); animation:drift1 19s ease-in-out infinite}
+  .s-orb.b{width:300px; height:300px; right:-80px; top:22%; background:radial-gradient(circle,#0EA5A5,transparent 70%); animation:drift2 23s ease-in-out infinite}
+  .s-orb.c{width:380px; height:380px; left:24%; bottom:-150px; background:radial-gradient(circle,#3A6FE0,transparent 70%); animation:drift3 27s ease-in-out infinite}
+  .schatz-sheet{width:100%; max-width:560px; display:flex; flex-direction:column; gap:14px;
+    transform:translateY(18px) scale(.985); opacity:0; transition:transform .34s cubic-bezier(.16,.86,.28,1), opacity .3s ease}
+  .schatz-overlay.open .schatz-sheet{transform:none; opacity:1}
+  .schatz-top{display:flex; align-items:flex-start; gap:12px; padding:2px 4px}
+  .schatz-titles{flex:1}
+  .schatz-kicker{font-size:23px; font-weight:780; letter-spacing:-.02em; color:#fff}
+  .schatz-count{font-size:12px; font-weight:650; color:rgba(255,255,255,.55); margin-top:2px; letter-spacing:.02em}
+  .schatz-close{width:34px; height:34px; flex:0 0 auto; border:none; border-radius:10px; cursor:pointer;
+    background:rgba(255,255,255,.1); color:#fff; font-size:14px; box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
+  .schatz-close:hover{background:rgba(255,255,255,.18)}
+  .schatz-add{background:rgba(255,255,255,.07); border-radius:14px; padding:12px;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.12); display:flex; flex-direction:column; gap:9px}
+  .schatz-add textarea{width:100%; box-sizing:border-box; font:inherit; font-size:15.5px; line-height:1.5;
+    font-family:Georgia,"Iowan Old Style",serif; color:#fff; background:transparent; border:none; resize:vertical; min-height:52px}
+  .schatz-add textarea:focus{outline:none}
+  .schatz-add textarea::placeholder{color:rgba(255,255,255,.42)}
+  .schatz-add-row{display:flex; gap:8px; align-items:center}
+  .schatz-add-row input{flex:1; font:inherit; font-size:13px; color:#fff; background:rgba(255,255,255,.07);
+    border:none; border-radius:9px; padding:8px 11px; box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
+  .schatz-add-row input:focus{outline:none; box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.3)}
+  .schatz-add-row input::placeholder{color:rgba(255,255,255,.4)}
+  .schatz-save{font:inherit; font-size:13px; font-weight:700; color:#0F1720; background:#fff; border:none;
+    border-radius:9px; padding:9px 15px; cursor:pointer; white-space:nowrap}
+  .schatz-save:hover{filter:brightness(.94)}
+  .schatz-list{display:flex; flex-direction:column; gap:11px; padding-bottom:24px}
+  .schatz-empty{text-align:center; padding:44px 20px; color:rgba(255,255,255,.5)}
+  .se-mark{font-family:Georgia,serif; font-size:52px; line-height:.5; opacity:.4; margin-bottom:14px}
+  .se-text{font-size:14px; line-height:1.6; font-weight:500}
+  .schatz-card{position:relative; border-radius:15px; padding:20px 42px 15px 20px; overflow:hidden;
+    background:rgba(255,255,255,.06); box-shadow:inset 0 0 0 1px rgba(255,255,255,.11);
+    opacity:0; animation:scIn .55s cubic-bezier(.16,.86,.28,1) forwards}
+  @keyframes scIn{from{opacity:0; transform:translateY(14px) scale(.98); filter:blur(3px)} to{opacity:1; transform:none; filter:none}}
+  .schatz-card::before{content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--g)}
+  .schatz-card::after{content:""; position:absolute; inset:0; pointer-events:none; opacity:.1; background:var(--g)}
+  .schatz-card.fresh{animation:scPop .7s cubic-bezier(.16,.9,.3,1.06) forwards}
+  @keyframes scPop{0%{opacity:0; transform:translateY(-8px) scale(.94)} 60%{opacity:1} 100%{opacity:1; transform:none}}
+  .sc-mark{font-family:Georgia,serif; font-size:34px; line-height:.5; color:#fff; opacity:.32; margin-bottom:10px}
+  .sc-text{font-family:Georgia,"Iowan Old Style",serif; font-size:16.5px; line-height:1.55; font-weight:500;
+    color:#fff; letter-spacing:.002em; position:relative; z-index:1}
+  .sc-foot{display:flex; align-items:baseline; gap:10px; margin-top:12px; position:relative; z-index:1}
+  .sc-by{flex:1; font-size:12px; font-weight:720; color:rgba(255,255,255,.8); letter-spacing:.02em}
+  .sc-when{font-size:10.5px; font-weight:600; color:rgba(255,255,255,.4); font-variant-numeric:tabular-nums}
+  .sc-del{position:absolute; top:10px; right:10px; z-index:2; width:24px; height:24px; border:none; border-radius:7px;
+    background:transparent; color:rgba(255,255,255,.35); font-size:15px; line-height:1; cursor:pointer}
+  .sc-del:hover{background:rgba(255,255,255,.12); color:#fff}
+  @media (prefers-reduced-motion: reduce){
+    .st-glow,.st-sheen,.st-icon,.s-orb{animation:none}
+    .schatz-card{animation:none; opacity:1}
+  }
+
+  /* ---------- Tagesabschluss ---------- */
+  .tages{--c:var(--sky); --c-tint:var(--sky-tint)}
+  .tag-icon{font-size:17px; line-height:1}
+  .tag-dot{width:7px; height:7px; border-radius:50%; background:var(--sky); flex:0 0 auto}
+  .tages-text{margin:2px 16px 12px}
+
+  :focus-visible{outline:2.5px solid var(--sky); outline-offset:3px; border-radius:10px}
+  .habit:focus-visible{outline-offset:-2px}
+
+  /* lightbox + confetti */
+  .lightbox{position:fixed; inset:0; background:rgba(8,12,18,.85); display:none; align-items:center; justify-content:center; padding:32px; z-index:100; cursor:zoom-out}
+  .lightbox.open{display:flex}
+  .lightbox img{max-width:100%; max-height:100%; border-radius:16px; box-shadow:0 24px 70px rgba(0,0,0,.55)}
+  .confetti{position:fixed; top:-12px; width:9px; height:14px; border-radius:2px; z-index:90; pointer-events:none; will-change:transform,opacity}
+  @keyframes fall{to{transform:translateY(105vh) rotate(720deg); opacity:0}}
+  @media (prefers-reduced-motion: reduce){ *{animation:none!important; transition:none!important} }
+</style>
+</head>
+<body>
+  <main class="app">
+    <nav class="tabs" id="tabs">
+      <button data-tab="prios" type="button">Prios &amp; ToDos</button>
+      <button data-tab="heute" type="button" class="active">Heute</button>
+      <button data-tab="vizija" type="button">Vizija</button>
+    </nav>
+
+    <!-- PRIOS -->
+    <section id="view-prios" class="view"></section>
+
+    <!-- HEUTE -->
+    <section id="view-heute" class="view active">
+      <div id="schatzBtn"></div>
+      <section class="head">
+        <div class="head-top">
+          <div>
+            <div class="greet" id="greet">Hallo</div>
+            <div class="date-row">
+              <span class="date" id="date">—</span>
+              <button class="cal-btn" id="calBtn" type="button" aria-label="Kalender öffnen/schließen" title="Kalender">📅</button>
+              <button class="today-btn" id="todayBtn" type="button" hidden>← Heute</button>
+            </div>
+            <div class="mini-cal" id="miniCal" hidden></div>
+          </div>
+          <div class="ring" id="ring" aria-hidden="true">
+            <svg viewBox="0 0 100 100" width="96" height="96" id="ringSvg"></svg>
+            <div class="ring-center">
+              <div class="ring-num"><span id="ringDone">0</span><small>/<span id="ringTotal">6</span></small></div>
+              <div class="ring-label">heute</div>
+            </div>
+          </div>
+        </div>
+        <button class="gospel-toggle" id="gospelToggle" type="button" aria-expanded="false" aria-controls="gospelPanel">
+          <span class="gospel-label">Tagesevangelium</span>
+          <span class="chev" aria-hidden="true">⌄</span>
+        </button>
+        <div class="gospel-panel" id="gospelPanel" hidden>
+          <div class="gospel-ref" id="gospelRef"></div>
+          <div class="gospel-title" id="gospelTitle"></div>
+          <div class="gospel-text" id="gospelText">Tippe oben, um das Tagesevangelium zu laden.</div>
+          <div class="papst" id="papst" hidden>
+            <div class="papst-head">Worte der Päpste</div>
+            <div class="papst-text" id="papstText"></div>
+            <div class="papst-src" id="papstSrc"></div>
+          </div>
+          <div class="gospel-src" id="gospelSrc"></div>
+        </div>
+        <div class="strip" id="strip"></div>
+      </section>
+      <div id="lockin"></div>
+      <div id="cats"></div>
+      <div id="tagesabschluss"></div>
+      <div class="foot">
+        <button id="editBtn" type="button">Bearbeiten</button>
+        <button id="resetBtn" type="button">Heute zurücksetzen</button>
+      </div>
+      <div class="sync-bar">
+        <button class="sync-btn" id="loadBtn" type="button"><span class="sync-ic">↓</span> Laden</button>
+        <button class="sync-btn" id="saveBtn" type="button"><span class="sync-ic">↑</span> Sichern</button>
+      </div>
+      <div class="wipe-bar" id="wipeBar" hidden>
+        <div class="wipe-title">Aufräumen</div>
+        <div class="wipe-desc">Löscht Texte in Lock-In und Tagesabschluss. Schatzkammer und Vizija bleiben erhalten. Kann nicht rückgängig gemacht werden.</div>
+        <div class="wipe-btns">
+          <button class="wipe-btn soft" id="wipePlain" type="button">Klartexte löschen<small>Verschlüsselte bleiben</small></button>
+          <button class="wipe-btn hard" id="wipeAll" type="button">Alles löschen<small>Auch verschlüsselte</small></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIZIJA -->
+    <section id="view-vizija" class="view"></section>
+
+    <div class="lightbox" id="lightbox"><img id="lightboxImg" alt=""></div>
+    <div class="schatz-overlay" id="schatzOverlay" role="dialog" aria-modal="true" aria-label="Schatzkammer" hidden>
+      <div class="schatz-sky" aria-hidden="true"><span class="s-orb a"></span><span class="s-orb b"></span><span class="s-orb c"></span><span class="s-grain"></span></div>
+      <div class="schatz-sheet">
+        <div class="schatz-top">
+          <div class="schatz-titles">
+            <div class="schatz-kicker">Schatzkammer</div>
+            <div class="schatz-count" id="schatzCount"></div>
+          </div>
+          <button class="schatz-close" id="schatzClose" type="button" aria-label="Schließen">✕</button>
+        </div>
+        <div class="schatz-add">
+          <textarea id="schatzText" rows="2" placeholder="Ein Satz, der bleiben soll …" aria-label="Satz oder Zitat"></textarea>
+          <div class="schatz-add-row">
+            <input type="text" id="schatzAuthor" placeholder="Von wem?" aria-label="Urheber">
+            <button class="schatz-save" id="schatzSave" type="button">Aufnehmen</button>
+          </div>
+        </div>
+        <div class="schatz-list" id="schatzList"></div>
+      </div>
+    </div>
+    <div class="pw-modal" id="pwModal" role="dialog" aria-modal="true">
+      <div class="pw-card">
+        <div class="pw-title" id="pwTitle">Passwort</div>
+        <div class="pw-note" id="pwNote"></div>
+        <input type="password" id="pwInput" class="pw-input" placeholder="Passwort" autocomplete="off">
+        <input type="password" id="pwConfirm" class="pw-input" placeholder="Passwort bestätigen" autocomplete="off" style="display:none">
+        <div class="pw-err" id="pwErr"></div>
+        <div class="pw-actions">
+          <button class="pw-cancel" id="pwCancel" type="button">Abbrechen</button>
+          <button class="pw-ok" id="pwOk" type="button">OK</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+<script>
+(function(){
+  "use strict";
+  const CFG="ht_config_v1", LOG="ht_log_v1", TODOS="ht_todos_v1", VIS="ht_vision_v1", TAB="ht_tab_v1";
+  const PRIOS="ht_prios_v2";
+  const LOCKIN="ht_lockin_v1";
+  const LOCKTXT="ht_lockintext_v1", CRYPTO="ht_crypto_v1", CAL="ht_cal_v1", QUOTES="ht_quotes_v1", LOCKCFG="ht_lockin_cfg_v1", SCHATZ="ht_schatz_v1";
+  const MAX_PRIOS=8;
+  const LOCKIN_DEFAULT=[
+    {id:"wins", label:"", date:true},
+    {id:"vizija", label:"In Vizija eintauchen"},
+    {id:"prios", label:"Top 3 Prioritäten für heute"},
+    {id:"staq", label:"STAQ eintauchen"},
+    {id:"visual", label:"Komm Heiliger Geist"}
+  ];
+
+  const DEFAULTS={
+    cats:[
+      {id:"k", title:"Körper", color:"var(--mint)",  tint:"var(--mint-tint)"},
+      {id:"g", title:"Geist",  color:"var(--sky)",   tint:"var(--sky-tint)"},
+      {id:"f", title:"Fokus",  color:"var(--amber)", tint:"var(--amber-tint)"}
+    ],
+    habits:[
+      {id:"h1",cat:"k",name:"💧  Wasser trinken"},
+      {id:"h2",cat:"k",name:"🏃  Bewegung"},
+      {id:"h3",cat:"k",name:"😴  Früh schlafen"},
+      {id:"h4",cat:"g",name:"🧘  Meditation"},
+      {id:"h5",cat:"g",name:"📖  Lesen"},
+      {id:"h6",cat:"g",name:"✍️  Journaling"},
+      {id:"h7",cat:"f",name:"🎯  Wichtigste Aufgabe"},
+      {id:"h8",cat:"f",name:"📵  Bildschirmzeit begrenzen"},
+      {id:"h9",cat:"f",name:"🌱  Etwas lernen"}
+    ]
+  };
+
+  let mem={};
+  function read(k,f){ try{const v=localStorage.getItem(k);return v?JSON.parse(v):f;}catch(e){return (k in mem)?mem[k]:f;} }
+  function write(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){mem[k]=v;} }
+  function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+
+  /* ---------- Sichern / Laden (iCloud-Datei) ---------- */
+  const SYNC_KEYS=[CFG,LOG,TODOS,VIS,TAB,PRIOS,LOCKIN,LOCKTXT,CRYPTO,CAL,QUOTES,LOCKCFG,SCHATZ];
+  function collectState(){
+    const data={};
+    SYNC_KEYS.forEach(k=>{ const v=localStorage.getItem(k); if(v!==null) data[k]=v; });
+    // etwaige weitere ht_-Schlüssel automatisch mitnehmen
+    for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k && k.indexOf("ht_")===0 && !(k in data)){ data[k]=localStorage.getItem(k); } }
+    return {app:"heute-tracker", v:1, savedAt:new Date().toISOString(), data};
+  }
+  function applyState(obj){
+    if(!obj || !obj.data || typeof obj.data!=="object") throw new Error("Ungültige Sicherung");
+    // bestehende ht_-Schlüssel entfernen, dann einspielen
+    const toDel=[]; for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k && k.indexOf("ht_")===0) toDel.push(k); }
+    toDel.forEach(k=>localStorage.removeItem(k));
+    Object.keys(obj.data).forEach(k=>{ localStorage.setItem(k, obj.data[k]); });
+  }
+  function backupFilename(){ return "heute-sicherung.json"; }
+  function doBackup(){
+    try{
+      const json=JSON.stringify(collectState());
+      // iOS-sicherer Download über data:-URL (umgeht den Blob-Bug in Safari)
+      const a=document.createElement("a");
+      a.href="data:application/json;charset=utf-8,"+encodeURIComponent(json);
+      a.download=backupFilename();
+      document.body.appendChild(a); a.click(); a.remove();
+      toast("Gesichert – wähle den iCloud-Ordner „Downloads“.");
+    }catch(e){ alert("Sichern fehlgeschlagen: "+e.message); }
+  }
+  function doRestore(){
+    const inp=document.createElement("input"); inp.type="file"; inp.accept=".json,application/json"; inp.style.display="none";
+    inp.addEventListener("change",e=>{
+      const f=e.target.files&&e.target.files[0]; if(!f) return;
+      const r=new FileReader();
+      r.onload=()=>{ try{
+          const obj=JSON.parse(String(r.result));
+          applyState(obj);
+          toast("Geladen – Stand übernommen.");
+          setTimeout(()=>location.reload(),700);
+        }catch(err){ alert("Laden fehlgeschlagen: "+err.message); } };
+      r.onerror=()=>alert("Datei konnte nicht gelesen werden.");
+      r.readAsText(f);
+    });
+    document.body.appendChild(inp); inp.click(); setTimeout(()=>inp.remove(),1000);
+  }
+  let toastTimer=null;
+  function toast(msg){
+    let t=document.getElementById("toast");
+    if(!t){ t=document.createElement("div"); t.id="toast"; t.className="toast"; document.body.appendChild(t); }
+    t.textContent=msg; t.classList.add("show");
+    clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),2600);
+  }
+  function esc(s){ return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+  let config=read(CFG,null)||DEFAULTS;
+  let log=read(LOG,{});
+  let prios=read(PRIOS,null);
+  let vision=read(VIS,{points:[],images:[]});
+  if(!vision.year) vision.year={points:[]};
+  if(!vision.quarter) vision.quarter={points:[]};
+  if(!vision.open) vision.open={big:true,year:true,quarter:true};
+  let lockinLog=read(LOCKIN,{});
+  let lockinCfg=read(LOCKCFG,null);
+  if(!lockinCfg || !Array.isArray(lockinCfg.items) || !lockinCfg.items.length){
+    lockinCfg={items:LOCKIN_DEFAULT.map(x=>({...x}))}; write(LOCKCFG,lockinCfg);
+  }
+  let lockinText=read(LOCKTXT,{});
+  let cryptoRec=read(CRYPTO,null);
+  let quotes=read(QUOTES,[]);
+  let schatz=read(SCHATZ,[]);
+  let visionTimer=null, quoteTimer=null;
+  const state={editing:false, lastComplete:false, tab:read(TAB,"heute"), lockinOpen:false, lockinComplete:false, priosSub:"heute", viewDate:null, passphrase:null, calOpen:false, calMonth:null, tagOpen:false, lockinEdit:false, backfill:false, chalOpen:{}, chalJustChecked:null, visLevel:"big"};
+
+  function ymd(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+  const today=ymd(new Date());
+  state.viewDate=today;
+  const isToday=()=>state.viewDate===today;
+  const dayEntry=k=>log[k]||{};
+  const isDone=(id,k)=>!!dayEntry(k)[id];
+  const doneCount=k=>config.habits.reduce((n,h)=>n+(isDone(h.id,k)?1:0),0);
+  function streak(id, end){
+    end=end||state.viewDate;
+    let d=new Date(end+"T00:00:00"); if(!isDone(id,ymd(d))) d.setDate(d.getDate()-1);
+    let n=0; while(isDone(id,ymd(d))){ n++; d.setDate(d.getDate()-1); } return n;
+  }
+  // The LAST category is an optional bonus. The day is 100% when all CORE habits
+  // (every category except the last) are done — bonus habits are extra credit.
+  const bonusCatId = config.cats.length ? config.cats[config.cats.length-1].id : null;
+  const isBonus = h => h.cat===bonusCatId;
+  const coreHabits  = () => config.habits.filter(h=>!isBonus(h));
+  const bonusHabits = () => config.habits.filter(isBonus);
+  const catOf = h => config.cats.find(c=>c.id===h.cat);
+  const coreDone  = k => coreHabits().reduce((n,h)=>n+(isDone(h.id,k)?1:0),0);
+  const bonusDone = k => bonusHabits().reduce((n,h)=>n+(isDone(h.id,k)?1:0),0);
+  const dayComplete = k => { const c=coreHabits(); return c.length>0 && coreDone(k)===c.length; };
+
+  /* ---------- Tabs ---------- */
+  function setTab(t){
+    state.tab=t; write(TAB,t);
+    document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("active",b.dataset.tab===t));
+    document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active",v.id==="view-"+t));
+    document.body.classList.toggle("tab-prios", t==="prios");
+    if(t==="vizija") playVizijaIntro();
+  }
+  function playVizijaIntro(){
+    const v=document.getElementById("view-vizija"); if(!v) return;
+    if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    v.classList.remove("intro"); void v.offsetWidth; v.classList.add("intro");
+    const els=v.querySelectorAll(".reveal");
+    els.forEach((el,i)=>{ el.style.animationDelay=(60+i*55)+"ms"; });
+  }
+
+  /* ---------- Heute: ring ---------- */
+  function polar(cx,cy,r,deg){const a=deg*Math.PI/180;return [cx+r*Math.sin(a),cy-r*Math.cos(a)];}
+  function arc(cx,cy,r,a0,a1){
+    const [x0,y0]=polar(cx,cy,r,a0),[x1,y1]=polar(cx,cy,r,a1),large=(a1-a0)>180?1:0;
+    return `M ${x0.toFixed(2)} ${y0.toFixed(2)} A ${r} ${r} 0 ${large} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`;
+  }
+  function buildRing(){
+    const D=state.viewDate;
+    const svg=document.getElementById("ringSvg");
+    const core=coreHabits(), bonus=bonusHabits();
+    let html="";
+    if(core.length){
+      const r=38, gap=6, n=core.length, seg=(360-gap*n)/n;
+      core.forEach((h,i)=>{
+        const a0=i*(seg+gap)+gap/2, a1=a0+seg;
+        const color=isDone(h.id,D)?catOf(h).color:"var(--track)";
+        html+=`<path class="seg" d="${arc(50,50,r,a0,a1)}" style="stroke:${color}"></path>`;
+      });
+    }
+    if(bonus.length){
+      const r=47, gap=14, n=bonus.length, seg=(360-gap*n)/n;
+      bonus.forEach((h,i)=>{
+        const a0=i*(seg+gap)+gap/2, a1=a0+seg;
+        const color=isDone(h.id,D)?"var(--amber)":"var(--amber-tint)";
+        html+=`<path class="seg outer" d="${arc(50,50,r,a0,a1)}" style="stroke:${color}"></path>`;
+      });
+    }
+    svg.innerHTML=html;
+    document.getElementById("ringDone").textContent=coreDone(D);
+    const tot=document.getElementById("ringTotal"); if(tot) tot.textContent=core.length;
+  }
+  function buildStrip(){
+    const wrap=document.getElementById("strip"),names=["So","Mo","Di","Mi","Do","Fr","Sa"];
+    const coreTotal=coreHabits().length||1;
+    let html="";
+    for(let i=6;i>=0;i--){
+      const d=new Date(); d.setDate(d.getDate()-i);
+      const key=ymd(d),pct=Math.round(coreDone(key)/coreTotal*100),t=key===today,sel=key===state.viewDate,bonus=bonusDone(key)>0;
+      html+=`<div class="day${t?" today":""}${sel?" sel":""}" data-day="${key}">${bonus?'<span class="bonus-pip" title="Bonus"></span>':'<span class="bonus-pip empty"></span>'}<div class="bar-track"><div class="bar-fill" style="height:${pct}%"></div></div><div class="day-name">${t?"Heute":names[d.getDay()]}</div></div>`;
+    }
+    wrap.innerHTML=html;
+    wrap.querySelectorAll(".day").forEach(el=>el.addEventListener("click",()=>{ state.viewDate=el.dataset.day; state.backfill=false; renderHeute(); }));
+  }
+  function buildHeader(){
+    const D=state.viewDate, t=isToday();
+    if(t) state.backfill=false;
+    const greet=document.getElementById("greet"), dateEl=document.getElementById("date"), todayBtn=document.getElementById("todayBtn");
+    if(t){
+      const h=new Date().getHours();
+      greet.textContent = h<5?"Gute Nacht":h<11?"Guten Morgen":h<18?"Guten Tag":"Guten Abend";
+    } else {
+      greet.textContent = state.backfill ? "Nachtragen" : "Rückblick";
+    }
+    dateEl.textContent = new Date(D+"T00:00:00").toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long"});
+    if(todayBtn) todayBtn.hidden = t;
+    let bf=document.getElementById("backfillBtn");
+    if(bf) bf.remove();
+    if(!t){
+      bf=document.createElement("button"); bf.id="backfillBtn"; bf.className="backfill-btn"+(state.backfill?" on":""); bf.type="button";
+      bf.textContent = state.backfill ? "Fertig" : "✎ Nachtragen";
+      bf.addEventListener("click",()=>{ state.backfill=!state.backfill; if(state.backfill) state.lockinOpen=true; renderHeute(); });
+      const row=document.querySelector(".date-row"); if(row) row.appendChild(bf);
+    }
+    const view=document.getElementById("view-heute"); if(view) view.classList.toggle("readonly", !canEdit());
+    const foot=document.querySelector("#view-heute .foot"); if(foot) foot.style.display = t ? "" : "none";
+  }
+  const canEdit=()=> isToday() || state.backfill;
+  /* ---------- Mini-Kalender ---------- */
+  function dayHasData(k){
+    return (log[k]&&Object.keys(log[k]).length) || (lockinLog[k]&&Object.keys(lockinLog[k]).length) || (lockinText[k]&&Object.keys(lockinText[k]).length);
+  }
+  function toggleCalendar(){
+    state.calOpen=!state.calOpen;
+    if(state.calOpen){ const d=new Date(state.viewDate+"T00:00:00"); state.calMonth={y:d.getFullYear(), m:d.getMonth()}; }
+    renderCalendar();
+  }
+  function renderCalendar(){
+    const box=document.getElementById("miniCal"); if(!box) return;
+    if(!state.calOpen){ box.hidden=true; box.innerHTML=""; return; }
+    box.hidden=false;
+    const cur=new Date(today+"T00:00:00");
+    if(!state.calMonth){ state.calMonth={y:cur.getFullYear(), m:cur.getMonth()}; }
+    const {y,m}=state.calMonth;
+    const monthNames=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+    const first=new Date(y,m,1), startDow=(first.getDay()+6)%7, days=new Date(y,m+1,0).getDate();
+    const atCurMonth = (y>cur.getFullYear() || (y===cur.getFullYear() && m>=cur.getMonth()));
+    let cells="";
+    for(let i=0;i<startDow;i++) cells+=`<div class="cal-cell empty"></div>`;
+    for(let d=1; d<=days; d++){
+      const k=y+"-"+String(m+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");
+      const future=k>today, isT=k===today, sel=k===state.viewDate, dot=dayHasData(k);
+      cells+=`<button class="cal-cell${isT?" today":""}${sel?" sel":""}" type="button" data-k="${k}" ${future?"disabled":""}>${d}${dot?'<span class="cal-dot"></span>':''}</button>`;
+    }
+    box.innerHTML=`
+      <div class="cal-head">
+        <button class="cal-nav" type="button" data-nav="-1" aria-label="Vorheriger Monat">‹</button>
+        <span class="cal-month">${monthNames[m]} ${y}</span>
+        <button class="cal-nav" type="button" data-nav="1" aria-label="Nächster Monat" ${atCurMonth?"disabled":""}>›</button>
+      </div>
+      <div class="cal-grid cal-dows">${["Mo","Di","Mi","Do","Fr","Sa","So"].map(x=>`<span class="cal-dow">${x}</span>`).join("")}</div>
+      <div class="cal-grid">${cells}</div>`;
+    box.querySelectorAll(".cal-nav").forEach(b=>b.addEventListener("click",()=>{
+      let nm=state.calMonth.m+Number(b.dataset.nav), ny=state.calMonth.y;
+      if(nm<0){ nm=11; ny--; } if(nm>11){ nm=0; ny++; }
+      state.calMonth={y:ny, m:nm}; renderCalendar();
+    }));
+    box.querySelectorAll(".cal-cell[data-k]").forEach(b=>b.addEventListener("click",()=>{
+      if(b.disabled) return;
+      state.viewDate=b.dataset.k; state.calOpen=false; state.lockinOpen=false; state.backfill=false; renderHeute();
+    }));
+  }
+
+  /* ---------- Verschlüsselung (AES-GCM, Passwort via PBKDF2) ---------- */
+  const TEXT_FIELDS=["wins"];
+  const TEXT_PLACEHOLDER={ wins:"Wins, dem Herrn danken, Scan, Metaskript, Nachricht an mich" };
+  const subtle=()=> (window.crypto && window.crypto.subtle) ? window.crypto.subtle : null;
+  function b64(buf){ let s=""; const b=new Uint8Array(buf); for(let i=0;i<b.length;i++) s+=String.fromCharCode(b[i]); return btoa(s); }
+  function unb64(s){ return Uint8Array.from(atob(s), c=>c.charCodeAt(0)); }
+  async function deriveKey(pw, salt){
+    const base=await subtle().importKey("raw", new TextEncoder().encode(pw), "PBKDF2", false, ["deriveKey"]);
+    return subtle().deriveKey({name:"PBKDF2", salt, iterations:150000, hash:"SHA-256"}, base, {name:"AES-GCM", length:256}, false, ["encrypt","decrypt"]);
+  }
+  async function encWith(pw, salt, text){
+    const iv=window.crypto.getRandomValues(new Uint8Array(12));
+    const key=await deriveKey(pw, salt);
+    const ct=await subtle().encrypt({name:"AES-GCM", iv}, key, new TextEncoder().encode(text));
+    return {iv:b64(iv), ct:b64(ct)};
+  }
+  async function decWith(pw, salt, payload){
+    const key=await deriveKey(pw, salt);
+    const pt=await subtle().decrypt({name:"AES-GCM", iv:unb64(payload.iv)}, key, unb64(payload.ct));
+    return new TextDecoder().decode(pt);
+  }
+  function askPassword(opts){
+    return new Promise(resolve=>{
+      const ov=document.getElementById("pwModal");
+      document.getElementById("pwTitle").textContent=opts.title||"Passwort";
+      document.getElementById("pwNote").textContent=opts.note||"";
+      const f1=document.getElementById("pwInput"), f2=document.getElementById("pwConfirm");
+      f1.value=""; f2.value=""; f2.style.display=opts.confirm?"block":"none";
+      ov.classList.add("open"); setTimeout(()=>f1.focus(),30);
+      const ok=document.getElementById("pwOk"), cancel=document.getElementById("pwCancel");
+      const err=document.getElementById("pwErr"); err.textContent="";
+      function close(val){ ov.classList.remove("open"); ok.onclick=null; cancel.onclick=null; f1.onkeydown=null; resolve(val); }
+      ok.onclick=()=>{
+        const v=f1.value;
+        if(!v){ err.textContent="Bitte ein Passwort eingeben."; return; }
+        if(opts.confirm && v!==f2.value){ err.textContent="Die Passwörter stimmen nicht überein."; return; }
+        close(v);
+      };
+      cancel.onclick=()=>close(null);
+      f1.onkeydown=e=>{ if(e.key==="Enter" && !opts.confirm) ok.onclick(); };
+    });
+  }
+  function hasEncryptedData(){
+    for(const d in lockinText){ const day=lockinText[d]; if(!day) continue; for(const id in day){ if(isEnc(day[id])) return true; } }
+    return false;
+  }
+  async function ensurePassphrase(){
+    if(!subtle()){ alert("Verschlüsselung wird hier nicht unterstützt."); return null; }
+    // Solange nichts verschlüsselt ist, ist es eine Neuanlage (Passwort festlegen, keine Prüfung).
+    const needVerify = cryptoRec && hasEncryptedData();
+    if(!needVerify){
+      const pw=await askPassword({title:"Passwort festlegen", confirm:true, note:"Merke es dir gut — ohne dieses Passwort sind verschlüsselte Texte nicht wiederherstellbar."});
+      if(pw==null) return null;
+      const salt=window.crypto.getRandomValues(new Uint8Array(16));
+      const check=await encWith(pw, salt, "ok");
+      cryptoRec={salt:b64(salt), check}; write(CRYPTO,cryptoRec);
+      return pw;
+    }
+    const pw=await askPassword({title:"Passwort eingeben"});
+    if(pw==null) return null;
+    try{ const v=await decWith(pw, unb64(cryptoRec.salt), cryptoRec.check); if(v!=="ok") throw 0; }
+    catch(e){ alert("Falsches Passwort."); return null; }
+    return pw;
+  }
+  const getText=(D,id)=> (lockinText[D] && lockinText[D][id]!==undefined) ? lockinText[D][id] : "";
+  function setText(D,id,val){ if(!lockinText[D]) lockinText[D]={}; lockinText[D][id]=val; write(LOCKTXT,lockinText); }
+  const isEnc=v=> v && typeof v==="object" && v.iv && v.ct;
+  function refreshTexts(){ buildLockIn(); buildTagesabschluss(); }
+  async function lockField(D,id){
+    const cur=getText(D,id); if(isEnc(cur)) return;
+    const text=(typeof cur==="string")?cur:""; if(!text.trim()){ alert("Kein Text zum Verschlüsseln."); return; }
+    const pw=await ensurePassphrase(); if(pw==null) return;
+    try{ const payload=await encWith(pw, unb64(cryptoRec.salt), text); setText(D,id,payload); refreshTexts(); }
+    catch(e){ alert("Verschlüsseln fehlgeschlagen."); }
+  }
+  async function unlockField(D,id){
+    const cur=getText(D,id); if(!isEnc(cur)) return;
+    const pw=await ensurePassphrase(); if(pw==null) return;
+    try{ const text=await decWith(pw, unb64(cryptoRec.salt), cur); setText(D,id,text); refreshTexts(); }
+    catch(e){ alert("Konnte nicht entschlüsseln (falsches Passwort?)."); }
+  }
+
+  /* ---------- 90-Tage-Challenge ---------- */
+  function addDays(dateStr,n){ const d=new Date(dateStr+"T00:00:00"); d.setDate(d.getDate()+n); return ymd(d); }
+  function daysBetween(a,b){ return Math.round((new Date(b+"T00:00:00")-new Date(a+"T00:00:00"))/86400000); }
+  function challengeStats(h){
+    const start=h.challenge.start, len=h.challenge.len||90;
+    const end=addDays(start,len-1);
+    const elapsed=Math.max(0, Math.min(len, daysBetween(start,today)+1));
+    let doneCount=0, days=[];
+    for(let i=0;i<len;i++){
+      const k=addDays(start,i);
+      const isPast = daysBetween(k,today)>=0;
+      const done=isDone(h.id,k);
+      if(done && isPast) doneCount++;
+      days.push({k, done:done&&isPast, today:k===today, future:daysBetween(k,today)<0});
+    }
+    // aktueller Streak innerhalb des Fensters (endet heute/gestern)
+    let s=0, d=today;
+    if(daysBetween(start,d)>=0 && daysBetween(d,end)>=0){
+      if(!isDone(h.id,d)) d=addDays(d,-1);
+      while(daysBetween(start,d)>=0 && isDone(h.id,d)){ s++; d=addDays(d,-1); }
+    }
+    const remaining=Math.max(0, len-elapsed);
+    return {start,len,end,elapsed,doneCount,days,streak:s,remaining,
+      pct:Math.round(doneCount/len*100), complete:doneCount>=len, dayNo:Math.min(elapsed,len)};
+  }
+  function challengeMessage(st,h){
+    if(st.complete) return "Vollbracht. 90 Tage — das bist jetzt du. 🕊️";
+    const ms=[7,21,30,60,90].find(m=>m>st.doneCount);
+    if(st.doneCount===0) return "Tag 1 beginnt mit einem Häkchen. Fang heute an.";
+    if(st.streak>=3 && ms) return `Starke Serie — noch ${ms-st.doneCount} bis Tag ${ms}.`;
+    if(ms) return `${st.doneCount} geschafft · noch ${ms-st.doneCount} bis Meilenstein ${ms}.`;
+    return `${st.doneCount} von ${st.len} Tagen.`;
+  }
+  const CHAL_THEMES=[
+    {name:"Aurora",  grad:"linear-gradient(135deg,#7C5CF0,#3A6FE0 55%,#0EA5A5)", accent:"#7C5CF0"},
+    {name:"Glut",    grad:"linear-gradient(135deg,#FB923C,#EF4444 55%,#9B1C1C)", accent:"#F0620C"},
+    {name:"Gold",    grad:"linear-gradient(135deg,#FCD34D,#F59E0B 55%,#B45309)", accent:"#E1901A"},
+    {name:"Ozean",   grad:"linear-gradient(135deg,#22D3EE,#3A6FE0 55%,#1E3A8A)", accent:"#0EA5A5"},
+    {name:"Nebula",  grad:"linear-gradient(135deg,#F472B6,#A855F7 55%,#3B82F6)", accent:"#C026D3"},
+    {name:"Wald",    grad:"linear-gradient(135deg,#4ADE80,#0FA678 55%,#065F46)", accent:"#0FA678"}
+  ];
+  const chalTheme=h=>CHAL_THEMES[(h.challenge && h.challenge.theme)||0] || CHAL_THEMES[0];
+  function downscaleImg(file, max, cb){
+    const r=new FileReader();
+    r.onload=e=>{ const img=new Image(); img.onload=()=>{
+      let {width:w,height:h}=img; if(w>h && w>max){ h=h*max/w; w=max; } else if(h>=w && h>max){ w=w*max/h; h=max; }
+      const c=document.createElement("canvas"); c.width=w; c.height=h;
+      c.getContext("2d").drawImage(img,0,0,w,h);
+      cb(c.toDataURL("image/jpeg",0.72));
+    }; img.src=e.target.result; };
+    r.readAsDataURL(file);
+  }
+  function renderChalPanel(h, justChecked){
+    const st=challengeStats(h), th=chalTheme(h);
+    const panel=document.createElement("div"); panel.className="chal-panel"; panel.style.setProperty("--acc",th.accent);
+
+    // Hero (Bild oder Farbverlauf)
+    const hero=document.createElement("div"); hero.className="chal-hero"+(st.complete?" done":"");
+    hero.style.background = (h.challenge.image?`url("${h.challenge.image}")`:th.grad);
+    hero.innerHTML=`
+      <div class="chal-hero-glow"></div>
+      <div class="chal-hero-veil"></div>
+      <div class="chal-hero-in">
+        <div class="chal-hero-top"><span class="chal-hero-name">${esc(h.name)}</span><span class="chal-hero-pct">${st.pct}%</span></div>
+        <div class="chal-hero-day"><b>${st.dayNo}</b><span>/ ${st.len}</span></div>
+        <div class="chal-hero-msg">${esc(challengeMessage(st,h))}</div>
+      </div>`;
+    panel.appendChild(hero);
+
+    // 90er-Raster
+    const grid=document.createElement("div"); grid.className="chal-grid";
+    st.days.forEach((d,i)=>{
+      const cell=document.createElement("span");
+      cell.className="chal-cell"+(d.done?" done":"")+(d.future?" future":"")+(d.today?" today":"");
+      if(justChecked && d.today && d.done) cell.classList.add("pop");
+      cell.title=`Tag ${i+1} · ${new Date(d.k+"T00:00:00").toLocaleDateString("de-DE",{day:"numeric",month:"short"})}`;
+      grid.appendChild(cell);
+    });
+    panel.appendChild(grid);
+
+    // Meilensteine
+    const mrow=document.createElement("div"); mrow.className="chal-miles";
+    [7,21,30,60,90].forEach(m=>{
+      const b=document.createElement("span"); b.className="chal-mile"+(st.doneCount>=m?" hit":"");
+      b.innerHTML=`<span class="cm-dot"></span>${m}`;
+      mrow.appendChild(b);
+    });
+    panel.appendChild(mrow);
+
+    // Statistik
+    const stats=document.createElement("div"); stats.className="chal-stats";
+    stats.innerHTML=`
+      <div class="cs"><b>${st.doneCount}</b><small>erledigt</small></div>
+      <div class="cs"><b>🔥 ${st.streak}</b><small>Serie</small></div>
+      <div class="cs"><b>${st.remaining}</b><small>Tage übrig</small></div>`;
+    panel.appendChild(stats);
+
+    // Gestalten: Themes + Bild
+    const design=document.createElement("div"); design.className="chal-design";
+    const swatches=document.createElement("div"); swatches.className="chal-swatches";
+    CHAL_THEMES.forEach((t,idx)=>{
+      const sw=document.createElement("button"); sw.type="button"; sw.className="chal-sw"+(((h.challenge.theme||0)===idx)?" on":"");
+      sw.style.background=t.grad; sw.title=t.name; sw.setAttribute("aria-label","Design "+t.name);
+      sw.addEventListener("click",()=>{ h.challenge.theme=idx; write(CFG,config); buildCats(); });
+      swatches.appendChild(sw);
+    });
+    design.appendChild(swatches);
+    const imgBtn=document.createElement("button"); imgBtn.type="button"; imgBtn.className="chal-imgbtn"; imgBtn.textContent = h.challenge.image?"Bild ändern":"📷 Bild";
+    const file=document.createElement("input"); file.type="file"; file.accept="image/*"; file.style.display="none";
+    imgBtn.addEventListener("click",()=>file.click());
+    file.addEventListener("change",e=>{ const f=e.target.files&&e.target.files[0]; if(f) downscaleImg(f,900,d=>{ h.challenge.image=d; write(CFG,config); buildCats(); }); });
+    design.append(imgBtn,file);
+    if(h.challenge.image){
+      const rm=document.createElement("button"); rm.type="button"; rm.className="chal-imgrm"; rm.textContent="Bild entfernen";
+      rm.addEventListener("click",()=>{ delete h.challenge.image; write(CFG,config); buildCats(); });
+      design.appendChild(rm);
+    }
+    panel.appendChild(design);
+
+    return panel;
+  }
+
+  /* ---------- Lock In (ausklappbar, bearbeitbar) ---------- */
+  function lockinItems(){ return lockinCfg.items; }
+  function itemLabel(it,D){
+    if(it.date) return new Date(D+"T00:00:00").toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+    return it.label;
+  }
+  const lockinDay=k=>lockinLog[k]||{};
+  const lockinOn=(id,k)=>!!lockinDay(k)[id];
+  const lockinDone=k=>lockinItems().reduce((n,it)=>n+(lockinOn(it.id,k)?1:0),0);
+  const lockinAll=k=>lockinItems().length>0 && lockinDone(k)===lockinItems().length;
+  function lockinStreak(end){
+    let d=new Date(end+"T00:00:00"); if(!lockinAll(ymd(d))) d.setDate(d.getDate()-1);
+    let n=0; while(lockinAll(ymd(d))){ n++; d.setDate(d.getDate()-1); } return n;
+  }
+  function saveLockinCfg(){ write(LOCKCFG,lockinCfg); }
+  function commitLockinEdits(){
+    document.querySelectorAll(".li-name-edit").forEach(i=>{
+      const it=lockinCfg.items.find(x=>x.id===i.dataset.li);
+      if(it && !it.date) it.label=i.value.trim()||it.label;
+    });
+    saveLockinCfg();
+  }
+  function buildLockIn(){
+    const D=state.viewDate, ro=!canEdit(), ed=state.lockinEdit && isToday();
+    const root=document.getElementById("lockin"); root.innerHTML="";
+    const sec=document.createElement("section"); sec.className="cat lockin"+(lockinAll(D)?" complete":"");
+    const done=lockinDone(D), s=lockinStreak(D);
+    const head=document.createElement("button");
+    head.className="lockin-head"; head.type="button"; head.setAttribute("aria-expanded", state.lockinOpen?"true":"false");
+    head.innerHTML=`<span class="lockin-check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
+      <span class="lockin-title">Lock In</span>
+      ${s>0?`<span class="lockin-streak">🔥 ${s}</span>`:""}
+      <span class="lockin-meter">${done}/${lockinItems().length}</span>
+      <span class="chev" aria-hidden="true">⌄</span>`;
+    head.addEventListener("click",()=>{ if(state.lockinEdit) commitLockinEdits(); state.lockinOpen=!state.lockinOpen; buildLockIn(); });
+    sec.appendChild(head);
+    if(state.lockinOpen){
+      const panel=document.createElement("div"); panel.className="lockin-panel";
+      lockinItems().forEach(it=>{
+        const on=lockinOn(it.id,D);
+        if(ed && !it.date){
+          const row=document.createElement("div"); row.className="lockin-item edit";
+          const inp=document.createElement("input"); inp.className="li-name-edit"; inp.dataset.li=it.id; inp.value=it.label; inp.setAttribute("aria-label","Punkt umbenennen");
+          const del=document.createElement("button"); del.className="row-del"; del.type="button"; del.textContent="×"; del.setAttribute("aria-label","Punkt löschen");
+          del.addEventListener("click",()=>{ commitLockinEdits(); lockinCfg.items=lockinCfg.items.filter(x=>x.id!==it.id); saveLockinCfg(); buildLockIn(); });
+          row.append(inp,del); panel.appendChild(row);
+        }else{
+          const btn=document.createElement("button"); btn.className="lockin-item"+(it.date?" is-date":""); btn.type="button";
+          btn.setAttribute("aria-pressed", on?"true":"false");
+          btn.innerHTML=`<span class="todo-check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span><span class="lockin-item-label"></span>`;
+          btn.querySelector(".lockin-item-label").textContent=itemLabel(it,D);
+          if(!ed) btn.addEventListener("click",()=>toggleLockin(it.id));
+          panel.appendChild(btn);
+        }
+        if(TEXT_FIELDS.includes(it.id)){
+          const cur=getText(D,it.id);
+          const wrap=document.createElement("div"); wrap.className="lockin-text";
+          if(isEnc(cur)){
+            const mask=document.createElement("div"); mask.className="enc-mask"; mask.textContent="🔒 Verschlüsselt";
+            const key=document.createElement("button"); key.className="key-btn open"; key.type="button"; key.textContent="🔑 Entsperren";
+            key.addEventListener("click",()=>unlockField(D,it.id));
+            wrap.append(mask,key);
+          }else{
+            const ta=document.createElement("textarea"); ta.className="lockin-ta"; ta.rows=5; ta.placeholder=TEXT_PLACEHOLDER[it.id]||"Notiz für diesen Tag …"; ta.value=(typeof cur==="string")?cur:"";
+            if(ro){ ta.readOnly=true; } else { ta.addEventListener("input",()=>setText(D,it.id,ta.value)); }
+            wrap.appendChild(ta);
+            const key=document.createElement("button"); key.className="key-btn"; key.type="button"; key.textContent="🔒 Verschlüsseln";
+            key.addEventListener("click",()=>lockField(D,it.id));
+            wrap.appendChild(key);
+          }
+          panel.appendChild(wrap);
+        }
+      });
+      if(ed){
+        const addI=document.createElement("button"); addI.className="ghost-add"; addI.type="button"; addI.textContent="+ Punkt";
+        addI.addEventListener("click",()=>{ commitLockinEdits(); lockinCfg.items.push({id:uid(),label:"Neuer Punkt"}); saveLockinCfg(); buildLockIn(); });
+        panel.appendChild(addI);
+      }
+      if(isToday()){
+        const editBar=document.createElement("div"); editBar.className="li-editbar";
+        const eb=document.createElement("button"); eb.className="li-edit-btn"+(ed?" on":""); eb.type="button"; eb.textContent=ed?"Fertig":"Lock In bearbeiten";
+        eb.addEventListener("click",()=>{ if(ed) commitLockinEdits(); state.lockinEdit=!state.lockinEdit; buildLockIn(); });
+        editBar.appendChild(eb); panel.appendChild(editBar);
+      }
+      sec.appendChild(panel);
+    }
+    root.appendChild(sec);
+  }
+  function toggleLockin(id){
+    if(!canEdit()) return;
+    const k=state.viewDate;
+    if(!lockinLog[k]) lockinLog[k]={};
+    if(lockinLog[k][id]) delete lockinLog[k][id]; else lockinLog[k][id]=true;
+    write(LOCKIN,lockinLog);
+    const nowComplete=lockinAll(k);
+    buildLockIn();
+    if(isToday() && nowComplete && !state.lockinComplete) celebrate();
+    state.lockinComplete=nowComplete;
+  }
+
+  /* ---------- Schatzkammer ---------- */
+  const SCHATZ_GRADS=[
+    "linear-gradient(135deg,#7C5CF0,#3A6FE0)",
+    "linear-gradient(135deg,#0FA678,#3A6FE0)",
+    "linear-gradient(135deg,#E1901A,#EF5A72)",
+    "linear-gradient(135deg,#EF5A72,#7C5CF0)",
+    "linear-gradient(135deg,#0EA5A5,#0FA678)"
+  ];
+  function saveSchatz(){ write(SCHATZ,schatz); }
+  function buildSchatzBtn(){
+    const root=document.getElementById("schatzBtn"); if(!root) return; root.innerHTML="";
+    const b=document.createElement("button"); b.className="schatz-trigger"; b.type="button";
+    b.innerHTML=`
+      <span class="st-glow" aria-hidden="true"></span>
+      <span class="st-sheen" aria-hidden="true"></span>
+      <span class="st-icon" aria-hidden="true">✦</span>
+      <span class="st-body">
+        <span class="st-title">Schatzkammer</span>
+        <span class="st-sub"></span>
+      </span>
+      <span class="st-arrow" aria-hidden="true">→</span>`;
+    b.querySelector(".st-sub").textContent = schatz.length
+      ? (schatz.length===1 ? "1 Satz bewahrt" : schatz.length+" Sätze bewahrt")
+      : "Worte sammeln, die bleiben";
+    b.addEventListener("click",openSchatz);
+    root.appendChild(b);
+  }
+  function openSchatz(){
+    const ov=document.getElementById("schatzOverlay");
+    ov.hidden=false; void ov.offsetWidth; ov.classList.add("open");
+    buildSchatzList();
+    setTimeout(()=>{ const t=document.getElementById("schatzText"); if(t) t.focus(); },260);
+  }
+  function closeSchatz(){
+    const ov=document.getElementById("schatzOverlay");
+    ov.classList.remove("open");
+    setTimeout(()=>{ ov.hidden=true; },260);
+  }
+  function addSchatz(){
+    const t=document.getElementById("schatzText"), a=document.getElementById("schatzAuthor");
+    const v=(t.value||"").trim(); if(!v) return;
+    schatz.unshift({id:uid(), text:v, author:(a.value||"").trim(), at:new Date().toISOString()});
+    saveSchatz(); t.value=""; a.value="";
+    buildSchatzList(true); buildSchatzBtn(); t.focus();
+  }
+  function buildSchatzList(flashFirst){
+    const list=document.getElementById("schatzList"); if(!list) return;
+    const cnt=document.getElementById("schatzCount");
+    if(cnt) cnt.textContent = schatz.length ? (schatz.length===1?"1 Satz":schatz.length+" Sätze") : "";
+    list.innerHTML="";
+    if(!schatz.length){
+      const e=document.createElement("div"); e.className="schatz-empty";
+      e.innerHTML=`<div class="se-mark">“</div><div class="se-text">Noch leer.<br>Der erste Satz, der dich trifft, gehört hierher.</div>`;
+      list.appendChild(e); return;
+    }
+    schatz.forEach((q,i)=>{
+      const card=document.createElement("figure"); card.className="schatz-card";
+      card.style.setProperty("--g", SCHATZ_GRADS[i%SCHATZ_GRADS.length]);
+      card.style.animationDelay=(40+i*70)+"ms";
+      if(flashFirst && i===0) card.classList.add("fresh");
+      const mark=document.createElement("div"); mark.className="sc-mark"; mark.textContent="“";
+      const body=document.createElement("blockquote"); body.className="sc-text"; body.textContent=q.text;
+      const foot=document.createElement("figcaption"); foot.className="sc-foot";
+      const by=document.createElement("span"); by.className="sc-by"; by.textContent=q.author||"";
+      const when=document.createElement("span"); when.className="sc-when";
+      when.textContent = q.at ? new Date(q.at).toLocaleDateString("de-DE",{day:"numeric",month:"short",year:"numeric"}) : "";
+      foot.append(by,when);
+      const del=document.createElement("button"); del.className="sc-del"; del.type="button"; del.textContent="×"; del.setAttribute("aria-label","Entfernen");
+      del.addEventListener("click",()=>{
+        if(!confirm("Diesen Satz aus der Schatzkammer entfernen?")) return;
+        schatz=schatz.filter(x=>x.id!==q.id); saveSchatz(); buildSchatzList(); buildSchatzBtn();
+      });
+      card.append(mark,body,foot,del);
+      list.appendChild(card);
+    });
+  }
+
+  /* ---------- Tagesabschluss (Textfeld unter den Habits, verschlüsselbar) ---------- */
+  function buildTagesabschluss(){
+    const D=state.viewDate, ro=!canEdit();
+    const root=document.getElementById("tagesabschluss"); if(!root) return; root.innerHTML="";
+    const cur=getText(D,"tagesabschluss");
+    const has = isEnc(cur) ? true : (typeof cur==="string" && cur.trim().length>0);
+    const sec=document.createElement("section"); sec.className="cat tages";
+    const head=document.createElement("button"); head.className="lockin-head"; head.type="button"; head.setAttribute("aria-expanded", state.tagOpen?"true":"false");
+    head.innerHTML=`<span class="tag-icon" aria-hidden="true">🌙</span><span class="lockin-title">Tagesabschluss</span>${has?'<span class="tag-dot"></span>':''}<span class="chev" aria-hidden="true">⌄</span>`;
+    head.addEventListener("click",()=>{ state.tagOpen=!state.tagOpen; buildTagesabschluss(); });
+    sec.appendChild(head);
+    if(state.tagOpen){
+      const panel=document.createElement("div"); panel.className="lockin-panel";
+      const wrap=document.createElement("div"); wrap.className="lockin-text tages-text";
+      if(isEnc(cur)){
+        const mask=document.createElement("div"); mask.className="enc-mask"; mask.textContent="🔒 Verschlüsselt";
+        const key=document.createElement("button"); key.className="key-btn open"; key.type="button"; key.textContent="🔑 Entsperren";
+        key.addEventListener("click",()=>unlockField(D,"tagesabschluss"));
+        wrap.append(mask,key);
+      }else{
+        const ta=document.createElement("textarea"); ta.className="lockin-ta"; ta.rows=3; ta.placeholder="Wie war dein Tag? Gedanken zum Abschluss …"; ta.value=(typeof cur==="string")?cur:"";
+        if(ro){ ta.readOnly=true; } else { ta.addEventListener("input",()=>setText(D,"tagesabschluss",ta.value)); }
+        const key=document.createElement("button"); key.className="key-btn"; key.type="button"; key.textContent="🔒 Verschlüsseln";
+        key.addEventListener("click",()=>lockField(D,"tagesabschluss"));
+        wrap.append(ta,key);
+      }
+      panel.appendChild(wrap); sec.appendChild(panel);
+    }
+    root.appendChild(sec);
+  }
+
+  function buildCats(){
+    const D=state.viewDate, ro=!canEdit();
+    const root=document.getElementById("cats"); root.innerHTML="";
+    config.cats.forEach(cat=>{
+      const items=config.habits.filter(h=>h.cat===cat.id);
+      const done=items.filter(h=>isDone(h.id,D)).length;
+      const sec=document.createElement("section"); sec.className="cat";
+      sec.style.setProperty("--c",cat.color); sec.style.setProperty("--c-tint",cat.tint);
+      const title=state.editing
+        ? `<input class="cat-title-edit" data-cat="${cat.id}" value="${esc(cat.title)}" aria-label="Kategoriename">`
+        : `<span class="eyebrow">${esc(cat.title)}</span>${cat.id===bonusCatId?'<span class="bonus-tag">Bonus ✨</span>':''}`;
+      sec.innerHTML=`<div class="cat-head"><span class="dot"></span>${title}<span class="meter">${done}/${items.length}</span></div>`;
+      items.forEach(h=>{
+        if(state.editing){
+          const row=document.createElement("div"); row.className="habit";
+          row.innerHTML=`<span class="check"></span><input class="name-edit" data-habit="${h.id}" value="${esc(h.name)}" aria-label="Habit-Name">`;
+          const chal=document.createElement("button"); chal.className="chal-toggle"+(h.challenge?" on":""); chal.type="button";
+          chal.textContent="🎯"; chal.title=h.challenge?"90-Tage-Challenge beenden":"Als 90-Tage-Challenge starten";
+          chal.setAttribute("aria-label",chal.title);
+          chal.addEventListener("click",()=>{
+            commitEdits();
+            if(h.challenge){ if(!confirm(`90-Tage-Challenge für „${h.name}" beenden? Der Fortschritt (deine Häkchen) bleibt erhalten.`)) return; delete h.challenge; }
+            else { h.challenge={start:today, len:90}; }
+            write(CFG,config); buildCats();
+          });
+          const del=document.createElement("button"); del.className="row-del"; del.type="button"; del.textContent="×"; del.setAttribute("aria-label","Gewohnheit löschen");
+          del.addEventListener("click",()=>{
+            if(!confirm(`„${h.name}" wirklich löschen? Die Häkchen der Vergangenheit bleiben gespeichert.`)) return;
+            commitEdits(); config.habits=config.habits.filter(x=>x.id!==h.id); write(CFG,config); buildCats(); buildRing();
+          });
+          row.append(chal,del);
+          sec.appendChild(row);
+        }else{
+          const on=isDone(h.id,D),s=streak(h.id,D);
+          const btn=document.createElement("button"); btn.className="habit"; btn.type="button";
+          btn.setAttribute("aria-pressed",on?"true":"false"); if(ro) btn.disabled=true;
+          btn.innerHTML=`<span class="check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span><span class="name">${esc(h.name)}</span><span class="streak${s>=3?" hot":""}">${s>0?("🔥 "+s):""}</span>`;
+          if(!ro) btn.addEventListener("click",()=>toggleHabit(h.id));
+          if(h.challenge && h.challenge.start && isToday()){
+            const st=challengeStats(h);
+            const wrap=document.createElement("div"); wrap.className="habit-wrap";
+            const line=document.createElement("div"); line.className="habit-line";
+            const chev=document.createElement("button"); chev.type="button";
+            chev.className="chal-chev"+(state.chalOpen[h.id]?" open":"")+(st.complete?" done":"");
+            chev.innerHTML=`<span class="chal-pill">🎯 ${st.dayNo}/${st.len}</span><span class="chal-chev-ic">⌄</span>`;
+            chev.title="90-Tage-Challenge anzeigen";
+            chev.addEventListener("click",()=>{ state.chalOpen[h.id]=!state.chalOpen[h.id]; buildCats(); });
+            line.append(btn,chev); wrap.appendChild(line);
+            if(state.chalOpen[h.id]){
+              const jc = state.chalJustChecked===h.id; state.chalJustChecked=null;
+              wrap.appendChild(renderChalPanel(h, jc));
+            }
+            sec.appendChild(wrap);
+          }else{
+            sec.appendChild(btn);
+          }
+        }
+      });
+      if(state.editing){
+        const addH=document.createElement("button"); addH.className="ghost-add"; addH.type="button"; addH.textContent="+ Gewohnheit";
+        addH.addEventListener("click",()=>{
+          commitEdits();
+          config.habits.push({id:uid(), name:"Neue Gewohnheit", cat:cat.id});
+          write(CFG,config); buildCats(); buildRing();
+          const ins=document.querySelectorAll(`.cat .name-edit`); if(ins.length){ const last=[...ins].filter(i=>{const h=config.habits.find(x=>x.id===i.dataset.habit); return h&&h.cat===cat.id;}).pop(); if(last){ last.focus(); last.select(); } }
+        });
+        sec.appendChild(addH);
+      }
+      root.appendChild(sec);
+    });
+  }
+  function commitEdits(){
+    document.querySelectorAll(".cat-title-edit").forEach(i=>{const c=config.cats.find(x=>x.id===i.dataset.cat);if(c)c.title=i.value.trim()||c.title;});
+    document.querySelectorAll(".name-edit").forEach(i=>{const h=config.habits.find(x=>x.id===i.dataset.habit);if(h)h.name=i.value.trim()||h.name;});
+    write(CFG,config);
+  }
+  function toggleHabit(id){
+    if(state.editing || !canEdit()) return;
+    const k=state.viewDate;
+    if(!log[k]) log[k]={};
+    const nowOn = !log[k][id];
+    if(log[k][id]) delete log[k][id]; else log[k][id]=true;
+    write(LOG,log);
+    const h=config.habits.find(x=>x.id===id);
+    if(h && h.challenge && isToday() && nowOn){ state.chalOpen[id]=true; state.chalJustChecked=id; }
+    renderHeute();
+  }
+  function renderHeute(){
+    buildRing(); buildStrip(); buildHeader(); buildLockIn(); buildCats(); buildTagesabschluss(); buildSchatzBtn(); renderCalendar();
+    const complete=dayComplete(state.viewDate);
+    const ring=document.getElementById("ring");
+    if(isToday() && complete&&!state.lastComplete){ ring.classList.remove("complete"); void ring.offsetWidth; ring.classList.add("complete"); celebrate(); }
+    if(isToday()) state.lastComplete=complete;
+  }
+  function celebrate(){
+    if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const colors=["#16B981","#5B8DEF","#F4A52E","#FB7185","#9B7DF5"];
+    for(let i=0;i<26;i++){
+      const p=document.createElement("div"); p.className="confetti";
+      p.style.left=Math.random()*100+"vw"; p.style.background=colors[i%colors.length];
+      const dur=1.6+Math.random()*1.4,delay=Math.random()*.25;
+      p.style.animation=`fall ${dur}s cubic-bezier(.3,.6,.5,1) ${delay}s forwards`;
+      document.body.appendChild(p); setTimeout(()=>p.remove(),(dur+delay)*1000+100);
+    }
+  }
+  function toggleEdit(){
+    if(state.editing){ commitEdits(); }
+    state.editing=!state.editing;
+    document.body.classList.toggle("editing",state.editing);
+    const b=document.getElementById("editBtn");
+    b.textContent=state.editing?"Fertig":"Bearbeiten"; b.classList.toggle("primary",state.editing);
+    const wb=document.getElementById("wipeBar"); if(wb) wb.hidden=!state.editing;
+    buildCats(); buildRing();
+  }
+  function wipeTexts(hard){
+    // Nur Lock-In + Tagesabschluss (Struktur: {tag:{feld:wert}})
+    // Schatzkammer und Vizija bleiben bewusst unangetastet.
+    let removed=0, keptEnc=0;
+    let lt={}; try{ lt=JSON.parse(localStorage.getItem(LOCKTXT)||"{}"); }catch(e){}
+    for(const day in lt){
+      for(const id in lt[day]){
+        const v=lt[day][id];
+        const enc = v && typeof v==="object" && v.iv && v.ct;
+        if(hard || !enc){ delete lt[day][id]; removed++; } else { keptEnc++; }
+      }
+      if(!Object.keys(lt[day]).length) delete lt[day];
+    }
+    write(LOCKTXT,lt); lockinText=lt;
+    return {removed, keptEnc};
+  }
+  function confirmWipe(hard){
+    const msg = hard
+      ? "WIRKLICH ALLES löschen?\n\nAlle Texte in Lock-In und Tagesabschluss — auch die verschlüsselten — werden entfernt. Schatzkammer und Vizija bleiben erhalten. Das lässt sich nicht rückgängig machen."
+      : "Alle unverschlüsselten Texte löschen?\n\nKlartext in Lock-In und Tagesabschluss wird entfernt. Verschlüsselte Einträge, Schatzkammer und Vizija bleiben erhalten. Das lässt sich nicht rückgängig machen.";
+    if(!confirm(msg)) return;
+    const r=wipeTexts(hard);
+    renderHeute();
+    const extra = r.keptEnc ? ` ${r.keptEnc} verschlüsselte Einträge blieben erhalten.` : "";
+    alert(`Aufgeräumt: ${r.removed} Feld-Texte in Lock-In/Tagesabschluss gelöscht.${extra}`);
+  }
+  function resetToday(){
+    if(state.editing) return;
+    if(Object.keys(dayEntry(today)).length===0) return;
+    if(!confirm("Alle Häkchen von heute zurücksetzen? (Deine Historie bleibt erhalten.)")) return;
+    delete log[today]; write(LOG,log); state.lastComplete=false; renderHeute();
+  }
+
+  /* ---------- iCloud-Kalender (öffentlicher Link, lokal via Server geholt) ---------- */
+  let calCfg=read(CAL,{url:""}), calEvents={}, calStatus="";
+  function setupCalendar(){
+    const cur=calCfg.url||"";
+    const v=prompt("Öffentlichen iCloud-Kalender-Link einfügen (webcal:// oder https://…ics).\nLeer lassen = Kalender entfernen.", cur);
+    if(v===null) return;
+    calCfg.url=v.trim(); write(CAL,calCfg); calEvents={}; calStatus="";
+    if(calCfg.url) loadCalendar(); else buildPrios();
+  }
+  function icsUnfold(txt){ return txt.replace(/\r\n/g,"\n").replace(/\n[ \t]/g,""); }
+  function icsDate(val){
+    const m=/(\d{4})(\d{2})(\d{2})(?:T(\d{2})(\d{2})(\d{2})(Z)?)?/.exec(val||""); if(!m) return null;
+    const [,Y,M,D,h,mi,s,z]=m;
+    if(h===undefined) return {date:`${Y}-${M}-${D}`, allDay:true};
+    const d = z ? new Date(Date.UTC(+Y,+M-1,+D,+h,+mi,+s)) : new Date(+Y,+M-1,+D,+h,+mi,+s);
+    return {date:ymd(d), allDay:false, hour:d.getHours(), min:d.getMinutes()};
+  }
+  function parseICS(txt){
+    const out={};
+    icsUnfold(txt).split("BEGIN:VEVENT").slice(1).forEach(block=>{
+      const body=block.split("END:VEVENT")[0];
+      const sum=/(?:^|\n)SUMMARY[^:\n]*:(.*)/.exec(body);
+      const dt=/(?:^|\n)DTSTART[^:\n]*:(.*)/.exec(body);
+      const de=/(?:^|\n)DTEND[^:\n]*:(.*)/.exec(body);
+      if(!dt) return;
+      const d=icsDate(dt[1].trim()); if(!d) return;
+      const e=de?icsDate(de[1].trim()):null;
+      const title=(sum?sum[1].trim():"Termin").replace(/\\,/g,",").replace(/\\n/gi," ").replace(/\\;/g,";");
+      let start, dur;
+      if(d.allDay){ start=6*60; dur=45; }
+      else{
+        start=d.hour*60+d.min;
+        dur = (e && !e.allDay && e.date===d.date) ? Math.max(15,(e.hour*60+e.min)-start) : 60;
+      }
+      if(start>=24*60) return;
+      (out[d.date]=out[d.date]||[]).push({start, dur, title, allDay:d.allDay});
+    });
+    return out;
+  }
+  async function loadCalendar(){
+    if(!calCfg.url) return;
+    calStatus="Kalender wird geladen …"; buildPrios();
+    try{
+      const r=await fetch("/kalender?url="+encodeURIComponent(calCfg.url));
+      const j=await r.json();
+      if(j.error) throw new Error("fetch");
+      calEvents=parseICS(j.ics||"");
+      const n=(calEvents[state.viewDate]||[]).length;
+      calStatus = n ? `${n} Termin${n>1?"e":""} heute` : "Keine Termine heute";
+    }catch(e){ calStatus="Kalender nicht erreichbar"; }
+    buildPrios();
+  }
+
+  /* ---------- Prios & ToDos ---------- */
+  function savePrios(){ write(PRIOS,prios); }
+  function seedPrios(){ return [0,1,2].map(()=>({id:uid(),text:"",done:false})); }
+  function ensurePrios(){
+    if(!prios){
+      const old=read(TODOS,[]);
+      prios={ day:today, items:seedPrios(), todos:(old||[]).map(t=>({id:t.id||uid(),text:t.text||"",done:!!t.done})), park:[], archive:[] };
+      savePrios();
+    }
+    if(prios.day!==today){
+      const oldDay=prios.day;
+      const doneP=(prios.items||[]).filter(it=>it.text.trim() && it.done).map(it=>({id:uid(),text:it.text.trim(),type:"prio",day:oldDay,doneAt:it.doneAt||null}));
+      const doneT=(prios.todos||[]).filter(t=>(t.text||"").trim() && t.done).map(t=>({id:uid(),text:t.text.trim(),type:"todo",day:oldDay,doneAt:t.doneAt||null}));
+      prios.archive=doneP.concat(doneT, prios.archive||[]).slice(0,500);
+      const carryP=(prios.items||[]).filter(it=>it.text.trim() && !it.done).map(it=>({id:uid(),text:it.text.trim(),type:"prio"}));
+      const carryT=(prios.todos||[]).filter(t=>(t.text||"").trim() && !t.done).map(t=>({id:uid(),text:t.text.trim(),type:"todo"}));
+      prios.park=carryP.concat(carryT, prios.park||[]);
+      prios.items=seedPrios();
+      prios.todos=[];
+      prios.day=today;
+      savePrios();
+    }
+    prios.items=prios.items||seedPrios(); prios.todos=prios.todos||[]; prios.park=prios.park||[]; prios.archive=prios.archive||[];
+  }
+  function setDone(obj,val){
+    obj.done=val;
+    obj.doneAt = val ? new Date().toISOString() : null;
+    savePrios(); buildPrios();
+  }
+  const allTasks=()=> prios.items.filter(i=>i.text.trim()).map(i=>({o:i,type:"prio"}))
+                     .concat(prios.todos.map(t=>({o:t,type:"todo"})));
+  const findTask=id=> allTasks().find(x=>x.o.id===id);
+
+  function buildPrios(){
+    ensurePrios();
+    const view=document.getElementById("view-prios"); view.innerHTML="";
+    const panel=document.createElement("section"); panel.className="panel";
+    panel.style.setProperty("--c","var(--rose)"); panel.style.setProperty("--c-tint","var(--rose-tint)");
+    const pc=prios.park.length;
+    const sub=state.priosSub;
+    const head=document.createElement("div"); head.className="panel-head";
+    head.innerHTML=`<span class="dot"></span><span class="eyebrow">Prios &amp; ToDos</span>
+      <div class="subtabs">
+        <button class="subtab ${sub==='heute'?'active':''}" data-sub="heute" type="button">Heute</button>
+        <button class="subtab ${sub==='park'?'active':''}" data-sub="park" type="button">Parkplatz${pc?` <span class="badge">${pc}</span>`:''}</button>
+      </div>`;
+    panel.appendChild(head);
+    head.querySelectorAll(".subtab").forEach(b=>b.addEventListener("click",()=>{ state.priosSub=b.dataset.sub; buildPrios(); }));
+    if(sub==='park') buildParkplatz(panel);
+    else if(sub==='archiv') buildArchiv(panel);
+    else buildHeuteList(panel);
+    view.appendChild(panel);
+    view.classList.toggle("single", sub!=='heute');
+    if(sub==='heute'){ buildTimeline(view); }
+    if(sub!=='archiv'){
+      const link=document.createElement("button"); link.className="archiv-link"; link.type="button"; link.textContent="Archiv ansehen";
+      link.addEventListener("click",()=>{ state.priosSub="archiv"; buildPrios(); });
+      view.appendChild(link);
+    }
+  }
+  function buildHeuteList(panel){
+    const lblP=document.createElement("div"); lblP.className="sub-label"; lblP.textContent="Prioritäten";
+    panel.appendChild(lblP);
+    prios.items.forEach((it,idx)=>{
+      const row=document.createElement("div"); row.className="prio-row"+(it.done?" done":"");
+      if(it.text.trim()){ row.draggable=true; row.addEventListener("dragstart",e=>{ e.dataTransfer.setData("text/plain",it.id); }); }
+      const check=document.createElement("button"); check.className="todo-check"; check.type="button"; check.setAttribute("aria-label","Erledigt umschalten");
+      check.innerHTML=`<svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>`;
+      check.addEventListener("click",()=>setDone(it,!it.done));
+      const inp=document.createElement("input"); inp.type="text"; inp.value=it.text; inp.placeholder=`Priorität ${idx+1} …`; inp.setAttribute("aria-label","Priorität");
+      inp.addEventListener("input",()=>{ it.text=inp.value; savePrios(); });
+      inp.addEventListener("blur",()=>buildPrios());
+      const dot=document.createElement("button"); dot.className="prio-dot"; dot.type="button"; dot.title="In normale ToDo umwandeln"; dot.setAttribute("aria-label","In normale ToDo umwandeln");
+      dot.addEventListener("click",()=>demotePrio(it));
+      row.append(check,inp,dot); panel.appendChild(row);
+    });
+    if(prios.items.length<3){
+      const addP=document.createElement("button"); addP.className="ghost-add mint"; addP.type="button"; addP.textContent="+ Prio";
+      addP.addEventListener("click",()=>{ prios.items.push({id:uid(),text:"",done:false}); savePrios(); buildPrios(); const ins=document.querySelectorAll(".prio-row input"); if(ins.length) ins[ins.length-1].focus(); });
+      panel.appendChild(addP);
+    }
+    const lblT=document.createElement("div"); lblT.className="sub-label with-line"; lblT.textContent="Weitere ToDos";
+    panel.appendChild(lblT);
+    const add=document.createElement("div"); add.className="add-row";
+    const input=document.createElement("input"); input.type="text"; input.maxLength=90; input.placeholder="Weitere ToDo hinzufügen …"; input.setAttribute("aria-label","Neue ToDo");
+    const addBtn=document.createElement("button"); addBtn.className="add-btn"; addBtn.type="button"; addBtn.textContent="+"; addBtn.setAttribute("aria-label","Hinzufügen");
+    const commit=()=>{ const v=input.value.trim(); if(!v) return; prios.todos.push({id:uid(),text:v,done:false}); savePrios(); buildPrios(); const ni=document.querySelector("#view-prios .add-row input"); if(ni) ni.focus(); };
+    addBtn.addEventListener("click",commit);
+    input.addEventListener("keydown",e=>{ if(e.key==="Enter") commit(); });
+    add.append(input,addBtn); panel.appendChild(add);
+    prios.todos.forEach(t=>{
+      const row=document.createElement("div"); row.className="todo"+(t.done?" done":"");
+      row.draggable=true; row.addEventListener("dragstart",e=>{ e.dataTransfer.setData("text/plain",t.id); });
+      const check=document.createElement("button"); check.className="todo-check"; check.type="button"; check.setAttribute("aria-label","Erledigt umschalten");
+      check.innerHTML=`<svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>`;
+      check.addEventListener("click",()=>setDone(t,!t.done));
+      const txt=document.createElement("span"); txt.className="todo-text"; txt.textContent=t.text;
+      txt.addEventListener("click",()=>setDone(t,!t.done));
+      const del=document.createElement("button"); del.className="row-del"; del.type="button"; del.textContent="×"; del.setAttribute("aria-label","Löschen");
+      del.addEventListener("click",()=>{ prios.todos=prios.todos.filter(x=>x.id!==t.id); savePrios(); buildPrios(); });
+      row.append(check,txt,del); panel.appendChild(row);
+    });
+  }
+
+  /* ---------- Tagesansicht 6–23 Uhr ---------- */
+  /* ---------- Tagesansicht 6–24 Uhr (frei ziehbare Blöcke) ---------- */
+  const TL_START=6*60, TL_END=24*60, TL_PXMIN=48/60, TL_SNAP=15, TL_MINDUR=15;
+  const y2min=y=>TL_START + Math.round((y/TL_PXMIN)/TL_SNAP)*TL_SNAP;
+  const min2y=m=>(m-TL_START)*TL_PXMIN;
+  const clampMin=m=>Math.max(TL_START, Math.min(TL_END-TL_MINDUR, m));
+  const fmtMin=m=>String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0");
+  function taskStart(o){ if(typeof o.start==="number") return o.start; if(typeof o.hour==="number") return o.hour*60; return null; }
+  function taskDur(o){ return (typeof o.dur==="number" && o.dur>=TL_MINDUR) ? o.dur : 60; }
+  function placeTask(o,startMin,durMin){
+    o.start=clampMin(startMin); delete o.hour;
+    o.dur=Math.max(TL_MINDUR, Math.min(durMin, TL_END-o.start));
+    savePrios();
+  }
+  function buildTimeline(view){
+    const panel=document.createElement("section"); panel.className="panel timeline";
+    panel.style.setProperty("--c","var(--sky)"); panel.style.setProperty("--c-tint","var(--sky-tint)");
+    const head=document.createElement("div"); head.className="panel-head";
+    head.innerHTML=`<span class="dot"></span><span class="eyebrow">Tagesansicht</span><span class="tl-hint">ziehen &amp; Kante fassen</span>`;
+    panel.appendChild(head);
+
+    const wrap=document.createElement("div"); wrap.className="tl-wrap";
+    const track=document.createElement("div"); track.className="tl-track";
+    track.style.height=((TL_END-TL_START)*TL_PXMIN)+"px";
+    for(let h=6; h<=24; h++){
+      const line=document.createElement("div"); line.className="tl-line"+(h===24?" last":"");
+      line.style.top=min2y(h*60)+"px";
+      const lab=document.createElement("span"); lab.className="tl-hour"; lab.textContent=String(h%24).padStart(2,"0")+":00";
+      line.appendChild(lab); track.appendChild(line);
+    }
+    // Jetzt-Linie
+    if(isToday()){
+      const now=new Date(), nm=now.getHours()*60+now.getMinutes();
+      if(nm>=TL_START && nm<=TL_END){
+        const nl=document.createElement("div"); nl.className="tl-now"; nl.style.top=min2y(nm)+"px";
+        track.appendChild(nl);
+      }
+    }
+    // Kalender-Termine
+    (calEvents[state.viewDate]||[]).forEach(ev=>{
+      const el=document.createElement("div"); el.className="tl-event";
+      el.style.top=min2y(Math.max(TL_START,ev.start))+"px";
+      el.style.height=Math.max(22,(Math.min(ev.start+ev.dur,TL_END)-Math.max(TL_START,ev.start))*TL_PXMIN-2)+"px";
+      el.innerHTML=`<span class="tl-ev-time"></span><span class="tl-ev-title"></span>`;
+      el.querySelector(".tl-ev-time").textContent=ev.allDay?"ganztägig":fmtMin(ev.start);
+      el.querySelector(".tl-ev-title").textContent=ev.title;
+      track.appendChild(el);
+    });
+    // Aufgabenblöcke
+    allTasks().forEach(x=>{
+      const st=taskStart(x.o); if(st===null) return;
+      const dur=taskDur(x.o);
+      const b=document.createElement("div");
+      b.className="tl-block"+(x.o.done?" done":"")+(x.type==="prio"?" prio":"");
+      b.style.top=min2y(st)+"px"; b.style.height=(dur*TL_PXMIN-3)+"px";
+      const ck=document.createElement("button"); ck.className="todo-check sm"; ck.type="button"; ck.setAttribute("aria-label","Erledigt umschalten");
+      ck.innerHTML=`<svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>`;
+      ck.addEventListener("click",e=>{ e.stopPropagation(); setDone(x.o,!x.o.done); });
+      const body=document.createElement("div"); body.className="tl-b-body";
+      const tx=document.createElement("div"); tx.className="tl-b-text"; tx.textContent=x.o.text;
+      const tm=document.createElement("div"); tm.className="tl-b-time"; tm.textContent=fmtMin(st)+"–"+fmtMin(Math.min(st+dur,TL_END));
+      body.append(tx,tm);
+      const rm=document.createElement("button"); rm.className="tl-b-x"; rm.type="button"; rm.textContent="×"; rm.title="Aus der Tagesansicht nehmen";
+      rm.addEventListener("click",e=>{ e.stopPropagation(); delete x.o.start; delete x.o.dur; delete x.o.hour; savePrios(); buildPrios(); });
+      const res=document.createElement("div"); res.className="tl-b-res"; res.title="Dauer ändern";
+      b.append(ck,body,rm,res);
+      attachBlockDrag(b,x.o,track,tm);
+      track.appendChild(b);
+    });
+    // Ablegen aus der Liste
+    track.addEventListener("dragover",e=>{ e.preventDefault(); track.classList.add("over"); });
+    track.addEventListener("dragleave",()=>track.classList.remove("over"));
+    track.addEventListener("drop",e=>{
+      e.preventDefault(); track.classList.remove("over");
+      const id=e.dataTransfer.getData("text/plain"); const f=findTask(id); if(!f) return;
+      const r=track.getBoundingClientRect();
+      placeTask(f.o, clampMin(y2min(e.clientY-r.top)), taskDur(f.o));
+      buildPrios();
+    });
+    wrap.appendChild(track); panel.appendChild(wrap);
+
+    const foot=document.createElement("div"); foot.className="tl-foot";
+    const cfgBtn=document.createElement("button"); cfgBtn.className="tl-cal-btn"; cfgBtn.type="button";
+    cfgBtn.textContent = calCfg.url ? "Kalender-Link ändern" : "iCloud-Kalender verbinden";
+    cfgBtn.addEventListener("click",setupCalendar);
+    foot.appendChild(cfgBtn);
+    if(calCfg.url){ const st=document.createElement("span"); st.className="tl-cal-status"; st.textContent=calStatus||""; foot.appendChild(st); }
+    panel.appendChild(foot);
+    view.appendChild(panel);
+  }
+  function attachBlockDrag(el,obj,track,timeEl){
+    let mode=null, startY=0, origStart=0, origDur=0;
+    const onDown=e=>{
+      if(e.target.closest(".todo-check, .tl-b-x")) return;
+      mode = e.target.classList.contains("tl-b-res") ? "resize" : "move";
+      startY=e.clientY; origStart=taskStart(obj); origDur=taskDur(obj);
+      el.classList.add("dragging"); el.setPointerCapture&&el.setPointerCapture(e.pointerId);
+      e.preventDefault();
+    };
+    const onMove=e=>{
+      if(!mode) return;
+      const dMin=Math.round(((e.clientY-startY)/TL_PXMIN)/TL_SNAP)*TL_SNAP;
+      if(mode==="move"){
+        const ns=Math.max(TL_START, Math.min(TL_END-origDur, origStart+dMin));
+        el.style.top=min2y(ns)+"px";
+        if(timeEl) timeEl.textContent=fmtMin(ns)+"–"+fmtMin(ns+origDur);
+        el.dataset.ns=ns;
+      }else{
+        const nd=Math.max(TL_MINDUR, Math.min(origDur+dMin, TL_END-origStart));
+        el.style.height=(nd*TL_PXMIN-3)+"px";
+        if(timeEl) timeEl.textContent=fmtMin(origStart)+"–"+fmtMin(origStart+nd);
+        el.dataset.nd=nd;
+      }
+    };
+    const onUp=()=>{
+      if(!mode) return;
+      if(mode==="move") placeTask(obj, Number(el.dataset.ns||origStart), origDur);
+      else placeTask(obj, origStart, Number(el.dataset.nd||origDur));
+      mode=null; el.classList.remove("dragging"); buildPrios();
+    };
+    el.addEventListener("pointerdown",onDown);
+    el.addEventListener("pointermove",onMove);
+    el.addEventListener("pointerup",onUp);
+    el.addEventListener("pointercancel",onUp);
+  }
+
+/* ---------- Archiv ---------- */
+  function todayDoneEntries(){
+    const out=[];
+    prios.items.forEach(i=>{ if(i.text.trim()&&i.done) out.push({text:i.text,type:"prio",day:prios.day,doneAt:i.doneAt}); });
+    prios.todos.forEach(t=>{ if(t.text.trim()&&t.done) out.push({text:t.text,type:"todo",day:prios.day,doneAt:t.doneAt}); });
+    return out;
+  }
+  function buildArchiv(panel){
+    const back=document.createElement("button"); back.className="ghost-add"; back.type="button"; back.textContent="← Zurück zu Heute";
+    back.addEventListener("click",()=>{ state.priosSub="heute"; buildPrios(); });
+    panel.appendChild(back);
+    const all=todayDoneEntries().concat(prios.archive||[]);
+    if(all.length===0){
+      const e=document.createElement("div"); e.className="empty";
+      e.textContent="Noch nichts erledigt. Abgehakte Prios und ToDos landen hier — mit Datum und Uhrzeit.";
+      panel.appendChild(e); return;
+    }
+    const groups={};
+    all.forEach(a=>{ const d=a.day||"—"; (groups[d]=groups[d]||[]).push(a); });
+    Object.keys(groups).sort().reverse().forEach(day=>{
+      const lbl=document.createElement("div"); lbl.className="sub-label with-line";
+      lbl.textContent = day===today ? "Heute" : new Date(day+"T00:00:00").toLocaleDateString("de-DE",{weekday:"short",day:"numeric",month:"long"});
+      panel.appendChild(lbl);
+      groups[day].forEach(a=>{
+        const row=document.createElement("div"); row.className="arch-row";
+        const tag=document.createElement("span"); tag.className="arch-tag"+(a.type==="prio"?" prio":""); tag.textContent=a.type==="prio"?"Prio":"ToDo";
+        const txt=document.createElement("span"); txt.className="arch-text"; txt.textContent=a.text;
+        const tm=document.createElement("span"); tm.className="arch-time";
+        tm.textContent = a.doneAt ? new Date(a.doneAt).toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"}) : "—";
+        row.append(tag,txt,tm); panel.appendChild(row);
+      });
+    });
+  }
+  function demotePrio(it){
+    prios.items=prios.items.filter(x=>x.id!==it.id);
+    if(it.text.trim()) prios.todos.unshift({id:uid(),text:it.text.trim(),done:it.done});
+    savePrios(); buildPrios();
+  }
+  function parkBackOne(p){
+    if(p.type==="todo"){ prios.todos.push({id:uid(),text:p.text,done:false}); }
+    else { const slot=prios.items.find(x=>!x.text.trim()); if(slot){ slot.text=p.text; } else { prios.todos.push({id:uid(),text:p.text,done:false}); } }
+    prios.park=prios.park.filter(x=>x.id!==p.id);
+    state.priosSub="heute"; savePrios(); buildPrios();
+  }
+  function parkBackAll(){
+    prios.park.forEach(p=>{
+      if(p.type==="todo"){ prios.todos.push({id:uid(),text:p.text,done:false}); }
+      else { const slot=prios.items.find(x=>!x.text.trim()); if(slot){ slot.text=p.text; } else { prios.todos.push({id:uid(),text:p.text,done:false}); } }
+    });
+    prios.park=[]; state.priosSub="heute"; savePrios(); buildPrios();
+  }
+  function buildParkplatz(panel){
+    if(prios.park.length===0){
+      const e=document.createElement("div"); e.className="empty";
+      e.textContent="Leer. Hier sammeln sich Prios und ToDos, die du an einem Tag nicht abgehakt hast.";
+      panel.appendChild(e); return;
+    }
+    const all=document.createElement("button"); all.className="ghost-add mint"; all.type="button"; all.textContent="↩ Alle zu Heute holen";
+    all.addEventListener("click",parkBackAll);
+    panel.appendChild(all);
+    prios.park.forEach(p=>{
+      const isTodo=(p.type==="todo");
+      const row=document.createElement("div"); row.className="park-row"+(isTodo?" muted":"");
+      const txt=document.createElement("span"); txt.className="park-text"; txt.textContent=p.text;
+      const back=document.createElement("button"); back.className="park-back"; back.type="button"; back.textContent="→ Heute";
+      back.addEventListener("click",()=>parkBackOne(p));
+      const del=document.createElement("button"); del.className="row-del"; del.type="button"; del.textContent="×"; del.setAttribute("aria-label","Löschen");
+      del.addEventListener("click",()=>{ prios.park=prios.park.filter(x=>x.id!==p.id); savePrios(); buildPrios(); });
+      row.append(txt,back,del); panel.appendChild(row);
+    });
+  }
+
+  /* ---------- Zitate ---------- */
+  const QUOTE_GRADS=[
+    "linear-gradient(135deg,#9B7DF5,#5B8DEF)",
+    "linear-gradient(135deg,#16B981,#5B8DEF)",
+    "linear-gradient(135deg,#F4A52E,#FB7185)",
+    "linear-gradient(135deg,#FB7185,#9B7DF5)",
+    "linear-gradient(135deg,#0EA5A5,#16B981)"
+  ];
+  function saveQuotes(){ write(QUOTES,quotes); }
+  function buildQuotes(panel){
+    if(quoteTimer){ clearInterval(quoteTimer); quoteTimer=null; }
+    const lbl=document.createElement("div"); lbl.className="sub-label with-line reveal"; lbl.textContent="Zitate";
+    panel.appendChild(lbl);
+
+    if(quotes.length){
+      const feat=document.createElement("div"); feat.className="quote-feature reveal";
+      const inner=document.createElement("div"); inner.className="quote-feature-inner";
+      feat.appendChild(inner);
+      let qi=Math.floor(Math.random()*quotes.length);
+      const paint=()=>{
+        const q=quotes[qi%quotes.length];
+        feat.style.background=QUOTE_GRADS[(qi%QUOTE_GRADS.length)];
+        inner.classList.remove("in"); void inner.offsetWidth; inner.classList.add("in");
+        inner.innerHTML=`<div class="quote-mark">“</div><div class="quote-body"></div><div class="quote-author"></div>`;
+        inner.querySelector(".quote-body").textContent=q.text;
+        inner.querySelector(".quote-author").textContent=q.author?("— "+q.author):"";
+      };
+      paint();
+      feat.addEventListener("click",()=>{ qi=(qi+1)%quotes.length; paint(); });
+      if(quotes.length>1) quoteTimer=setInterval(()=>{ qi=(qi+1)%quotes.length; paint(); },8000);
+      panel.appendChild(feat);
+    }
+
+    quotes.forEach((q,i)=>{
+      const row=document.createElement("div"); row.className="quote-row";
+      const bar=document.createElement("span"); bar.className="quote-bar"; bar.style.background=QUOTE_GRADS[i%QUOTE_GRADS.length];
+      const wrap=document.createElement("div"); wrap.className="quote-wrap";
+      const t=document.createElement("div"); t.className="quote-text"; t.textContent=q.text;
+      const a=document.createElement("div"); a.className="quote-by"; a.textContent=q.author||"";
+      wrap.append(t,a);
+      const del=document.createElement("button"); del.className="row-del"; del.type="button"; del.textContent="×"; del.setAttribute("aria-label","Zitat löschen");
+      del.addEventListener("click",()=>{ quotes=quotes.filter(x=>x.id!==q.id); saveQuotes(); buildVision(); });
+      row.append(bar,wrap,del); panel.appendChild(row);
+    });
+
+    const add=document.createElement("div"); add.className="add-row quote-add";
+    const qt=document.createElement("input"); qt.type="text"; qt.placeholder="Zitat …"; qt.setAttribute("aria-label","Zitat");
+    const qa=document.createElement("input"); qa.type="text"; qa.className="qa"; qa.placeholder="Von wem?"; qa.setAttribute("aria-label","Urheber");
+    const btn=document.createElement("button"); btn.className="add-btn"; btn.type="button"; btn.textContent="+"; btn.setAttribute("aria-label","Zitat hinzufügen");
+    const commit=()=>{ const v=qt.value.trim(); if(!v) return; quotes.push({id:uid(),text:v,author:qa.value.trim()}); saveQuotes(); buildVision(); };
+    btn.addEventListener("click",commit);
+    qt.addEventListener("keydown",e=>{ if(e.key==="Enter") commit(); });
+    qa.addEventListener("keydown",e=>{ if(e.key==="Enter") commit(); });
+    add.append(qt,qa,btn); panel.appendChild(add);
+  }
+
+  /* ---------- Vizija ---------- */
+  function saveVision(){ write(VIS,vision); }
+  const firstText=arr=>{ const p=(arr||[]).find(x=>x.text&&x.text.trim()); return p?p.text.trim():""; };
+  function yearInfo(){
+    const y=new Date().getFullYear(), start=y+"-01-01", end=y+"-12-31";
+    const total=daysBetween(start,end)+1, dayNo=Math.min(total,daysBetween(start,today)+1);
+    return {label:""+y, dayNo, total, remaining:total-dayNo, pct:Math.round(dayNo/total*100)};
+  }
+  function quarterInfo(){
+    const now=new Date(), y=now.getFullYear(), q=Math.floor(now.getMonth()/3), sm=q*3;
+    const start=ymd(new Date(y,sm,1)), end=ymd(new Date(y,sm+3,0));
+    const total=daysBetween(start,end)+1, dayNo=Math.min(total,daysBetween(start,today)+1);
+    return {label:"Q"+(q+1), year:y, dayNo, total, remaining:total-dayNo, pct:Math.round(dayNo/total*100)};
+  }
+  // Meta pro Ebene: Punkte holen, Farbe, Kopplungsziel
+  function visPoints(key){ return key==="year"?vision.year.points : key==="quarter"?vision.quarter.points : vision.points; }
+  function visParentKey(key){ return key==="quarter"?"year" : key==="year"?"big" : null; }
+  // Rendert eine Ebene als klappbare Stufe der Kaskade
+  function renderVisTier(cfg){
+    const {key, num, kicker, grad, accent, tint, placeholder, coupleTo} = cfg;
+    const open = vision.open[key] !== false;
+    const tier=document.createElement("div"); tier.className="vtier reveal"+(open?" open":""); tier.dataset.level=key;
+    tier.style.setProperty("--c",accent); tier.style.setProperty("--c-tint",tint); tier.style.setProperty("--grad",grad);
+    const pts=visPoints(key);
+
+    const bar=document.createElement("button"); bar.type="button"; bar.className="vtier-bar";
+    bar.innerHTML=`
+      <span class="vtier-glow" aria-hidden="true"></span>
+      <span class="vtier-sheen" aria-hidden="true"></span>
+      <span class="vtier-num">${num}</span>
+      <span class="vtier-titles">
+        <span class="vtier-kicker">${kicker}</span>
+        <span class="vtier-meta">${pts.length? (pts.length===1?"1 Ziel":pts.length+" Ziele") : "noch leer"}</span>
+      </span>
+      <span class="vtier-chev" aria-hidden="true">⌄</span>`;
+    bar.addEventListener("click",()=>{ const willOpen=!tier.classList.contains("open"); tier.classList.toggle("open",willOpen); vision.open[key]=willOpen; saveVision(); });
+    tier.appendChild(bar);
+
+    const collapse=document.createElement("div"); collapse.className="vtier-collapse";
+    const inner=document.createElement("div"); inner.className="vtier-inner";
+
+    if(pts.length===0){
+      const e=document.createElement("div"); e.className="vtier-empty"; e.textContent=placeholder;
+      inner.appendChild(e);
+    }
+    pts.forEach(p=>{
+      const row=document.createElement("div"); row.className="vgoal"+(coupleTo && p.parent?" linked":"");
+      row.dataset.id=p.id;
+      const dot=document.createElement("span"); dot.className="vgoal-dot";
+      const inp=document.createElement("input"); inp.type="text"; inp.value=p.text; inp.placeholder="Ziel…"; inp.setAttribute("aria-label","Ziel");
+      inp.addEventListener("input",()=>{ p.text=inp.value; saveVision(); });
+      row.append(dot,inp);
+      if(coupleTo){
+        const parents=visPoints(coupleTo).filter(x=>x.text&&x.text.trim());
+        const link=document.createElement("button"); link.type="button"; link.className="vgoal-link"+(p.parent?" set":"");
+        const parentObj = p.parent && parents.find(x=>x.id===p.parent);
+        link.innerHTML = parentObj ? `<span class="vl-ic">↳</span><span class="vl-tx">${esc(parentObj.text.trim())}</span>`
+                                   : `<span class="vl-ic">↳</span><span class="vl-tx muted">an Jahresziel koppeln</span>`;
+        link.title="Mit einem Jahresziel verknüpfen";
+        link.addEventListener("click",()=>openCoupleMenu(p, coupleTo, link));
+        row.appendChild(link);
+      }
+      const del=document.createElement("button"); del.className="row-del"; del.type="button"; del.textContent="×"; del.setAttribute("aria-label","Löschen");
+      del.addEventListener("click",()=>{ const a=visPoints(key); const i=a.findIndex(x=>x.id===p.id); if(i>=0)a.splice(i,1);
+        if(key==="year") vision.quarter.points.forEach(q=>{ if(q.parent===p.id) delete q.parent; });
+        saveVision(); buildVision(); });
+      row.append(del);
+      inner.appendChild(row);
+    });
+    const add=document.createElement("button"); add.className="vtier-add"; add.type="button"; add.textContent="+ Ziel";
+    add.addEventListener("click",()=>{ visPoints(key).push({id:uid(),text:""}); if(vision.open[key]===false) vision.open[key]=true; saveVision(); buildVision();
+      const ins=document.querySelectorAll(`.vtier[data-level="${key}"] .vgoal input`); if(ins.length) ins[ins.length-1].focus(); });
+    inner.appendChild(add);
+
+    collapse.appendChild(inner); tier.appendChild(collapse);
+    return tier;
+  }
+  // kleines Auswahlmenü zum Koppeln
+  function openCoupleMenu(qPoint, parentKey, anchor){
+    document.querySelectorAll(".couple-pop").forEach(x=>x.remove());
+    const parents=visPoints(parentKey).filter(x=>x.text&&x.text.trim());
+    const pop=document.createElement("div"); pop.className="couple-pop";
+    if(!parents.length){ const e=document.createElement("div"); e.className="cp-empty"; e.textContent="Erst ein Jahresziel anlegen."; pop.appendChild(e); }
+    parents.forEach(pp=>{
+      const b=document.createElement("button"); b.type="button"; b.className="cp-item"+(qPoint.parent===pp.id?" on":""); b.textContent=pp.text.trim();
+      b.addEventListener("click",()=>{ qPoint.parent = (qPoint.parent===pp.id?undefined:pp.id); saveVision(); pop.remove(); buildVision(); });
+      pop.appendChild(b);
+    });
+    if(qPoint.parent){ const c=document.createElement("button"); c.type="button"; c.className="cp-clear"; c.textContent="Verknüpfung lösen";
+      c.addEventListener("click",()=>{ delete qPoint.parent; saveVision(); pop.remove(); buildVision(); }); pop.appendChild(c); }
+    anchor.appendChild(pop);
+    setTimeout(()=>{ const off=e=>{ if(!pop.contains(e.target)){ pop.remove(); document.removeEventListener("click",off,true);} }; document.addEventListener("click",off,true); },0);
+  }
+  function buildVision(){
+    if(visionTimer){ clearInterval(visionTimer); visionTimer=null; }
+    const view=document.getElementById("view-vizija"); view.innerHTML="";
+    const panel=document.createElement("section"); panel.className="panel vizija-panel cascade";
+    panel.style.setProperty("--c","var(--violet)"); panel.style.setProperty("--c-tint","var(--violet-tint)");
+
+    const aurora=document.createElement("div"); aurora.className="aurora"; aurora.setAttribute("aria-hidden","true");
+    aurora.innerHTML=`<span class="orb o1"></span><span class="orb o2"></span><span class="orb o3"></span>`;
+    panel.appendChild(aurora);
+
+    const head=document.createElement("div"); head.className="panel-head reveal";
+    head.innerHTML=`<span class="dot"></span><span class="eyebrow">Vizija</span><span class="vis-hint">Nordstern → Jahr → Quartal</span>`;
+    panel.appendChild(head);
+
+    const flow=document.createElement("div"); flow.className="vflow";
+    flow.appendChild(renderVisTier({key:"big", num:"I", kicker:"Große Vizija",
+      grad:"linear-gradient(120deg,#7C5CF0,#5B34D6 55%,#3B1E9A)", accent:"var(--violet)", tint:"var(--violet-tint)",
+      placeholder:"Worauf läuft alles hinaus? Dein Nordstern."}));
+    flow.appendChild(renderVisTier({key:"year", num:"II", kicker:"1-Jahres-Vision",
+      grad:"linear-gradient(120deg,#FBBF24,#F59E0B 55%,#EA580C)", accent:"var(--amber)", tint:"var(--amber-tint)",
+      placeholder:"Wie sieht dieses Jahr aus, wenn die Vizija realer wird?"}));
+    flow.appendChild(renderVisTier({key:"quarter", num:"III", kicker:"Dieses Quartal",
+      grad:"linear-gradient(120deg,#22D3EE,#0EA5A5 55%,#0369A1)", accent:"var(--sky)", tint:"var(--sky-tint)",
+      placeholder:"Was wird in diesen ~90 Tagen wahr?", coupleTo:"year"}));
+    panel.appendChild(flow);
+
+    // Quartals-Countdown am Fuß
+    const info=quarterInfo();
+    const hero=document.createElement("div"); hero.className="vis-hero reveal q";
+    hero.innerHTML=`
+      <div class="vis-hero-glow"></div>
+      <div class="vis-hero-in">
+        <div class="vis-hero-top">
+          <span class="vis-hero-label">${info.label} · ${info.year}</span>
+          <span class="vis-hero-count">noch ${info.remaining} Tage</span>
+        </div>
+        <div class="vis-hero-bar"><span style="width:${info.pct}%"></span></div>
+        <div class="vis-hero-sub">Tag ${info.dayNo} von ${info.total} · ${info.pct}%</div>
+      </div>`;
+    panel.appendChild(hero);
+
+    // Bilder + Zitate (zur großen Vizija gehörig, ganz unten)
+    const imgWrap=document.createElement("div"); imgWrap.className="vis-images";
+    panel.appendChild(imgWrap);
+    if(vision.images.length){
+      const show=document.createElement("div"); show.className="slideshow reveal";
+      vision.images.forEach((img,i)=>{
+        const im=document.createElement("img"); im.className="slide"+(i===0?" active":""); im.src=img.src; im.alt="Vision";
+        im.addEventListener("click",()=>openLightbox(img.src));
+        show.appendChild(im);
+      });
+      imgWrap.appendChild(show);
+      if(vision.images.length>1){
+        const slides=show.querySelectorAll(".slide"); let idx=0;
+        visionTimer=setInterval(()=>{ slides[idx].classList.remove("active"); idx=(idx+1)%slides.length; slides[idx].classList.add("active"); },3000);
+      }
+    }
+    buildQuotes(panel);
+    const board=document.createElement("div"); board.className="board";
+    vision.images.forEach(img=>{
+      const cell=document.createElement("div"); cell.className="thumb";
+      const im=document.createElement("img"); im.src=img.src; im.alt="Vision-Bild"; im.loading="lazy";
+      im.addEventListener("click",()=>openLightbox(img.src));
+      const del=document.createElement("button"); del.className="thumb-del"; del.type="button"; del.textContent="×"; del.setAttribute("aria-label","Bild entfernen");
+      del.addEventListener("click",()=>{ vision.images=vision.images.filter(x=>x.id!==img.id); saveVision(); buildVision(); });
+      cell.append(im,del); board.appendChild(cell);
+    });
+    const tile=document.createElement("button"); tile.className="add-tile"; tile.type="button";
+    tile.innerHTML=`<span class="plus">+</span><span>Bild</span>`;
+    const file=document.createElement("input"); file.type="file"; file.accept="image/*"; file.multiple=true; file.style.display="none";
+    tile.addEventListener("click",()=>file.click());
+    file.addEventListener("change",e=>{ Array.from(e.target.files||[]).forEach(addImage); file.value=""; });
+    board.appendChild(tile); imgWrap.appendChild(board); imgWrap.appendChild(file);
+
+    view.appendChild(panel);
+  }
+  function addImage(f){
+    if(!f||!f.type.startsWith("image/")) return;
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      const img=new Image();
+      img.onload=()=>{
+        const max=560; let w=img.width,h=img.height;
+        if(w>h&&w>max){ h=Math.round(h*max/w); w=max; } else if(h>=w&&h>max){ w=Math.round(w*max/h); h=max; }
+        const cv=document.createElement("canvas"); cv.width=w; cv.height=h;
+        cv.getContext("2d").drawImage(img,0,0,w,h);
+        let src; try{ src=cv.toDataURL("image/jpeg",0.72); }catch(e){ src=ev.target.result; }
+        vision.images.push({id:uid(),src});
+        try{ write(VIS,vision); buildVision(); }
+        catch(e){ vision.images.pop(); alert("Speicher voll — entferne ein paar Bilder, dann geht's weiter."); }
+      };
+      img.src=ev.target.result;
+    };
+    reader.readAsDataURL(f);
+  }
+  function openLightbox(src){ const lb=document.getElementById("lightbox"); document.getElementById("lightboxImg").src=src; lb.classList.add("open"); }
+
+  /* ---------- Tagesevangelium (katholisch, deutsch) ---------- */
+  // Quelle: Evangelizo / "Evangelium Tag für Tag". Wird bevorzugt über den eigenen
+  // lokalen Server (/evangelium) geholt; faellt sonst auf den direkten Abruf zurueck.
+  const GOSPEL_PAGE="https://www.vaticannews.va/de/tagesevangelium-und-tagesliturgie.html";
+  let gospelLoaded=false;
+  function cleanText(t){ return String(t||"").replace(/<br\s*\/?>/gi,"\n").replace(/<\/p>/gi,"\n\n").replace(/<[^>]+>/g,"").replace(/&nbsp;/g," ").replace(/\n{3,}/g,"\n\n").trim(); }
+  async function fetchGospel(date){
+    const urls=["/evangelium?date="+date];
+    for(const u of urls){
+      try{
+        const r=await fetch(u,{cache:"no-store"});
+        if(!r||!r.ok) continue;
+        const j=await r.json();
+        if(j && j.error) continue;
+        const g=j.gospel||j; // Proxy liefert {ref,title,text}; API liefert {gospel:{...}}
+        const ref=g.reference_displayed||g.ref||"";
+        const stelle=g.stelle||"";
+        const title=g.title||"";
+        const text=cleanText(g.text||"");
+        if(text||ref) return {ref,stelle,title,text,source:j.source||"Evangelizo"};
+      }catch(e){ /* naechste Quelle */ }
+    }
+    return {error:true};
+  }
+  function extractStelle(text){
+    const first=(text||"").split("\n").map(s=>s.trim()).filter(Boolean)[0]||"";
+    const m=first.match(/([1-3]?\s?[A-Za-zÄÖÜäöü]{2,}\.?\s+\d+[,\. ]\s?\d+(?:\s?[-–]\s?\d+)?)/);
+    return m?m[1].replace(/\s+/g," ").trim():"";
+  }
+  function renderGospel(d){
+    const stelle=d.stelle||extractStelle(d.text);
+    document.getElementById("gospelRef").textContent = stelle || (d.ref||"");
+    document.getElementById("gospelTitle").textContent=d.title||"";
+    document.getElementById("gospelText").textContent=d.text||"";
+    document.getElementById("gospelSrc").innerHTML = d.source
+      ? ("Quelle: "+esc(d.source)+" · <a href=\""+GOSPEL_PAGE+"\" target=\"_blank\" rel=\"noopener\">Vatican News</a>")
+      : "";
+  }
+  async function loadGospel(){
+    if(gospelLoaded) return;
+    const key="gospelv4_"+today, textEl=document.getElementById("gospelText");
+    try{ const c=localStorage.getItem(key); if(c){ renderGospel(JSON.parse(c)); gospelLoaded=true; loadPapst(); return; } }catch(e){}
+    textEl.textContent="Lädt …";
+    const d=await fetchGospel(today);
+    if(d && !d.error){ try{localStorage.setItem(key,JSON.stringify(d));}catch(e){} renderGospel(d); gospelLoaded=true; loadPapst(); }
+    else{
+      document.getElementById("gospelRef").textContent="";
+      document.getElementById("gospelTitle").textContent="";
+      document.getElementById("gospelSrc").innerHTML="";
+      textEl.innerHTML="Konnte das Tagesevangelium gerade nicht laden. <a href=\""+GOSPEL_PAGE+"\" target=\"_blank\" rel=\"noopener\">Bei Vatican News öffnen</a>";
+      loadPapst();
+    }
+  }
+  /* ---------- Worte der Päpste (Meditation von Vatican News) ---------- */
+  let papstLoaded=false;
+  function renderPapst(d){
+    const box=document.getElementById("papst");
+    if(!d || d.error || !d.text){ box.setAttribute("hidden",""); return; }
+    box.removeAttribute("hidden");
+    document.getElementById("papstText").textContent=d.text;
+    const src=document.getElementById("papstSrc");
+    const q=d.quelle?esc(d.quelle):"Vatican News";
+    src.innerHTML = d.url
+      ? (esc(q)+" · <a href=\""+esc(d.url)+"\" target=\"_blank\" rel=\"noopener\">Vatican News</a>")
+      : esc(q);
+  }
+  async function loadPapst(){
+    if(papstLoaded) return;
+    const key="papstv2_"+today;
+    try{ const c=localStorage.getItem(key); if(c){ renderPapst(JSON.parse(c)); papstLoaded=true; return; } }catch(e){}
+    try{
+      const r=await fetch("/papst?date="+encodeURIComponent(today));
+      const d=await r.json();
+      if(d && !d.error && d.text){ try{localStorage.setItem(key,JSON.stringify(d));}catch(e){} renderPapst(d); papstLoaded=true; }
+      else{ renderPapst(null); }
+    }catch(e){ renderPapst(null); }
+  }
+  function toggleGospel(){
+    const btn=document.getElementById("gospelToggle"), panel=document.getElementById("gospelPanel");
+    const willOpen=panel.hasAttribute("hidden");
+    if(willOpen){ panel.removeAttribute("hidden"); btn.setAttribute("aria-expanded","true"); loadGospel(); }
+    else{ panel.setAttribute("hidden",""); btn.setAttribute("aria-expanded","false"); }
+  }
+
+  /* ---------- init ---------- */
+  document.getElementById("editBtn").addEventListener("click",toggleEdit);
+  document.getElementById("resetBtn").addEventListener("click",resetToday);
+  document.getElementById("wipePlain").addEventListener("click",()=>confirmWipe(false));
+  document.getElementById("wipeAll").addEventListener("click",()=>confirmWipe(true));
+  document.getElementById("saveBtn").addEventListener("click",doBackup);
+  document.getElementById("loadBtn").addEventListener("click",doRestore);
+  document.getElementById("gospelToggle").addEventListener("click",toggleGospel);
+  // Evangelium/Papst brauchen den lokalen Server - ohne ihn den Bereich ausblenden
+  (function(){
+    const h=location.hostname;
+    const hasServer = (h==="localhost" || h==="127.0.0.1" || /^\d+\.\d+\.\d+\.\d+$/.test(h));
+    if(!hasServer){
+      const t=document.getElementById("gospelToggle"); if(t) t.style.display="none";
+      const p=document.getElementById("gospelPanel"); if(p) p.setAttribute("hidden","");
+    }
+  })();
+  document.getElementById("tabs").addEventListener("click",e=>{ const b=e.target.closest("button[data-tab]"); if(b) setTab(b.dataset.tab); });
+  document.getElementById("lightbox").addEventListener("click",function(){ this.classList.remove("open"); });
+  (function(){
+    const ov=document.getElementById("schatzOverlay");
+    document.getElementById("schatzClose").addEventListener("click",closeSchatz);
+    document.getElementById("schatzSave").addEventListener("click",addSchatz);
+    ov.addEventListener("click",e=>{ if(e.target===ov) closeSchatz(); });
+    document.getElementById("schatzText").addEventListener("keydown",e=>{ if(e.key==="Enter"&&(e.metaKey||e.ctrlKey)) addSchatz(); });
+    document.getElementById("schatzAuthor").addEventListener("keydown",e=>{ if(e.key==="Enter") addSchatz(); });
+    document.addEventListener("keydown",e=>{ if(e.key==="Escape" && !ov.hidden) closeSchatz(); });
+  })();
+  (function(){
+    const cal=document.getElementById("calBtn"), tb=document.getElementById("todayBtn");
+    if(cal){ cal.addEventListener("click",toggleCalendar); }
+    if(tb){ tb.addEventListener("click",()=>{ state.viewDate=today; state.calOpen=false; state.backfill=false; renderHeute(); }); }
+  })();
+  document.addEventListener("visibilitychange",()=>{ if(!document.hidden&&ymd(new Date())!==today) location.reload(); });
+
+  renderHeute(); buildPrios(); buildVision();
+  if(calCfg.url) loadCalendar();
+  state.lastComplete=dayComplete(today);
+  state.lockinComplete=lockinAll(today);
+  setTab(state.tab);
+})();
+</script>
+</body>
+</html>

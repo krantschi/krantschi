@@ -1174,6 +1174,11 @@
       return bad?"badpw":"offline";
     }
   }
+  async function syncNow(){
+    const res=await syncPull();
+    if(res==="empty") await syncPush(true);
+    return res;
+  }
   async function setupSync(){
     const cur=(syncCfg&&syncCfg.pantry)||"";
     const id=prompt("Pantry-ID einfügen (kostenlos auf getpantry.cloud).\n\nLeer lassen = Abgleich ausschalten.", cur);
@@ -2433,10 +2438,10 @@
   document.getElementById("wipeAll").addEventListener("click",()=>confirmWipe(true));
   document.getElementById("saveBtn").addEventListener("click",doBackup);
   document.getElementById("loadBtn").addEventListener("click",doRestore);
-  document.getElementById("syncBtn").addEventListener("click",()=>{ if(syncOn()) syncPull(); else setupSync(); });
+  document.getElementById("syncBtn").addEventListener("click",()=>{ if(syncOn()) syncNow(); else setupSync(); });
   syncReady=true;
-  if(syncOn()){ setSyncStatus("prüft …"); syncPull(); }
-  document.addEventListener("visibilitychange",()=>{ if(!document.hidden && syncOn()) syncPull(); });
+  if(syncOn()){ setSyncStatus("prüft …"); syncNow(); }
+  document.addEventListener("visibilitychange",()=>{ if(!document.hidden && syncOn()) syncNow(); });
   document.getElementById("gospelToggle").addEventListener("click",toggleGospel);
   // Evangelium/Papst brauchen den lokalen Server - ohne ihn den Bereich ausblenden
   (function(){

@@ -1162,6 +1162,7 @@
     const r=await fetch(syncUrl(),{method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)});
     return {ok:r.ok, status:r.status, updatedAt:body.updatedAt};
   }
+  var lastSyncError="";
   async function syncPush(force){
     if(!syncOn()||syncBusy) return "busy";
     let data=collectSyncData(), noImages=false;
@@ -1169,6 +1170,7 @@
     if(plain.length>400000){ data=stripImages(data); plain=JSON.stringify(data); noImages=true; }
     if(!force && plain===lastPushedPlain) return "same";
     syncBusy=true; setSyncStatus("sichert …");
+    const kb=Math.round(plain.length/1024);
     try{
       let res=await pushOnce(plain,noImages);
       if(!res.ok && !noImages){            // vielleicht zu groß -> ohne Bilder erneut
@@ -1177,14 +1179,18 @@
       }
       if(!res.ok){
         const idOk=await pantryIdOk();
+        lastSyncError = (idOk===false ? "ID ungültig" : ("HTTP "+res.status)) + " · "+Math.round(plain.length/1024)+" KB";
         setSyncStatus(idOk===false ? "ID prüfen" : ("Fehler "+res.status));
         syncBusy=false; return "error";
       }
-      lastPushedPlain=plain;
+      lastPushedPlain=plain; lastSyncError="";
       syncCfg.lastAppliedAt=res.updatedAt; localStorage.setItem(SYNC,JSON.stringify(syncCfg));
       setSyncStatus(noImages?"aktuell (ohne Bilder)":"aktuell");
       syncBusy=false; return "ok";
-    }catch(e){ setSyncStatus("offline"); syncBusy=false; return "offline"; }
+    }catch(e){
+      lastSyncError="blockiert/kein Netz ("+((e&&e.message)||"?")+") · "+kb+" KB";
+      setSyncStatus("offline"); syncBusy=false; return "offline";
+    }
   }
   function dataWeight(store){
     let n=0;
@@ -1251,10 +1257,18 @@
       const id=idEl.value.trim();
       if(!id){ testMsg.textContent="Bitte zuerst die ID einfügen."; return; }
       testMsg.textContent="prüft …";
+      let readOk=false;
       try{
         const r=await fetch(PANTRY_BASE+encodeURIComponent(id),{cache:"no-store"});
-        testMsg.textContent = r.ok ? "✓ ID gültig – Verbindung steht." : ("✗ ID wird abgelehnt (Fehler "+r.status+")");
-      }catch(e){ testMsg.textContent="✗ Keine Verbindung zum Dienst."; }
+        readOk=r.ok;
+        if(!r.ok){ testMsg.textContent="✗ ID wird abgelehnt (Fehler "+r.status+")"; return; }
+      }catch(e){ testMsg.textContent="✗ Keine Verbindung zum Dienst."; return; }
+      // Schreibtest mit winziger Datenmenge
+      try{
+        const u=PANTRY_BASE+encodeURIComponent(id)+"/basket/heute-test";
+        const w=await fetch(u,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({t:Date.now()})});
+        testMsg.textContent = w.ok ? "✓ ID gültig, Schreiben funktioniert." : ("✗ Schreiben abgelehnt (Fehler "+w.status+")");
+      }catch(e){ testMsg.textContent="✗ Schreiben blockiert ("+((e&&e.message)||"?")+")"; }
     };
     document.getElementById("syncSave").onclick=async()=>{
       const id=idEl.value.trim(), p=pw1.value;
@@ -1275,7 +1289,7 @@
       }
       if(res==="badid"){ err.textContent="Die Pantry-ID wird abgelehnt. Bitte prüfen."; return; }
       if(res==="offline"){ err.textContent="Keine Verbindung. Es wurde nichts hochgeladen."; return; }
-      if(res==="empty"){ const p2=await syncPush(true); if(p2!=="ok"){ err.textContent="Hochladen fehlgeschlagen."; return; } }
+      if(res==="empty"){ const p2=await syncPush(true); if(p2!=="ok"){ err.textContent="Hochladen fehlgeschlagen: "+(lastSyncError||"unbekannt"); return; } }
       close();
     };
   }

@@ -788,8 +788,8 @@
     <div class="pw-modal" id="syncModal" role="dialog" aria-modal="true">
       <div class="pw-card">
         <div class="pw-title">Abgleich einrichten</div>
-        <div class="pw-note">Pantry-ID von getpantry.cloud einfügen. Auf beiden Geräten dieselbe ID und dasselbe Passwort.</div>
-        <input class="pw-input" type="text" id="syncId" placeholder="Pantry-ID einfügen" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Pantry-ID">
+        <div class="pw-note">GitHub-Token einfügen (mit Gist-Berechtigung). Auf beiden Geräten dasselbe Token und dasselbe Passwort.</div>
+        <input class="pw-input" type="text" id="syncId" placeholder="GitHub-Token einfügen" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="GitHub-Token">
         <button class="sync-test" id="syncTest" type="button">Verbindung testen</button>
         <div class="pw-err" id="syncTestMsg"></div>
         <input class="pw-input" type="password" id="syncPw" placeholder="Abgleich-Passwort" aria-label="Passwort">
@@ -1104,14 +1104,25 @@
     const pt=await subtle().decrypt({name:"AES-GCM", iv:unb64(payload.iv)}, key, unb64(payload.ct));
     return new TextDecoder().decode(pt);
   }
-  /* ---------- Automatischer Abgleich (verschlüsselt, Pantry als Transport) ---------- */
+  /* ---------- Automatischer Abgleich (verschlüsselt, privater Gist als Transport) ---------- */
   const SYNC="ht_sync_v1";
-  const PANTRY_BASE="https://getpantry.cloud/apiv1/pantry/";
+  const GH_API="https://api.github.com";
+  const GIST_DESC="heute-tracker-sync";
+  const GIST_FILE="heute.json";
   const SYNC_EXCLUDE=[LOCKTXT, CRYPTO, TAB, SYNC];   // Texte bleiben strikt lokal
   var syncCfg=null, syncReady=false, syncTimer=null, syncBusy=false, lastPushedPlain="";
   try{ syncCfg=JSON.parse(localStorage.getItem("ht_sync_v1")||"null"); }catch(e){ syncCfg=null; }
-  function syncOn(){ return !!(syncCfg && syncCfg.pantry && syncCfg.pw); }
-  function syncUrl(){ return PANTRY_BASE+encodeURIComponent(syncCfg.pantry)+"/basket/"+encodeURIComponent(syncCfg.basket||"heute"); }
+  function syncOn(){ return !!(syncCfg && syncCfg.token && syncCfg.pw); }
+  function ghHead(extra){ return Object.assign({Authorization:"Bearer "+syncCfg.token, Accept:"application/vnd.github+json"}, extra||{}); }
+  async function findGist(){
+    try{
+      const r=await fetch(GH_API+"/gists?per_page=100",{headers:ghHead(),cache:"no-store"});
+      if(!r.ok) return {ok:false,status:r.status};
+      const list=await r.json();
+      const g=(list||[]).find(x=>x.description===GIST_DESC || (x.files && x.files[GIST_FILE]));
+      return {ok:true, id:g?g.id:null};
+    }catch(e){ return {ok:false,status:0,net:true}; }
+  }
   function setSyncStatus(t){ const el=document.getElementById("syncLabel"); if(el) el.textContent=t; }
   function collectSyncData(){
     const d={};
@@ -1151,15 +1162,23 @@
     if(k && SYNC_EXCLUDE.indexOf(k)>=0) return;
     clearTimeout(syncTimer); syncTimer=setTimeout(()=>{ syncPush(false); },2500);
   }
-  async function pantryIdOk(){
-    try{ const r=await fetch(PANTRY_BASE+encodeURIComponent(syncCfg.pantry),{cache:"no-store"}); return r.ok; }
-    catch(e){ return null; }   // null = Netzproblem, nicht ID
+  async function tokenOk(){
+    try{ const r=await fetch(GH_API+"/gists?per_page=1",{headers:ghHead(),cache:"no-store"}); return r.ok; }
+    catch(e){ return null; }   // null = Netzproblem, nicht Token
   }
   async function pushOnce(plain,noImages){
     const salt=window.crypto.getRandomValues(new Uint8Array(16));
     const enc=await encWith(syncCfg.pw, salt, plain);
     const body={v:1, updatedAt:new Date().toISOString(), noImages:noImages, salt:b64(salt), iv:enc.iv, ct:enc.ct};
-    const r=await fetch(syncUrl(),{method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)});
+    const payload={description:GIST_DESC, files:{}};
+    payload.files[GIST_FILE]={content:JSON.stringify(body)};
+    let url=GH_API+"/gists", method="POST";
+    if(syncCfg.gist){ url=GH_API+"/gists/"+syncCfg.gist; method="PATCH"; }
+    else { payload.public=false; }
+    const r=await fetch(url,{method:method, headers:ghHead({"Content-Type":"application/json"}), body:JSON.stringify(payload)});
+    if(r.ok){
+      try{ const j=await r.json(); if(j && j.id){ syncCfg.gist=j.id; localStorage.setItem(SYNC,JSON.stringify(syncCfg)); } }catch(e){}
+    }
     return {ok:r.ok, status:r.status, updatedAt:body.updatedAt};
   }
   var lastSyncError="";
@@ -1178,9 +1197,9 @@
         res=await pushOnce(plain,noImages);
       }
       if(!res.ok){
-        const idOk=await pantryIdOk();
-        lastSyncError = (idOk===false ? "ID ungültig" : ("HTTP "+res.status)) + " · "+Math.round(plain.length/1024)+" KB";
-        setSyncStatus(idOk===false ? "ID prüfen" : ("Fehler "+res.status));
+        const tOk=await tokenOk();
+        lastSyncError = (tOk===false ? "Token ungültig" : ("HTTP "+res.status)) + " · "+Math.round(plain.length/1024)+" KB";
+        setSyncStatus(tOk===false ? "Token prüfen" : ("Fehler "+res.status));
         syncBusy=false; return "error";
       }
       lastPushedPlain=plain; lastSyncError="";
@@ -1203,21 +1222,27 @@
     if(!syncOn()||syncBusy) return "busy";
     syncBusy=true; setSyncStatus("prüft …");
     try{
-      const r=await fetch(syncUrl(),{cache:"no-store"});
-      if(r.status===400||r.status===404){
-        const idOk=await pantryIdOk();
-        syncBusy=false;
-        if(idOk===false){ setSyncStatus("ID prüfen"); return "badid"; }
-        setSyncStatus("leer"); return "empty";
+      if(!syncCfg.gist){
+        const f=await findGist();
+        if(!f.ok){ syncBusy=false; if(f.net){ setSyncStatus("offline"); return "offline"; } setSyncStatus("Token prüfen"); return "badid"; }
+        if(!f.id){ syncBusy=false; setSyncStatus("leer"); return "empty"; }
+        syncCfg.gist=f.id; localStorage.setItem(SYNC,JSON.stringify(syncCfg));
       }
+      const r=await fetch(GH_API+"/gists/"+syncCfg.gist,{headers:ghHead(),cache:"no-store"});
+      if(r.status===404){ syncCfg.gist=""; localStorage.setItem(SYNC,JSON.stringify(syncCfg)); syncBusy=false; setSyncStatus("leer"); return "empty"; }
+      if(r.status===401||r.status===403){ syncBusy=false; setSyncStatus("Token prüfen"); return "badid"; }
       if(!r.ok) throw new Error("HTTP "+r.status);
-      const body=await r.json();
+      const j=await r.json();
+      const file=j.files && j.files[GIST_FILE];
+      if(!file){ syncBusy=false; setSyncStatus("leer"); return "empty"; }
+      let content=file.content;
+      if(file.truncated && file.raw_url){ const rr=await fetch(file.raw_url,{cache:"no-store"}); content=await rr.text(); }
+      const body=JSON.parse(content);
       if(!body||!body.ct){ syncBusy=false; setSyncStatus("leer"); return "empty"; }
       if(syncCfg.lastAppliedAt && body.updatedAt<=syncCfg.lastAppliedAt){ setSyncStatus("aktuell"); syncBusy=false; return "uptodate"; }
       const plain=await decWith(syncCfg.pw, unb64(body.salt), {iv:body.iv, ct:body.ct});
       let data=JSON.parse(plain);
       if(body.noImages) data=keepLocalImages(data);
-      // Schutz: nicht versehentlich viele lokale Daten durch einen fast leeren Stand ersetzen
       const mine=dataWeight(null), theirs=dataWeight(data);
       if(mine>5 && theirs*3 < mine){
         syncBusy=false;
@@ -1246,7 +1271,7 @@
     const ov=document.getElementById("syncModal");
     const idEl=document.getElementById("syncId"), pw1=document.getElementById("syncPw"), pw2=document.getElementById("syncPw2");
     const err=document.getElementById("syncErr"), testMsg=document.getElementById("syncTestMsg");
-    idEl.value=(syncCfg&&syncCfg.pantry)||""; pw1.value=""; pw2.value=""; err.textContent=""; testMsg.textContent="";
+    idEl.value=(syncCfg&&syncCfg.token)||""; pw1.value=""; pw2.value=""; err.textContent=""; testMsg.textContent="";
     ov.classList.add("open"); setTimeout(()=>idEl.focus(),30);
     const close=()=>{ ov.classList.remove("open"); };
     document.getElementById("syncCancel").onclick=close;
@@ -1255,28 +1280,22 @@
     };
     document.getElementById("syncTest").onclick=async()=>{
       const id=idEl.value.trim();
-      if(!id){ testMsg.textContent="Bitte zuerst die ID einfügen."; return; }
+      if(!id){ testMsg.textContent="Bitte zuerst das Token einfügen."; return; }
       testMsg.textContent="prüft …";
-      let readOk=false;
       try{
-        const r=await fetch(PANTRY_BASE+encodeURIComponent(id),{cache:"no-store"});
-        readOk=r.ok;
-        if(!r.ok){ testMsg.textContent="✗ ID wird abgelehnt (Fehler "+r.status+")"; return; }
-      }catch(e){ testMsg.textContent="✗ Keine Verbindung zum Dienst."; return; }
-      // Schreibtest mit winziger Datenmenge
-      try{
-        const u=PANTRY_BASE+encodeURIComponent(id)+"/basket/heute-test";
-        const w=await fetch(u,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({t:Date.now()})});
-        testMsg.textContent = w.ok ? "✓ ID gültig, Schreiben funktioniert." : ("✗ Schreiben abgelehnt (Fehler "+w.status+")");
-      }catch(e){ testMsg.textContent="✗ Schreiben blockiert ("+((e&&e.message)||"?")+")"; }
+        const r=await fetch(GH_API+"/gists?per_page=1",{headers:{Authorization:"Bearer "+id, Accept:"application/vnd.github+json"},cache:"no-store"});
+        if(r.status===401){ testMsg.textContent="✗ Token ungültig oder abgelaufen."; return; }
+        if(r.status===403){ testMsg.textContent="✗ Abgelehnt (403) – fehlende Gist-Berechtigung oder Limit erreicht."; return; }
+        testMsg.textContent = r.ok ? "✓ Token gültig – Verbindung steht." : ("✗ Abgelehnt (Fehler "+r.status+")");
+      }catch(e){ testMsg.textContent="✗ Keine Verbindung ("+((e&&e.message)||"?")+")"; }
     };
     document.getElementById("syncSave").onclick=async()=>{
       const id=idEl.value.trim(), p=pw1.value;
-      if(!id){ err.textContent="Bitte die Pantry-ID einfügen."; return; }
+      if(!id){ err.textContent="Bitte das GitHub-Token einfügen."; return; }
       if(!p){ err.textContent="Bitte ein Passwort festlegen."; return; }
       if(p!==pw2.value){ err.textContent="Die Passwörter stimmen nicht überein."; return; }
       const prev=syncCfg;
-      syncCfg={pantry:id, basket:"heute", pw:p, lastAppliedAt:null};
+      syncCfg={token:id, gist:(prev&&prev.gist)||"", pw:p, lastAppliedAt:null};
       localStorage.setItem(SYNC,JSON.stringify(syncCfg));
       syncReady=true; lastPushedPlain="";
       err.textContent="verbindet …";
@@ -1287,7 +1306,7 @@
         err.textContent="Passwort passt nicht zu den vorhandenen Daten. Es wurde nichts überschrieben.";
         return;
       }
-      if(res==="badid"){ err.textContent="Die Pantry-ID wird abgelehnt. Bitte prüfen."; return; }
+      if(res==="badid"){ err.textContent="Das Token wird abgelehnt. Bitte prüfen (Gist-Berechtigung nötig)."; return; }
       if(res==="offline"){ err.textContent="Keine Verbindung. Es wurde nichts hochgeladen."; return; }
       if(res==="empty"){ const p2=await syncPush(true); if(p2!=="ok"){ err.textContent="Hochladen fehlgeschlagen: "+(lastSyncError||"unbekannt"); return; } }
       close();

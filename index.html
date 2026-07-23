@@ -823,7 +823,7 @@
   const CFG="ht_config_v1", LOG="ht_log_v1", TODOS="ht_todos_v1", VIS="ht_vision_v1", TAB="ht_tab_v1";
   const PRIOS="ht_prios_v2";
   const LOCKIN="ht_lockin_v1";
-  const LOCKTXT="ht_lockintext_v1", CRYPTO="ht_crypto_v1", CAL="ht_cal_v1", QUOTES="ht_quotes_v1", LOCKCFG="ht_lockin_cfg_v1", SCHATZ="ht_schatz_v1";
+  const LOCKTXT="ht_lockintext_v1", CRYPTO="ht_crypto_v1", CAL="ht_cal_v1", QUOTES="ht_quotes_v1", LOCKCFG="ht_lockin_cfg_v1", SCHATZ="ht_schatz_v1", GOSPELC="ht_gospel_v1";
   const MAX_PRIOS=8;
   const LOCKIN_DEFAULT=[
     {id:"wins", label:"", date:true},
@@ -2459,19 +2459,20 @@
   let gospelLoaded=false;
   function cleanText(t){ return String(t||"").replace(/<br\s*\/?>/gi,"\n").replace(/<\/p>/gi,"\n\n").replace(/<[^>]+>/g,"").replace(/&nbsp;/g," ").replace(/\n{3,}/g,"\n\n").trim(); }
   async function fetchGospel(date){
-    const urls=["/evangelium?date="+date];
+    // 1) lokaler Server (Mac)   2) taeglich erzeugte Datei neben der App (iPhone/Web)
+    const urls=["/evangelium?date="+date, "evangelium/"+date+".json"];
     for(const u of urls){
       try{
         const r=await fetch(u,{cache:"no-store"});
         if(!r||!r.ok) continue;
         const j=await r.json();
         if(j && j.error) continue;
-        const g=j.gospel||j; // Proxy liefert {ref,title,text}; API liefert {gospel:{...}}
+        const g=j.gospel||j;
         const ref=g.reference_displayed||g.ref||"";
         const stelle=g.stelle||"";
         const title=g.title||"";
         const text=cleanText(g.text||"");
-        if(text||ref) return {ref,stelle,title,text,source:j.source||"Evangelizo"};
+        if(text||ref) return {ref,stelle,title,text,source:j.source||g.source||"Evangelizo", papst:(j.papst||g.papst||null)};
       }catch(e){ /* naechste Quelle */ }
     }
     return {error:true};
@@ -2490,19 +2491,32 @@
       ? ("Quelle: "+esc(d.source)+" · <a href=\""+GOSPEL_PAGE+"\" target=\"_blank\" rel=\"noopener\">Vatican News</a>")
       : "";
   }
+  /* Tagesevangelium wird im gemeinsamen Speicher abgelegt und damit
+     automatisch auf die anderen Geraete uebertragen (letzte 10 Tage). */
+  function gospelStore(){ try{ return JSON.parse(localStorage.getItem(GOSPELC)||"{}"); }catch(e){ return {}; } }
+  function gospelSave(date,d){
+    const st=gospelStore();
+    st[date]={stelle:d.stelle||"", ref:d.ref||"", title:d.title||"", text:d.text||"", source:d.source||"", papst:d.papst||null};
+    const keys=Object.keys(st).sort();
+    while(keys.length>10){ delete st[keys.shift()]; }
+    write(GOSPELC,st);            // write() loest den Abgleich mit aus
+  }
   async function loadGospel(){
     if(gospelLoaded) return;
-    const key="gospelv4_"+today, textEl=document.getElementById("gospelText");
-    try{ const c=localStorage.getItem(key); if(c){ renderGospel(JSON.parse(c)); gospelLoaded=true; loadPapst(); return; } }catch(e){}
+    const textEl=document.getElementById("gospelText");
+    const cached=gospelStore()[today];
+    if(cached && cached.text){ renderGospel(cached); gospelLoaded=true; loadPapst(cached.papst); return; }
     textEl.textContent="Lädt …";
     const d=await fetchGospel(today);
-    if(d && !d.error){ try{localStorage.setItem(key,JSON.stringify(d));}catch(e){} renderGospel(d); gospelLoaded=true; loadPapst(); }
-    else{
+    if(d && !d.error){
+      gospelSave(today,d);
+      renderGospel(d); gospelLoaded=true; loadPapst(d.papst);
+    }else{
       document.getElementById("gospelRef").textContent="";
       document.getElementById("gospelTitle").textContent="";
       document.getElementById("gospelSrc").innerHTML="";
-      textEl.innerHTML="Konnte das Tagesevangelium gerade nicht laden. <a href=\""+GOSPEL_PAGE+"\" target=\"_blank\" rel=\"noopener\">Bei Vatican News öffnen</a>";
-      loadPapst();
+      textEl.innerHTML="Heute noch nicht geladen. Öffne die App kurz auf dem Mac – dann ist der Text auch hier. <a href=\""+GOSPEL_PAGE+"\" target=\"_blank\" rel=\"noopener\">Bei Vatican News öffnen</a>";
+      loadPapst(null);
     }
   }
   /* ---------- Worte der Päpste (Meditation von Vatican News) ---------- */
@@ -2518,15 +2532,16 @@
       ? (esc(q)+" · <a href=\""+esc(d.url)+"\" target=\"_blank\" rel=\"noopener\">Vatican News</a>")
       : esc(q);
   }
-  async function loadPapst(){
+  async function loadPapst(supplied){
     if(papstLoaded) return;
-    const key="papstv2_"+today;
-    try{ const c=localStorage.getItem(key); if(c){ renderPapst(JSON.parse(c)); papstLoaded=true; return; } }catch(e){}
+    if(supplied && supplied.text){ renderPapst(supplied); papstLoaded=true; return; }
     try{
       const r=await fetch("/papst?date="+encodeURIComponent(today));
       const d=await r.json();
-      if(d && !d.error && d.text){ try{localStorage.setItem(key,JSON.stringify(d));}catch(e){} renderPapst(d); papstLoaded=true; }
-      else{ renderPapst(null); }
+      if(d && !d.error && d.text){
+        renderPapst(d); papstLoaded=true;
+        const st=gospelStore(); if(st[today]){ st[today].papst=d; write(GOSPELC,st); }
+      } else { renderPapst(null); }
     }catch(e){ renderPapst(null); }
   }
   function toggleGospel(){
@@ -2552,15 +2567,7 @@
   if(syncOn()){ setSyncStatus("prüft …"); syncNow(); }
   document.addEventListener("visibilitychange",()=>{ if(!document.hidden && syncOn()) syncNow(); });
   document.getElementById("gospelToggle").addEventListener("click",toggleGospel);
-  // Evangelium/Papst brauchen den lokalen Server - ohne ihn den Bereich ausblenden
-  (function(){
-    const h=location.hostname;
-    const hasServer = (h==="localhost" || h==="127.0.0.1" || /^\d+\.\d+\.\d+\.\d+$/.test(h));
-    if(!hasServer){
-      const t=document.getElementById("gospelToggle"); if(t) t.style.display="none";
-      const p=document.getElementById("gospelPanel"); if(p) p.setAttribute("hidden","");
-    }
-  })();
+
   document.getElementById("tabs").addEventListener("click",e=>{ const b=e.target.closest("button[data-tab]"); if(b) setTab(b.dataset.tab); });
   document.getElementById("lightbox").addEventListener("click",function(){ this.classList.remove("open"); });
   (function(){

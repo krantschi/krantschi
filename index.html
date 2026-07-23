@@ -401,19 +401,21 @@
   .vtier-inner{overflow:hidden; min-height:0}
   .vtier-body-pad{padding:0}
   .vtier-inner{padding:2px 2px 2px 14px; margin-top:6px; margin-left:24px; border-left:2px solid var(--c-tint)}
-  .vgoal{position:relative; display:flex; align-items:center; gap:10px; padding:8px 0}
-  .vgoal::before{content:""; position:absolute; left:-14px; top:50%; width:10px; height:2px; background:var(--c-tint)}
-  .vgoal-dot{width:10px; height:10px; border-radius:50%; background:var(--card); box-shadow:inset 0 0 0 2.5px var(--c); flex:0 0 auto}
-  .vgoal input{flex:1; min-width:0; font:inherit; font-size:15px; font-weight:560; color:var(--ink); background:transparent; border:none; padding:2px 0}
-  .vgoal input:focus{outline:none}
-  .vgoal input::placeholder{color:var(--ink-faint)}
-  .vtier[data-level="big"] .vgoal input{font-family:Georgia,"Iowan Old Style",serif; font-size:16.5px; font-weight:560; letter-spacing:.002em}
-  .vgoal .row-del{opacity:0; transition:opacity .15s}
+  .vgoal{position:relative; display:flex; align-items:flex-start; gap:10px; padding:9px 0}
+  .vgoal::before{content:""; position:absolute; left:-14px; top:19px; width:10px; height:2px; background:var(--c-tint)}
+  .vgoal-dot{width:10px; height:10px; border-radius:50%; background:var(--card); box-shadow:inset 0 0 0 2.5px var(--c); flex:0 0 auto; margin-top:6px}
+  .vgoal-main{flex:1; min-width:0; display:flex; flex-direction:column; align-items:flex-start; gap:6px}
+  .vgoal-text{width:100%; box-sizing:border-box; font:inherit; font-size:14.5px; font-weight:560; line-height:1.45;
+    color:var(--ink); background:transparent; border:none; padding:1px 0; resize:none; overflow:hidden; display:block}
+  .vgoal-text:focus{outline:none}
+  .vgoal-text::placeholder{color:var(--ink-faint)}
+  .vtier[data-level="big"] .vgoal-text{font-family:Georgia,"Iowan Old Style",serif; font-size:15.5px; line-height:1.5; letter-spacing:.002em}
+  .vgoal .row-del{opacity:0; transition:opacity .15s; margin-top:2px; flex:0 0 auto}
   .vgoal:hover .row-del,.vgoal:focus-within .row-del{opacity:1}
-  .vgoal-link{display:inline-flex; align-items:center; gap:5px; max-width:44%; font:inherit; font-size:11px; font-weight:700;
+  .vgoal-link{display:inline-flex; align-items:center; gap:5px; max-width:100%; font:inherit; font-size:11px; font-weight:700;
     border:none; cursor:pointer; border-radius:999px; padding:4px 10px; background:var(--bg-1); box-shadow:inset 0 0 0 1px var(--hair); color:var(--ink-soft)}
   .vgoal-link .vl-ic{color:var(--amber); font-weight:800}
-  .vgoal-link .vl-tx{white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:150px}
+  .vgoal-link .vl-tx{white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:190px}
   .vgoal-link .vl-tx.muted{color:var(--ink-faint); font-weight:600}
   .vgoal-link.set{background:var(--amber-tint); box-shadow:inset 0 0 0 1px var(--amber); color:var(--amber)}
   .vgoal.linked::before{background:linear-gradient(90deg,var(--amber),var(--c)); height:2.5px; box-shadow:0 0 8px -1px var(--amber)}
@@ -2311,9 +2313,14 @@
       const row=document.createElement("div"); row.className="vgoal"+(coupleTo && p.parent?" linked":"");
       row.dataset.id=p.id;
       const dot=document.createElement("span"); dot.className="vgoal-dot";
-      const inp=document.createElement("input"); inp.type="text"; inp.value=p.text; inp.placeholder="Ziel…"; inp.setAttribute("aria-label","Ziel");
-      inp.addEventListener("input",()=>{ p.text=inp.value; saveVision(); });
-      row.append(dot,inp);
+      const main=document.createElement("div"); main.className="vgoal-main";
+      const inp=document.createElement("textarea"); inp.className="vgoal-text"; inp.rows=1;
+      inp.value=p.text; inp.placeholder="Ziel…"; inp.setAttribute("aria-label","Ziel");
+      const grow=()=>{ inp.style.height="auto"; inp.style.height=(inp.scrollHeight||24)+"px"; };
+      inp.addEventListener("input",()=>{ p.text=inp.value; saveVision(); grow(); });
+      main.appendChild(inp);
+      row.append(dot,main);
+      requestAnimationFrame(grow);
       if(coupleTo){
         const parents=visPoints(coupleTo).filter(x=>x.text&&x.text.trim());
         const link=document.createElement("button"); link.type="button"; link.className="vgoal-link"+(p.parent?" set":"");
@@ -2322,7 +2329,7 @@
                                    : `<span class="vl-ic">↳</span><span class="vl-tx muted">an Jahresziel koppeln</span>`;
         link.title="Mit einem Jahresziel verknüpfen";
         link.addEventListener("click",()=>openCoupleMenu(p, coupleTo, link));
-        row.appendChild(link);
+        main.appendChild(link);
       }
       const del=document.createElement("button"); del.className="row-del"; del.type="button"; del.textContent="×"; del.setAttribute("aria-label","Löschen");
       del.addEventListener("click",()=>{ const a=visPoints(key); const i=a.findIndex(x=>x.id===p.id); if(i>=0)a.splice(i,1);

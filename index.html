@@ -289,6 +289,10 @@
   .pw-cancel,.pw-ok{font:inherit; font-size:14px; font-weight:680; border:none; border-radius:11px; padding:9px 16px; cursor:pointer}
   .pw-cancel{background:var(--bg-1); color:var(--ink-soft)}
   .pw-ok{background:var(--ink); color:var(--card)}
+  .sync-test{font:inherit; font-size:12.5px; font-weight:680; color:var(--sky); background:var(--sky-tint); border:none; border-radius:9px; padding:8px 12px; cursor:pointer; margin-bottom:4px}
+  #syncTestMsg{color:var(--ink-soft)}
+  .sync-off{display:block; width:100%; margin-top:12px; font:inherit; font-size:12px; font-weight:650; color:var(--ink-faint); background:transparent; border:none; cursor:pointer; padding:6px}
+  .sync-off:hover{color:var(--rose)}
 
   /* ---------- Tagesansicht (frei ziehbare Blöcke) ---------- */
   .timeline{margin-top:14px}
@@ -781,6 +785,23 @@
         <div class="schatz-list" id="schatzList"></div>
       </div>
     </div>
+    <div class="pw-modal" id="syncModal" role="dialog" aria-modal="true">
+      <div class="pw-card">
+        <div class="pw-title">Abgleich einrichten</div>
+        <div class="pw-note">Pantry-ID von getpantry.cloud einfügen. Auf beiden Geräten dieselbe ID und dasselbe Passwort.</div>
+        <input class="pw-input" type="text" id="syncId" placeholder="Pantry-ID einfügen" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Pantry-ID">
+        <button class="sync-test" id="syncTest" type="button">Verbindung testen</button>
+        <div class="pw-err" id="syncTestMsg"></div>
+        <input class="pw-input" type="password" id="syncPw" placeholder="Abgleich-Passwort" aria-label="Passwort">
+        <input class="pw-input" type="password" id="syncPw2" placeholder="Passwort wiederholen" aria-label="Passwort wiederholen">
+        <div class="pw-err" id="syncErr"></div>
+        <div class="pw-actions">
+          <button class="pw-cancel" id="syncCancel" type="button">Abbrechen</button>
+          <button class="pw-ok" id="syncSave" type="button">Verbinden</button>
+        </div>
+        <button class="sync-off" id="syncOff" type="button">Abgleich ausschalten</button>
+      </div>
+    </div>
     <div class="pw-modal" id="pwModal" role="dialog" aria-modal="true">
       <div class="pw-card">
         <div class="pw-title" id="pwTitle">Passwort</div>
@@ -1130,31 +1151,59 @@
     if(k && SYNC_EXCLUDE.indexOf(k)>=0) return;
     clearTimeout(syncTimer); syncTimer=setTimeout(()=>{ syncPush(false); },2500);
   }
+  async function pantryIdOk(){
+    try{ const r=await fetch(PANTRY_BASE+encodeURIComponent(syncCfg.pantry),{cache:"no-store"}); return r.ok; }
+    catch(e){ return null; }   // null = Netzproblem, nicht ID
+  }
+  async function pushOnce(plain,noImages){
+    const salt=window.crypto.getRandomValues(new Uint8Array(16));
+    const enc=await encWith(syncCfg.pw, salt, plain);
+    const body={v:1, updatedAt:new Date().toISOString(), noImages:noImages, salt:b64(salt), iv:enc.iv, ct:enc.ct};
+    const r=await fetch(syncUrl(),{method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)});
+    return {ok:r.ok, status:r.status, updatedAt:body.updatedAt};
+  }
   async function syncPush(force){
-    if(!syncOn()||syncBusy) return;
+    if(!syncOn()||syncBusy) return "busy";
     let data=collectSyncData(), noImages=false;
     let plain=JSON.stringify(data);
-    if(plain.length>1300000){ data=stripImages(data); plain=JSON.stringify(data); noImages=true; }
-    if(!force && plain===lastPushedPlain) return;
+    if(plain.length>400000){ data=stripImages(data); plain=JSON.stringify(data); noImages=true; }
+    if(!force && plain===lastPushedPlain) return "same";
     syncBusy=true; setSyncStatus("sichert …");
     try{
-      const salt=window.crypto.getRandomValues(new Uint8Array(16));
-      const enc=await encWith(syncCfg.pw, salt, plain);
-      const body={v:1, updatedAt:new Date().toISOString(), noImages:noImages, salt:b64(salt), iv:enc.iv, ct:enc.ct};
-      const r=await fetch(syncUrl(),{method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)});
-      if(!r.ok) throw new Error("HTTP "+r.status);
+      let res=await pushOnce(plain,noImages);
+      if(!res.ok && !noImages){            // vielleicht zu groß -> ohne Bilder erneut
+        data=stripImages(collectSyncData()); plain=JSON.stringify(data); noImages=true;
+        res=await pushOnce(plain,noImages);
+      }
+      if(!res.ok){
+        const idOk=await pantryIdOk();
+        setSyncStatus(idOk===false ? "ID prüfen" : ("Fehler "+res.status));
+        syncBusy=false; return "error";
+      }
       lastPushedPlain=plain;
-      syncCfg.lastAppliedAt=body.updatedAt; localStorage.setItem(SYNC,JSON.stringify(syncCfg));
-      setSyncStatus("aktuell");
-    }catch(e){ setSyncStatus("offline"); }
-    syncBusy=false;
+      syncCfg.lastAppliedAt=res.updatedAt; localStorage.setItem(SYNC,JSON.stringify(syncCfg));
+      setSyncStatus(noImages?"aktuell (ohne Bilder)":"aktuell");
+      syncBusy=false; return "ok";
+    }catch(e){ setSyncStatus("offline"); syncBusy=false; return "offline"; }
+  }
+  function dataWeight(store){
+    let n=0;
+    try{ const log=JSON.parse((store?store[LOG]:localStorage.getItem(LOG))||"{}"); n+=Object.keys(log).length*10; }catch(e){}
+    try{ const p=JSON.parse((store?store[PRIOS]:localStorage.getItem(PRIOS))||"{}"); n+=((p.todos||[]).length+(p.items||[]).length+(p.archive||[]).length); }catch(e){}
+    try{ const s=JSON.parse((store?store[SCHATZ]:localStorage.getItem(SCHATZ))||"[]"); n+=s.length; }catch(e){}
+    return n;
   }
   async function syncPull(){
     if(!syncOn()||syncBusy) return "busy";
     syncBusy=true; setSyncStatus("prüft …");
     try{
       const r=await fetch(syncUrl(),{cache:"no-store"});
-      if(r.status===400||r.status===404){ syncBusy=false; setSyncStatus("leer"); return "empty"; }
+      if(r.status===400||r.status===404){
+        const idOk=await pantryIdOk();
+        syncBusy=false;
+        if(idOk===false){ setSyncStatus("ID prüfen"); return "badid"; }
+        setSyncStatus("leer"); return "empty";
+      }
       if(!r.ok) throw new Error("HTTP "+r.status);
       const body=await r.json();
       if(!body||!body.ct){ syncBusy=false; setSyncStatus("leer"); return "empty"; }
@@ -1162,6 +1211,14 @@
       const plain=await decWith(syncCfg.pw, unb64(body.salt), {iv:body.iv, ct:body.ct});
       let data=JSON.parse(plain);
       if(body.noImages) data=keepLocalImages(data);
+      // Schutz: nicht versehentlich viele lokale Daten durch einen fast leeren Stand ersetzen
+      const mine=dataWeight(null), theirs=dataWeight(data);
+      if(mine>5 && theirs*3 < mine){
+        syncBusy=false;
+        const ok=confirm("Achtung: Der abgeglichene Stand enthält deutlich weniger Daten als dieses Gerät.\n\nHier: "+mine+" Einträge · Abgleich: "+theirs+"\n\nÜbernehmen und die lokalen Daten ersetzen?\n(Abbrechen = dieses Gerät hochladen)");
+        if(!ok){ await syncPush(true); return "pushed"; }
+        syncBusy=true;
+      }
       applySyncData(data);
       syncCfg.lastAppliedAt=body.updatedAt; localStorage.setItem(SYNC,JSON.stringify(syncCfg));
       setSyncStatus("aktualisiert"); syncBusy=false;
@@ -1179,33 +1236,48 @@
     if(res==="empty") await syncPush(true);
     return res;
   }
-  async function setupSync(){
-    const cur=(syncCfg&&syncCfg.pantry)||"";
-    const id=prompt("Pantry-ID einfügen (kostenlos auf getpantry.cloud).\n\nLeer lassen = Abgleich ausschalten.", cur);
-    if(id===null) return;
-    if(!id.trim()){ syncCfg=null; localStorage.removeItem(SYNC); setSyncStatus("Abgleich einrichten"); return; }
-    const pw=await askPassword({title:"Abgleich-Passwort",
-      note:"Auf beiden Geräten dasselbe Passwort. Damit werden die Daten verschlüsselt, bevor sie hochgeladen werden.",
-      confirm:true});
-    if(!pw) return;
-    const prev=syncCfg;
-    syncCfg={pantry:id.trim(), basket:"heute", pw:pw, lastAppliedAt:null};
-    localStorage.setItem(SYNC,JSON.stringify(syncCfg));
-    syncReady=true; lastPushedPlain="";
-    const res=await syncPull();
-    if(res==="badpw"){
-      // NICHT hochladen - sonst würden die Daten des anderen Geräts überschrieben
-      syncCfg=prev||null;
-      if(syncCfg) localStorage.setItem(SYNC,JSON.stringify(syncCfg)); else localStorage.removeItem(SYNC);
-      setSyncStatus(syncOn()?"aktuell":"Abgleich einrichten");
-      alert("Das Passwort passt nicht zu den bereits abgeglichenen Daten.\n\nNimm auf diesem Gerät dasselbe Passwort wie auf dem anderen. Es wurde nichts überschrieben.");
-      return;
-    }
-    if(res==="offline"){
-      alert("Keine Verbindung zum Abgleich. Prüfe die Pantry-ID und deine Internetverbindung.\n\nEs wurde nichts hochgeladen.");
-      return;
-    }
-    if(res==="empty") await syncPush(true);   // nur wenn dort noch nichts liegt
+  function setupSync(){
+    const ov=document.getElementById("syncModal");
+    const idEl=document.getElementById("syncId"), pw1=document.getElementById("syncPw"), pw2=document.getElementById("syncPw2");
+    const err=document.getElementById("syncErr"), testMsg=document.getElementById("syncTestMsg");
+    idEl.value=(syncCfg&&syncCfg.pantry)||""; pw1.value=""; pw2.value=""; err.textContent=""; testMsg.textContent="";
+    ov.classList.add("open"); setTimeout(()=>idEl.focus(),30);
+    const close=()=>{ ov.classList.remove("open"); };
+    document.getElementById("syncCancel").onclick=close;
+    document.getElementById("syncOff").onclick=()=>{
+      syncCfg=null; localStorage.removeItem(SYNC); setSyncStatus("Abgleich einrichten"); close();
+    };
+    document.getElementById("syncTest").onclick=async()=>{
+      const id=idEl.value.trim();
+      if(!id){ testMsg.textContent="Bitte zuerst die ID einfügen."; return; }
+      testMsg.textContent="prüft …";
+      try{
+        const r=await fetch(PANTRY_BASE+encodeURIComponent(id),{cache:"no-store"});
+        testMsg.textContent = r.ok ? "✓ ID gültig – Verbindung steht." : ("✗ ID wird abgelehnt (Fehler "+r.status+")");
+      }catch(e){ testMsg.textContent="✗ Keine Verbindung zum Dienst."; }
+    };
+    document.getElementById("syncSave").onclick=async()=>{
+      const id=idEl.value.trim(), p=pw1.value;
+      if(!id){ err.textContent="Bitte die Pantry-ID einfügen."; return; }
+      if(!p){ err.textContent="Bitte ein Passwort festlegen."; return; }
+      if(p!==pw2.value){ err.textContent="Die Passwörter stimmen nicht überein."; return; }
+      const prev=syncCfg;
+      syncCfg={pantry:id, basket:"heute", pw:p, lastAppliedAt:null};
+      localStorage.setItem(SYNC,JSON.stringify(syncCfg));
+      syncReady=true; lastPushedPlain="";
+      err.textContent="verbindet …";
+      const res=await syncPull();
+      if(res==="badpw"){
+        syncCfg=prev||null;
+        if(syncCfg) localStorage.setItem(SYNC,JSON.stringify(syncCfg)); else localStorage.removeItem(SYNC);
+        err.textContent="Passwort passt nicht zu den vorhandenen Daten. Es wurde nichts überschrieben.";
+        return;
+      }
+      if(res==="badid"){ err.textContent="Die Pantry-ID wird abgelehnt. Bitte prüfen."; return; }
+      if(res==="offline"){ err.textContent="Keine Verbindung. Es wurde nichts hochgeladen."; return; }
+      if(res==="empty"){ const p2=await syncPush(true); if(p2!=="ok"){ err.textContent="Hochladen fehlgeschlagen."; return; } }
+      close();
+    };
   }
 
   function askPassword(opts){
@@ -2438,7 +2510,11 @@
   document.getElementById("wipeAll").addEventListener("click",()=>confirmWipe(true));
   document.getElementById("saveBtn").addEventListener("click",doBackup);
   document.getElementById("loadBtn").addEventListener("click",doRestore);
-  document.getElementById("syncBtn").addEventListener("click",()=>{ if(syncOn()) syncNow(); else setupSync(); });
+  document.getElementById("syncBtn").addEventListener("click",async()=>{
+    if(!syncOn()){ setupSync(); return; }
+    const r=await syncNow();
+    if(r==="badid"||r==="offline"||r==="badpw"||r==="error") setupSync();
+  });
   syncReady=true;
   if(syncOn()){ setSyncStatus("prüft …"); syncNow(); }
   document.addEventListener("visibilitychange",()=>{ if(!document.hidden && syncOn()) syncNow(); });

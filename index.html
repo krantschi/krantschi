@@ -226,6 +226,8 @@
   .fclock{display:flex; align-items:baseline; gap:8px}
   .fclock-btn{font-family:Georgia,serif; font-size:13.5px; font-weight:700; font-style:italic; color:#fff; background:var(--sky); border:none; border-radius:999px; padding:7px 17px; cursor:pointer; box-shadow:0 6px 16px -8px var(--sky)}
   .fclock-btn:active{transform:scale(.97)}
+  .fclock-btn.out{background:var(--mint); box-shadow:0 6px 16px -8px var(--mint); display:inline-flex; align-items:center; gap:7px}
+  .fcm-dot{width:8px; height:8px; border-radius:50%; background:#fff; animation:fpulse 1.6s ease-in-out infinite}
   .fclock-label{font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint)}
   .fclock-time{font-family:Georgia,serif; font-size:21px; font-weight:600; font-style:italic; color:var(--sky); font-variant-numeric:tabular-nums}
   .fblocks{display:flex; flex-direction:column; gap:0}
@@ -2117,7 +2119,16 @@
   function blockSpan(b){ if(b.start==null||b.end==null) return 0; return Math.max(0,b.end-b.start); }
   function dayProductive(blocks){ return (blocks||[]).reduce((s,b)=>s+(parseInt(b.prod,10)||0),0); }
 
-  function fokusClockIn(){ ensureFocus(); if(focus.clockIn==null){ focus.clockIn=nowMin(); saveFocus(); buildFokus(); } }
+  function toggleClock(){
+    ensureFocus();
+    if(focus.clockIn==null || focus.clockedOut!=null){
+      // einclocken (kein Fokusblock wird gestartet)
+      focus.clockIn=nowMin(); focus.clockedOut=null;
+      saveFocus(); buildFokus(); toast("Clock In "+fMinToClock(focus.clockIn));
+    }else{
+      focus.clockedOut=nowMin(); saveFocus(); buildFokus(); toast("Clock Out "+fMinToClock(focus.clockedOut));
+    }
+  }
   function startBlock(){
     ensureFocus();
     if(runningBlock()) return;
@@ -2202,6 +2213,7 @@
   }
   function startFlow(){
     primeAudio();
+    playGong();                 // Gong auch beim Start
     fclock.phase="flow"; fclock.endsAt=Date.now()+ftimer.flowMin*60000;
     runTick();
     // Fokusblock starten, falls noch keiner läuft
@@ -2211,9 +2223,9 @@
     fclock.phase="break"; fclock.endsAt=Date.now()+ftimer.breakMin*60000;
     runTick(); buildFokus();
   }
-  function stopClock(){ // Clock Out / Stopp: nur die Uhr
+  function stopClock(){ // stoppt nur die Fokusuhr (nicht den Fokustag)
     fclock.phase="idle"; fclock.endsAt=0; if(ftick){ clearInterval(ftick); ftick=null; }
-    focus.clockedOut=nowMin(); saveFocus(); buildFokus();
+    buildFokus();
   }
   function runTick(){
     if(ftick) clearInterval(ftick);
@@ -2289,14 +2301,6 @@
       stop.addEventListener("click",()=>{ if(ftick){clearInterval(ftick);ftick=null;} fclock.phase="idle"; buildFokus(); }); ctrl.appendChild(stop);
     }
     box.appendChild(ctrl);
-
-    // Clock Out (wenn Tag läuft und Uhr nicht aktiv)
-    if(focus.clockIn!=null && phase==="idle"){
-      const out=document.createElement("button"); out.className="fclock-out"; out.type="button";
-      out.textContent = focus.clockedOut!=null ? ("Clock Out · "+fMinToClock(focus.clockedOut)) : "Clock Out";
-      out.addEventListener("click",()=>{ focus.clockedOut=nowMin(); saveFocus(); buildFokus(); toast("Clock Out "+fMinToClock(focus.clockedOut)); });
-      box.appendChild(out);
-    }
     wrap.appendChild(box);
     return wrap;
   }
@@ -2320,18 +2324,23 @@
     const view=document.getElementById("view-fokus"); view.innerHTML="";
     const sheet=document.createElement("div"); sheet.className="fsheet";
 
-    // Kopf: Datum + Clock In
+    // Kopf: Datum + Clock-Umschalter
     const head=document.createElement("div"); head.className="fsheet-head";
     const dt=new Date(today+"T00:00:00");
     const ds=dt.toLocaleDateString("de-DE",{weekday:"long", day:"numeric", month:"long"});
     head.innerHTML=`<div class="fdate">${esc(ds)}</div>`;
     const clock=document.createElement("div"); clock.className="fclock";
-    if(focus.clockIn==null){
-      const b=document.createElement("button"); b.className="fclock-btn"; b.type="button"; b.textContent="Clock In";
-      b.addEventListener("click",fokusClockIn); clock.appendChild(b);
+    const inClocked = focus.clockIn!=null && focus.clockedOut==null;
+    const b=document.createElement("button"); b.type="button";
+    b.className="fclock-btn"+(inClocked?" out":"");
+    if(inClocked){
+      b.innerHTML=`<span class="fcm-dot"></span>Clock Out`;
+      b.title="Seit "+fMinToClock(focus.clockIn)+" eingeclockt";
     }else{
-      clock.innerHTML=`<span class="fclock-label">Clock In</span><span class="fclock-time">${fMinToClock(focus.clockIn)}</span>`;
+      b.textContent="Clock In";
     }
+    b.addEventListener("click",toggleClock);
+    clock.appendChild(b);
     head.appendChild(clock);
     sheet.appendChild(head);
 

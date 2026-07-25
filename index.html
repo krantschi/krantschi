@@ -168,6 +168,39 @@
   .streak{font-size:12.5px; font-weight:720; color:var(--ink-faint); font-variant-numeric:tabular-nums; white-space:nowrap; opacity:.85}
   .streak.hot{color:var(--amber)}
 
+  /* ---------- Fokusuhr ---------- */
+  .fclockwrap{margin:0 0 4px 14px; border-bottom:1.5px solid var(--rule)}
+  .fclock-bar{width:100%; display:flex; align-items:center; gap:9px; background:transparent; border:none; cursor:pointer; padding:11px 2px; font-family:Georgia,serif}
+  .fcb-ic{font-size:15px; color:var(--sky)}
+  .fcb-label{font-size:13px; font-weight:600; font-style:italic; color:var(--ink)}
+  .fcb-time{margin-left:auto; font-size:13px; font-weight:700; color:var(--ink-soft); font-variant-numeric:tabular-nums}
+  .fcb-chev{font-family:system-ui,sans-serif; font-size:13px; color:var(--ink-faint); transition:transform .25s}
+  .fclockwrap.open .fcb-chev{transform:rotate(180deg)}
+  .fclock-bar.live .fcb-ic{color:var(--sky); animation:fpulse 1.6s ease-in-out infinite}
+  .fclock-bar.live .fcb-time{color:var(--sky)}
+  .fclockbox{padding:6px 0 16px; display:flex; flex-direction:column; align-items:center; gap:14px}
+  .fclock-ringwrap{position:relative}
+  .fclock-ring{width:150px; height:150px; border-radius:50%; display:grid; place-items:center; transition:background .3s linear}
+  .fclock-inner{width:128px; height:128px; border-radius:50%; background:var(--paper); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; box-shadow:inset 0 0 0 1px var(--rule)}
+  .fclock-phase{font-family:Georgia,serif; font-style:italic; font-size:12.5px; font-weight:600; color:var(--sky); letter-spacing:.02em}
+  .fclock-disp{font-family:Georgia,serif; font-size:34px; font-weight:700; color:var(--ink); font-variant-numeric:tabular-nums; line-height:1}
+  .fclock-set{display:flex; gap:18px}
+  .fnum{display:flex; align-items:center; gap:5px}
+  .fnum-l{font-family:Georgia,serif; font-style:italic; font-size:12.5px; color:var(--ink-soft); margin-right:2px}
+  .fnum-b{width:24px; height:24px; border:none; border-radius:6px; background:var(--sky-tint); color:var(--sky); font-size:15px; font-weight:700; cursor:pointer; line-height:1}
+  .fnum-b:active{transform:scale(.94)}
+  .fnum-i{width:34px; text-align:center; font-family:Georgia,serif; font-size:16px; font-weight:700; color:var(--ink); background:transparent; border:none; border-bottom:1.5px solid var(--rule); padding:2px 0}
+  .fnum-i:focus{outline:none; border-bottom-color:var(--sky)}
+  .fnum-u{font-size:11px; color:var(--ink-faint); font-style:italic}
+  .fclock-ctrl{display:flex; gap:8px; flex-wrap:wrap; justify-content:center}
+  .fclock-go{font-family:Georgia,serif; font-size:14.5px; font-weight:700; font-style:italic; color:#fff; background:var(--sky); border:none; border-radius:11px; padding:11px 22px; cursor:pointer; box-shadow:0 8px 20px -10px var(--sky)}
+  .fclock-go:active{transform:scale(.98)}
+  .fclock-go.break{background:var(--amber); box-shadow:0 8px 20px -10px var(--amber)}
+  .fclock-stop{font-family:Georgia,serif; font-size:13px; font-weight:600; font-style:italic; color:var(--ink-soft); background:transparent; border:none; box-shadow:inset 0 0 0 1.5px var(--rule); border-radius:11px; padding:11px 18px; cursor:pointer}
+  .fclock-stop:hover{color:var(--ink); box-shadow:inset 0 0 0 1.5px var(--track)}
+  .fclock-out{font-family:Georgia,serif; font-size:12.5px; font-weight:600; font-style:italic; color:var(--rose); background:transparent; border:none; cursor:pointer; padding:4px 8px}
+  .fclock-out:hover{text-decoration:underline}
+
   /* ==================== FOKUS-BLOCKER ==================== */
   body.tab-fokus .app{max-width:640px}
   .fsheet{
@@ -2136,8 +2169,154 @@
     savePrios();
   }
 
+  /* ---------- Fokusuhr (Flow / Pause, Gong) ---------- */
+  const TIMER="ht_focustimer_v1";
+  let ftimer={flowMin:50, breakMin:10};   // Einstellungen
+  let fclock={phase:"idle", endsAt:0, remain:0, open:false};  // phase: idle | flow | breakwait | break
+  let ftick=null, audioCtx=null;
+  function loadTimerCfg(){ const t=read(TIMER,null); if(t){ ftimer.flowMin=t.flowMin||50; ftimer.breakMin=t.breakMin||10; } }
+  function saveTimerCfg(){ write(TIMER,{flowMin:ftimer.flowMin, breakMin:ftimer.breakMin}); }
+  function playGong(){
+    try{
+      const Ctx=window.AudioContext||window.webkitAudioContext; if(!Ctx) return;
+      if(!audioCtx) audioCtx=new Ctx();
+      if(audioCtx.state==="suspended") audioCtx.resume();
+      const ctx=audioCtx, now=ctx.currentTime;
+      const partials=[[1,1.0],[2.01,0.5],[2.99,0.28],[4.2,0.16],[5.4,0.09]];
+      const base=210, master=ctx.createGain();
+      master.gain.setValueAtTime(0.0001, now);
+      master.gain.exponentialRampToValueAtTime(0.9, now+0.02);
+      master.gain.exponentialRampToValueAtTime(0.0001, now+4.2);
+      master.connect(ctx.destination);
+      partials.forEach(([mult,amp])=>{
+        const o=ctx.createOscillator(), g=ctx.createGain();
+        o.type="sine"; o.frequency.value=base*mult;
+        g.gain.setValueAtTime(amp, now);
+        g.gain.exponentialRampToValueAtTime(0.0001, now+3.4+Math.random());
+        o.connect(g); g.connect(master); o.start(now); o.stop(now+4.4);
+      });
+    }catch(e){}
+  }
+  function primeAudio(){ // beim ersten Nutzer-Klick den Audiokontext freischalten
+    try{ const Ctx=window.AudioContext||window.webkitAudioContext; if(Ctx&&!audioCtx){ audioCtx=new Ctx(); if(audioCtx.state==="suspended") audioCtx.resume(); } }catch(e){}
+  }
+  function startFlow(){
+    primeAudio();
+    fclock.phase="flow"; fclock.endsAt=Date.now()+ftimer.flowMin*60000;
+    runTick();
+    // Fokusblock starten, falls noch keiner läuft
+    if(!runningBlock()) startBlock(); else buildFokus();
+  }
+  function startBreak(){
+    fclock.phase="break"; fclock.endsAt=Date.now()+ftimer.breakMin*60000;
+    runTick(); buildFokus();
+  }
+  function stopClock(){ // Clock Out / Stopp: nur die Uhr
+    fclock.phase="idle"; fclock.endsAt=0; if(ftick){ clearInterval(ftick); ftick=null; }
+    focus.clockedOut=nowMin(); saveFocus(); buildFokus();
+  }
+  function runTick(){
+    if(ftick) clearInterval(ftick);
+    ftick=setInterval(()=>{
+      const left=Math.max(0, fclock.endsAt-Date.now());
+      fclock.remain=left;
+      const disp=document.getElementById("ftimeDisp");
+      if(disp) disp.textContent=fmtClock(left);
+      const barT=document.getElementById("ftimeBar");
+      if(barT) barT.textContent=fmtClock(left);
+      const ring=document.getElementById("ftimeRing");
+      if(ring){ const total=(fclock.phase==="break"?ftimer.breakMin:ftimer.flowMin)*60000; const frac=total?left/total:0; ring.style.background=`conic-gradient(var(--sky) ${(1-frac)*360}deg, var(--sky-tint) 0)`; }
+      if(left<=0){
+        clearInterval(ftick); ftick=null;
+        if(fclock.phase==="flow"){ playGong(); fclock.phase="breakwait"; fclock.open=true; buildFokus(); }
+        else if(fclock.phase==="break"){ playGong(); fclock.phase="idle"; buildFokus(); }
+      }
+    },250);
+  }
+  function fmtClock(ms){ const s=Math.round(ms/1000); const m=Math.floor(s/60), ss=s%60; return String(m).padStart(2,"0")+":"+String(ss).padStart(2,"0"); }
+
+  function renderFocusClock(){
+    const wrap=document.createElement("div"); wrap.className="fclockwrap"+(fclock.open?" open":"");
+    const phase=fclock.phase;
+    const active = phase==="flow"||phase==="break";
+    // Mini-Leiste (immer sichtbar)
+    const bar=document.createElement("button"); bar.type="button"; bar.className="fclock-bar"+(active?" live":"");
+    const label = phase==="flow"?"Flow" : phase==="break"?"Pause" : phase==="breakwait"?"Pause bereit" : "Fokusuhr";
+    const timeTxt = active ? fmtClock(Math.max(0,fclock.endsAt-Date.now())) : (ftimer.flowMin+"/"+ftimer.breakMin+" min");
+    bar.innerHTML=`<span class="fcb-ic">◔</span><span class="fcb-label">${label}</span><span class="fcb-time" id="ftimeBar">${timeTxt}</span><span class="fcb-chev">⌄</span>`;
+    bar.addEventListener("click",()=>{ fclock.open=!fclock.open; buildFokus(); });
+    wrap.appendChild(bar);
+    if(!fclock.open) return wrap;
+
+    const box=document.createElement("div"); box.className="fclockbox";
+    const total=(phase==="break"?ftimer.breakMin:ftimer.flowMin)*60000;
+    const left=phase==="flow"||phase==="break"?Math.max(0,fclock.endsAt-Date.now()):total;
+    const frac=total?left/total:1;
+
+    // Ring + Zeit
+    const ringWrap=document.createElement("div"); ringWrap.className="fclock-ringwrap";
+    const ring=document.createElement("div"); ring.className="fclock-ring"; ring.id="ftimeRing";
+    ring.style.background=`conic-gradient(var(--sky) ${(1-frac)*360}deg, var(--sky-tint) 0)`;
+    const inner=document.createElement("div"); inner.className="fclock-inner";
+    const ph=document.createElement("div"); ph.className="fclock-phase";
+    ph.textContent = phase==="flow"?"Flow" : phase==="break"?"Pause" : phase==="breakwait"?"Pause bereit" : "Bereit";
+    const disp=document.createElement("div"); disp.className="fclock-disp"; disp.id="ftimeDisp"; disp.textContent=fmtClock(left);
+    inner.append(ph,disp); ring.appendChild(inner); ringWrap.appendChild(ring); box.appendChild(ringWrap);
+
+    // Einstellungen (nur im Ruhezustand)
+    if(phase==="idle"){
+      const set=document.createElement("div"); set.className="fclock-set";
+      set.appendChild(numField("Flow", ftimer.flowMin, v=>{ ftimer.flowMin=v; saveTimerCfg(); }));
+      set.appendChild(numField("Pause", ftimer.breakMin, v=>{ ftimer.breakMin=v; saveTimerCfg(); }));
+      box.appendChild(set);
+    }
+
+    // Steuerung je Phase
+    const ctrl=document.createElement("div"); ctrl.className="fclock-ctrl";
+    if(phase==="idle"){
+      const start=document.createElement("button"); start.className="fclock-go"; start.type="button"; start.textContent="▶ Flow starten";
+      start.addEventListener("click",startFlow); ctrl.appendChild(start);
+    }else if(phase==="flow"){
+      const stop=document.createElement("button"); stop.className="fclock-stop"; stop.type="button"; stop.textContent="Uhr stoppen";
+      stop.addEventListener("click",stopClock); ctrl.appendChild(stop);
+    }else if(phase==="breakwait"){
+      const go=document.createElement("button"); go.className="fclock-go break"; go.type="button"; go.textContent="☕ Pause starten ("+ftimer.breakMin+" min)";
+      go.addEventListener("click",startBreak); ctrl.appendChild(go);
+      const skip=document.createElement("button"); skip.className="fclock-stop"; skip.type="button"; skip.textContent="Überspringen";
+      skip.addEventListener("click",()=>{ fclock.phase="idle"; buildFokus(); }); ctrl.appendChild(skip);
+    }else if(phase==="break"){
+      const stop=document.createElement("button"); stop.className="fclock-stop"; stop.type="button"; stop.textContent="Pause beenden";
+      stop.addEventListener("click",()=>{ if(ftick){clearInterval(ftick);ftick=null;} fclock.phase="idle"; buildFokus(); }); ctrl.appendChild(stop);
+    }
+    box.appendChild(ctrl);
+
+    // Clock Out (wenn Tag läuft und Uhr nicht aktiv)
+    if(focus.clockIn!=null && phase==="idle"){
+      const out=document.createElement("button"); out.className="fclock-out"; out.type="button";
+      out.textContent = focus.clockedOut!=null ? ("Clock Out · "+fMinToClock(focus.clockedOut)) : "Clock Out";
+      out.addEventListener("click",()=>{ focus.clockedOut=nowMin(); saveFocus(); buildFokus(); toast("Clock Out "+fMinToClock(focus.clockedOut)); });
+      box.appendChild(out);
+    }
+    wrap.appendChild(box);
+    return wrap;
+  }
+  function numField(label,val,onchange){
+    const w=document.createElement("label"); w.className="fnum";
+    const l=document.createElement("span"); l.className="fnum-l"; l.textContent=label;
+    const minus=document.createElement("button"); minus.type="button"; minus.className="fnum-b"; minus.textContent="−";
+    const inp=document.createElement("input"); inp.type="text"; inp.inputMode="numeric"; inp.value=val; inp.className="fnum-i";
+    const plus=document.createElement("button"); plus.type="button"; plus.className="fnum-b"; plus.textContent="+";
+    const unit=document.createElement("span"); unit.className="fnum-u"; unit.textContent="min";
+    const set=v=>{ v=Math.max(1,Math.min(180,v)); inp.value=v; onchange(v); };
+    minus.addEventListener("click",()=>set((parseInt(inp.value,10)||0)-1));
+    plus.addEventListener("click",()=>set((parseInt(inp.value,10)||0)+1));
+    inp.addEventListener("input",()=>{ inp.value=inp.value.replace(/[^0-9]/g,""); });
+    inp.addEventListener("blur",()=>set(parseInt(inp.value,10)||1));
+    w.append(l,minus,inp,plus,unit); return w;
+  }
+
   function buildFokus(){
-    ensureFocus();
+    ensureFocus(); loadTimerCfg();
     const view=document.getElementById("view-fokus"); view.innerHTML="";
     const sheet=document.createElement("div"); sheet.className="fsheet";
 
@@ -2155,6 +2334,9 @@
     }
     head.appendChild(clock);
     sheet.appendChild(head);
+
+    // Fokusuhr
+    sheet.appendChild(renderFocusClock());
 
     // Blöcke
     const list=document.createElement("div"); list.className="fblocks";

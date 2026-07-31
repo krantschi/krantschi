@@ -549,6 +549,82 @@
   .vtier-titles{position:relative; z-index:1; flex:1; min-width:0; display:flex; flex-direction:column; gap:1px}
   .vtier-kicker{font-size:15px; font-weight:820; letter-spacing:-.01em; text-shadow:0 1px 10px rgba(0,0,0,.25)}
   .vtier-meta{font-size:11px; font-weight:650; opacity:.82}
+  .vtier-sep{opacity:.6; margin:0 1px}
+  /* Wochen-Ansicht in Prios */
+  .wk-head{display:flex; align-items:baseline; gap:10px; margin-bottom:9px}
+  .wk-kw{font-size:19px; font-weight:800; letter-spacing:-.01em; color:var(--ink)}
+  .wk-span{font-size:12.5px; font-weight:600; color:var(--ink-soft)}
+  .wk-day{margin-left:auto; font-size:10.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--mint)}
+  .wk-prog{height:4px; border-radius:999px; background:var(--bg-1); overflow:hidden; margin-bottom:16px}
+  .wk-prog>span{display:block; height:100%; border-radius:999px; background:var(--mint)}
+  .wk-goals{display:flex; flex-direction:column; gap:0}
+  .wk-empty{font-size:13px; font-style:italic; line-height:1.5; color:var(--ink-faint); padding:2px 0 8px}
+  .wk-goal{position:relative; display:flex; align-items:flex-start; gap:10px; padding:9px 0; border-bottom:1px solid var(--line)}
+  .wk-dot{width:10px; height:10px; border-radius:50%; background:var(--card); box-shadow:inset 0 0 0 2.5px var(--mint); flex:0 0 auto; margin-top:6px}
+  .wk-goal.linked .wk-dot{box-shadow:inset 0 0 0 2.5px var(--sky), 0 0 10px -2px var(--sky)}
+  .wk-main{flex:1; min-width:0; display:flex; flex-direction:column; align-items:flex-start; gap:6px}
+  .wk-text{width:100%; box-sizing:border-box; font:inherit; font-size:14.5px; font-weight:560; line-height:1.45; color:var(--ink); background:transparent; border:none; padding:0; resize:none; overflow:hidden}
+  .wk-text:focus{outline:none}
+  .wk-text::placeholder{color:var(--ink-faint)}
+  .wk-link{display:inline-flex; align-items:center; gap:5px; max-width:100%; font:inherit; font-size:11px; font-weight:700; border:none; cursor:pointer; border-radius:999px; padding:4px 11px; position:relative; background:rgba(58,111,224,.08); box-shadow:inset 0 0 0 1px rgba(58,111,224,.22); color:var(--ink-soft)}
+  .wk-link .vl-ic{color:var(--sky); font-weight:800}
+  .wk-link.set{background:var(--sky-tint); box-shadow:inset 0 0 0 1px var(--sky); color:var(--sky)}
+  .wk-goal .row-del{opacity:0; transition:opacity .15s; margin-top:2px; flex:0 0 auto}
+  .wk-goal:hover .row-del,.wk-goal:focus-within .row-del{opacity:1}
+  .wk-add{align-self:flex-start; font:inherit; font-size:12.5px; font-weight:700; color:var(--mint); background:transparent; border:none; cursor:pointer; padding:11px 0}
+  .wk-report{margin-top:20px; padding-top:15px; border-top:1px solid var(--line)}
+  .wk-sec{font-size:9.5px; font-weight:800; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:9px}
+  .sa-day.heute .sa-wd{color:var(--mint); font-weight:800}
+  .sa-day.heute .sa-bar{box-shadow:inset 0 0 0 1.5px var(--mint)}
+  /* Verlauf abgeschlossener Wochen/Quartale */
+  .sarch{margin-top:16px; border-top:1px solid var(--line)}
+  .sarch-head{width:100%; display:flex; align-items:center; gap:9px; background:transparent; border:none; cursor:pointer; padding:13px 2px; font-size:12.5px; font-weight:750; letter-spacing:.02em; color:var(--ink-soft)}
+  .sarch-count{font-size:10.5px; font-weight:800; color:var(--violet); background:var(--violet-tint); border-radius:999px; padding:2px 8px}
+  .sarch-chev{margin-left:auto; font-size:13px; color:var(--ink-faint); transition:transform .25s}
+  .sarch.open .sarch-chev{transform:rotate(180deg)}
+  .sarch-body{padding:0 2px 12px; display:flex; flex-direction:column; gap:12px}
+  .sarch-empty{font-size:12.5px; line-height:1.5; color:var(--ink-faint); padding:2px 0 8px}
+  .sarch-item{padding-left:12px; border-left:2.5px solid var(--track)}
+  .sarch-item.q{border-left-color:var(--sky)}
+  .sarch-item.w{border-left-color:var(--mint)}
+  .sarch-item.now{border-left-color:var(--mint); border-left-style:dashed}
+  .sa-wbtn{width:100%; display:flex; align-items:baseline; gap:9px; background:transparent; border:none; cursor:pointer; padding:3px 0; text-align:left}
+  .sa-wbtn .sa-label{margin-bottom:0}
+  .sa-sum{margin-left:auto; font-size:11px; font-weight:650; color:var(--mint); font-variant-numeric:tabular-nums}
+  .sa-chev{font-size:12px; color:var(--ink-faint); transition:transform .25s}
+  .sarch-item.open .sa-chev{transform:rotate(180deg)}
+  .sa-detail{padding:6px 0 4px}
+  .sa-sec{font-size:9.5px; font-weight:800; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-faint); margin:9px 0 4px}
+  .sa-none{font-size:12px; font-style:italic; color:var(--ink-faint)}
+  .sa-stats{display:flex; flex-wrap:wrap; gap:14px; margin-bottom:4px}
+  .sa-stats span{font-size:10.5px; color:var(--ink-faint); display:flex; align-items:baseline; gap:4px}
+  .sa-stats strong{font-size:15px; font-weight:750; color:var(--ink); font-variant-numeric:tabular-nums}
+  .sa-week{display:grid; grid-template-columns:repeat(7,1fr); gap:5px; margin-top:8px}
+  .sa-day{display:flex; flex-direction:column; align-items:center; gap:3px}
+  .sa-bar{width:100%; height:34px; border-radius:4px; background:var(--bg-1); display:flex; align-items:flex-end; overflow:hidden}
+  .sa-bar>span{width:100%; background:var(--mint); border-radius:4px; min-height:2px}
+  .sa-day.full .sa-bar>span{background:var(--sky)}
+  .sa-day.idle .sa-bar{opacity:.5}
+  .sa-day.future{opacity:.35}
+  .sa-wd{font-size:9.5px; font-weight:700; color:var(--ink-faint); text-transform:uppercase}
+  .sa-min{font-size:10px; font-weight:650; color:var(--ink-soft); font-variant-numeric:tabular-nums}
+  .sa-hab{font-size:9px; color:var(--ink-faint); font-variant-numeric:tabular-nums}
+  .sa-label{font-size:10.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:5px}
+  .sa-pt{font-size:13px; line-height:1.45; color:var(--ink-soft); padding:2px 0}
+  .sa-par{display:block; font-size:11px; color:var(--ink-faint); margin-top:1px}
+  /* Wochenleiste in der Tagesansicht */
+  .wstrip{margin:0 0 14px; padding:13px 15px; border-radius:13px; background:var(--mint-tint); box-shadow:inset 0 0 0 1px rgba(15,166,120,.22)}
+  .ws-head{display:flex; align-items:baseline; gap:9px; margin-bottom:8px}
+  .ws-kicker{font-size:10.5px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--mint)}
+  .ws-meta{margin-left:auto; font-size:10.5px; font-weight:650; color:var(--ink-faint)}
+  .ws-list{display:flex; flex-direction:column; gap:7px}
+  .ws-item{display:grid; grid-template-columns:auto 1fr; align-items:baseline; gap:8px}
+  .ws-dot{width:7px; height:7px; border-radius:50%; background:var(--mint); margin-top:5px}
+  .ws-tx{font-size:13.5px; font-weight:560; line-height:1.4; color:var(--ink)}
+  .ws-par{grid-column:2; font-size:11px; color:var(--ink-faint); margin-top:-3px}
+  .ws-empty{font-size:12.5px; line-height:1.5; color:var(--ink-soft)}
+  .ws-go{margin-top:9px; font:inherit; font-size:11.5px; font-weight:750; color:var(--mint); background:transparent; border:none; box-shadow:inset 0 0 0 1.2px var(--mint); border-radius:999px; padding:5px 13px; cursor:pointer}
+  .ws-go:hover{background:var(--mint); color:#fff}
   .vtier-chev{position:relative; z-index:1; flex:0 0 auto; font-size:16px; opacity:.9; transition:transform .28s cubic-bezier(.2,.8,.3,1.2)}
   .vtier.open .vtier-chev{transform:rotate(180deg)}
   /* Klapp-Mechanik: sanft über grid-rows */
@@ -1082,7 +1158,10 @@
   let vision=read(VIS,{points:[],images:[]});
   if(!vision.year) vision.year={points:[]};
   if(!vision.quarter) vision.quarter={points:[]};
-  if(!vision.open) vision.open={big:true,year:true,quarter:true};
+  if(!vision.week) vision.week={points:[]};
+  if(!vision.open) vision.open={big:true,year:true,quarter:true,week:true};
+  if(vision.open.week===undefined) vision.open.week=true;
+  if(!vision.archive) vision.archive={weeks:[],quarters:[]};
   let lockinLog=read(LOCKIN,{});
   let lockinCfg=read(LOCKCFG,null);
   if(!lockinCfg || !Array.isArray(lockinCfg.items) || !lockinCfg.items.length){
@@ -1125,7 +1204,7 @@
     document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active",v.id==="view-"+t));
     document.body.classList.toggle("tab-prios", t==="prios");
     document.body.classList.toggle("tab-fokus", t==="fokus");
-    if(t==="vizija") playVizijaIntro();
+    if(t==="vizija"){ buildVision(); playVizijaIntro(); }
     if(t==="fokus") buildFokus();
     if(t==="prios") buildPrios();
   }
@@ -2501,17 +2580,22 @@
     const panel=document.createElement("section"); panel.className="panel";
     panel.style.setProperty("--c","var(--rose)"); panel.style.setProperty("--c-tint","var(--rose-tint)");
     const pc=prios.park.length;
+    scopeRollover();
+    const wc=(vision.week.points||[]).filter(p=>(p.text||"").trim()).length;
     const sub=state.priosSub;
     const head=document.createElement("div"); head.className="panel-head";
     head.innerHTML=`<span class="dot"></span><span class="eyebrow">Prios &amp; ToDos</span>
       <div class="subtabs">
         <button class="subtab ${sub==='heute'?'active':''}" data-sub="heute" type="button">Heute</button>
+        <button class="subtab ${sub==='woche'?'active':''}" data-sub="woche" type="button">Woche${wc?` <span class="badge">${wc}</span>`:''}</button>
         <button class="subtab ${sub==='park'?'active':''}" data-sub="park" type="button">Parkplatz${pc?` <span class="badge">${pc}</span>`:''}</button>
       </div>`;
     panel.appendChild(head);
     head.querySelectorAll(".subtab").forEach(b=>b.addEventListener("click",()=>{ state.priosSub=b.dataset.sub; buildPrios(); }));
+    if(sub==='heute') buildWeekStrip(panel);
     if(sub==='park') buildParkplatz(panel);
     else if(sub==='archiv') buildArchiv(panel);
+    else if(sub==='woche') buildWoche(panel);
     else buildHeuteList(panel);
     view.appendChild(panel);
     view.classList.toggle("single", sub!=='heute');
@@ -2522,6 +2606,101 @@
       view.appendChild(link);
     }
   }
+  // Wochenziele als Auswahlgrundlage für den Tag
+  function buildWeekStrip(panel){
+    scopeRollover();
+    const pts=(vision.week.points||[]).filter(p=>(p.text||"").trim());
+    const wi=weekInfo();
+    const box=document.createElement("div"); box.className="wstrip";
+    if(!pts.length){
+      box.innerHTML=`<div class="ws-head"><span class="ws-kicker">Diese Woche</span></div>
+        <div class="ws-empty">Noch keine Wochenziele. Ohne sie wählst du deinen Tag aus dem Nichts.</div>`;
+      const go=document.createElement("button"); go.className="ws-go"; go.type="button"; go.textContent="Woche festlegen →";
+      go.addEventListener("click",()=>setTab("vizija"));
+      box.querySelector(".ws-empty").after(go);
+    }else{
+      box.innerHTML=`<div class="ws-head"><span class="ws-kicker">Diese Woche</span><span class="ws-meta">Tag ${wi.dayNo} von 7</span></div>`;
+      const list=document.createElement("div"); list.className="ws-list";
+      pts.forEach(p=>{
+        const par=parentTextOf(p,"quarter");
+        const it=document.createElement("div"); it.className="ws-item";
+        it.innerHTML=`<span class="ws-dot"></span><span class="ws-tx">${esc(p.text.trim())}</span>`+
+          (par?`<span class="ws-par">↳ ${esc(par)}</span>`:"");
+        list.appendChild(it);
+      });
+      box.appendChild(list);
+    }
+    panel.appendChild(box);
+  }
+
+  // Wochen-Ansicht: Ziele bearbeiten + laufende Bilanz
+  function buildWoche(panel){
+    const wi=weekInfo(), rep=weekReport(wi.key);
+    const pts=vision.week.points||[];
+
+    const head=document.createElement("div"); head.className="wk-head";
+    head.innerHTML=`<div class="wk-kw">KW ${wi.num}</div>
+      <div class="wk-span">${fmtShort(wi.start)} – ${fmtShort(wi.end)}</div>
+      <div class="wk-day">Tag ${wi.dayNo} von 7</div>`;
+    panel.appendChild(head);
+
+    const bar=document.createElement("div"); bar.className="wk-prog";
+    bar.innerHTML=`<span style="width:${wi.pct}%"></span>`;
+    panel.appendChild(bar);
+
+    // Ziele
+    const goals=document.createElement("div"); goals.className="wk-goals";
+    if(!pts.length){
+      const e=document.createElement("div"); e.className="wk-empty";
+      e.textContent="Welches Stück vom Quartal holst du dir in diesen 7 Tagen?";
+      goals.appendChild(e);
+    }
+    pts.forEach(p=>{
+      const row=document.createElement("div"); row.className="wk-goal"+(p.parent?" linked":"");
+      const dot=document.createElement("span"); dot.className="wk-dot";
+      const main=document.createElement("div"); main.className="wk-main";
+      const ta=document.createElement("textarea"); ta.className="wk-text"; ta.rows=1; ta.value=p.text||""; ta.placeholder="Wochenziel…";
+      const grow=()=>{ ta.style.height="auto"; ta.style.height=(ta.scrollHeight||24)+"px"; };
+      ta.addEventListener("input",()=>{ p.text=ta.value; saveVision(); grow(); });
+      main.appendChild(ta);
+      requestAnimationFrame(grow);
+      const parents=(vision.quarter.points||[]).filter(x=>x.text&&x.text.trim());
+      const parentObj=p.parent&&parents.find(x=>x.id===p.parent);
+      const link=document.createElement("button"); link.type="button"; link.className="wk-link"+(p.parent?" set":"");
+      link.innerHTML=parentObj?`<span class="vl-ic">↳</span><span class="vl-tx">${esc(parentObj.text.trim())}</span>`
+                              :`<span class="vl-ic">↳</span><span class="vl-tx muted">an Quartalsziel koppeln</span>`;
+      link.addEventListener("click",()=>openCoupleMenu(p,"quarter",link,buildPrios));
+      main.appendChild(link);
+      const del=document.createElement("button"); del.className="row-del"; del.type="button"; del.textContent="×"; del.setAttribute("aria-label","Löschen");
+      del.addEventListener("click",()=>{ const i=pts.findIndex(x=>x.id===p.id); if(i>=0)pts.splice(i,1); saveVision(); buildPrios(); });
+      row.append(dot,main,del);
+      goals.appendChild(row);
+    });
+    const add=document.createElement("button"); add.className="wk-add"; add.type="button"; add.textContent="+ Wochenziel";
+    add.addEventListener("click",()=>{ pts.push({id:uid(),text:""}); saveVision(); buildPrios();
+      const ins=document.querySelectorAll(".wk-text"); if(ins.length)ins[ins.length-1].focus(); });
+    goals.appendChild(add);
+    panel.appendChild(goals);
+
+    // Bilanz der laufenden Woche
+    const rp=document.createElement("div"); rp.className="wk-report";
+    const max=Math.max(60,...rep.days.map(x=>x.min));
+    rp.innerHTML=`<div class="wk-sec">Diese Woche gelaufen</div>
+      <div class="sa-stats">
+        <span><strong>${rep.mins}</strong>min produktiv</span>
+        <span><strong>${rep.blocks}</strong>Fokusblöcke</span>
+        <span><strong>${rep.full}</strong>volle Tage</span>
+      </div>
+      <div class="sa-week">`+rep.days.map(x=>`
+        <div class="sa-day${x.full?" full":""}${x.future?" future":""}${(x.min||x.done)?"":" idle"}${x.k===today?" heute":""}">
+          <span class="sa-bar"><span style="height:${Math.round(x.min/max*100)}%"></span></span>
+          <span class="sa-wd">${x.wd}</span>
+          <span class="sa-min">${x.min?x.min+"′":"–"}</span>
+          <span class="sa-hab">${x.core&&!x.future?x.done+"/"+x.core:""}</span>
+        </div>`).join("")+`</div>`;
+    panel.appendChild(rp);
+  }
+
   function buildHeuteList(panel){
     const lblP=document.createElement("div"); lblP.className="sub-label"; lblP.textContent="Prioritäten";
     panel.appendChild(lblP);
@@ -2659,7 +2838,7 @@
     // Fokuszeiten: helle Ummantelung Clock In -> Clock Out + einzelne Blöcke
     if(isToday()){
       ensureFocus();
-      const ci=focus.clockIn, co=(focus.clockedOut!=null?focus.clockedOut:(runningBlock()? (new Date().getHours()*60+new Date().getMinutes()) : null));
+      const ci=focus.clockIn, co=(focus.clockedOut!=null?focus.clockedOut:(ci!=null? (new Date().getHours()*60+new Date().getMinutes()) : null));
       if(ci!=null && co!=null && co>ci){
         const env=document.createElement("div"); env.className="tl-focus-env";
         env.style.top=min2y(Math.max(TL_START,ci))+"px";
@@ -2865,12 +3044,85 @@
     const total=daysBetween(start,end)+1, dayNo=Math.min(total,daysBetween(start,today)+1);
     return {label:"Q"+(q+1), year:y, dayNo, total, remaining:total-dayNo, pct:Math.round(dayNo/total*100)};
   }
+  // ISO-Woche: Montag als Wochenstart
+  function weekStart(d){ const x=new Date(d.getFullYear(),d.getMonth(),d.getDate()); const wd=(x.getDay()+6)%7; x.setDate(x.getDate()-wd); return x; }
+  function weekInfo(){
+    const now=new Date(), ws=weekStart(now), we=new Date(ws); we.setDate(we.getDate()+6);
+    const start=ymd(ws), end=ymd(we);
+    const dayNo=Math.min(7, daysBetween(start,today)+1);
+    // ISO-Wochennummer
+    const t=new Date(ws); t.setDate(t.getDate()+3);
+    const jan1=new Date(t.getFullYear(),0,1);
+    const num=1+Math.round(((t-jan1)/86400000-3+((jan1.getDay()+6)%7))/7);
+    return {key:start, start, end, num, dayNo, remaining:7-dayNo, pct:Math.round(dayNo/7*100)};
+  }
+  function fmtShort(d){ const x=new Date(d+"T00:00:00"); return x.toLocaleDateString("de-DE",{day:"numeric",month:"short"}); }
+
+  // Selbstreinigung: jede Ebene wird zu ihrem Intervall neu abgeleitet, Altes wandert ins Archiv
+  function scopeRollover(){
+    const w=weekInfo(), q=quarterInfo();
+    const qKey=q.year+"-"+q.label;
+    let changed=false;
+    if(vision.weekKey && vision.weekKey!==w.key){
+      const pts=(vision.week.points||[]).filter(p=>(p.text||"").trim());
+      const rep=weekReport(vision.weekKey);
+      if(pts.length || rep.mins>0 || rep.active>0){
+        vision.archive.weeks.unshift({key:vision.weekKey, num:vision.weekNum||null, points:pts.map(p=>({text:p.text.trim(), parentText:p.parentText||parentTextOf(p,"quarter")}))});
+        vision.archive.weeks=vision.archive.weeks.slice(0,60);
+      }
+      vision.week.points=[]; changed=true;
+    }
+    if(vision.quarterKey && vision.quarterKey!==qKey){
+      const pts=(vision.quarter.points||[]).filter(p=>(p.text||"").trim());
+      if(pts.length){
+        vision.archive.quarters.unshift({key:vision.quarterKey, points:pts.map(p=>({text:p.text.trim(), parentText:parentTextOf(p,"year")}))});
+        vision.archive.quarters=vision.archive.quarters.slice(0,20);
+      }
+      vision.quarter.points=[];
+      // Wochenziele verlieren ihre Kopplung an vergangene Quartalsziele
+      (vision.week.points||[]).forEach(p=>{ delete p.parent; });
+      changed=true;
+    }
+    if(vision.weekKey!==w.key || vision.weekNum!==w.num || vision.quarterKey!==qKey){
+      vision.weekKey=w.key; vision.weekNum=w.num; vision.quarterKey=qKey; changed=true;
+    }
+    if(changed) saveVision();
+  }
+  // Was lief in dieser Woche? Aus Habit-Log und Fokus-Archiv berechnet
+  function weekReport(startKey){
+    const fx=readFocus();
+    const byDay={};
+    (fx.archive||[]).forEach(d=>{ if(d&&d.day) byDay[d.day]=d; });
+    if(fx.day) byDay[fx.day]={day:fx.day, clockIn:fx.clockIn, clockedOut:fx.clockedOut, blocks:fx.blocks||[], tasks:fx.tasks||[]};
+    const core=coreHabits().length;
+    const days=[]; let mins=0, blocks=0, full=0, active=0, tasksDone=0, tasksAll=0;
+    for(let i=0;i<7;i++){
+      const d=new Date(startKey+"T00:00:00"); d.setDate(d.getDate()+i);
+      const k=ymd(d);
+      const f=byDay[k];
+      const m=f?dayProductive(f.blocks):0;
+      const nb=f?(f.blocks||[]).length:0;
+      const hd=coreDone(k);
+      const ft=(f&&f.tasks?f.tasks.filter(t=>(t.text||"").trim()):[]);
+      tasksAll+=ft.length; tasksDone+=ft.filter(t=>t.status==="done").length;
+      const isFull=dayComplete(k);
+      mins+=m; blocks+=nb; if(isFull) full++; if(m>0||hd>0) active++;
+      days.push({k, wd:d.toLocaleDateString("de-DE",{weekday:"short"}), min:m, blocks:nb, done:hd, core, full:isFull, future:k>today});
+    }
+    return {days, mins, blocks, full, active, core, tasksDone, tasksAll};
+  }
+  function parentTextOf(p,parentKey){
+    if(!p.parent) return "";
+    const par=visPoints(parentKey).find(x=>x.id===p.parent);
+    return par&&par.text?par.text.trim():"";
+  }
+
   // Meta pro Ebene: Punkte holen, Farbe, Kopplungsziel
-  function visPoints(key){ return key==="year"?vision.year.points : key==="quarter"?vision.quarter.points : vision.points; }
-  function visParentKey(key){ return key==="quarter"?"year" : key==="year"?"big" : null; }
+  function visPoints(key){ return key==="year"?vision.year.points : key==="quarter"?vision.quarter.points : key==="week"?vision.week.points : vision.points; }
+  function visParentKey(key){ return key==="week"?"quarter" : key==="quarter"?"year" : key==="year"?"big" : null; }
   // Rendert eine Ebene als klappbare Stufe der Kaskade
   function renderVisTier(cfg){
-    const {key, num, kicker, grad, accent, tint, placeholder, coupleTo} = cfg;
+    const {key, num, kicker, grad, accent, tint, placeholder, coupleTo, coupleLabel, meta} = cfg;
     const open = vision.open[key] !== false;
     const tier=document.createElement("div"); tier.className="vtier reveal"+(open?" open":""); tier.dataset.level=key;
     tier.style.setProperty("--c",accent); tier.style.setProperty("--c-tint",tint); tier.style.setProperty("--grad",grad);
@@ -2883,7 +3135,7 @@
       <span class="vtier-num">${num}</span>
       <span class="vtier-titles">
         <span class="vtier-kicker">${kicker}</span>
-        <span class="vtier-meta">${pts.length? (pts.length===1?"1 Ziel":pts.length+" Ziele") : "noch leer"}</span>
+        <span class="vtier-meta">${pts.length? (pts.length===1?"1 Ziel":pts.length+" Ziele") : "noch leer"}${meta?' <span class="vtier-sep">·</span> '+meta:''}</span>
       </span>
       <span class="vtier-chev" aria-hidden="true">⌄</span>`;
     bar.addEventListener("click",()=>{ const willOpen=!tier.classList.contains("open"); tier.classList.toggle("open",willOpen); vision.open[key]=willOpen; saveVision(); });
@@ -2913,14 +3165,15 @@
         const link=document.createElement("button"); link.type="button"; link.className="vgoal-link"+(p.parent?" set":"");
         const parentObj = p.parent && parents.find(x=>x.id===p.parent);
         link.innerHTML = parentObj ? `<span class="vl-ic">↳</span><span class="vl-tx">${esc(parentObj.text.trim())}</span>`
-                                   : `<span class="vl-ic">↳</span><span class="vl-tx muted">an Jahresziel koppeln</span>`;
-        link.title="Mit einem Jahresziel verknüpfen";
+                                   : `<span class="vl-ic">↳</span><span class="vl-tx muted">an ${coupleLabel||"Ziel"} koppeln</span>`;
+        link.title="Mit einem "+(coupleLabel||"Ziel")+" verknüpfen";
         link.addEventListener("click",()=>openCoupleMenu(p, coupleTo, link));
         main.appendChild(link);
       }
       const del=document.createElement("button"); del.className="row-del"; del.type="button"; del.textContent="×"; del.setAttribute("aria-label","Löschen");
       del.addEventListener("click",()=>{ const a=visPoints(key); const i=a.findIndex(x=>x.id===p.id); if(i>=0)a.splice(i,1);
         if(key==="year") vision.quarter.points.forEach(q=>{ if(q.parent===p.id) delete q.parent; });
+        if(key==="quarter") vision.week.points.forEach(q=>{ if(q.parent===p.id) delete q.parent; });
         saveVision(); buildVision(); });
       row.append(del);
       inner.appendChild(row);
@@ -2934,22 +3187,115 @@
     return tier;
   }
   // kleines Auswahlmenü zum Koppeln
-  function openCoupleMenu(qPoint, parentKey, anchor){
+  function openCoupleMenu(qPoint, parentKey, anchor, rebuild){
+    const redraw = rebuild || buildVision;
     document.querySelectorAll(".couple-pop").forEach(x=>x.remove());
     const parents=visPoints(parentKey).filter(x=>x.text&&x.text.trim());
     const pop=document.createElement("div"); pop.className="couple-pop";
-    if(!parents.length){ const e=document.createElement("div"); e.className="cp-empty"; e.textContent="Erst ein Jahresziel anlegen."; pop.appendChild(e); }
+    if(!parents.length){ const e=document.createElement("div"); e.className="cp-empty"; e.textContent=parentKey==="quarter"?"Erst ein Quartalsziel anlegen.":"Erst ein Jahresziel anlegen."; pop.appendChild(e); }
     parents.forEach(pp=>{
       const b=document.createElement("button"); b.type="button"; b.className="cp-item"+(qPoint.parent===pp.id?" on":""); b.textContent=pp.text.trim();
-      b.addEventListener("click",()=>{ qPoint.parent = (qPoint.parent===pp.id?undefined:pp.id); saveVision(); pop.remove(); buildVision(); });
+      b.addEventListener("click",()=>{ qPoint.parent = (qPoint.parent===pp.id?undefined:pp.id); saveVision(); pop.remove(); redraw(); });
       pop.appendChild(b);
     });
     if(qPoint.parent){ const c=document.createElement("button"); c.type="button"; c.className="cp-clear"; c.textContent="Verknüpfung lösen";
-      c.addEventListener("click",()=>{ delete qPoint.parent; saveVision(); pop.remove(); buildVision(); }); pop.appendChild(c); }
+      c.addEventListener("click",()=>{ delete qPoint.parent; saveVision(); pop.remove(); redraw(); }); pop.appendChild(c); }
     anchor.appendChild(pop);
     setTimeout(()=>{ const off=e=>{ if(!pop.contains(e.target)){ pop.remove(); document.removeEventListener("click",off,true);} }; document.addEventListener("click",off,true); },0);
   }
+  let scopeArchOpen=false, sarchWeek=null;
+  function renderScopeArchive(){
+    const box=document.createElement("div"); box.className="sarch reveal"+(scopeArchOpen?" open":"");
+    const weeks=vision.archive.weeks||[], quarters=vision.archive.quarters||[];
+    const n=weeks.length+quarters.length;
+    const h=document.createElement("button"); h.className="sarch-head"; h.type="button";
+    h.innerHTML=`<span>Verlauf</span><span class="sarch-count">${n}</span><span class="sarch-chev">⌄</span>`;
+    h.addEventListener("click",()=>{ scopeArchOpen=!scopeArchOpen; buildVision(); });
+    box.appendChild(h);
+    if(scopeArchOpen){
+      const body=document.createElement("div"); body.className="sarch-body";
+      if(!n){ const e=document.createElement("div"); e.className="sarch-empty"; e.textContent="Noch nichts abgeschlossen. Am Ende jeder Woche landet hier, was du dir vorgenommen hattest — und was tatsächlich lief."; body.appendChild(e); }
+      // laufende Woche live, damit die Bilanz nicht erst montags sichtbar wird
+      {
+        const wi=weekInfo(), rep=weekReport(wi.key);
+        const open=(sarchWeek==="__now");
+        const d=document.createElement("div"); d.className="sarch-item now"+(open?" open":"");
+        const btn=document.createElement("button"); btn.type="button"; btn.className="sa-wbtn";
+        btn.innerHTML=`<span class="sa-label">KW ${wi.num} · läuft</span>
+          <span class="sa-sum">${rep.mins} min · ${rep.full}/${wi.dayNo} volle Tage</span>
+          <span class="sa-chev">⌄</span>`;
+        btn.addEventListener("click",()=>{ sarchWeek=(open?null:"__now"); buildVision(); });
+        d.appendChild(btn);
+        if(open){
+          const det=document.createElement("div"); det.className="sa-detail";
+          const max=Math.max(60,...rep.days.map(x=>x.min));
+          det.innerHTML=`<div class="sa-sec">Gelaufen</div>
+            <div class="sa-stats"><span><strong>${rep.mins}</strong>min produktiv</span><span><strong>${rep.blocks}</strong>Fokusblöcke</span><span><strong>${rep.full}</strong>volle Tage</span></div>
+            <div class="sa-week">`+rep.days.map(x=>`
+              <div class="sa-day${x.full?" full":""}${x.future?" future":""}${(x.min||x.done)?"":" idle"}">
+                <span class="sa-bar"><span style="height:${Math.round(x.min/max*100)}%"></span></span>
+                <span class="sa-wd">${x.wd}</span>
+                <span class="sa-min">${x.min?x.min+"′":"–"}</span>
+                <span class="sa-hab">${x.core&&!x.future?x.done+"/"+x.core:""}</span>
+              </div>`).join("")+`</div>`;
+          d.appendChild(det);
+        }
+        body.appendChild(d);
+      }
+      quarters.forEach(q=>{
+        const d=document.createElement("div"); d.className="sarch-item q";
+        const qp=String(q.key).split("-");
+        d.innerHTML=`<div class="sa-label">${esc(qp[1]||q.key)}${qp[0]?" "+esc(qp[0]):""}</div>`+
+          q.points.map(p=>`<div class="sa-pt">${esc(p.text)}${p.parentText?`<span class="sa-par">↳ ${esc(p.parentText)}</span>`:""}</div>`).join("");
+        body.appendChild(d);
+      });
+      weeks.forEach(w=>{
+        const we=new Date(w.key+"T00:00:00"); we.setDate(we.getDate()+6);
+        const rep=weekReport(w.key);
+        const open=(sarchWeek===w.key);
+        const d=document.createElement("div"); d.className="sarch-item w"+(open?" open":"");
+        const btn=document.createElement("button"); btn.type="button"; btn.className="sa-wbtn";
+        btn.innerHTML=`<span class="sa-label">KW ${w.num||""} · ${fmtShort(w.key)}–${fmtShort(ymd(we))}</span>
+          <span class="sa-sum">${rep.mins} min · ${rep.full}/7 volle Tage</span>
+          <span class="sa-chev">⌄</span>`;
+        btn.addEventListener("click",()=>{ sarchWeek=(open?null:w.key); buildVision(); });
+        d.appendChild(btn);
+        if(open){
+          const det=document.createElement("div"); det.className="sa-detail";
+          let html="";
+          if(w.points.length){
+            html+=`<div class="sa-sec">Vorgenommen</div>`;
+            html+=w.points.map(p=>`<div class="sa-pt">${esc(p.text)}${p.parentText?`<span class="sa-par">↳ ${esc(p.parentText)}</span>`:""}</div>`).join("");
+          }else{
+            html+=`<div class="sa-sec">Vorgenommen</div><div class="sa-none">Keine Wochenziele gesetzt.</div>`;
+          }
+          html+=`<div class="sa-sec">Gelaufen</div>`;
+          html+=`<div class="sa-stats">
+            <span><strong>${rep.mins}</strong>min produktiv</span>
+            <span><strong>${rep.blocks}</strong>Fokusblöcke</span>
+            <span><strong>${rep.full}</strong>volle Tage</span>
+            ${rep.tasksAll?`<span><strong>${rep.tasksDone}/${rep.tasksAll}</strong>Aufgaben</span>`:""}
+          </div>`;
+          const max=Math.max(60,...rep.days.map(x=>x.min));
+          html+=`<div class="sa-week">`+rep.days.map(x=>`
+            <div class="sa-day${x.full?" full":""}${x.min||x.done?"":" idle"}">
+              <span class="sa-bar"><span style="height:${Math.round(x.min/max*100)}%"></span></span>
+              <span class="sa-wd">${x.wd}</span>
+              <span class="sa-min">${x.min?x.min+"′":"–"}</span>
+              <span class="sa-hab">${x.core?x.done+"/"+x.core:""}</span>
+            </div>`).join("")+`</div>`;
+          det.innerHTML=html;
+          d.appendChild(det);
+        }
+        body.appendChild(d);
+      });
+      box.appendChild(body);
+    }
+    return box;
+  }
+
   function buildVision(){
+    scopeRollover();
     if(visionTimer){ clearInterval(visionTimer); visionTimer=null; }
     const view=document.getElementById("view-vizija"); view.innerHTML="";
     const panel=document.createElement("section"); panel.className="panel vizija-panel cascade";
@@ -2960,7 +3306,7 @@
     panel.appendChild(aurora);
 
     const head=document.createElement("div"); head.className="panel-head reveal";
-    head.innerHTML=`<span class="dot"></span><span class="eyebrow">Vizija</span><span class="vis-hint">Nordstern → Jahr → Quartal</span>`;
+    head.innerHTML=`<span class="dot"></span><span class="eyebrow">Vizija</span><span class="vis-hint">Nordstern → Jahr → Quartal → Woche</span>`;
     panel.appendChild(head);
 
     const flow=document.createElement("div"); flow.className="vflow";
@@ -2970,10 +3316,19 @@
     flow.appendChild(renderVisTier({key:"year", num:"II", kicker:"1-Jahres-Vision",
       grad:"linear-gradient(120deg,#FBBF24,#F59E0B 55%,#EA580C)", accent:"var(--amber)", tint:"var(--amber-tint)",
       placeholder:"Wie sieht dieses Jahr aus, wenn die Vizija realer wird?"}));
+    const qi=quarterInfo(), wi=weekInfo();
     flow.appendChild(renderVisTier({key:"quarter", num:"III", kicker:"Dieses Quartal",
       grad:"linear-gradient(120deg,#22D3EE,#0EA5A5 55%,#0369A1)", accent:"var(--sky)", tint:"var(--sky-tint)",
-      placeholder:"Was wird in diesen ~90 Tagen wahr?", coupleTo:"year"}));
+      placeholder:"Was wird in diesen ~90 Tagen wahr?", coupleTo:"year", coupleLabel:"Jahresziel",
+      meta:`Tag ${qi.dayNo} von ${qi.total}`}));
+    flow.appendChild(renderVisTier({key:"week", num:"IV", kicker:"Diese Woche",
+      grad:"linear-gradient(120deg,#34D399,#0FA678 55%,#046C51)", accent:"var(--mint)", tint:"var(--mint-tint)",
+      placeholder:"Welches Stück vom Quartal holst du dir in diesen 7 Tagen?", coupleTo:"quarter", coupleLabel:"Quartalsziel",
+      meta:`KW ${wi.num} · Tag ${wi.dayNo} von 7`}));
     panel.appendChild(flow);
+
+    // Verlauf: abgeschlossene Wochen und Quartale
+    panel.appendChild(renderScopeArchive());
 
     // Quartals-Countdown am Fuß
     const info=quarterInfo();

@@ -211,6 +211,36 @@
   .streak{font-size:12.5px; font-weight:720; color:var(--ink-faint); font-variant-numeric:tabular-nums; white-space:nowrap; opacity:.85}
   .streak.hot{color:var(--amber)}
 
+  /* ---------- Klangkulisse ---------- */
+  .fsound{margin:0 0 4px 14px; padding:9px 2px 11px; border-bottom:1.5px solid var(--rule); display:grid; grid-template-columns:auto auto 1fr; align-items:center; gap:10px}
+  .fsnd-play{width:32px; height:32px; flex:0 0 auto; border-radius:50%; border:none; cursor:pointer; font-size:11px; line-height:1; color:var(--sky); background:transparent; box-shadow:inset 0 0 0 1.5px var(--sky); transition:all .18s}
+  .fsnd-play.on{background:var(--sky); color:#fff; box-shadow:0 6px 16px -8px var(--sky)}
+  .fsnd-modes{display:flex; gap:4px}
+  .fsnd-chip{font-family:var(--serif); font-size:12px; font-style:italic; font-weight:600; color:var(--ink-faint); background:transparent; border:none; border-radius:999px; padding:4px 11px; cursor:pointer; transition:all .16s}
+  .fsnd-ytopts{display:flex; align-items:center; gap:8px; min-width:0}
+  .fsnd-chip.small{font-size:11px; padding:3px 9px}
+  .fsnd-chip.on{color:var(--sky); background:var(--sky-tint); box-shadow:inset 0 0 0 1px var(--sky)}
+  .fsnd-vol{width:100%; min-width:60px; accent-color:var(--sky); height:3px}
+  .fsnd-link{grid-column:1 / -1; display:flex; gap:7px; align-items:center; margin-top:2px}
+  .fsnd-inp{flex:1; min-width:0; font-family:var(--serif); font-size:12px; font-style:italic; color:var(--ink); background:transparent; border:none; border-bottom:1px solid var(--rule); padding:3px 2px}
+  .fsnd-inp:focus{outline:none; border-bottom-color:var(--sky)}
+  .fsnd-inp::placeholder{color:var(--ink-faint)}
+  .fsnd-save,.fsnd-edit{font-family:var(--serif); font-size:11px; font-style:italic; font-weight:650; color:var(--sky); background:transparent; border:none; cursor:pointer; padding:3px 6px}
+  .fsnd-open{font-family:var(--serif); font-size:12px; font-style:italic; font-weight:650; color:var(--sky); background:var(--sky-tint); border:none; border-radius:999px; padding:4px 12px; cursor:pointer}
+  .fsnd-edit{color:var(--ink-faint)}
+  .fsnd-play:disabled{opacity:.35; cursor:default}
+  .fsnd-hint{font-family:var(--serif); font-size:11.5px; font-style:italic; color:var(--ink-faint); justify-self:start}
+  /* Tonspieler: lebt außerhalb des Fokus-Bogens, damit die Wiedergabe nicht abreißt */
+  #ytdock:empty{display:none}
+  #ytdock{margin:12px auto 0; width:100%; border-radius:12px; overflow:hidden; background:#000; aspect-ratio:16/9;
+    box-shadow:0 14px 32px -18px rgba(0,0,0,.7), 0 0 0 1px rgba(var(--sheen),.06); transition:width .22s ease}
+  #ytdock iframe{width:100%; height:100%; border:0; display:block}
+  /* Nur Ton: auf einen kleinen Spieler zusammengezogen */
+  #ytdock.compact{width:232px; aspect-ratio:16/9}
+  /* Außerhalb des Fokus-Tabs als kleiner Spieler in der Ecke, damit der Ton weiterläuft */
+  body:not(.tab-fokus) #ytdock{position:fixed; right:14px; width:212px; margin:0; z-index:60;
+    bottom:calc(14px + env(safe-area-inset-bottom))}
+  @media (max-width:520px){ #ytdock.compact{width:200px} body:not(.tab-fokus) #ytdock{width:172px} }
   /* ---------- Fokusuhr ---------- */
   .fclockwrap{margin:0 0 4px 14px; border-bottom:1.5px solid var(--rule)}
   .fclock-bar{width:100%; display:flex; align-items:center; gap:9px; background:transparent; border:none; cursor:pointer; padding:11px 2px; font-family:var(--display)}
@@ -1208,6 +1238,7 @@
 
     <!-- FOKUS -->
     <section id="view-fokus" class="view"></section>
+    <div id="ytdock"></div>
 
     <!-- PRIOS -->
     <section id="view-prios" class="view"></section>
@@ -2577,6 +2608,8 @@
     try{ const Ctx=window.AudioContext||window.webkitAudioContext; if(Ctx&&!audioCtx){ audioCtx=new Ctx(); if(audioCtx.state==="suspended") audioCtx.resume(); } }catch(e){}
   }
   function startFlow(){
+    loadSound();
+    if(sound.follow){ if(sound.mode==="yt"){ if(ytParse(sound.yt)) ytOn=true; } else if(!sndPlaying()) setTimeout(startSound,60); }
     primeAudio();
     playGong();                 // Gong auch beim Start
     fclock.phase="flow"; fclock.endsAt=Date.now()+ftimer.flowMin*60000;
@@ -2585,10 +2618,12 @@
     if(!runningBlock()) startBlock(); else buildFokus();
   }
   function startBreak(){
+    loadSound(); if(sound.follow){ if(sndPlaying()) stopSound(true); ytOn=false; }
     fclock.phase="break"; fclock.endsAt=Date.now()+ftimer.breakMin*60000;
     runTick(); buildFokus();
   }
-  function stopClock(){ // stoppt nur die Fokusuhr (nicht den Fokustag)
+  function stopClock(){
+    loadSound(); if(sound.follow){ if(sndPlaying()) stopSound(true); ytOn=false; } // stoppt nur die Fokusuhr (nicht den Fokustag)
     fclock.phase="idle"; fclock.endsAt=0; if(ftick){ clearInterval(ftick); ftick=null; }
     buildFokus();
   }
@@ -2611,6 +2646,189 @@
     },250);
   }
   function fmtClock(ms){ const s=Math.round(ms/1000); const m=Math.floor(s/60), ss=s%60; return String(m).padStart(2,"0")+":"+String(ss).padStart(2,"0"); }
+
+  /* ---------- Klangkulisse: Rauschen & Klavier ---------- */
+  const SOUND="ht_sound_v1";
+  let sound=null, sndNodes=null, ytOn=false;
+  function loadSound(){ if(!sound) sound=read(SOUND,{mode:"brown", vol:0.45, yt:"", follow:true}); 
+    if(typeof sound.vol!=="number") sound.vol=0.45;
+    if(sound.mode!=="brown"&&sound.mode!=="yt") sound.mode="brown";
+    if(typeof sound.yt!=="string") sound.yt="";
+    if(sound.follow===undefined) sound.follow=true;
+    return sound; }
+  function saveSound(){ write(SOUND,sound); }
+  const sndPlaying=()=>!!sndNodes;
+
+  function brownBuffer(ctx){
+    const len=Math.floor(ctx.sampleRate*8), buf=ctx.createBuffer(1,len,ctx.sampleRate), d=buf.getChannelData(0);
+    let last=0;
+    for(let i=0;i<len;i++){ const w=Math.random()*2-1; last=(last+0.02*w)/1.02; d[i]=last*3.4; }
+    // Enden überblenden, damit die Schleife nicht klickt
+    const f=Math.floor(ctx.sampleRate*0.5);
+    for(let i=0;i<f;i++){ const t=i/f; d[i]=d[i]*t + d[len-f+i]*(1-t); }
+    return buf;
+  }
+  function startSound(){
+    loadSound();
+    if(sound.mode!=="brown") return;
+    try{
+      const Ctx=window.AudioContext||window.webkitAudioContext; if(!Ctx) return;
+      if(!audioCtx) audioCtx=new Ctx();
+      if(audioCtx.state==="suspended") audioCtx.resume();
+      stopSound(true);
+      const ctx=audioCtx;
+      const gain=ctx.createGain(); gain.gain.setValueAtTime(0.0001,ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(Math.max(0.0002,sound.vol),ctx.currentTime+1.2);
+      const lp=ctx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=900;
+      gain.connect(lp); lp.connect(ctx.destination);
+      const src=ctx.createBufferSource(); src.buffer=brownBuffer(ctx); src.loop=true;
+      src.connect(gain); src.start();
+      sndNodes={gain,lp,src};
+    }catch(e){}
+    if(state.tab==="fokus") buildFokus();
+  }
+
+  function stopSound(silent){
+    if(sndNodes){
+      try{
+        const g=sndNodes.gain, ctx=audioCtx, now=ctx.currentTime;
+        g.gain.cancelScheduledValues(now);
+        g.gain.setValueAtTime(Math.max(0.0002,g.gain.value),now);
+        g.gain.exponentialRampToValueAtTime(0.0001,now+0.6);
+        const s=sndNodes.src; setTimeout(()=>{ try{ if(s)s.stop(); }catch(e){} },700);
+      }catch(e){}
+      sndNodes=null;
+    }
+    if(!silent && state.tab==="fokus") buildFokus();
+  }
+  function toggleSound(){ sndPlaying()?stopSound():startSound(); }
+  function setSoundVol(v){
+    loadSound(); sound.vol=v; saveSound();
+    if(sndNodes){ try{ sndNodes.gain.gain.setTargetAtTime(Math.max(0.0002,v),audioCtx.currentTime,0.08); }catch(e){} }
+  }
+
+  /* YouTube: Playlist- oder Video-Kennung aus einem beliebigen Link lesen */
+  function ytParse(url){
+    const u=(url||"").trim(); if(!u) return null;
+    const list=u.match(/[?&]list=([A-Za-z0-9_-]+)/);
+    if(list) return {type:"list", id:list[1]};
+    let v=u.match(/[?&]v=([A-Za-z0-9_-]{6,})/) || u.match(/youtu\.be\/([A-Za-z0-9_-]{6,})/)
+        || u.match(/\/embed\/([A-Za-z0-9_-]{6,})/) || u.match(/\/shorts\/([A-Za-z0-9_-]{6,})/);
+    if(v) return {type:"video", id:v[1]};
+    if(/^PL|^UU|^OL/.test(u) && /^[A-Za-z0-9_-]+$/.test(u)) return {type:"list", id:u};
+    if(/^[A-Za-z0-9_-]{11}$/.test(u)) return {type:"video", id:u};
+    return null;
+  }
+  function ytEmbed(p,autoplay){
+    const base="https://www.youtube-nocookie.com/embed/";
+    const common="rel=0&modestbranding=1&playsinline=1"+(autoplay?"&autoplay=1":"");
+    return p.type==="list" ? base+"videoseries?list="+p.id+"&"+common
+                           : base+p.id+"?"+common;
+  }
+  function stopYT(){ ytOn=false; }
+  /* Der Player lebt außerhalb des Fokus-Bogens und wird nur bei Quellwechsel neu geladen,
+     damit die Wiedergabe das Neuzeichnen und Tabwechsel übersteht. */
+  function renderYTDock(){
+    const dock=document.getElementById("ytdock"); if(!dock) return;
+    loadSound();
+    const parsed = sound.mode==="yt" ? ytParse(sound.yt) : null;
+    const active = !!(parsed && ytOn);
+    const key = active ? parsed.type+":"+parsed.id : "";
+    dock.classList.toggle("compact", sound.compact!==false);
+    if(dock.dataset.key===key) return;
+    dock.dataset.key=key;
+    dock.innerHTML="";
+    if(!active) return;
+    const f=document.createElement("iframe");
+    f.src=ytEmbed(parsed,true);
+    f.title="Fokus-Playlist";
+    f.setAttribute("allow","autoplay; encrypted-media; picture-in-picture; fullscreen");
+    f.setAttribute("allowfullscreen","");
+    f.setAttribute("referrerpolicy","strict-origin-when-cross-origin");
+    dock.appendChild(f);
+  }
+
+  function renderSound(){
+    loadSound();
+    const wrap=document.createElement("div"); wrap.className="fsound"+(sndPlaying()?" on":"");
+    const isYT=sound.mode==="yt";
+    const parsed=isYT?ytParse(sound.yt):null;
+
+    const play=document.createElement("button"); play.type="button";
+    const on = isYT ? ytOn : sndPlaying();
+    play.className="fsnd-play"+(on?" on":"");
+    play.innerHTML=on?"❚❚":"▶";
+    play.setAttribute("aria-label",on?"Anhalten":"Abspielen");
+    play.addEventListener("click",()=>{
+      if(isYT){ if(!parsed) return; ytOn=!ytOn; renderYTDock(); buildFokus(); }
+      else toggleSound();
+    });
+    play.disabled = isYT && !parsed;
+    wrap.appendChild(play);
+
+    const modes=document.createElement("div"); modes.className="fsnd-modes";
+    [["brown","Rauschen"],["yt","Video"]].forEach(([k,lbl])=>{
+      const c=document.createElement("button"); c.type="button";
+      c.className="fsnd-chip"+(sound.mode===k?" on":""); c.textContent=lbl;
+      c.addEventListener("click",()=>{
+        if(sound.mode===k) return;
+        sound.mode=k; saveSound();
+        if(k==="yt"){ stopSound(true); } else { ytOn=false; renderYTDock(); }
+        buildFokus();
+      });
+      modes.appendChild(c);
+    });
+    wrap.appendChild(modes);
+
+    if(!isYT){
+      const vol=document.createElement("input"); vol.type="range"; vol.className="fsnd-vol";
+      vol.min="0"; vol.max="1"; vol.step="0.01"; vol.value=String(sound.vol);
+      vol.setAttribute("aria-label","Lautstärke");
+      vol.addEventListener("input",()=>setSoundVol(parseFloat(vol.value)));
+      wrap.appendChild(vol);
+    }else{
+      const box=document.createElement("div"); box.className="fsnd-ytopts";
+      const hint=document.createElement("span"); hint.className="fsnd-hint";
+      hint.textContent = parsed ? (parsed.type==="list"?"Playlist bereit":"Video bereit") : "Link fehlt";
+      box.appendChild(hint);
+      const sw=document.createElement("button"); sw.type="button";
+      sw.className="fsnd-chip small"+(sound.compact!==false?" on":"");
+      sw.textContent = sound.compact!==false ? "Nur Ton" : "Mit Bild";
+      sw.title="Zwischen kleinem Tonspieler und großem Bild wechseln";
+      sw.addEventListener("click",()=>{ sound.compact=(sound.compact===false); saveSound(); renderYTDock(); buildFokus(); });
+      box.appendChild(sw);
+      wrap.appendChild(box);
+    }
+
+    // YouTube-Link + Player
+    if(isYT){
+      const row=document.createElement("div"); row.className="fsnd-link";
+      if(sound.yt && parsed){
+        const a=document.createElement("button"); a.type="button"; a.className="fsnd-open";
+        a.textContent="Bei YouTube öffnen ↗";
+        a.addEventListener("click",()=>window.open(sound.yt,"_blank","noopener"));
+        const ed=document.createElement("button"); ed.type="button"; ed.className="fsnd-edit"; ed.textContent="ändern";
+        ed.addEventListener("click",()=>{ sound.yt=""; ytOn=false; saveSound(); renderYTDock(); buildFokus(); });
+        row.append(a,ed);
+      }else{
+        const inp=document.createElement("input"); inp.type="url"; inp.className="fsnd-inp";
+        inp.placeholder="YouTube-Playlist oder Video einfügen";
+        inp.value=sound.yt||"";
+        const ok=document.createElement("button"); ok.type="button"; ok.className="fsnd-save"; ok.textContent="Sichern";
+        ok.addEventListener("click",()=>{
+          const v=inp.value.trim();
+          if(!ytParse(v)){ toast("Das sieht nicht nach einem YouTube-Link aus"); return; }
+          sound.yt=v; saveSound(); renderYTDock(); buildFokus();
+        });
+        inp.addEventListener("keydown",e=>{ if(e.key==="Enter") ok.click(); });
+        row.append(inp,ok);
+      }
+      wrap.appendChild(row);
+
+    }
+    return wrap;
+  }
+
 
   function renderFocusClock(){
     const wrap=document.createElement("div"); wrap.className="fclockwrap"+(fclock.open?" open":"");
@@ -2709,6 +2927,8 @@
 
     // Fokusuhr (Mini-Feld)
     sheet.appendChild(renderFocusClock());
+    sheet.appendChild(renderSound());
+    setTimeout(renderYTDock,0);
 
     // Zwei Spalten: links Zeiten, rechts Tagesaufgaben
     const cols=document.createElement("div"); cols.className="fcols";

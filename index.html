@@ -230,17 +230,47 @@
   .fsnd-edit{color:var(--ink-faint)}
   .fsnd-play:disabled{opacity:.35; cursor:default}
   .fsnd-hint{font-family:var(--serif); font-size:11.5px; font-style:italic; color:var(--ink-faint); justify-self:start}
-  /* Tonspieler: lebt außerhalb des Fokus-Bogens, damit die Wiedergabe nicht abreißt */
+  /* Spieler: lebt außerhalb des Fokus-Bogens, damit die Wiedergabe nicht abreißt */
   #ytdock:empty{display:none}
-  #ytdock{margin:12px auto 0; width:100%; border-radius:12px; overflow:hidden; background:#000; aspect-ratio:16/9;
+  #ytdock{margin:12px auto 0; width:100%; border-radius:12px; overflow:hidden;
     box-shadow:0 14px 32px -18px rgba(0,0,0,.7), 0 0 0 1px rgba(var(--sheen),.06); transition:width .22s ease}
-  #ytdock iframe{width:100%; height:100%; border:0; display:block}
-  /* Nur Ton: auf einen kleinen Spieler zusammengezogen */
-  #ytdock.compact{width:232px; aspect-ratio:16/9}
-  /* Außerhalb des Fokus-Tabs als kleiner Spieler in der Ecke, damit der Ton weiterläuft */
-  body:not(.tab-fokus) #ytdock{position:fixed; right:14px; width:212px; margin:0; z-index:60;
+  #ytdock iframe{width:100%; border:0; display:block}
+  /* YouTube: Bild, deshalb 16:9 */
+  #ytdock.kind-yt{background:#000; aspect-ratio:16/9}
+  #ytdock.kind-yt iframe{height:100%}
+  #ytdock.kind-yt.vis-small{width:232px}
+  /* Bild aus: der Rahmen bleibt geladen, damit der Ton läuft, ist aber nicht zu sehen */
+  #ytdock.kind-yt.vis-off{aspect-ratio:auto; width:100%; max-width:520px; background:transparent; box-shadow:none}
+  #ytdock.kind-yt.vis-off iframe{position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; left:-9999px}
+  #ytdock.kind-yt.vis-off .ytbar{display:flex}
+  .ytbar{display:none; align-items:center; gap:10px; padding:10px 14px; border-radius:12px;
+    background:var(--card); box-shadow:0 0 0 1px rgba(var(--sheen),.07), 0 10px 24px -18px rgba(0,0,0,.5)}
+  .ytb-btn{width:30px; height:30px; flex:0 0 auto; border:none; border-radius:50%; cursor:pointer;
+    font-size:11px; line-height:1; color:var(--brass); background:transparent; box-shadow:inset 0 0 0 1.4px var(--brass)}
+  .ytb-btn.play{color:var(--on-ink); background:var(--brass); box-shadow:none}
+  .ytb-lab{margin-left:auto; font-family:var(--serif); font-style:italic; font-size:12px; color:var(--ink-faint)}
+  /* Spotify / Apple Music: reine Tonspieler, feste Höhe, kein Bild */
+  #ytdock.kind-spotify{background:transparent; box-shadow:none; max-width:520px}
+  #ytdock.kind-spotify iframe{height:152px; border-radius:12px}
+  #ytdock.kind-apple{background:transparent; box-shadow:none; max-width:520px}
+  #ytdock.kind-apple iframe{height:175px; border-radius:12px}
+  /* Direktlink: nackter Tonspieler */
+  #ytdock.kind-audio{background:transparent; box-shadow:none; max-width:520px}
+  #ytdock.kind-audio audio{width:100%; display:block}
+  /* Außerhalb des Fokus-Tabs klein in die Ecke, damit der Ton weiterläuft */
+  body:not(.tab-fokus) #ytdock{position:fixed; right:14px; margin:0; z-index:60;
     bottom:calc(14px + env(safe-area-inset-bottom))}
-  @media (max-width:520px){ #ytdock.compact{width:200px} body:not(.tab-fokus) #ytdock{width:172px} }
+  body:not(.tab-fokus) #ytdock.kind-yt{width:212px}
+  body:not(.tab-fokus) #ytdock.kind-spotify,
+  body:not(.tab-fokus) #ytdock.kind-apple,
+  body:not(.tab-fokus) #ytdock.kind-audio{width:300px}
+  @media (max-width:520px){
+    #ytdock.kind-yt.vis-small{width:200px}
+    body:not(.tab-fokus) #ytdock.kind-yt{width:172px}
+    body:not(.tab-fokus) #ytdock.kind-spotify,
+    body:not(.tab-fokus) #ytdock.kind-apple,
+    body:not(.tab-fokus) #ytdock.kind-audio{width:calc(100% - 28px)}
+  }
   /* ---------- Fokusuhr ---------- */
   .fclockwrap{margin:0 0 4px 14px; border-bottom:1.5px solid var(--rule)}
   .fclock-bar{width:100%; display:flex; align-items:center; gap:9px; background:transparent; border:none; cursor:pointer; padding:11px 2px; font-family:var(--display)}
@@ -2708,51 +2738,104 @@
   }
 
   /* YouTube: Playlist- oder Video-Kennung aus einem beliebigen Link lesen */
-  function ytParse(url){
+  /* Quelle erkennen: YouTube (Bild), Spotify/Apple (reiner Ton), Direktlink (reiner Ton) */
+  function srcParse(url){
     const u=(url||"").trim(); if(!u) return null;
+    // Direkte Audiodatei oder Radiostream
+    if(/^https?:\/\//i.test(u) && /\.(mp3|m4a|aac|ogg|opus|wav|flac)(\?|$)/i.test(u))
+      return {kind:"audio", url:u, label:"Audiodatei"};
+    // Spotify
+    let m=u.match(/open\.spotify\.com\/(?:intl-[a-z]+\/)?(playlist|album|track|episode|show|artist)\/([A-Za-z0-9]+)/);
+    if(m) return {kind:"spotify", type:m[1], id:m[2], label:"Spotify"};
+    m=u.match(/^spotify:(playlist|album|track|episode|show|artist):([A-Za-z0-9]+)$/);
+    if(m) return {kind:"spotify", type:m[1], id:m[2], label:"Spotify"};
+    // Apple Music
+    if(/music\.apple\.com\//.test(u)) return {kind:"apple", url:u, label:"Apple Music"};
+    // YouTube
     const list=u.match(/[?&]list=([A-Za-z0-9_-]+)/);
-    if(list) return {type:"list", id:list[1]};
+    if(list) return {kind:"yt", type:"list", id:list[1], label:"YouTube-Playlist"};
     let v=u.match(/[?&]v=([A-Za-z0-9_-]{6,})/) || u.match(/youtu\.be\/([A-Za-z0-9_-]{6,})/)
         || u.match(/\/embed\/([A-Za-z0-9_-]{6,})/) || u.match(/\/shorts\/([A-Za-z0-9_-]{6,})/);
-    if(v) return {type:"video", id:v[1]};
-    if(/^PL|^UU|^OL/.test(u) && /^[A-Za-z0-9_-]+$/.test(u)) return {type:"list", id:u};
-    if(/^[A-Za-z0-9_-]{11}$/.test(u)) return {type:"video", id:u};
+    if(v) return {kind:"yt", type:"video", id:v[1], label:"YouTube-Video"};
+    if(/^(PL|UU|OL|RD)/.test(u) && /^[A-Za-z0-9_-]+$/.test(u)) return {kind:"yt", type:"list", id:u, label:"YouTube-Playlist"};
+    if(/^[A-Za-z0-9_-]{11}$/.test(u)) return {kind:"yt", type:"video", id:u, label:"YouTube-Video"};
+    // Sonstiger Link: als Stream versuchen
+    if(/^https?:\/\//i.test(u)) return {kind:"audio", url:u, label:"Stream"};
     return null;
   }
-  function ytEmbed(p,autoplay){
-    const base="https://www.youtube-nocookie.com/embed/";
-    const common="rel=0&modestbranding=1&playsinline=1"+(autoplay?"&autoplay=1":"");
-    return p.type==="list" ? base+"videoseries?list="+p.id+"&"+common
-                           : base+p.id+"?"+common;
+  // Quellen ohne Bild — hier gibt es nichts zu verstecken
+  const srcIsAudioOnly=p=>!!p && p.kind!=="yt";
+  function srcEmbed(p){
+    if(p.kind==="yt"){
+      const base="https://www.youtube-nocookie.com/embed/";
+      const common="rel=0&modestbranding=1&playsinline=1&autoplay=1&enablejsapi=1";
+      return p.type==="list" ? base+"videoseries?list="+p.id+"&"+common : base+p.id+"?"+common;
+    }
+    if(p.kind==="spotify") return "https://open.spotify.com/embed/"+p.type+"/"+p.id+"?utm_source=generator";
+    if(p.kind==="apple") return p.url.replace(/music\.apple\.com/,"embed.music.apple.com");
+    return "";
   }
   function stopYT(){ ytOn=false; }
-  /* Der Player lebt außerhalb des Fokus-Bogens und wird nur bei Quellwechsel neu geladen,
-     damit die Wiedergabe das Neuzeichnen und Tabwechsel übersteht. */
+
+  /* Der Spieler lebt außerhalb des Fokus-Bogens und wird nur bei Quellwechsel neu geladen,
+     damit die Wiedergabe Neuzeichnen und Tabwechsel übersteht. */
   function renderYTDock(){
     const dock=document.getElementById("ytdock"); if(!dock) return;
     loadSound();
-    const parsed = sound.mode==="yt" ? ytParse(sound.yt) : null;
+    const parsed = sound.mode==="yt" ? srcParse(sound.yt) : null;
     const active = !!(parsed && ytOn);
-    const key = active ? parsed.type+":"+parsed.id : "";
-    dock.classList.toggle("compact", sound.compact!==false);
+    const vis = sound.vis||"small";
+    const key = active ? parsed.kind+":"+(parsed.id||parsed.url) : "";
+    dock.className = active ? ("kind-"+parsed.kind+(parsed.kind==="yt"?" vis-"+vis:"")) : "";
     if(dock.dataset.key===key) return;
     dock.dataset.key=key;
     dock.innerHTML="";
     if(!active) return;
+
+    if(parsed.kind==="audio"){
+      const a=document.createElement("audio");
+      a.src=parsed.url; a.controls=true; a.autoplay=true; a.loop=true; a.preload="none";
+      a.volume=Math.min(1,Math.max(0,sound.vol||0.6));
+      dock.appendChild(a);
+      try{ // Sperrbildschirm-Bedienung auf dem iPhone
+        if(navigator.mediaSession) navigator.mediaSession.metadata=new MediaMetadata({title:"Fokus", artist:"Heute"});
+      }catch(e){}
+      return;
+    }
     const f=document.createElement("iframe");
-    f.src=ytEmbed(parsed,true);
-    f.title="Fokus-Playlist";
-    f.setAttribute("allow","autoplay; encrypted-media; picture-in-picture; fullscreen");
+    f.src=srcEmbed(parsed);
+    f.title="Fokus-Klang";
+    f.id="ytframe";
+    f.setAttribute("allow","autoplay; encrypted-media; picture-in-picture; fullscreen; clipboard-write");
     f.setAttribute("allowfullscreen","");
     f.setAttribute("referrerpolicy","strict-origin-when-cross-origin");
     dock.appendChild(f);
+    // Ohne Bild braucht es eigene Bedienelemente
+    if(parsed.kind==="yt"){
+      const bar=document.createElement("div"); bar.className="ytbar";
+      const mk=(cls,txt,cmd,lbl)=>{ const b=document.createElement("button"); b.type="button"; b.className=cls; b.innerHTML=txt;
+        b.setAttribute("aria-label",lbl); b.addEventListener("click",()=>ytCmd(cmd)); return b; };
+      const pp=document.createElement("button"); pp.type="button"; pp.className="ytb-btn play"; pp.innerHTML="❚❚";
+      pp.setAttribute("aria-label","Abspielen oder anhalten");
+      pp.addEventListener("click",()=>{ ytPaused=!ytPaused; ytCmd(ytPaused?"pauseVideo":"playVideo"); pp.innerHTML=ytPaused?"▶":"❚❚"; });
+      bar.appendChild(pp);
+      bar.appendChild(mk("ytb-btn","⏮","previousVideo","Vorheriger Titel"));
+      bar.appendChild(mk("ytb-btn","⏭","nextVideo","Nächster Titel"));
+      const lab=document.createElement("span"); lab.className="ytb-lab"; lab.textContent="Ton läuft";
+      bar.appendChild(lab);
+      dock.appendChild(bar);
+    }
   }
-
+  let ytPaused=false;
+  function ytCmd(func){
+    const f=document.getElementById("ytframe"); if(!f||!f.contentWindow) return;
+    try{ f.contentWindow.postMessage(JSON.stringify({event:"command",func:func,args:[]}),"*"); }catch(e){}
+  }
   function renderSound(){
     loadSound();
     const wrap=document.createElement("div"); wrap.className="fsound"+(sndPlaying()?" on":"");
     const isYT=sound.mode==="yt";
-    const parsed=isYT?ytParse(sound.yt):null;
+    const parsed=isYT?srcParse(sound.yt):null;
 
     const play=document.createElement("button"); play.type="button";
     const on = isYT ? ytOn : sndPlaying();
@@ -2767,7 +2850,7 @@
     wrap.appendChild(play);
 
     const modes=document.createElement("div"); modes.className="fsnd-modes";
-    [["brown","Rauschen"],["yt","Video"]].forEach(([k,lbl])=>{
+    [["brown","Rauschen"],["yt","Musik"]].forEach(([k,lbl])=>{
       const c=document.createElement("button"); c.type="button";
       c.className="fsnd-chip"+(sound.mode===k?" on":""); c.textContent=lbl;
       c.addEventListener("click",()=>{
@@ -2789,14 +2872,19 @@
     }else{
       const box=document.createElement("div"); box.className="fsnd-ytopts";
       const hint=document.createElement("span"); hint.className="fsnd-hint";
-      hint.textContent = parsed ? (parsed.type==="list"?"Playlist bereit":"Video bereit") : "Link fehlt";
+      hint.textContent = parsed ? (srcIsAudioOnly(parsed) ? parsed.label+" · ohne Bild" : parsed.label) : "Link fehlt";
       box.appendChild(hint);
-      const sw=document.createElement("button"); sw.type="button";
-      sw.className="fsnd-chip small"+(sound.compact!==false?" on":"");
-      sw.textContent = sound.compact!==false ? "Nur Ton" : "Mit Bild";
-      sw.title="Zwischen kleinem Tonspieler und großem Bild wechseln";
-      sw.addEventListener("click",()=>{ sound.compact=(sound.compact===false); saveSound(); renderYTDock(); buildFokus(); });
-      box.appendChild(sw);
+      // Bild-Umschalter nur bei YouTube — sonst gibt es ohnehin keines
+      if(parsed && parsed.kind==="yt"){
+        const VIS=["big","small","off"], VLBL={big:"Bild groß", small:"Bild klein", off:"Bild aus"};
+        const cur=sound.vis||"small";
+        const sw=document.createElement("button"); sw.type="button";
+        sw.className="fsnd-chip small"+(cur==="off"?" on":"");
+        sw.textContent=VLBL[cur];
+        sw.title="Bild groß, klein oder ganz aus";
+        sw.addEventListener("click",()=>{ sound.vis=VIS[(VIS.indexOf(cur)+1)%VIS.length]; saveSound(); renderYTDock(); buildFokus(); });
+        box.appendChild(sw);
+      }
       wrap.appendChild(box);
     }
 
@@ -2805,20 +2893,21 @@
       const row=document.createElement("div"); row.className="fsnd-link";
       if(sound.yt && parsed){
         const a=document.createElement("button"); a.type="button"; a.className="fsnd-open";
-        a.textContent="Bei YouTube öffnen ↗";
+        a.textContent="Quelle öffnen ↗";
         a.addEventListener("click",()=>window.open(sound.yt,"_blank","noopener"));
         const ed=document.createElement("button"); ed.type="button"; ed.className="fsnd-edit"; ed.textContent="ändern";
         ed.addEventListener("click",()=>{ sound.yt=""; ytOn=false; saveSound(); renderYTDock(); buildFokus(); });
         row.append(a,ed);
       }else{
         const inp=document.createElement("input"); inp.type="url"; inp.className="fsnd-inp";
-        inp.placeholder="YouTube-Playlist oder Video einfügen";
+        inp.placeholder="Spotify, Apple Music, YouTube oder Stream-Link";
         inp.value=sound.yt||"";
         const ok=document.createElement("button"); ok.type="button"; ok.className="fsnd-save"; ok.textContent="Sichern";
         ok.addEventListener("click",()=>{
           const v=inp.value.trim();
-          if(!ytParse(v)){ toast("Das sieht nicht nach einem YouTube-Link aus"); return; }
-          sound.yt=v; saveSound(); renderYTDock(); buildFokus();
+          const pp=srcParse(v);
+          if(!pp){ toast("Diesen Link erkenne ich nicht"); return; }
+          sound.yt=v; saveSound(); renderYTDock(); buildFokus(); toast(srcIsAudioOnly(pp)?pp.label+" bereit — ohne Bild":pp.label+" bereit");
         });
         inp.addEventListener("keydown",e=>{ if(e.key==="Enter") ok.click(); });
         row.append(inp,ok);

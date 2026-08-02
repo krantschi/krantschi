@@ -585,6 +585,17 @@
   .tls-btn{font:inherit; font-size:11.5px; font-weight:700; color:var(--ink-faint); background:transparent; border:none;
     border-radius:999px; padding:4px 12px; cursor:pointer; transition:all .16s}
   .tls-btn.on{color:var(--on-ink); background:var(--brass)}
+  .wp-nav{display:flex; align-items:center; gap:8px; padding:2px 18px 12px}
+  .wp-arrow{width:30px; height:30px; flex:0 0 auto; border:none; border-radius:50%; cursor:pointer;
+    font-size:17px; line-height:1; color:var(--ink-soft); background:rgba(var(--sheen),.07); transition:all .16s}
+  .wp-arrow:hover{color:var(--brass); background:rgba(var(--sheen),.14)}
+  .wp-navlab{flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; gap:1px; line-height:1.2}
+  .wp-kw{font-family:var(--serif); font-size:16px; font-weight:680; color:var(--ink); letter-spacing:.01em}
+  .wp-rel{font-size:10px; font-weight:750; letter-spacing:.07em; text-transform:uppercase; color:var(--brass)}
+  .wp-span{font-size:11px; color:var(--ink-faint); font-variant-numeric:tabular-nums}
+  .wp-now{flex:0 0 auto; font:inherit; font-size:11px; font-weight:700; color:var(--brass);
+    background:rgba(227,178,95,.12); border:none; border-radius:999px; padding:5px 11px; cursor:pointer}
+  .wp-now:hover{color:var(--on-ink); background:var(--brass)}
   .wp-goals{display:flex; flex-wrap:wrap; align-items:center; gap:7px; padding:2px 20px 10px}
   .wp-goals-k{font-size:9.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint)}
   .wp-goal{font-size:11.5px; font-weight:650; color:var(--mint); background:var(--mint-tint); border-radius:999px; padding:3px 10px}
@@ -3581,17 +3592,44 @@
   }
 
   const WP_PXMIN=26/60;   // Wochenspalten sind schmaler als die Tagesansicht
-  let tlMode="day";
+  let tlMode="day", wpOffset=0;   // 0 = laufende Woche, +1 = nächste
+
   /* Wochenplan: sieben Spalten, Blocker im Voraus setzen.
      Verknüpft mit Kalender, Wochenzielen, Fokuszeiten und Tagesansicht. */
   const WD=["Mo","Di","Mi","Do","Fr","Sa","So"];
+  // Keine Grenze: beliebig weit vor- und zurückblättern
   function buildWeekPlan(panel){
-    const wi=weekInfo();
-    const dayKeys=[]; for(let i=0;i<7;i++) dayKeys.push(addDays(wi.start,i));
+    const cur=weekInfo();
+    const start=addDays(cur.start, wpOffset*7);
+    const endD=addDays(start,6);
+    const wnum=isoWeek(start);
+    const wyear=isoWeekYear(start);
+    const dayKeys=[]; for(let i=0;i<7;i++) dayKeys.push(addDays(start,i));
 
-    // Wochenziele als Kopfzeile — wofür die Woche eigentlich da ist
+    // Navigation zwischen den Wochen
+    const nav=document.createElement("div"); nav.className="wp-nav";
+    const prev=document.createElement("button"); prev.type="button"; prev.className="wp-arrow"; prev.textContent="‹";
+    prev.setAttribute("aria-label","Vorherige Woche");
+    prev.addEventListener("click",()=>{ wpOffset--; buildPrios(); });
+    const label=document.createElement("div"); label.className="wp-navlab";
+    const rel = wpOffset===0 ? "Diese Woche" : wpOffset===1 ? "Nächste Woche" : wpOffset===-1 ? "Letzte Woche"
+              : (wpOffset>0 ? "in "+wpOffset+" Wochen" : "vor "+Math.abs(wpOffset)+" Wochen");
+    label.innerHTML=`<span class="wp-kw">KW ${wnum}${wyear!==isoWeekYear(cur.start)?" / "+wyear:""}</span><span class="wp-rel">${rel}</span>
+      <span class="wp-span">${fmtShort(start)} – ${fmtShort(endD)}</span>`;
+    const next=document.createElement("button"); next.type="button"; next.className="wp-arrow"; next.textContent="›";
+    next.setAttribute("aria-label","Nächste Woche");
+    next.addEventListener("click",()=>{ wpOffset++; buildPrios(); });
+    nav.append(prev,label,next);
+    if(wpOffset!==0){
+      const back=document.createElement("button"); back.type="button"; back.className="wp-now"; back.textContent="heute";
+      back.addEventListener("click",()=>{ wpOffset=0; buildPrios(); });
+      nav.appendChild(back);
+    }
+    panel.appendChild(nav);
+
+    // Wochenziele nur bei der laufenden Woche — für kommende gibt es sie noch nicht
     const goals=(vision.week.points||[]).filter(p=>(p.text||"").trim());
-    if(goals.length){
+    if(wpOffset===0 && goals.length){
       const g=document.createElement("div"); g.className="wp-goals";
       g.innerHTML=`<span class="wp-goals-k">Diese Woche</span>`+
         goals.map(p=>`<span class="wp-goal">${esc(p.text.trim())}</span>`).join("");
@@ -3599,7 +3637,9 @@
     }
 
     const hint=document.createElement("div"); hint.className="wp-hint";
-    hint.textContent="Auf eine freie Stelle tippen, um einen Blocker zu setzen. Er erscheint am jeweiligen Tag in der Tagesansicht.";
+    hint.textContent = wpOffset>0
+      ? "Vorplanen: Blocker hier eintragen — sie erscheinen automatisch, wenn der Tag da ist."
+      : "Auf eine freie Stelle tippen, um einen Blocker zu setzen. Er erscheint am jeweiligen Tag in der Tagesansicht.";
     panel.appendChild(hint);
 
     const grid=document.createElement("div"); grid.className="wp-grid";
@@ -3671,11 +3711,15 @@
     panel.appendChild(grid);
 
     // Fuß: was in der Woche schon zusammengekommen ist
-    const rep=weekReport(wi.start);
+    const rep=weekReport(start);
     const foot=document.createElement("div"); foot.className="wp-foot";
-    foot.innerHTML=`<span><strong>${blockers().filter(b=>dayKeys.includes(b.day)).length}</strong> Blocker</span>
-      <span><strong>${rep.mins}</strong> min Fokus</span>
-      <span><strong>${rep.full}</strong> volle Tage</span>`;
+    const nBlk=blockers().filter(b=>dayKeys.includes(b.day)).length;
+    // Bei kommenden Wochen gibt es noch nichts zu bilanzieren
+    foot.innerHTML = wpOffset>0
+      ? `<span><strong>${nBlk}</strong> Blocker vorgeplant</span>`
+      : `<span><strong>${nBlk}</strong> Blocker</span>
+         <span><strong>${rep.mins}</strong> min Fokus</span>
+         <span><strong>${rep.full}</strong> volle Tage</span>`;
     panel.appendChild(foot);
   }
 
@@ -4040,6 +4084,16 @@
     const num=1+Math.round(((t-jan1)/86400000-3+((jan1.getDay()+6)%7))/7);
     return {key:start, start, end, num, dayNo, remaining:7-dayNo, pct:Math.round(dayNo/7*100)};
   }
+  // ISO-Wochennummer und zugehöriges Jahr — trägt korrekt über den Jahreswechsel
+  function isoParts(dayStr){
+    const d=new Date(dayStr+"T00:00:00");
+    const t=new Date(d); t.setDate(t.getDate()+3-((d.getDay()+6)%7));
+    const jan1=new Date(t.getFullYear(),0,1);
+    const num=1+Math.round(((t-jan1)/86400000-3+((jan1.getDay()+6)%7))/7);
+    return {num, year:t.getFullYear()};
+  }
+  const isoWeek=d=>isoParts(d).num;
+  const isoWeekYear=d=>isoParts(d).year;
   function fmtShort(d){ const x=new Date(d+"T00:00:00"); return x.toLocaleDateString("de-DE",{day:"numeric",month:"short"}); }
 
   // Selbstreinigung: jede Ebene wird zu ihrem Intervall neu abgeleitet, Altes wandert ins Archiv

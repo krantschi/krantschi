@@ -2,6 +2,22 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
+<!-- Sicherheitsnetz: begrenzt, wohin die App überhaupt Verbindungen aufbauen und was sie laden darf.
+     Falls je ein fremder Text irgendwo durchrutscht, kann er nichts nachladen und nichts hinaussenden. -->
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'none';
+  script-src 'self' 'unsafe-inline';
+  style-src 'self' 'unsafe-inline';
+  img-src 'self' data: blob:;
+  media-src 'self' https: blob:;
+  font-src 'self';
+  connect-src 'self' https://api.github.com http://localhost:* http://127.0.0.1:*;
+  frame-src https://www.youtube-nocookie.com https://open.spotify.com https://embed.music.apple.com;
+  form-action 'none';
+  base-uri 'none';
+  object-src 'none';
+  frame-ancestors 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -581,7 +597,7 @@
   .timeline{margin-top:14px}
   .tl-hint{margin-left:auto; font-size:10.5px; color:var(--ink-faint); font-weight:650; letter-spacing:.02em}
   /* ---------- Wochenplan ---------- */
-  .tl-switch{margin-left:auto; display:flex; gap:2px; background:rgba(var(--sheen),.06); border-radius:999px; padding:2px}
+  .tl-switch{margin-left:10px; display:flex; gap:2px; background:rgba(var(--sheen),.06); border-radius:999px; padding:2px}
   .tls-btn{font:inherit; font-size:11.5px; font-weight:700; color:var(--ink-faint); background:transparent; border:none;
     border-radius:999px; padding:4px 12px; cursor:pointer; transition:all .16s}
   .tls-btn.on{color:var(--on-ink); background:var(--brass)}
@@ -1282,7 +1298,9 @@
   .add-row input:focus,.name-edit:focus,.cat-title-edit:focus{
     outline:none; border-color:var(--brass); box-shadow:0 0 0 3px rgba(227,178,95,.14);
   }
-  .add-btn,.plus,.fth-plus{background:var(--brass); color:var(--on-accent); box-shadow:0 8px 20px -12px rgba(227,178,95,.8)}
+  .add-btn,.fth-plus{background:var(--brass); color:var(--on-accent); box-shadow:0 8px 20px -12px rgba(227,178,95,.8)}
+  /* Das Pluszeichen in der Bild-Kachel ist Text, keine Fläche */
+  .add-tile .plus{background:transparent; color:inherit; box-shadow:none}
   .archiv-link,.today-btn,.backfill-btn,.park-back{
     font-family:var(--mono); font-size:10px; letter-spacing:.11em; text-transform:uppercase; font-weight:500;
     color:var(--ink-soft); background:rgba(var(--sheen),.035); border:1px solid var(--line); border-radius:999px;
@@ -1465,7 +1483,7 @@
       </div>
       <div class="wipe-bar" id="wipeBar" hidden>
         <div class="wipe-title">Aufräumen</div>
-        <div class="wipe-desc">Löscht Texte in Lock-In und Tagesabschluss. Schatzkammer und Vizija bleiben erhalten. Kann nicht rückgängig gemacht werden.</div>
+        <div class="wipe-desc">Löscht Texte in Lock-In und Tagesabschluss. Bewahrte Worte und Vizija bleiben erhalten. Kann nicht rückgängig gemacht werden.</div>
         <div class="wipe-btns">
           <button class="wipe-btn soft" id="wipePlain" type="button">Klartexte löschen<small>Verschlüsselte bleiben</small></button>
           <button class="wipe-btn hard" id="wipeAll" type="button">Alles löschen<small>Auch verschlüsselte</small></button>
@@ -1477,12 +1495,12 @@
     <section id="view-vizija" class="view"></section>
 
     <div class="lightbox" id="lightbox"><img id="lightboxImg" alt=""></div>
-    <div class="schatz-overlay" id="schatzOverlay" role="dialog" aria-modal="true" aria-label="Schatzkammer" hidden>
+    <div class="schatz-overlay" id="schatzOverlay" role="dialog" aria-modal="true" aria-label="Bewahrte Worte" hidden>
       <div class="schatz-sky" aria-hidden="true"><span class="s-orb a"></span><span class="s-orb b"></span><span class="s-orb c"></span><span class="s-grain"></span></div>
       <div class="schatz-sheet">
         <div class="schatz-top">
           <div class="schatz-titles">
-            <div class="schatz-kicker">Schatzkammer</div>
+            <div class="schatz-kicker" aria-label="Bewahrte Worte">🕊️</div>
             <div class="schatz-count" id="schatzCount"></div>
           </div>
           <button class="schatz-close" id="schatzClose" type="button" aria-label="Schließen">✕</button>
@@ -1847,18 +1865,37 @@
   const subtle=()=> (window.crypto && window.crypto.subtle) ? window.crypto.subtle : null;
   function b64(buf){ let s=""; const b=new Uint8Array(buf); for(let i=0;i<b.length;i++) s+=String.fromCharCode(b[i]); return btoa(s); }
   function unb64(s){ return Uint8Array.from(atob(s), c=>c.charCodeAt(0)); }
-  async function deriveKey(pw, salt){
+  const KDF_IT=600000;        // Rundenzahl für alles Neue
+  const KDF_IT_LEGACY=150000; // ältere Daten wurden so erzeugt und bleiben lesbar
+  // Abgeleitete Schlüssel nur im Arbeitsspeicher halten, nie speichern.
+  // Das macht die höhere Rundenzahl bezahlbar, ohne das Passwort abzulegen.
+  const keyCache=new Map();
+  async function deriveKey(pw, salt, it){
+    const iter=it||KDF_IT;
+    const ck=b64(salt)+"|"+iter+"|"+pw.length+"|"+await fingerprint(pw);
+    if(keyCache.has(ck)) return keyCache.get(ck);
     const base=await subtle().importKey("raw", new TextEncoder().encode(pw), "PBKDF2", false, ["deriveKey"]);
-    return subtle().deriveKey({name:"PBKDF2", salt, iterations:150000, hash:"SHA-256"}, base, {name:"AES-GCM", length:256}, false, ["encrypt","decrypt"]);
+    const key=await subtle().deriveKey({name:"PBKDF2", salt, iterations:iter, hash:"SHA-256"}, base,
+      {name:"AES-GCM", length:256}, false, ["encrypt","decrypt"]);
+    if(keyCache.size>12) keyCache.clear();
+    keyCache.set(ck,key);
+    return key;
   }
+  // Kurzer Abdruck des Passworts als Cache-Schlüssel — das Passwort selbst wird nicht abgelegt
+  async function fingerprint(pw){
+    const h=await subtle().digest("SHA-256", new TextEncoder().encode("ht|"+pw));
+    return b64(h).slice(0,16);
+  }
+  function forgetKeys(){ keyCache.clear(); }
   async function encWith(pw, salt, text){
     const iv=window.crypto.getRandomValues(new Uint8Array(12));
-    const key=await deriveKey(pw, salt);
+    const key=await deriveKey(pw, salt, KDF_IT);
     const ct=await subtle().encrypt({name:"AES-GCM", iv}, key, new TextEncoder().encode(text));
-    return {iv:b64(iv), ct:b64(ct)};
+    return {iv:b64(iv), ct:b64(ct), it:KDF_IT};
   }
   async function decWith(pw, salt, payload){
-    const key=await deriveKey(pw, salt);
+    const it=(payload && payload.it) || KDF_IT_LEGACY;   // ohne Angabe: alter Datensatz
+    const key=await deriveKey(pw, salt, it);
     const pt=await subtle().decrypt({name:"AES-GCM", iv:unb64(payload.iv)}, key, unb64(payload.ct));
     return new TextDecoder().decode(pt);
   }
@@ -1925,9 +1962,13 @@
     catch(e){ return null; }   // null = Netzproblem, nicht Token
   }
   async function pushOnce(plain,noImages){
-    const salt=window.crypto.getRandomValues(new Uint8Array(16));
+    // Festes Salz je Gerät: der Schlüssel wird einmal pro Sitzung abgeleitet statt bei jedem Sichern.
+    // Sicher, weil AES-GCM für jeden Vorgang einen frischen, zufälligen IV verwendet.
+    let salt;
+    if(syncCfg.salt){ salt=unb64(syncCfg.salt); }
+    else { salt=window.crypto.getRandomValues(new Uint8Array(16)); syncCfg.salt=b64(salt); localStorage.setItem(SYNC,JSON.stringify(syncCfg)); }
     const enc=await encWith(syncCfg.pw, salt, plain);
-    const body={v:1, updatedAt:new Date().toISOString(), noImages:noImages, salt:b64(salt), iv:enc.iv, ct:enc.ct};
+    const body={v:1, updatedAt:new Date().toISOString(), noImages:noImages, salt:b64(salt), iv:enc.iv, ct:enc.ct, it:enc.it};
     const payload={description:GIST_DESC, files:{}};
     payload.files[GIST_FILE]={content:JSON.stringify(body)};
     let url=GH_API+"/gists", method="POST";
@@ -1998,7 +2039,7 @@
       const body=JSON.parse(content);
       if(!body||!body.ct){ syncBusy=false; setSyncStatus("leer"); return "empty"; }
       if(syncCfg.lastAppliedAt && body.updatedAt<=syncCfg.lastAppliedAt){ setSyncStatus("aktuell"); syncBusy=false; return "uptodate"; }
-      const plain=await decWith(syncCfg.pw, unb64(body.salt), {iv:body.iv, ct:body.ct});
+      const plain=await decWith(syncCfg.pw, unb64(body.salt), {iv:body.iv, ct:body.ct, it:body.it});
       let data=JSON.parse(plain);
       if(body.noImages) data=keepLocalImages(data);
       const mine=dataWeight(null), theirs=dataWeight(data);
@@ -2034,7 +2075,8 @@
     const close=()=>{ ov.classList.remove("open"); };
     document.getElementById("syncCancel").onclick=close;
     document.getElementById("syncOff").onclick=()=>{
-      syncCfg=null; localStorage.removeItem(SYNC); setSyncStatus("Abgleich einrichten"); close();
+      syncCfg=null; localStorage.removeItem(SYNC); lastPushedPlain=""; forgetKeys();
+      setSyncStatus("Abgleich einrichten"); close();
     };
     document.getElementById("syncTest").onclick=async()=>{
       const id=idEl.value.trim();
@@ -2400,14 +2442,14 @@
   ];
   function saveSchatz(){ write(SCHATZ,schatz); }
   function buildSchatzBtn(){
+    syncQuotesToSchatz();
     const root=document.getElementById("schatzBtn"); if(!root) return; root.innerHTML="";
     const b=document.createElement("button"); b.className="schatz-trigger"; b.type="button";
     b.innerHTML=`
       <span class="st-glow" aria-hidden="true"></span>
       <span class="st-sheen" aria-hidden="true"></span>
-      <span class="st-icon" aria-hidden="true">✦</span>
+      <span class="st-icon" aria-hidden="true">🕊️</span>
       <span class="st-body">
-        <span class="st-title">Schatzkammer</span>
         <span class="st-sub"></span>
       </span>
       <span class="st-arrow" aria-hidden="true">→</span>`;
@@ -2418,6 +2460,7 @@
     root.appendChild(b);
   }
   function openSchatz(){
+    syncQuotesToSchatz();
     const ov=document.getElementById("schatzOverlay");
     ov.hidden=false; void ov.offsetWidth; ov.classList.add("open");
     buildSchatzList();
@@ -2454,12 +2497,13 @@
       const body=document.createElement("blockquote"); body.className="sc-text"; body.textContent=q.text;
       const foot=document.createElement("figcaption"); foot.className="sc-foot";
       const by=document.createElement("span"); by.className="sc-by"; by.textContent=q.author||"";
+      if(q.src==="vizija"){ const tag=document.createElement("span"); tag.className="sc-src"; tag.textContent="Vizija"; foot.appendChild(tag); }
       const when=document.createElement("span"); when.className="sc-when";
       when.textContent = q.at ? new Date(q.at).toLocaleDateString("de-DE",{day:"numeric",month:"short",year:"numeric"}) : "";
       foot.append(by,when);
       const del=document.createElement("button"); del.className="sc-del"; del.type="button"; del.textContent="×"; del.setAttribute("aria-label","Entfernen");
       del.addEventListener("click",()=>{
-        if(!confirm("Diesen Satz aus der Schatzkammer entfernen?")) return;
+        if(!confirm("Diesen Satz entfernen?")) return;
         schatz=schatz.filter(x=>x.id!==q.id); saveSchatz(); buildSchatzList(); buildSchatzBtn();
       });
       card.append(mark,body,foot,del);
@@ -2649,7 +2693,7 @@
   }
   function confirmWipe(hard){
     const msg = hard
-      ? "WIRKLICH ALLES löschen?\n\nAlle Texte in Lock-In und Tagesabschluss — auch die verschlüsselten — werden entfernt. Schatzkammer und Vizija bleiben erhalten. Das lässt sich nicht rückgängig machen."
+      ? "WIRKLICH ALLES löschen?\n\nAlle Texte in Lock-In und Tagesabschluss — auch die verschlüsselten — werden entfernt. Bewahrte Worte und Vizija bleiben erhalten. Das lässt sich nicht rückgängig machen."
       : "Alle unverschlüsselten Texte löschen?\n\nKlartext in Lock-In und Tagesabschluss wird entfernt. Verschlüsselte Einträge, Schatzkammer und Vizija bleiben erhalten. Das lässt sich nicht rückgängig machen.";
     if(!confirm(msg)) return;
     const r=wipeTexts(hard);
@@ -2957,6 +3001,17 @@
 
   /* YouTube: Playlist- oder Video-Kennung aus einem beliebigen Link lesen */
   /* Quelle erkennen: YouTube (Bild), Spotify/Apple (reiner Ton), Direktlink (reiner Ton) */
+  // Nur http(s) öffnen — verhindert javascript:- und data:-URLs aus Eingabefeldern
+  function safeUrl(u){
+    try{ const x=new URL(String(u||"").trim()); return (x.protocol==="https:"||x.protocol==="http:") ? x.href : null; }
+    catch(e){ return null; }
+  }
+  function openExternal(u){
+    const ok=safeUrl(u);
+    if(!ok){ toast("Dieser Link ist nicht sicher zu öffnen"); return; }
+    const w=window.open(ok,"_blank","noopener,noreferrer");
+    if(w) w.opener=null;
+  }
   function srcParse(url){
     const u=(url||"").trim(); if(!u) return null;
     // Direkte Audiodatei oder Radiostream
@@ -3011,7 +3066,8 @@
 
     if(parsed.kind==="audio"){
       const a=document.createElement("audio");
-      a.src=parsed.url; a.controls=true; a.autoplay=true; a.loop=true; a.preload="none";
+      const su=safeUrl(parsed.url); if(!su){ dock.innerHTML=""; return; }
+      a.src=su; a.controls=true; a.autoplay=true; a.loop=true; a.preload="none";
       a.volume=Math.min(1,Math.max(0,sound.vol||0.6));
       dock.appendChild(a);
       try{ // Sperrbildschirm-Bedienung auf dem iPhone
@@ -3025,6 +3081,8 @@
     f.id="ytframe";
     f.setAttribute("allow","autoplay; encrypted-media; picture-in-picture; fullscreen; clipboard-write");
     f.setAttribute("allowfullscreen","");
+    // Rahmen einsperren: kein Zugriff auf diese Seite, keine Navigation, keine Formulare
+    f.setAttribute("sandbox","allow-scripts allow-same-origin allow-presentation allow-popups allow-popups-to-escape-sandbox");
     f.setAttribute("referrerpolicy","strict-origin-when-cross-origin");
     dock.appendChild(f);
     // Ohne Bild braucht es eigene Bedienelemente
@@ -3046,7 +3104,9 @@
   let ytPaused=false;
   function ytCmd(func){
     const f=document.getElementById("ytframe"); if(!f||!f.contentWindow) return;
-    try{ f.contentWindow.postMessage(JSON.stringify({event:"command",func:func,args:[]}),"*"); }catch(e){}
+    // Befehl nur an YouTube senden, nicht an jeden beliebigen Rahmen
+    try{ f.contentWindow.postMessage(JSON.stringify({event:"command",func:func,args:[]}),
+      "https://www.youtube-nocookie.com"); }catch(e){}
   }
   function renderSound(){
     loadSound();
@@ -3100,7 +3160,7 @@
       if(sound.yt && parsed){
         const a=document.createElement("button"); a.type="button"; a.className="fsnd-open";
         a.textContent="Quelle öffnen ↗";
-        a.addEventListener("click",()=>window.open(sound.yt,"_blank","noopener"));
+        a.addEventListener("click",()=>openExternal(sound.yt));
         const ed=document.createElement("button"); ed.type="button"; ed.className="fsnd-edit"; ed.textContent="ändern";
         ed.addEventListener("click",()=>{ sound.yt=""; ytOn=false; saveSound(); renderYTDock(); buildFokus(); });
         row.append(a,ed);
@@ -3763,6 +3823,18 @@
       inp.addEventListener("keydown",e=>{ if(e.key==="Enter") submit(); });
     });
   }
+  // Neue ToDo direkt aus der Tagesansicht — sie erscheint zugleich in der ToDo-Liste
+  async function newTaskAt(start){
+    const r=await askText({title:"Aufgabe um "+fMinToClock(start), placeholder:"Was steht an?", times:true,
+      from:fMinToClock(start), dur:60});
+    if(!r||r.deleted||!r.text) return;
+    ensurePrios();
+    prios.todos=prios.todos||[];
+    prios.todos.push({id:uid(), text:r.text, done:false,
+      start:clampMin(r.start!=null?r.start:start), dur:Math.max(TL_MINDUR,r.dur||60), fromTimeline:true});
+    savePrios(); buildPrios();
+    toast("Aufgabe eingeplant");
+  }
   async function openNewBlocker(day,start){
     const r=await askText({title:"Blocker eintragen", placeholder:"Wofür ist die Zeit reserviert?",
       times:true, from:fMinToClock(start), dur:60});
@@ -3785,7 +3857,8 @@
     const panel=document.createElement("section"); panel.className="panel timeline";
     panel.style.setProperty("--c","var(--sky)"); panel.style.setProperty("--c-tint","var(--sky-tint)");
     const head=document.createElement("div"); head.className="panel-head";
-    head.innerHTML=`<span class="dot"></span><span class="eyebrow">${tlMode==="day"?"Tagesansicht":"Wochenansicht"}</span>`;
+    head.innerHTML=`<span class="dot"></span><span class="eyebrow">${tlMode==="day"?"Tagesansicht":"Wochenansicht"}</span>`+
+      `<span class="tl-hint">${tlMode==="day"?"gedrückt halten legt an":""}</span>`;
     const sw=document.createElement("div"); sw.className="tl-switch";
     [["day","Tag"],["week","Woche"]].forEach(([k,lbl])=>{
       const b=document.createElement("button"); b.type="button"; b.className="tls-btn"+(tlMode===k?" on":""); b.textContent=lbl;
@@ -3874,6 +3947,25 @@
         track.appendChild(fb);
       });
     }
+    // Langdruck auf eine freie Stelle legt direkt eine ToDo mit Uhrzeit an
+    (function(){
+      let t=null, sy=0;
+      const startAt=e=>{
+        // auf bestehenden Einträgen soll der Langdruck nichts Neues anlegen
+        if(e.target.closest(".tl-block,.tl-event,.tl-blk,.tl-focus-blk,.tl-now")) return;
+        const pt=e.touches?e.touches[0]:e;
+        sy=pt.clientY;
+        const r=track.getBoundingClientRect();
+        const raw=TL_START+Math.round(((pt.clientY-r.top)/TL_PXMIN)/TL_SNAP)*TL_SNAP;
+        t=setTimeout(()=>{ t=null; if(navigator.vibrate) try{navigator.vibrate(16);}catch(e2){} newTaskAt(clampMin(raw)); },520);
+      };
+      const move=e=>{ const pt=e.touches?e.touches[0]:e; if(t && Math.abs(pt.clientY-sy)>10){ clearTimeout(t); t=null; } };
+      const cancel=()=>{ if(t){ clearTimeout(t); t=null; } };
+      track.addEventListener("mousedown",startAt); track.addEventListener("touchstart",startAt,{passive:true});
+      track.addEventListener("mousemove",move); track.addEventListener("touchmove",move,{passive:true});
+      ["mouseup","mouseleave","touchend","touchcancel"].forEach(ev=>track.addEventListener(ev,cancel));
+    })();
+
     // Blocker dieses Tages
     blockersFor(state.viewDate).forEach(b=>{
       const el=document.createElement("div"); el.className="tl-blk";
@@ -4010,7 +4102,31 @@
     "linear-gradient(135deg,#FB7185,#9B7DF5)",
     "linear-gradient(135deg,#0EA5A5,#16B981)"
   ];
-  function saveQuotes(){ write(QUOTES,quotes); }
+  function saveQuotes(){ write(QUOTES,quotes); syncQuotesToSchatz(); }
+  // Zitate aus der Vizija erscheinen automatisch bei den bewahrten Worten.
+  // Sie werden mit ihrer Herkunft markiert, damit sie sich nicht doppeln
+  // und beim Löschen in der Vizija wieder verschwinden.
+  let qsyncing=false;
+  function syncQuotesToSchatz(){
+    if(qsyncing) return; qsyncing=true;
+    let changed=false;
+    (quotes||[]).forEach(q=>{
+      const t=(q.text||"").trim(); if(!t) return;
+      const hit=schatz.find(x=>x.qid===q.id);
+      if(hit){ if(hit.text!==t || (hit.author||"")!==(q.author||"")){ hit.text=t; hit.author=q.author||""; changed=true; } }
+      else if(!schatz.some(x=>!x.qid && x.text===t)){
+        schatz.unshift({id:uid(), qid:q.id, text:t, author:q.author||"", at:Date.now(), src:"vizija"});
+        changed=true;
+      }
+    });
+    // in der Vizija entfernte Zitate auch hier entfernen
+    const ids=new Set((quotes||[]).map(q=>q.id));
+    const before=schatz.length;
+    schatz=schatz.filter(x=>!x.qid || ids.has(x.qid));
+    if(schatz.length!==before) changed=true;
+    if(changed){ saveSchatz(); if(document.getElementById("schatzList")) buildSchatzList(); buildSchatzBtn(); }
+    qsyncing=false;
+  }
   function buildQuotes(panel){
     if(quoteTimer){ clearInterval(quoteTimer); quoteTimer=null; }
     const lbl=document.createElement("div"); lbl.className="sub-label with-line reveal"; lbl.textContent="Zitate";
@@ -4557,7 +4673,7 @@
     document.getElementById("gospelTitle").textContent=d.title||"";
     document.getElementById("gospelText").textContent=d.text||"";
     document.getElementById("gospelSrc").innerHTML = d.source
-      ? ("Quelle: "+esc(d.source)+" · <a href=\""+GOSPEL_PAGE+"\" target=\"_blank\" rel=\"noopener\">Vatican News</a>")
+      ? ("Quelle: "+esc(d.source)+" · <a href=\""+GOSPEL_PAGE+"\" target=\"_blank\" rel=\"noopener noreferrer\">Vatican News</a>")
       : "";
   }
   /* Tagesevangelium wird im gemeinsamen Speicher abgelegt und damit
@@ -4584,7 +4700,7 @@
       document.getElementById("gospelRef").textContent="";
       document.getElementById("gospelTitle").textContent="";
       document.getElementById("gospelSrc").innerHTML="";
-      textEl.innerHTML="Heute noch nicht geladen. Öffne die App kurz auf dem Mac – dann ist der Text auch hier. <a href=\""+GOSPEL_PAGE+"\" target=\"_blank\" rel=\"noopener\">Bei Vatican News öffnen</a>";
+      textEl.innerHTML="Heute noch nicht geladen. Öffne die App kurz auf dem Mac – dann ist der Text auch hier. <a href=\""+GOSPEL_PAGE+"\" target=\"_blank\" rel=\"noopener noreferrer\">Bei Vatican News öffnen</a>";
       loadPapst(null);
     }
   }
@@ -4598,7 +4714,7 @@
     const src=document.getElementById("papstSrc");
     const q=d.quelle?esc(d.quelle):"Vatican News";
     src.innerHTML = d.url
-      ? (esc(q)+" · <a href=\""+esc(d.url)+"\" target=\"_blank\" rel=\"noopener\">Vatican News</a>")
+      ? (esc(q)+" · <a href=\""+esc(d.url)+"\" target=\"_blank\" rel=\"noopener noreferrer\">Vatican News</a>")
       : esc(q);
   }
   async function loadPapst(supplied){
@@ -4640,6 +4756,9 @@
     const next=THEME_ORDER[(THEME_ORDER.indexOf(cur)+1)%THEME_ORDER.length];
     write(THEME,next); applyTheme();
   }
+  // Abgeleitete Schlüssel beim Verlassen der Seite verwerfen
+  window.addEventListener("pagehide",forgetKeys);
+  document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="hidden") forgetKeys(); });
   document.getElementById("themeMini").addEventListener("click",cycleTheme);
   applyTheme();
   document.getElementById("editBtn").addEventListener("click",toggleEdit);

@@ -249,6 +249,18 @@
   .streak{font-size:12.5px; font-weight:720; color:var(--ink-faint); font-variant-numeric:tabular-nums; white-space:nowrap; opacity:.85}
   .streak.hot{color:var(--amber)}
 
+  /* ---------- Werkzeugleiste: Uhr und Klang, bewusst zurückgenommen ---------- */
+  .ftools{margin:18px 0 0 14px; padding-top:12px; border-top:1px solid var(--rule); display:flex; flex-direction:column; gap:2px}
+  .ftools .fclockwrap,.ftools .fsound{margin:0; border:none}
+  .ftools .fsound{border-top:1px solid var(--rule); padding-top:8px; margin-top:6px}
+  /* Verlauf als feine Schaltfläche in der Kopfzeile */
+  .fhist-mini{margin-left:auto; margin-right:10px; display:inline-flex; align-items:center; gap:5px;
+    font-family:var(--serif); font-size:12px; font-style:italic; font-weight:600; color:var(--ink-faint);
+    background:transparent; border:none; cursor:pointer; padding:4px 2px; opacity:.75; transition:opacity .16s, color .16s}
+  .fhist-mini:hover{opacity:1; color:var(--ink-soft)}
+  .fhist-mini.on{color:var(--brass); opacity:1}
+  .fhm-chev{font-family:var(--font); font-size:11px; transition:transform .25s}
+  .fhist-mini.on .fhm-chev{transform:rotate(180deg)}
   /* ---------- Klangkulisse ---------- */
   .fsound{margin:0 0 4px 14px; padding:9px 2px 11px; border-bottom:1.5px solid var(--rule); display:grid; grid-template-columns:auto auto 1fr; align-items:center; gap:10px}
   .fsnd-play{width:32px; height:32px; flex:0 0 auto; border-radius:50%; border:none; cursor:pointer; font-size:11px; line-height:1; color:var(--sky); background:transparent; box-shadow:inset 0 0 0 1.5px var(--sky); transition:all .18s}
@@ -309,20 +321,20 @@
   }
   /* ---------- Fokusuhr ---------- */
   .fclockwrap{margin:0 0 4px 14px; border-bottom:1.5px solid var(--rule)}
-  .fclock-bar{width:100%; display:flex; align-items:center; gap:9px; background:transparent; border:none; cursor:pointer; padding:11px 2px; font-family:var(--display)}
+  .fclock-bar{width:100%; display:flex; align-items:center; gap:9px; background:transparent; border:none; cursor:pointer; padding:8px 2px; font-family:var(--display)}
   .fcb-ic{font-size:15px; color:var(--sky)}
-  .fcb-label{font-size:13px; font-weight:600; font-style:italic; color:var(--ink)}
+  .fcb-label{font-size:12px; font-weight:600; font-style:italic; color:var(--ink)}
   .fcb-time{margin-left:auto; font-size:13px; font-weight:700; color:var(--ink-soft); font-variant-numeric:tabular-nums}
   .fcb-chev{font-family:system-ui,sans-serif; font-size:13px; color:var(--ink-faint); transition:transform .25s}
   .fclockwrap.open .fcb-chev{transform:rotate(180deg)}
   .fclock-bar.live .fcb-ic{color:var(--sky); animation:fpulse 1.6s ease-in-out infinite}
   .fclock-bar.live .fcb-time{color:var(--sky)}
-  .fclockbox{padding:6px 0 16px; display:flex; flex-direction:column; align-items:center; gap:14px}
+  .fclockbox{padding:8px 0 12px; display:flex; flex-direction:column; align-items:center; gap:14px}
   .fclock-ringwrap{position:relative}
-  .fclock-ring{width:150px; height:150px; border-radius:50%; display:grid; place-items:center; transition:background .3s linear}
-  .fclock-inner{width:128px; height:128px; border-radius:50%; background:var(--paper); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; box-shadow:inset 0 0 0 1px var(--rule)}
-  .fclock-phase{font-family:var(--display); font-style:italic; font-size:12.5px; font-weight:600; color:var(--sky); letter-spacing:.02em}
-  .fclock-disp{font-family:var(--display); font-size:34px; font-weight:700; color:var(--ink); font-variant-numeric:tabular-nums; line-height:1}
+  .fclock-ring{width:104px; height:104px; border-radius:50%; display:grid; place-items:center; transition:background .3s linear}
+  .fclock-inner{width:88px; height:88px; border-radius:50%; background:var(--paper); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; box-shadow:inset 0 0 0 1px var(--rule)}
+  .fclock-phase{font-family:var(--display); font-style:italic; font-size:9.5px; font-weight:600; color:var(--brass); letter-spacing:.02em}
+  .fclock-disp{font-family:var(--display); font-size:21px; font-weight:700; color:var(--ink); font-variant-numeric:tabular-nums; line-height:1}
   .fclock-set{display:flex; gap:18px}
   .fnum{display:flex; align-items:center; gap:5px}
   .fnum-l{font-family:var(--display); font-style:italic; font-size:12.5px; color:var(--ink-soft); margin-right:2px}
@@ -332,9 +344,11 @@
   .fnum-i:focus{outline:none; border-bottom-color:var(--sky)}
   .fnum-u{font-size:11px; color:var(--ink-faint); font-style:italic}
   .fclock-ctrl{display:flex; gap:8px; flex-wrap:wrap; justify-content:center}
-  .fclock-go{font-family:var(--display); font-size:14.5px; font-weight:700; font-style:italic; color:var(--on-accent); background:var(--sky); border:none; border-radius:11px; padding:11px 22px; cursor:pointer; box-shadow:0 8px 20px -10px var(--sky)}
+  .fclock-go{font-family:var(--display); font-size:13px; font-weight:700; font-style:italic; color:var(--brass); background:transparent; border:none; border-radius:999px; padding:8px 18px; cursor:pointer; box-shadow:inset 0 0 0 1.4px var(--brass); transition:all .16s}
+  .fclock-go:hover{color:var(--on-accent); background:var(--brass)}
   .fclock-go:active{transform:scale(.98)}
-  .fclock-go.break{background:var(--amber); box-shadow:0 8px 20px -10px var(--amber)}
+  .fclock-go.break{color:var(--amber); box-shadow:inset 0 0 0 1.4px var(--amber)}
+  .fclock-go.break:hover{color:var(--on-accent); background:var(--amber)}
   .fclock-stop{font-family:var(--display); font-size:13px; font-weight:600; font-style:italic; color:var(--ink-soft); background:transparent; border:none; box-shadow:inset 0 0 0 1.5px var(--rule); border-radius:11px; padding:11px 18px; cursor:pointer}
   .fclock-stop:hover{color:var(--ink); box-shadow:inset 0 0 0 1.5px var(--track)}
   .fclock-out{font-family:var(--display); font-size:12.5px; font-weight:600; font-style:italic; color:var(--rose); background:transparent; border:none; cursor:pointer; padding:4px 8px}
@@ -569,11 +583,19 @@
   .lockin-ta{width:100%; box-sizing:border-box; font:inherit; font-size:14px; line-height:1.45; color:var(--ink); background:var(--bg-1); border:1px solid var(--line); border-radius:10px; padding:9px 11px; resize:vertical; min-height:42px}
   .lockin-ta:focus{outline:none; border-color:var(--c)}
   .lockin-ta[readonly]{opacity:.85}
-  .key-btn{align-self:flex-start; font:inherit; font-size:12px; font-weight:680; color:var(--c); background:color-mix(in srgb, var(--c) 12%, transparent); border:none; border-radius:999px; padding:5px 11px; cursor:pointer}
-  .key-btn.del{color:var(--rose); background:var(--rose-tint); box-shadow:inset 0 0 0 1px rgba(212,115,106,.35)}
-  .key-btn.del:hover{color:#fff; background:var(--rose)}
-  .key-btn.open{color:var(--amber); background:var(--amber-tint)}
-  .enc-mask{font-size:13.5px; font-weight:600; color:var(--ink-faint); background:var(--bg-1); border:1px dashed var(--line); border-radius:10px; padding:10px 12px; letter-spacing:.06em}
+  /* Die Schaltflächen halten sich zurück und treten erst beim Darüberfahren hervor */
+  .key-btn{align-self:flex-start; font:inherit; font-size:11px; font-weight:600; color:var(--ink-faint);
+    background:transparent; border:none; border-radius:999px; padding:4px 8px; cursor:pointer;
+    opacity:.5; transition:opacity .16s ease, color .16s ease}
+  .key-btn:hover,.key-btn:focus-visible{opacity:1; color:var(--ink-soft)}
+  .key-btn.del{color:var(--ink-faint)}
+  .key-btn.del:hover{color:var(--rose); opacity:1}
+  .key-btn.open{color:var(--ink-faint); opacity:.6}
+  .key-btn.open:hover{color:var(--brass); opacity:1}
+  /* Verschlossener Text: sieht aus wie eine leere Zeile, nicht wie ein Tresor */
+  .enc-mask{font-size:14px; color:var(--ink-faint); background:transparent; border:none;
+    border-bottom:1px solid var(--line); border-radius:0; padding:9px 2px; letter-spacing:.42em; opacity:.45; cursor:default}
+  .enc-mask:hover{opacity:.7}
 
   /* ---------- Passwort-Fenster ---------- */
   .pw-modal{position:fixed; inset:0; background:rgba(15,18,26,.55); display:none; align-items:center; justify-content:center; z-index:60; padding:24px}
@@ -1485,8 +1507,8 @@
         <div class="wipe-title">Aufräumen</div>
         <div class="wipe-desc">Löscht Texte in Lock-In und Tagesabschluss. Bewahrte Worte und Vizija bleiben erhalten. Kann nicht rückgängig gemacht werden.</div>
         <div class="wipe-btns">
-          <button class="wipe-btn soft" id="wipePlain" type="button">Klartexte löschen<small>Verschlüsselte bleiben</small></button>
-          <button class="wipe-btn hard" id="wipeAll" type="button">Alles löschen<small>Auch verschlüsselte</small></button>
+          <button class="wipe-btn soft" id="wipePlain" type="button">Offene Texte löschen<small>Abgelegte bleiben</small></button>
+          <button class="wipe-btn hard" id="wipeAll" type="button">Alles löschen<small>Auch Abgelegtes</small></button>
         </div>
       </div>
     </section>
@@ -2139,11 +2161,11 @@
     return false;
   }
   async function ensurePassphrase(){
-    if(!subtle()){ alert("Verschlüsselung wird hier nicht unterstützt."); return null; }
+    if(!subtle()){ alert("Das wird in diesem Browser nicht unterstützt."); return null; }
     // Solange nichts verschlüsselt ist, ist es eine Neuanlage (Passwort festlegen, keine Prüfung).
     const needVerify = cryptoRec && hasEncryptedData();
     if(!needVerify){
-      const pw=await askPassword({title:"Passwort festlegen", confirm:true, note:"Merke es dir gut — ohne dieses Passwort sind verschlüsselte Texte nicht wiederherstellbar."});
+      const pw=await askPassword({title:"Passwort festlegen", confirm:true, note:"Merke es dir gut — ohne dieses Passwort lassen sich abgelegte Texte nicht wiederherstellen."});
       if(pw==null) return null;
       const salt=window.crypto.getRandomValues(new Uint8Array(16));
       const check=await encWith(pw, salt, "ok");
@@ -2179,17 +2201,17 @@
     toast("Text gelöscht");
   }
   function delBtn(D,id){
-    const b=document.createElement("button"); b.className="key-btn del"; b.type="button"; b.textContent="🗑 Löschen";
+    const b=document.createElement("button"); b.className="key-btn del"; b.type="button"; b.textContent="löschen";
     b.title="Text dieses Tages löschen";
     b.addEventListener("click",()=>deleteField(D,id));
     return b;
   }
   async function lockField(D,id){
     const cur=getText(D,id); if(isEnc(cur)) return;
-    const text=(typeof cur==="string")?cur:""; if(!text.trim()){ alert("Kein Text zum Verschlüsseln."); return; }
+    const text=(typeof cur==="string")?cur:""; if(!text.trim()){ alert("Hier steht noch nichts."); return; }
     const pw=await ensurePassphrase(); if(pw==null) return;
     try{ const payload=await encWith(pw, unb64(cryptoRec.salt), text); setText(D,id,payload); refreshTexts(); }
-    catch(e){ alert("Verschlüsseln fehlgeschlagen."); }
+    catch(e){ alert("Ablegen fehlgeschlagen."); }
   }
   async function unlockField(D,id){
     const cur=getText(D,id); if(!isEnc(cur)) return;
@@ -2388,8 +2410,8 @@
           const cur=getText(D,it.id);
           const wrap=document.createElement("div"); wrap.className="lockin-text";
           if(isEnc(cur)){
-            const mask=document.createElement("div"); mask.className="enc-mask"; mask.textContent="🔒 Verschlüsselt";
-            const key=document.createElement("button"); key.className="key-btn open"; key.type="button"; key.textContent="🔑 Entsperren";
+            const mask=document.createElement("div"); mask.className="enc-mask"; mask.textContent="· · · · ·"; mask.title="Antippen zum Öffnen";
+            const key=document.createElement("button"); key.className="key-btn open"; key.type="button"; key.textContent="öffnen"; key.title="Text sichtbar machen";
             key.addEventListener("click",()=>unlockField(D,it.id));
             wrap.append(mask,key);
             if(!ro) wrap.appendChild(delBtn(D,it.id));
@@ -2397,7 +2419,7 @@
             const ta=document.createElement("textarea"); ta.className="lockin-ta"; ta.rows=5; ta.placeholder=TEXT_PLACEHOLDER[it.id]||"Notiz für diesen Tag …"; ta.value=(typeof cur==="string")?cur:"";
             if(ro){ ta.readOnly=true; } else { ta.addEventListener("input",()=>setText(D,it.id,ta.value)); }
             wrap.appendChild(ta);
-            const key=document.createElement("button"); key.className="key-btn"; key.type="button"; key.textContent="🔒 Verschlüsseln";
+            const key=document.createElement("button"); key.className="key-btn"; key.type="button"; key.textContent="ablegen"; key.title="Text geschützt ablegen";
             key.addEventListener("click",()=>lockField(D,it.id));
             wrap.appendChild(key);
             if(!ro && typeof cur==="string" && cur.trim()) wrap.appendChild(delBtn(D,it.id));
@@ -2526,15 +2548,15 @@
       const panel=document.createElement("div"); panel.className="lockin-panel";
       const wrap=document.createElement("div"); wrap.className="lockin-text tages-text";
       if(isEnc(cur)){
-        const mask=document.createElement("div"); mask.className="enc-mask"; mask.textContent="🔒 Verschlüsselt";
-        const key=document.createElement("button"); key.className="key-btn open"; key.type="button"; key.textContent="🔑 Entsperren";
+        const mask=document.createElement("div"); mask.className="enc-mask"; mask.textContent="· · · · ·"; mask.title="Antippen zum Öffnen";
+        const key=document.createElement("button"); key.className="key-btn open"; key.type="button"; key.textContent="öffnen"; key.title="Text sichtbar machen";
         key.addEventListener("click",()=>unlockField(D,"tagesabschluss"));
         wrap.append(mask,key);
         if(!ro) wrap.appendChild(delBtn(D,"tagesabschluss"));
       }else{
         const ta=document.createElement("textarea"); ta.className="lockin-ta"; ta.rows=3; ta.placeholder="Wie war dein Tag? Gedanken zum Abschluss …"; ta.value=(typeof cur==="string")?cur:"";
         if(ro){ ta.readOnly=true; } else { ta.addEventListener("input",()=>setText(D,"tagesabschluss",ta.value)); }
-        const key=document.createElement("button"); key.className="key-btn"; key.type="button"; key.textContent="🔒 Verschlüsseln";
+        const key=document.createElement("button"); key.className="key-btn"; key.type="button"; key.textContent="ablegen"; key.title="Text geschützt ablegen";
         key.addEventListener("click",()=>lockField(D,"tagesabschluss"));
         wrap.append(ta,key);
         if(!ro && typeof cur==="string" && cur.trim()) wrap.appendChild(delBtn(D,"tagesabschluss"));
@@ -2901,7 +2923,7 @@
   }
   function startFlow(){
     loadSound();
-    if(sound.follow){ if(sound.mode==="yt"){ if(ytParse(sound.yt)) ytOn=true; } else if(!sndPlaying()) setTimeout(startSound,60); }
+    if(sound.follow){ if(sound.mode==="yt"){ if(srcParse(sound.yt)) ytOn=true; } else if(!sndPlaying()) setTimeout(startSound,60); }
     primeAudio();
     playGong();                 // Gong auch beim Start
     fclock.phase="flow"; fclock.endsAt=Date.now()+ftimer.flowMin*60000;
@@ -2929,7 +2951,7 @@
       const barT=document.getElementById("ftimeBar");
       if(barT) barT.textContent=fmtClock(left);
       const ring=document.getElementById("ftimeRing");
-      if(ring){ const total=(fclock.phase==="break"?ftimer.breakMin:ftimer.flowMin)*60000; const frac=total?left/total:0; ring.style.background=`conic-gradient(var(--sky) ${(1-frac)*360}deg, var(--sky-tint) 0)`; }
+      if(ring){ const total=(fclock.phase==="break"?ftimer.breakMin:ftimer.flowMin)*60000; const frac=total?left/total:0; ring.style.background=`conic-gradient(var(--brass) ${(1-frac)*360}deg, rgba(var(--sheen),.10) 0)`; }
       if(left<=0){
         clearInterval(ftick); ftick=null;
         if(fclock.phase==="flow"){ playGong(); fclock.phase="breakwait"; fclock.open=true; buildFokus(); }
@@ -3263,14 +3285,16 @@
     const view=document.getElementById("view-fokus"); view.innerHTML="";
     const sheet=document.createElement("div"); sheet.className="fsheet";
 
-    // Verlaufsregister (aufklappbare Liste vergangener aktiver Tage)
-    sheet.appendChild(renderHistory());
-
-    // Kopf: Datum + Clock-Umschalter
+    // Kopf: Datum, Verlauf (dezent) und Clock-Umschalter
     const head=document.createElement("div"); head.className="fsheet-head";
     const dt=new Date(today+"T00:00:00");
     const ds=dt.toLocaleDateString("de-DE",{weekday:"long", day:"numeric", month:"long"});
     head.innerHTML=`<div class="fdate">${esc(ds)}</div>`;
+    const hv=document.createElement("button"); hv.type="button"; hv.className="fhist-mini"+(fhistOpen?" on":"");
+    hv.innerHTML=`Verlauf<span class="fhm-chev">⌄</span>`;
+    hv.title="Vergangene Tage";
+    hv.addEventListener("click",()=>{ fhistOpen=!fhistOpen; fhistDay=null; buildFokus(); });
+    head.appendChild(hv);
     const clock=document.createElement("div"); clock.className="fclock";
     const inClocked = focus.clockIn!=null && focus.clockedOut==null;
     const b=document.createElement("button"); b.type="button";
@@ -3280,10 +3304,8 @@
     b.addEventListener("click",toggleClock);
     clock.appendChild(b); head.appendChild(clock); sheet.appendChild(head);
 
-    // Fokusuhr (Mini-Feld)
-    sheet.appendChild(renderFocusClock());
-    sheet.appendChild(renderSound());
-    setTimeout(renderYTDock,0);
+    // Verlauf nur, wenn ausgeklappt — sonst nimmt er den Zeiten den Platz weg
+    if(fhistOpen) sheet.appendChild(renderHistory());
 
     // Zwei Spalten: links Zeiten, rechts Tagesaufgaben
     const cols=document.createElement("div"); cols.className="fcols";
@@ -3332,6 +3354,14 @@
     tlist.appendChild(add); right.appendChild(tlist); cols.appendChild(right);
 
     sheet.appendChild(cols);
+
+    // Werkzeuge: bewusst unterhalb der Zeiten und Aufgaben, ruhig gehalten
+    const tools=document.createElement("div"); tools.className="ftools";
+    tools.appendChild(renderFocusClock());
+    tools.appendChild(renderSound());
+    sheet.appendChild(tools);
+    setTimeout(renderYTDock,0);
+
     sheet.appendChild(renderThoughts());
     view.appendChild(sheet);
   }
@@ -3375,7 +3405,7 @@
 
   function renderHistory(){
     const box=document.createElement("div"); box.className="fhist"+(fhistOpen?" open":"");
-    const h=document.createElement("button"); h.className="fhist-head"; h.type="button";
+    const h=document.createElement("button"); h.className="fhist-head"; h.type="button"; h.hidden=true;
     h.innerHTML=`<span>Verlauf</span><span class="fhist-count">${focus.archive.length}</span><span class="fhist-chev">\u2304</span>`;
     h.addEventListener("click",()=>{ fhistOpen=!fhistOpen; fhistDay=null; buildFokus(); });
     box.appendChild(h);

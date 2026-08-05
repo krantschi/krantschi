@@ -299,6 +299,39 @@
   .lp-repeat{margin-top:10px; font-family:var(--serif); font-size:11.5px; font-style:italic; color:var(--ink-faint);
     background:transparent; border:none; cursor:pointer; padding:2px 0; text-align:left}
   .lp-repeat:hover{color:var(--brass)}
+  /* Farbwähler */
+  .lp-sub{position:relative}
+  .lp-swatch{width:11px; height:11px; flex:0 0 auto; border:none; border-radius:50%; cursor:pointer;
+    background:var(--sc); box-shadow:0 0 0 1.5px color-mix(in srgb, var(--sc) 55%, transparent); margin-right:2px}
+  .lp-swpop{position:absolute; top:calc(100% + 6px); left:0; z-index:40; display:grid;
+    grid-template-columns:repeat(8,18px); gap:5px; padding:9px; border-radius:12px; background:var(--card);
+    box-shadow:0 0 0 1px rgba(var(--sheen),.09), 0 18px 40px -18px rgba(0,0,0,.7)}
+  .lp-swopt{width:18px; height:18px; border:none; border-radius:50%; cursor:pointer; box-shadow:inset 0 0 0 1px rgba(0,0,0,.18)}
+  .lp-swopt.on{box-shadow:0 0 0 2px var(--card), 0 0 0 3.5px var(--ink)}
+  /* Prüfungstage */
+  .lp-cell.exam{box-shadow:inset 0 0 0 1.5px var(--rose); background:color-mix(in srgb, var(--rose) 12%, transparent)}
+  .lp-cell.exam.today{box-shadow:inset 0 0 0 2px var(--rose), 0 0 14px -4px var(--rose)}
+  .lp-cell.exam .lp-num{color:var(--rose); font-weight:800}
+  .lp-exbadge{font-size:7.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--rose);
+    line-height:1; white-space:nowrap}
+  .lp-grid.month .lp-exbadge{font-size:0; width:5px; height:5px; border-radius:50%; background:var(--rose); display:block}
+  .lp-exrow{display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:12px}
+  .lp-exbtn{font:inherit; font-size:11.5px; font-weight:700; color:var(--ink-faint); background:transparent;
+    border:none; border-radius:999px; padding:5px 12px; cursor:pointer; box-shadow:inset 0 0 0 1px var(--line)}
+  .lp-exbtn:hover{color:var(--rose); box-shadow:inset 0 0 0 1px var(--rose)}
+  .lp-exbtn.on{color:#fff; background:var(--rose); box-shadow:none}
+  .lp-exlabel{flex:1; min-width:120px; font:inherit; font-size:12.5px; color:var(--ink); background:transparent;
+    border:none; border-bottom:1px solid var(--line); padding:4px 2px}
+  .lp-exlabel:focus{outline:none; border-bottom-color:var(--rose)}
+  /* Prüfungshinweis im Fokus */
+  .ftasks-exam{display:flex; flex-wrap:wrap; align-items:baseline; gap:7px; margin:-2px 0 8px; padding:5px 10px;
+    border-radius:8px; background:color-mix(in srgb, var(--rose) 12%, transparent);
+    box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--rose) 35%, transparent)}
+  .ftasks-exam.near{animation:examPulse 2.6s ease-in-out infinite}
+  .fte-k{font-size:10.5px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; color:var(--rose)}
+  .fte-l{font-family:var(--serif); font-size:12px; font-style:italic; color:var(--ink-soft)}
+  @keyframes examPulse{0%,100%{opacity:1}50%{opacity:.62}}
+  @media (prefers-reduced-motion:reduce){ .ftasks-exam.near{animation:none} }
   /* Heutige Fächer im normalen Fokus-Tab */
   .ftasks-lern{display:flex; flex-wrap:wrap; gap:5px; margin:-2px 0 8px}
   .ftl-chip{font-size:10.5px; font-weight:700; color:var(--sc); border-radius:999px; padding:2px 9px;
@@ -3415,17 +3448,38 @@
   let fhistOpen=false, fhistDay=null;
   /* ---------- Lernplan (versteckt: Datum im Fokus gedrückt halten) ---------- */
   let lernOn=false, lernMode="week", lernOffset=0, lernDay=null;
-  const LERN_COLORS=["var(--sky)","var(--mint)","var(--brass)","var(--violet)","var(--rose)","var(--t3)"];
+  // 16 Töne mit gleicher Sättigung und Helligkeit — dadurch unterscheidbar und in beiden Ansichten lesbar
+  const LERN_COLORS=[
+    "hsl(210,58%,58%)","hsl(160,50%,44%)","hsl(40,62%,50%)","hsl(266,45%,62%)",
+    "hsl(355,56%,60%)","hsl(190,52%,47%)","hsl(88,44%,45%)","hsl(24,64%,55%)",
+    "hsl(315,42%,58%)","hsl(232,46%,62%)","hsl(140,45%,44%)","hsl(52,55%,46%)",
+    "hsl(12,48%,54%)","hsl(334,50%,60%)","hsl(176,46%,43%)","hsl(68,38%,44%)"
+  ];
   let lern=null;
   function loadLern(){
     if(!lern) lern=read(LERN,{subjects:[],plan:{}});
     if(!Array.isArray(lern.subjects)) lern.subjects=[];
     if(!lern.plan || typeof lern.plan!=="object") lern.plan={};
+    if(!lern.exams || typeof lern.exams!=="object") lern.exams={};
     return lern;
   }
   const saveLern=()=>write(LERN,lern);
   const subjOf=id=>loadLern().subjects.find(x=>x.id===id);
   const planFor=k=>(loadLern().plan[k]||[]).filter(subjOf);
+  const examFor=k=>loadLern().exams[k]||null;
+  function setExam(k,val){
+    loadLern();
+    if(val) lern.exams[k]=val; else delete lern.exams[k];
+    saveLern();
+  }
+  // Nächste Prüfung ab heute, für den Hinweis im Fokus
+  function nextExam(){
+    loadLern();
+    const ks=Object.keys(lern.exams).filter(k=>k>=today).sort();
+    if(!ks.length) return null;
+    const k=ks[0];
+    return {day:k, days:daysBetween(today,k), ...lern.exams[k]};
+  }
   function toggleSubjectOn(k,id){
     loadLern();
     const cur=lern.plan[k]||[];
@@ -3434,6 +3488,20 @@
     saveLern();
   }
   function toggleLern(){ lernOn=!lernOn; if(lernOn){ lernMode="week"; lernOffset=0; lernDay=null; } buildFokus(); }
+
+  function openSwatches(sj,anchor){
+    document.querySelectorAll(".lp-swpop").forEach(x=>x.remove());
+    const pop=document.createElement("div"); pop.className="lp-swpop";
+    LERN_COLORS.forEach(c=>{
+      const b=document.createElement("button"); b.type="button"; b.className="lp-swopt"+(sj.color===c?" on":"");
+      b.style.background=c; b.title=c;
+      b.addEventListener("click",()=>{ sj.color=c; saveLern(); pop.remove(); buildFokus(); });
+      pop.appendChild(b);
+    });
+    anchor.parentElement.appendChild(pop);
+    setTimeout(()=>{ const off=e=>{ if(!pop.contains(e.target)){ pop.remove(); document.removeEventListener("click",off,true); } };
+      document.addEventListener("click",off,true); },0);
+  }
 
   function buildLernplan(view){
     loadLern();
@@ -3457,6 +3525,10 @@
     lern.subjects.forEach((sj,i)=>{
       const chip=document.createElement("div"); chip.className="lp-sub";
       chip.style.setProperty("--sc", sj.color||LERN_COLORS[i%LERN_COLORS.length]);
+      const sw=document.createElement("button"); sw.type="button"; sw.className="lp-swatch";
+      sw.title="Farbe wählen"; sw.setAttribute("aria-label","Farbe wählen");
+      sw.addEventListener("click",e=>{ e.stopPropagation(); openSwatches(sj,sw); });
+      chip.appendChild(sw);
       const nm=document.createElement("input"); nm.type="text"; nm.className="lp-subname"; nm.value=sj.name||"";
       nm.placeholder="Fach"; nm.size=Math.max(4,(sj.name||"").length||4);
       nm.addEventListener("input",()=>{ sj.name=nm.value; nm.size=Math.max(4,nm.value.length||4); saveLern(); });
@@ -3525,9 +3597,14 @@
       const cell=document.createElement("button"); cell.type="button";
       cell.className="lp-cell"+(k===today?" today":"")+(k<today?" past":"")+(lernDay===k?" sel":"");
       const d=new Date(k+"T00:00:00");
+      const ex=examFor(k);
+      if(ex) cell.classList.add("exam");
       const marks=planFor(k).map(id=>{ const sj=subjOf(id);
         return `<span class="lp-mark" style="background:${sj.color}"></span>`; }).join("");
-      cell.innerHTML=`<span class="lp-num">${d.getDate()}</span><span class="lp-marks">${marks}</span>`;
+      cell.innerHTML=`<span class="lp-num">${d.getDate()}</span>`+
+        (ex?`<span class="lp-exbadge">Prüfung</span>`:"")+
+        `<span class="lp-marks">${marks}</span>`;
+      if(ex && ex.label) cell.title="Prüfung: "+ex.label;
       cell.addEventListener("click",()=>{ lernDay=(lernDay===k?null:k); buildFokus(); });
       grid.appendChild(cell);
     });
@@ -3548,6 +3625,26 @@
         row.appendChild(b);
       });
       pick.appendChild(row);
+      // Prüfungstag
+      const exNow=examFor(lernDay);
+      const exRow=document.createElement("div"); exRow.className="lp-exrow";
+      const exBtn=document.createElement("button"); exBtn.type="button"; exBtn.className="lp-exbtn"+(exNow?" on":"");
+      exBtn.textContent=exNow?"Prüfungstag":"als Prüfungstag markieren";
+      exBtn.addEventListener("click",()=>{
+        if(exNow) setExam(lernDay,null);
+        else { const names=planFor(lernDay).map(i=>subjOf(i)?.name).filter(Boolean).join(", ");
+               setExam(lernDay,{label:names}); }
+        buildFokus();
+      });
+      exRow.appendChild(exBtn);
+      if(exNow){
+        const lab=document.createElement("input"); lab.type="text"; lab.className="lp-exlabel";
+        lab.value=exNow.label||""; lab.placeholder="Worum geht es?";
+        lab.addEventListener("input",()=>{ setExam(lernDay,{label:lab.value}); });
+        exRow.appendChild(lab);
+      }
+      pick.appendChild(exRow);
+
       // Auf die ganze Woche übertragen
       const rep=document.createElement("button"); rep.type="button"; rep.className="lp-repeat";
       rep.textContent="auf denselben Wochentag der nächsten 4 Wochen übertragen";
@@ -3630,6 +3727,13 @@
     // RECHTS - Tagesfokus-Aufgaben
     const right=document.createElement("div"); right.className="ftasks";
     right.innerHTML=`<div class="ftasks-head">Tagesfokus</div>`;
+    const ex=nextExam();
+    if(ex && ex.days<=21){
+      const eb=document.createElement("div"); eb.className="ftasks-exam"+(ex.days<=3?" near":"");
+      const wann = ex.days===0?"heute" : ex.days===1?"morgen" : "in "+ex.days+" Tagen";
+      eb.innerHTML=`<span class="fte-k">Prüfung ${wann}</span>`+(ex.label?`<span class="fte-l">${esc(ex.label)}</span>`:"");
+      right.appendChild(eb);
+    }
     const heute=planFor(today);
     if(heute.length){
       const lp=document.createElement("div"); lp.className="ftasks-lern";

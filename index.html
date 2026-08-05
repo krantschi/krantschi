@@ -249,6 +249,60 @@
   .streak{font-size:12.5px; font-weight:720; color:var(--ink-faint); font-variant-numeric:tabular-nums; white-space:nowrap; opacity:.85}
   .streak.hot{color:var(--amber)}
 
+  /* ---------- Lernplan ---------- */
+  .fdate.secret{cursor:pointer; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none}
+  .lp-modes{margin-left:auto; display:flex; gap:2px; background:rgba(var(--sheen),.06); border-radius:999px; padding:2px}
+  .lp-mode{font-family:var(--serif); font-size:11.5px; font-style:italic; font-weight:600; color:var(--ink-faint);
+    background:transparent; border:none; border-radius:999px; padding:4px 11px; cursor:pointer}
+  .lp-mode.on{color:var(--on-accent); background:var(--brass)}
+  .lp-back{margin-left:8px; font-family:var(--serif); font-size:11.5px; font-style:italic; color:var(--ink-faint);
+    background:transparent; border:none; cursor:pointer; opacity:.7}
+  .lp-back:hover{opacity:1; color:var(--ink)}
+  .lp-subs{display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:0 0 12px 14px}
+  .lp-sub{display:inline-flex; align-items:center; gap:2px; border-radius:999px; padding:3px 4px 3px 10px;
+    background:color-mix(in srgb, var(--sc) 16%, transparent); box-shadow:inset 0 0 0 1px var(--sc)}
+  .lp-subname{font:inherit; font-size:12px; font-weight:650; color:var(--sc); background:transparent; border:none; padding:0; min-width:32px}
+  .lp-subname:focus{outline:none}
+  .lp-subdel{width:16px; height:16px; border:none; background:transparent; color:var(--sc); opacity:.5; font-size:13px; cursor:pointer}
+  .lp-subdel:hover{opacity:1}
+  .lp-subadd{font-family:var(--serif); font-size:12px; font-style:italic; color:var(--ink-faint);
+    background:transparent; border:none; cursor:pointer; padding:3px 6px}
+  .lp-subadd:hover{color:var(--brass)}
+  .lp-empty{margin:0 14px; font-family:var(--serif); font-style:italic; font-size:13.5px; line-height:1.6; color:var(--ink-faint); max-width:46ch}
+  .lp-nav{display:flex; align-items:center; gap:8px; margin:0 14px 10px}
+  .lp-arrow{width:26px; height:26px; border:none; border-radius:50%; background:rgba(var(--sheen),.06);
+    color:var(--ink-soft); font-size:15px; line-height:1; cursor:pointer}
+  .lp-arrow:hover{background:rgba(var(--sheen),.12)}
+  .lp-navlab{flex:1; text-align:center; font-family:var(--serif); font-size:13.5px; font-weight:650; color:var(--ink)}
+  .lp-now{font-size:10.5px; font-weight:700; color:var(--brass); background:transparent; border:none; cursor:pointer}
+  .lp-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin:0 14px}
+  .lp-wd{font-size:9px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-faint); text-align:center; padding-bottom:2px}
+  .lp-cell{position:relative; min-height:46px; border:none; border-radius:8px; cursor:pointer; padding:4px 3px;
+    background:rgba(var(--sheen),.04); display:flex; flex-direction:column; align-items:center; gap:3px;
+    transition:background .16s ease, box-shadow .16s ease}
+  .lp-grid.week .lp-cell{min-height:64px}
+  .lp-cell.empty{background:transparent; cursor:default; pointer-events:none}
+  .lp-cell:hover{background:rgba(var(--sheen),.09)}
+  .lp-cell.today{box-shadow:inset 0 0 0 1px var(--brass)}
+  .lp-cell.past{opacity:.5}
+  .lp-cell.sel{background:rgba(var(--sheen),.14); box-shadow:inset 0 0 0 1.5px var(--brass)}
+  .lp-num{font-size:11px; font-weight:700; color:var(--ink-soft); font-variant-numeric:tabular-nums}
+  .lp-cell.today .lp-num{color:var(--brass)}
+  .lp-marks{display:flex; flex-wrap:wrap; justify-content:center; gap:2px}
+  .lp-mark{width:6px; height:6px; border-radius:50%; display:block}
+  .lp-pick{margin:14px 14px 0; padding-top:12px; border-top:1px solid var(--rule)}
+  .lp-pick-h{font-family:var(--serif); font-size:13.5px; font-weight:650; color:var(--ink); margin-bottom:8px}
+  .lp-pick-row{display:flex; flex-wrap:wrap; gap:6px}
+  .lp-pickchip{font:inherit; font-size:12px; font-weight:650; color:var(--sc); border:none; border-radius:999px;
+    padding:5px 12px; cursor:pointer; background:transparent; box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--sc) 45%, transparent); opacity:.65}
+  .lp-pickchip.on{opacity:1; background:color-mix(in srgb, var(--sc) 18%, transparent); box-shadow:inset 0 0 0 1.5px var(--sc)}
+  .lp-repeat{margin-top:10px; font-family:var(--serif); font-size:11.5px; font-style:italic; color:var(--ink-faint);
+    background:transparent; border:none; cursor:pointer; padding:2px 0; text-align:left}
+  .lp-repeat:hover{color:var(--brass)}
+  /* Heutige Fächer im normalen Fokus-Tab */
+  .ftasks-lern{display:flex; flex-wrap:wrap; gap:5px; margin:-2px 0 8px}
+  .ftl-chip{font-size:10.5px; font-weight:700; color:var(--sc); border-radius:999px; padding:2px 9px;
+    background:color-mix(in srgb, var(--sc) 14%, transparent); box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--sc) 40%, transparent)}
   /* ---------- Werkzeugleiste: Uhr und Klang, bewusst zurückgenommen ---------- */
   .ftools{margin:18px 0 0 14px; padding-top:12px; border-top:1px solid var(--rule); display:flex; flex-direction:column; gap:2px}
   .ftools .fclockwrap,.ftools .fsound{margin:0; border:none}
@@ -1608,6 +1662,7 @@
   const THEME="ht_theme_v1";
   const PRIOS="ht_prios_v2";
   const FOCUS="ht_focus_v1";
+  const LERN="ht_lernplan_v1";
   const LOCKIN="ht_lockin_v1";
   const LOCKTXT="ht_lockintext_v1", CRYPTO="ht_crypto_v1", CAL="ht_cal_v1", QUOTES="ht_quotes_v1", LOCKCFG="ht_lockin_cfg_v1", SCHATZ="ht_schatz_v1", GOSPELC="ht_gospel_v1";
   const MAX_PRIOS=8;
@@ -1801,6 +1856,7 @@
     document.body.classList.toggle("tab-fokus", t==="fokus");
     // Die Rückseite schließt sich beim Verlassen — sie soll nicht offen liegen bleiben.
     if(t!=="vizija") antiOn=false;
+    if(t!=="fokus") lernOn=false;   // versteckte Ansicht bleibt nicht offen liegen
     if(t==="vizija"){ buildVision(); playVizijaIntro(); }
     if(t==="fokus") buildFokus();
     if(t==="prios") buildPrios();
@@ -3357,16 +3413,168 @@
   }
 
   let fhistOpen=false, fhistDay=null;
+  /* ---------- Lernplan (versteckt: Datum im Fokus gedrückt halten) ---------- */
+  let lernOn=false, lernMode="week", lernOffset=0, lernDay=null;
+  const LERN_COLORS=["var(--sky)","var(--mint)","var(--brass)","var(--violet)","var(--rose)","var(--t3)"];
+  let lern=null;
+  function loadLern(){
+    if(!lern) lern=read(LERN,{subjects:[],plan:{}});
+    if(!Array.isArray(lern.subjects)) lern.subjects=[];
+    if(!lern.plan || typeof lern.plan!=="object") lern.plan={};
+    return lern;
+  }
+  const saveLern=()=>write(LERN,lern);
+  const subjOf=id=>loadLern().subjects.find(x=>x.id===id);
+  const planFor=k=>(loadLern().plan[k]||[]).filter(subjOf);
+  function toggleSubjectOn(k,id){
+    loadLern();
+    const cur=lern.plan[k]||[];
+    lern.plan[k] = cur.includes(id) ? cur.filter(x=>x!==id) : cur.concat(id);
+    if(!lern.plan[k].length) delete lern.plan[k];
+    saveLern();
+  }
+  function toggleLern(){ lernOn=!lernOn; if(lernOn){ lernMode="week"; lernOffset=0; lernDay=null; } buildFokus(); }
+
+  function buildLernplan(view){
+    loadLern();
+    const sheet=document.createElement("div"); sheet.className="fsheet lern";
+
+    // Kopf
+    const head=document.createElement("div"); head.className="fsheet-head";
+    head.innerHTML=`<div class="fdate">Lernplan</div>`;
+    const modes=document.createElement("div"); modes.className="lp-modes";
+    [["week","Woche"],["month","Monat"]].forEach(([k,l])=>{
+      const b=document.createElement("button"); b.type="button"; b.className="lp-mode"+(lernMode===k?" on":""); b.textContent=l;
+      b.addEventListener("click",()=>{ lernMode=k; lernOffset=0; lernDay=null; buildFokus(); });
+      modes.appendChild(b);
+    });
+    const back=document.createElement("button"); back.type="button"; back.className="lp-back"; back.textContent="zurück";
+    back.addEventListener("click",toggleLern);
+    head.append(modes,back); sheet.appendChild(head);
+
+    // Fächer
+    const sub=document.createElement("div"); sub.className="lp-subs";
+    lern.subjects.forEach((sj,i)=>{
+      const chip=document.createElement("div"); chip.className="lp-sub";
+      chip.style.setProperty("--sc", sj.color||LERN_COLORS[i%LERN_COLORS.length]);
+      const nm=document.createElement("input"); nm.type="text"; nm.className="lp-subname"; nm.value=sj.name||"";
+      nm.placeholder="Fach"; nm.size=Math.max(4,(sj.name||"").length||4);
+      nm.addEventListener("input",()=>{ sj.name=nm.value; nm.size=Math.max(4,nm.value.length||4); saveLern(); });
+      const del=document.createElement("button"); del.type="button"; del.className="lp-subdel"; del.textContent="×";
+      del.title="Fach entfernen";
+      del.addEventListener("click",()=>{
+        lern.subjects=lern.subjects.filter(x=>x.id!==sj.id);
+        Object.keys(lern.plan).forEach(k=>{ lern.plan[k]=lern.plan[k].filter(x=>x!==sj.id); if(!lern.plan[k].length) delete lern.plan[k]; });
+        saveLern(); buildFokus();
+      });
+      chip.append(nm,del); sub.appendChild(chip);
+    });
+    const addS=document.createElement("button"); addS.type="button"; addS.className="lp-subadd"; addS.textContent="+ Fach";
+    addS.addEventListener("click",()=>{
+      const i=lern.subjects.length;
+      lern.subjects.push({id:uid(), name:"", color:LERN_COLORS[i%LERN_COLORS.length]});
+      saveLern(); buildFokus();
+      const ins=document.querySelectorAll(".lp-subname"); if(ins.length) ins[ins.length-1].focus();
+    });
+    sub.appendChild(addS); sheet.appendChild(sub);
+
+    if(!lern.subjects.length){
+      const e=document.createElement("div"); e.className="lp-empty";
+      e.textContent="Lege zuerst deine Fächer an. Danach tippst du im Kalender auf einen Tag und wählst, was ansteht.";
+      sheet.appendChild(e); view.appendChild(sheet); return;
+    }
+
+    // Blättern
+    const nav=document.createElement("div"); nav.className="lp-nav";
+    const prev=document.createElement("button"); prev.type="button"; prev.className="lp-arrow"; prev.textContent="‹";
+    prev.addEventListener("click",()=>{ lernOffset--; lernDay=null; buildFokus(); });
+    const next=document.createElement("button"); next.type="button"; next.className="lp-arrow"; next.textContent="›";
+    next.addEventListener("click",()=>{ lernOffset++; lernDay=null; buildFokus(); });
+    const lbl=document.createElement("div"); lbl.className="lp-navlab";
+    nav.append(prev,lbl,next);
+    if(lernOffset!==0){
+      const now=document.createElement("button"); now.type="button"; now.className="lp-now"; now.textContent="heute";
+      now.addEventListener("click",()=>{ lernOffset=0; lernDay=null; buildFokus(); });
+      nav.appendChild(now);
+    }
+    sheet.appendChild(nav);
+
+    // Tage einsammeln
+    let days=[], title="";
+    if(lernMode==="week"){
+      const wi=weekInfo(); const start=addDays(wi.start, lernOffset*7);
+      for(let i=0;i<7;i++) days.push(addDays(start,i));
+      title="KW "+(wi.num+lernOffset)+" · "+fmtShort(start)+" – "+fmtShort(addDays(start,6));
+    }else{
+      const base=new Date(today+"T00:00:00");
+      const m=new Date(base.getFullYear(), base.getMonth()+lernOffset, 1);
+      title=m.toLocaleDateString("de-DE",{month:"long", year:"numeric"});
+      const lead=(m.getDay()+6)%7;
+      for(let i=0;i<lead;i++) days.push(null);
+      const last=new Date(m.getFullYear(), m.getMonth()+1, 0).getDate();
+      for(let d=1; d<=last; d++) days.push(ymd(new Date(m.getFullYear(), m.getMonth(), d)));
+    }
+    lbl.textContent=title;
+
+    const grid=document.createElement("div"); grid.className="lp-grid "+lernMode;
+    ["Mo","Di","Mi","Do","Fr","Sa","So"].forEach(w=>{
+      const h=document.createElement("div"); h.className="lp-wd"; h.textContent=w; grid.appendChild(h);
+    });
+    days.forEach(k=>{
+      if(!k){ const sp=document.createElement("div"); sp.className="lp-cell empty"; grid.appendChild(sp); return; }
+      const cell=document.createElement("button"); cell.type="button";
+      cell.className="lp-cell"+(k===today?" today":"")+(k<today?" past":"")+(lernDay===k?" sel":"");
+      const d=new Date(k+"T00:00:00");
+      const marks=planFor(k).map(id=>{ const sj=subjOf(id);
+        return `<span class="lp-mark" style="background:${sj.color}"></span>`; }).join("");
+      cell.innerHTML=`<span class="lp-num">${d.getDate()}</span><span class="lp-marks">${marks}</span>`;
+      cell.addEventListener("click",()=>{ lernDay=(lernDay===k?null:k); buildFokus(); });
+      grid.appendChild(cell);
+    });
+    sheet.appendChild(grid);
+
+    // Auswahl für den gewählten Tag
+    if(lernDay){
+      const pick=document.createElement("div"); pick.className="lp-pick";
+      const d=new Date(lernDay+"T00:00:00");
+      pick.innerHTML=`<div class="lp-pick-h">${d.toLocaleDateString("de-DE",{weekday:"long", day:"numeric", month:"long"})}</div>`;
+      const row=document.createElement("div"); row.className="lp-pick-row";
+      lern.subjects.forEach(sj=>{
+        const on=planFor(lernDay).includes(sj.id);
+        const b=document.createElement("button"); b.type="button"; b.className="lp-pickchip"+(on?" on":"");
+        b.style.setProperty("--sc", sj.color);
+        b.textContent=sj.name||"Fach";
+        b.addEventListener("click",()=>{ toggleSubjectOn(lernDay,sj.id); buildFokus(); });
+        row.appendChild(b);
+      });
+      pick.appendChild(row);
+      // Auf die ganze Woche übertragen
+      const rep=document.createElement("button"); rep.type="button"; rep.className="lp-repeat";
+      rep.textContent="auf denselben Wochentag der nächsten 4 Wochen übertragen";
+      rep.addEventListener("click",()=>{
+        const src=planFor(lernDay);
+        if(!src.length) return;
+        for(let i=1;i<=4;i++){ lern.plan[addDays(lernDay,i*7)]=src.slice(); }
+        saveLern(); buildFokus(); toast("Übertragen");
+      });
+      pick.appendChild(rep);
+      sheet.appendChild(pick);
+    }
+    view.appendChild(sheet);
+  }
+
   function buildFokus(){
     ensureFocus(); loadTimerCfg();
     const view=document.getElementById("view-fokus"); view.innerHTML="";
+    if(lernOn){ buildLernplan(view); return; }
     const sheet=document.createElement("div"); sheet.className="fsheet";
 
     // Kopf: Datum, Verlauf (dezent) und Clock-Umschalter
     const head=document.createElement("div"); head.className="fsheet-head";
     const dt=new Date(today+"T00:00:00");
     const ds=dt.toLocaleDateString("de-DE",{weekday:"long", day:"numeric", month:"long"});
-    head.innerHTML=`<div class="fdate">${esc(ds)}</div>`;
+    head.innerHTML=`<div class="fdate secret">${esc(ds)}</div>`;
+    armSecret(head.querySelector(".fdate"), toggleLern);
     const hv=document.createElement("button"); hv.type="button"; hv.className="fhist-mini"+(fhistOpen?" on":"");
     hv.innerHTML=`Verlauf<span class="fhm-chev">⌄</span>`;
     hv.title="Vergangene Tage";
@@ -3422,6 +3630,14 @@
     // RECHTS - Tagesfokus-Aufgaben
     const right=document.createElement("div"); right.className="ftasks";
     right.innerHTML=`<div class="ftasks-head">Tagesfokus</div>`;
+    const heute=planFor(today);
+    if(heute.length){
+      const lp=document.createElement("div"); lp.className="ftasks-lern";
+      lp.innerHTML=heute.map(id=>{ const sj=subjOf(id);
+        return `<span class="ftl-chip" style="--sc:${sj.color}">${esc(sj.name||"Fach")}</span>`; }).join("");
+      lp.title="Lernplan für heute";
+      right.appendChild(lp);
+    }
     const tlist=document.createElement("div"); tlist.className="ftask-list";
     if(!focus.tasks.length){ const e=document.createElement("div"); e.className="ftask-empty"; e.textContent="Woran arbeitest du heute?"; tlist.appendChild(e); }
     focus.tasks.forEach(t=>tlist.appendChild(renderTask(t)));
@@ -4569,9 +4785,10 @@
     }, 340);
   }
   // Geheimer Zugang: den Punkt in der Kopfzeile gedrückt halten
-  function armSecret(el){
+  function armSecret(el, fn){
     let t=null;
-    const start=()=>{ t=setTimeout(()=>{ t=null; if(navigator.vibrate) try{navigator.vibrate(18);}catch(e){} flipVizija(); }, 620); };
+    const act = fn || flipVizija;
+    const start=()=>{ t=setTimeout(()=>{ t=null; if(navigator.vibrate) try{navigator.vibrate(18);}catch(e){} act(); }, 620); };
     const cancel=()=>{ if(t){ clearTimeout(t); t=null; } };
     el.addEventListener("mousedown",start); el.addEventListener("touchstart",start,{passive:true});
     ["mouseup","mouseleave","touchend","touchcancel","touchmove"].forEach(e=>el.addEventListener(e,cancel));

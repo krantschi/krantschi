@@ -249,6 +249,56 @@
   .streak{font-size:12.5px; font-weight:720; color:var(--ink-faint); font-variant-numeric:tabular-nums; white-space:nowrap; opacity:.85}
   .streak.hot{color:var(--amber)}
 
+  /* ---------- Angelus ---------- */
+  .ang-card{margin-bottom:10px; padding:9px 16px; border-radius:12px; background:var(--card); box-shadow:var(--shadow)}
+  .ang-row{display:flex; align-items:center; gap:9px; flex-wrap:wrap}
+  .ang-bell{color:var(--brass); font-size:12px; opacity:.85}
+  .ang-name{font-family:var(--serif); font-size:13.5px; font-style:italic; font-weight:600; color:var(--ink-soft)}
+  .ang-times{display:flex; gap:4px; margin-left:2px}
+  .ang-time{font:inherit; font-size:11.5px; font-weight:650; color:var(--ink-faint); background:transparent;
+    border:none; border-radius:999px; padding:4px 10px; cursor:pointer; box-shadow:inset 0 0 0 1px var(--line);
+    font-variant-numeric:tabular-nums; transition:all .16s}
+  .ang-time:hover{color:var(--brass); box-shadow:inset 0 0 0 1px var(--brass)}
+  .ang-time.next{color:var(--brass); box-shadow:inset 0 0 0 1.4px var(--brass)}
+  .ang-time.done{color:var(--mint); background:color-mix(in srgb, var(--mint) 14%, transparent); box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--mint) 45%, transparent)}
+  .ang-notify,.ang-cal{margin-left:auto; font:inherit; font-size:10.5px; font-weight:650; color:var(--ink-faint);
+    background:transparent; border:none; cursor:pointer; padding:3px 6px; opacity:.6; transition:opacity .16s, color .16s}
+  .ang-cal{margin-left:0}
+  .ang-notify:hover,.ang-cal:hover{opacity:1; color:var(--brass)}
+  .ang-notify.on{color:var(--brass); opacity:1}
+  /* Gebetstext */
+  .ang-overlay{position:fixed; inset:0; z-index:95; display:flex; align-items:center; justify-content:center;
+    padding:20px; background:rgba(0,0,0,.6); backdrop-filter:blur(4px)}
+  .ang-box{width:100%; max-width:420px; max-height:82vh; overflow-y:auto; padding:24px 24px 18px; border-radius:16px;
+    background:linear-gradient(168deg,#1A1723 0%,#12101A 60%,#0C0B10 100%);
+    --sheen:255,255,255; color:#EDE9E4;
+    box-shadow:0 0 0 1px rgba(255,255,255,.07), 0 30px 70px -26px #000}
+  .ang-h{display:flex; align-items:baseline; gap:10px; margin-bottom:14px;
+    padding-bottom:10px; border-bottom:1px solid rgba(255,255,255,.1)}
+  .ang-k{font-family:var(--serif); font-size:17px; font-style:italic; font-weight:650; color:#F3EEE4}
+  .ang-t{margin-left:auto; font-size:12px; color:rgba(237,233,228,.5); font-variant-numeric:tabular-nums}
+  .ang-l{margin:0 0 9px; font-family:var(--serif); font-size:15px; line-height:1.55; color:#EDE9E4}
+  .ang-l.ang-ave{color:rgba(237,233,228,.55); font-style:italic; padding-left:22px}
+  .ang-r{display:inline-block; width:18px; font-weight:800; color:var(--brass); font-style:normal}
+  .ang-k.secret{cursor:pointer; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none}
+  .ang-lang{font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--brass);
+    background:rgba(227,178,95,.14); border-radius:999px; padding:2px 8px}
+  .ang-gap{height:9px; margin:0}
+  .ang-reg{margin-top:16px; padding-top:12px; border-top:1px solid rgba(255,255,255,.1)}
+  .ang-reg-h{width:100%; display:flex; align-items:baseline; gap:9px; background:transparent; border:none;
+    cursor:pointer; padding:2px 0; font-family:var(--serif); font-size:14px; font-style:italic; font-weight:620;
+    color:rgba(237,233,228,.72); text-align:left}
+  .ang-reg-h:hover{color:#F3EEE4}
+  .ang-reg-s{font-family:var(--font); font-size:9px; font-style:normal; font-weight:800; letter-spacing:.09em;
+    text-transform:uppercase; color:rgba(237,233,228,.38)}
+  .ang-reg-c{margin-left:auto; font-family:var(--font); font-size:13px; color:rgba(237,233,228,.45); transition:transform .25s}
+  .ang-reg.open .ang-reg-c{transform:rotate(180deg)}
+  .ang-reg-b{padding-top:10px}
+  .ang-acts{display:flex; gap:8px; margin-top:16px; padding-top:14px; border-top:1px solid rgba(255,255,255,.1)}
+  .ang-btn{flex:1; font:inherit; font-size:13px; font-weight:650; color:rgba(237,233,228,.7);
+    background:rgba(255,255,255,.07); border:none; border-radius:10px; padding:10px; cursor:pointer}
+  .ang-btn:hover{color:#fff; background:rgba(255,255,255,.13)}
+  .ang-btn.ok{color:#12160E; background:var(--brass)}
   /* ---------- Lernplan ---------- */
   .fdate.secret{cursor:pointer; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none}
   .lp-modes{margin-left:auto; display:flex; gap:2px; background:rgba(var(--sheen),.06); border-radius:999px; padding:2px}
@@ -1610,6 +1660,7 @@
         </div>
         <div class="strip" id="strip"></div>
       </section>
+      <div id="angelus"></div>
       <div id="lockin"></div>
       <div id="cats"></div>
       <div id="tagesabschluss"></div>
@@ -1696,6 +1747,7 @@
   const PRIOS="ht_prios_v2";
   const FOCUS="ht_focus_v1";
   const LERN="ht_lernplan_v1";
+  const ANGELUS="ht_angelus_v1";
   const LOCKIN="ht_lockin_v1";
   const LOCKTXT="ht_lockintext_v1", CRYPTO="ht_crypto_v1", CAL="ht_cal_v1", QUOTES="ht_quotes_v1", LOCKCFG="ht_lockin_cfg_v1", SCHATZ="ht_schatz_v1", GOSPELC="ht_gospel_v1";
   const MAX_PRIOS=8;
@@ -2825,7 +2877,202 @@
     }
     renderHeute();
   }
+  /* ---------- Angelus ---------- */
+  // Überlieferter Text, gemeinfrei. Zur Osterzeit tritt das Regina caeli an seine Stelle.
+  const ANGELUS_TIMES=["06:00","12:00","18:00"];
+  const ANGELUS_TEXT=[
+    ["V.","Der Engel des Herrn brachte Maria die Botschaft,"],
+    ["R.","und sie empfing vom Heiligen Geist."],
+    ["","Gegrüßet seist du, Maria …"],
+    ["V.","Maria sprach: Siehe, ich bin die Magd des Herrn;"],
+    ["R.","mir geschehe nach deinem Wort."],
+    ["","Gegrüßet seist du, Maria …"],
+    ["V.","Und das Wort ist Fleisch geworden"],
+    ["R.","und hat unter uns gewohnt."],
+    ["","Gegrüßet seist du, Maria …"],
+    ["V.","Bitte für uns, heilige Gottesmutter,"],
+    ["R.","auf dass wir würdig werden der Verheißungen Christi."]
+  ];
+  // Kroatisch — überlieferter Wortlaut
+  const ANGELUS_TEXT_HR=[
+    ["V.","Anđeo Gospodnji navijesti Mariji,"],
+    ["R.","i ona začne po Duhu Svetom."],
+    ["","Zdravo, Marijo …"],
+    ["V.","Evo službenice Gospodnje,"],
+    ["R.","neka mi bude po riječi tvojoj."],
+    ["","Zdravo, Marijo …"],
+    ["V.","I Riječ tijelom postade"],
+    ["R.","i prebiva među nama."],
+    ["","Zdravo, Marijo …"],
+    ["V.","Moli za nas, sveta Bogorodice,"],
+    ["R.","da dostojni postanemo obećanja Kristovih."]
+  ];
+  // Regina caeli — in der Osterzeit anstelle des Angelus
+  const REGINA_TEXT=[
+    ["V.","Freu dich, du Himmelskönigin, halleluja."],
+    ["R.","Den du zu tragen würdig warst, halleluja,"],
+    ["R.","er ist erstanden, wie er sagte, halleluja."],
+    ["R.","Bitt Gott für uns, halleluja."],
+    ["",""],
+    ["V.","Freu dich und frohlocke, Jungfrau Maria, halleluja."],
+    ["R.","Denn der Herr ist wahrhaft auferstanden, halleluja."]
+  ];
+  const REGINA_TEXT_HR=[
+    ["V.","Kraljice neba, raduj se, aleluja."],
+    ["R.","Jer koga si bila dostojna nositi, aleluja,"],
+    ["R.","uskrsnu, kako je rekao, aleluja."],
+    ["R.","Moli za nas Boga, aleluja."],
+    ["",""],
+    ["V.","Veseli se i raduj, Djevice Marijo, aleluja."],
+    ["R.","Jer je Gospodin uskrsnuo doista, aleluja."]
+  ];
+  let ang=null, angTimer=null, angLastFired="", reginaOpen=false;
+  function loadAng(){
+    if(!ang) ang=read(ANGELUS,{on:true, notify:false, times:ANGELUS_TIMES.slice(), log:{}});
+    if(!Array.isArray(ang.times)||!ang.times.length) ang.times=ANGELUS_TIMES.slice();
+    if(!ang.log||typeof ang.log!=="object") ang.log={};
+    if(ang.lang!=="hr") ang.lang="de";
+    return ang;
+  }
+  const saveAng=()=>write(ANGELUS,ang);
+  const angPrayed=t=>(loadAng().log[today]||[]).includes(t);
+  function markPrayed(t){
+    loadAng();
+    const l=ang.log[today]||[];
+    ang.log[today] = l.includes(t) ? l.filter(x=>x!==t) : l.concat(t);
+    if(!ang.log[today].length) delete ang.log[today];
+    // Nur die letzten Wochen behalten
+    const cut=addDays(today,-40);
+    Object.keys(ang.log).forEach(k=>{ if(k<cut) delete ang.log[k]; });
+    saveAng(); renderHeute();
+  }
+  const hm2min=t=>{ const [h,m]=t.split(":").map(Number); return h*60+(m||0); };
+  function nextAngelus(){
+    loadAng();
+    const now=nowMin();
+    const up=ang.times.slice().sort().find(t=>hm2min(t)>now);
+    return {time: up||ang.times.slice().sort()[0], today: !!up};
+  }
+  // Läuft nur, solange die App offen ist — das ist die Grenze einer Web-App
+  function startAngelusWatch(){
+    if(angTimer) clearInterval(angTimer);
+    angTimer=setInterval(()=>{
+      loadAng(); if(!ang.on) return;
+      const now=new Date(); const t=String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0");
+      if(!ang.times.includes(t)) return;
+      const key=today+" "+t; if(angLastFired===key) return; angLastFired=key;
+      fireAngelus(t);
+    }, 20000);
+  }
+  function fireAngelus(t){
+    try{ if(ang.notify && "Notification" in window && Notification.permission==="granted"){
+      new Notification("Angelus · "+t, {body:"Der Engel des Herrn brachte Maria die Botschaft.", tag:"angelus-"+t});
+    } }catch(e){}
+    try{ playGong(); }catch(e){}
+    openAngelus(t);
+  }
+  async function askAngelusNotify(){
+    loadAng();
+    if(!("Notification" in window)){ alert("Dieser Browser kennt keine Benachrichtigungen."); return; }
+    if(Notification.permission==="denied"){ alert("Benachrichtigungen sind für diese Seite blockiert. Das lässt sich nur in den Browser-Einstellungen wieder erlauben."); return; }
+    let p=Notification.permission;
+    if(p!=="granted"){ try{ p=await Notification.requestPermission(); }catch(e){} }
+    ang.notify=(p==="granted"); saveAng(); renderHeute();
+    if(!ang.notify) toast("Ohne Erlaubnis meldet sich nur die App selbst");
+  }
+  // Kalenderdatei: echte Weckrufe auf allen Geräten, auch bei geschlossener App
+  function angelusICS(){
+    loadAng();
+    const pad=n=>String(n).padStart(2,"0");
+    const d=new Date(); const stamp=d.getUTCFullYear()+pad(d.getUTCMonth()+1)+pad(d.getUTCDate())+"T"+pad(d.getUTCHours())+pad(d.getUTCMinutes())+"00Z";
+    const base=new Date(); const ds=base.getFullYear()+pad(base.getMonth()+1)+pad(base.getDate());
+    const ev=ang.times.slice().sort().map((t,i)=>{
+      const [h,m]=t.split(":");
+      return ["BEGIN:VEVENT","UID:angelus-"+t.replace(":","")+"-"+ds+"@heute",
+        "DTSTAMP:"+stamp,"DTSTART:"+ds+"T"+h+m+"00","DURATION:PT5M",
+        "RRULE:FREQ=DAILY","SUMMARY:Angelus","DESCRIPTION:Der Engel des Herrn brachte Maria die Botschaft.",
+        "BEGIN:VALARM","TRIGGER:PT0M","ACTION:DISPLAY","DESCRIPTION:Angelus","END:VALARM","END:VEVENT"].join("\r\n");
+    }).join("\r\n");
+    const ics=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Heute//Angelus//DE","CALSCALE:GREGORIAN",ev,"END:VCALENDAR"].join("\r\n");
+    const blob=new Blob([ics],{type:"text/calendar;charset=utf-8"});
+    const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="angelus.ics";
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+    toast("Kalenderdatei erzeugt");
+  }
+  const angLines=(arr)=>arr.map(([r,l])=>l===""?`<p class="ang-gap"></p>`:
+      `<p class="ang-l${r?"":" ang-ave"}">${r?`<span class="ang-r">${r}</span>`:""}${esc(l)}</p>`).join("");
+  function openAngelus(t){
+    document.querySelectorAll(".ang-overlay").forEach(x=>x.remove());
+    loadAng();
+    const hr = ang.lang==="hr";
+    const ov=document.createElement("div"); ov.className="ang-overlay open";
+    const box=document.createElement("div"); box.className="ang-box";
+    box.innerHTML=`<div class="ang-h"><span class="ang-k secret">Angelus</span>${hr?`<span class="ang-lang">hrvatski</span>`:""}<span class="ang-t">${esc(t||"")}</span></div>`+
+      angLines(hr?ANGELUS_TEXT_HR:ANGELUS_TEXT);
+
+    // Regina caeli — aufklappbar, für die Osterzeit
+    const reg=document.createElement("div"); reg.className="ang-reg"+(reginaOpen?" open":"");
+    const rh=document.createElement("button"); rh.type="button"; rh.className="ang-reg-h";
+    rh.innerHTML=`<span>Regina caeli</span><span class="ang-reg-s">Osterzeit</span><span class="ang-reg-c">⌄</span>`;
+    rh.addEventListener("click",()=>{ reginaOpen=!reginaOpen; openAngelus(t); });
+    reg.appendChild(rh);
+    if(reginaOpen){
+      const body=document.createElement("div"); body.className="ang-reg-b";
+      body.innerHTML=angLines(hr?REGINA_TEXT_HR:REGINA_TEXT);
+      reg.appendChild(body);
+    }
+    box.appendChild(reg);
+
+    const acts=document.createElement("div"); acts.className="ang-acts";
+    if(t){
+      const done=document.createElement("button"); done.type="button"; done.className="ang-btn ok";
+      done.textContent=angPrayed(t)?"gebetet ✓":"gebetet";
+      done.addEventListener("click",()=>{ markPrayed(t); ov.remove(); });
+      acts.appendChild(done);
+    }
+    const close=document.createElement("button"); close.type="button"; close.className="ang-btn"; close.textContent="schließen";
+    close.addEventListener("click",()=>ov.remove());
+    acts.appendChild(close); box.appendChild(acts); ov.appendChild(box);
+    ov.addEventListener("click",e=>{ if(e.target===ov) ov.remove(); });
+    document.body.appendChild(ov);
+    // Titel gedrückt halten wechselt die Sprache
+    armSecret(box.querySelector(".ang-k"), ()=>{
+      loadAng(); ang.lang = (ang.lang==="hr"?"de":"hr"); saveAng(); openAngelus(t);
+    });
+  }
+  function renderAngelus(){
+    const host=document.getElementById("angelus"); if(!host) return;
+    loadAng(); host.innerHTML="";
+    if(!ang.on) return;
+    const card=document.createElement("section"); card.className="ang-card";
+    const nx=nextAngelus();
+    const row=document.createElement("div"); row.className="ang-row";
+    row.innerHTML=`<span class="ang-bell">✦</span><span class="ang-name">Angelus</span>`;
+    const times=document.createElement("div"); times.className="ang-times";
+    ang.times.slice().sort().forEach(t=>{
+      const b=document.createElement("button"); b.type="button";
+      b.className="ang-time"+(angPrayed(t)?" done":"")+(t===nx.time&&nx.today?" next":"");
+      b.textContent=t; b.title=angPrayed(t)?"gebetet":"Text öffnen";
+      b.addEventListener("click",()=>openAngelus(t));
+      times.appendChild(b);
+    });
+    row.appendChild(times);
+    const bell=document.createElement("button"); bell.type="button"; bell.className="ang-notify"+(ang.notify?" on":"");
+    bell.textContent=ang.notify?"Meldung an":"Meldung";
+    bell.title="Benachrichtigung, solange die App geöffnet ist";
+    bell.addEventListener("click",askAngelusNotify);
+    row.appendChild(bell);
+    const cal=document.createElement("button"); cal.type="button"; cal.className="ang-cal"; cal.textContent="Kalender";
+    cal.title="Wiederkehrende Termine mit Wecker als Datei — funktioniert auch bei geschlossener App";
+    cal.addEventListener("click",angelusICS);
+    row.appendChild(cal);
+    card.appendChild(row);
+    host.appendChild(card);
+  }
+
   function renderHeute(){
+    renderAngelus();
     buildRing(); buildStrip(); buildHeader(); buildLockIn(); buildCats(); buildTagesabschluss(); buildSchatzBtn(); renderCalendar();
     const complete=dayComplete(state.viewDate);
     const ring=document.getElementById("ring");
@@ -5188,6 +5435,7 @@
   // Abgeleitete Schlüssel beim Verlassen der Seite verwerfen
   window.addEventListener("pagehide",forgetKeys);
   document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="hidden") forgetKeys(); });
+  startAngelusWatch();
   document.getElementById("themeMini").addEventListener("click",cycleTheme);
   applyTheme();
   document.getElementById("editBtn").addEventListener("click",toggleEdit);

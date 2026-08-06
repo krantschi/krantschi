@@ -294,6 +294,11 @@
   .ang-reg-c{margin-left:auto; font-family:var(--font); font-size:13px; color:rgba(237,233,228,.45); transition:transform .25s}
   .ang-reg.open .ang-reg-c{transform:rotate(180deg)}
   .ang-reg-b{padding-top:10px}
+  .ang-lat-h{margin:16px 0 8px; padding-top:12px; border-top:1px solid rgba(255,255,255,.1);
+    font-size:9.5px; font-weight:800; letter-spacing:.11em; text-transform:uppercase; color:rgba(237,233,228,.42)}
+  .ang-lat .ang-l{font-style:italic; color:rgba(237,233,228,.72); font-size:14px}
+  .ang-lat .ang-oration{font-style:italic; color:rgba(237,233,228,.6)}
+  .ang-lat .ang-call{color:rgba(237,233,228,.5)}
   .ang-acts{display:flex; gap:8px; margin-top:16px; padding-top:14px; border-top:1px solid rgba(255,255,255,.1)}
   .ang-btn{flex:1; font:inherit; font-size:13px; font-weight:650; color:rgba(237,233,228,.7);
     background:rgba(255,255,255,.07); border:none; border-radius:10px; padding:10px; cursor:pointer}
@@ -2891,21 +2896,25 @@
     ["R.","und hat unter uns gewohnt."],
     ["","Gegrüßet seist du, Maria …"],
     ["V.","Bitte für uns, heilige Gottesmutter,"],
-    ["R.","auf dass wir würdig werden der Verheißungen Christi."]
+    ["R.","auf dass wir würdig werden der Verheißungen Christi."],
+    ["§","Lasset uns beten."],
+    ["+","Allmächtiger Gott, gieße deine Gnade in unsere Herzen ein. Durch die Botschaft des Engels haben wir die Menschwerdung Christi, deines Sohnes, erkannt. Lass uns durch sein Leiden und Kreuz zur Herrlichkeit der Auferstehung gelangen. Darum bitten wir durch Christus, unseren Herrn. Amen."]
   ];
   // Kroatisch — überlieferter Wortlaut
   const ANGELUS_TEXT_HR=[
-    ["V.","Anđeo Gospodnji navijesti Mariji,"],
+    ["V.","Anđeo Gospodnji navjestio Mariji,"],
     ["R.","i ona začne po Duhu Svetom."],
     ["","Zdravo, Marijo …"],
     ["V.","Evo službenice Gospodnje,"],
     ["R.","neka mi bude po riječi tvojoj."],
     ["","Zdravo, Marijo …"],
     ["V.","I Riječ tijelom postade"],
-    ["R.","i prebiva među nama."],
+    ["R.","i nastani se među nama."],
     ["","Zdravo, Marijo …"],
     ["V.","Moli za nas, sveta Bogorodice,"],
-    ["R.","da dostojni postanemo obećanja Kristovih."]
+    ["R.","da dostojni postanemo obećanja Kristovih."],
+    ["§","Pomolimo se."],
+    ["+","Milost svoju, molimo te, Gospodine, ulij u duše naše, da mi, koji smo po anđelovu navještenju spoznali utjelovljenje Krista, Sina tvoga, po muci njegovoj i križu k slavi uskrsnuća privedeni budemo. Po Kristu Gospodinu našemu. Amen."]
   ];
   // Regina caeli — in der Osterzeit anstelle des Angelus
   const REGINA_TEXT=[
@@ -2915,7 +2924,9 @@
     ["R.","Bitt Gott für uns, halleluja."],
     ["",""],
     ["V.","Freu dich und frohlocke, Jungfrau Maria, halleluja."],
-    ["R.","Denn der Herr ist wahrhaft auferstanden, halleluja."]
+    ["R.","Denn der Herr ist wahrhaft auferstanden, halleluja."],
+    ["§","Lasset uns beten."],
+    ["+","Allmächtiger Gott, durch die Auferstehung deines Sohnes, unseres Herrn Jesus Christus, hast du die Welt erfreut. Lass uns durch seine jungfräuliche Mutter Maria zur unvergänglichen Freude der Auferstehung gelangen. Darum bitten wir durch Christus, unseren Herrn. Amen."]
   ];
   const REGINA_TEXT_HR=[
     ["V.","Kraljice neba, raduj se, aleluja."],
@@ -2924,7 +2935,21 @@
     ["R.","Moli za nas Boga, aleluja."],
     ["",""],
     ["V.","Veseli se i raduj, Djevice Marijo, aleluja."],
-    ["R.","Jer je Gospodin uskrsnuo doista, aleluja."]
+    ["R.","Jer je Gospodin uskrsnuo doista, aleluja."],
+    ["§","Pomolimo se."],
+    ["+","Bože, ti si uskrsnućem svoga Sina, Gospodina našega Isusa Krista, obradovao svijet. Daj, molimo, da po njegovoj Majci Djevici Mariji postignemo radosti vječnoga života. Po Kristu Gospodinu našemu. Amen."]
+  ];
+  // Regina caeli — lateinische Urfassung
+  const REGINA_TEXT_LAT=[
+    ["V.","Regina caeli, laetare, alleluia."],
+    ["R.","Quia quem meruisti portare, alleluia,"],
+    ["R.","resurrexit, sicut dixit, alleluia."],
+    ["R.","Ora pro nobis Deum, alleluia."],
+    ["",""],
+    ["V.","Gaude et laetare, Virgo Maria, alleluia."],
+    ["R.","Quia surrexit Dominus vere, alleluia."],
+    ["§","Oremus."],
+    ["+","Deus, qui per resurrectionem Filii tui, Domini nostri Iesu Christi, mundum laetificare dignatus es: praesta, quaesumus, ut per eius Genetricem Virginem Mariam perpetuae capiamus gaudia vitae. Per eundem Christum Dominum nostrum. Amen."]
   ];
   let ang=null, angTimer=null, angLastFired="", reginaOpen=false;
   function loadAng(){
@@ -3000,8 +3025,12 @@
     setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
     toast("Kalenderdatei erzeugt");
   }
-  const angLines=(arr)=>arr.map(([r,l])=>l===""?`<p class="ang-gap"></p>`:
-      `<p class="ang-l${r?"":" ang-ave"}">${r?`<span class="ang-r">${r}</span>`:""}${esc(l)}</p>`).join("");
+  const angLines=(arr)=>arr.map(([r,l])=>{
+    if(l==="") return `<p class="ang-gap"></p>`;
+    if(r==="§") return `<p class="ang-call">${esc(l)}</p>`;
+    if(r==="+") return `<p class="ang-oration">${esc(l)}</p>`;
+    return `<p class="ang-l${r?"":" ang-ave"}">${r?`<span class="ang-r">${r}</span>`:""}${esc(l)}</p>`;
+  }).join("");
   function openAngelus(t){
     document.querySelectorAll(".ang-overlay").forEach(x=>x.remove());
     loadAng();
@@ -3019,7 +3048,9 @@
     reg.appendChild(rh);
     if(reginaOpen){
       const body=document.createElement("div"); body.className="ang-reg-b";
-      body.innerHTML=angLines(hr?REGINA_TEXT_HR:REGINA_TEXT);
+      body.innerHTML=angLines(hr?REGINA_TEXT_HR:REGINA_TEXT)
+        +`<div class="ang-lat-h">Regina caeli · lateinisch</div>`
+        +`<div class="ang-lat">${angLines(REGINA_TEXT_LAT)}</div>`;
       reg.appendChild(body);
     }
     box.appendChild(reg);

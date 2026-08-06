@@ -557,16 +557,18 @@
   /* Tagesfokus-Aufgaben rechts */
   .ftasks-head{font-family:var(--display); font-size:14px; font-weight:700; font-style:italic; color:var(--ink); margin-bottom:8px; padding-bottom:6px; border-bottom:1.5px solid var(--rule)}
   .ftask-list{display:flex; flex-direction:column; gap:0}
-  .ftask{display:flex; align-items:center; gap:9px; min-height:var(--row); padding:1px 0}
-  .ftask-chk{width:19px; height:19px; flex:0 0 auto; border-radius:5px; border:1.8px solid var(--track); background:transparent; cursor:pointer; position:relative; transition:all .18s}
+  .ftask{display:flex; align-items:flex-start; gap:9px; min-height:var(--row); padding:1px 0}
+  .ftask-chk{width:19px; height:19px; flex:0 0 auto; margin-top:3px; border-radius:5px; border:1.8px solid var(--track); background:transparent; cursor:pointer; position:relative; transition:all .18s}
   .ftask.st-started .ftask-chk{border-color:var(--amber); background:linear-gradient(135deg,var(--amber) 50%,transparent 50%)}
   .ftask.st-done .ftask-chk{background:var(--mint); border-color:var(--mint)}
   .ftask.st-done .ftask-chk::after{content:"\2713"; position:absolute; inset:0; display:grid; place-items:center; color:#fff; font-size:12px; font-weight:800}
   .ftask.st-done .ftask-text{color:var(--ink-faint); text-decoration:line-through}
-  .ftask-text{flex:1; min-width:0; font-family:var(--display); font-size:14px; line-height:var(--row); color:var(--ink); background:transparent; border:none; padding:0; height:var(--row)}
+  .ftask-text{flex:1; min-width:0; box-sizing:border-box; font-family:var(--serif); font-size:14px;
+    line-height:1.45; color:var(--ink); background:transparent; border:none; padding:2px 0;
+    resize:none; overflow:hidden; word-break:break-word}
   .ftask-text:focus{outline:none}
   .ftask-text::placeholder{color:var(--ink-faint); font-style:italic}
-  .ftask-del{opacity:0; width:20px; border:none; background:transparent; color:var(--ink-faint); font-size:15px; cursor:pointer; transition:opacity .15s}
+  .ftask-del{opacity:0; width:20px; margin-top:1px; border:none; background:transparent; color:var(--ink-faint); font-size:15px; cursor:pointer; transition:opacity .15s}
   .ftask:hover .ftask-del{opacity:1}
   .ftask-add{font-family:var(--display); font-size:12.5px; font-weight:600; font-style:italic; color:var(--sky); background:transparent; border:none; cursor:pointer; padding:0; height:var(--row); line-height:var(--row); align-self:flex-start}
   .ftask-empty{font-family:var(--display); font-style:italic; font-size:13px; color:var(--ink-faint); min-height:var(--row); line-height:var(--row)}
@@ -979,7 +981,17 @@
   .wk-goals{display:flex; flex-direction:column; gap:0}
   .wk-empty{font-size:13px; font-style:italic; line-height:1.5; color:var(--ink-faint); padding:2px 0 8px}
   .wk-goal{position:relative; display:flex; align-items:flex-start; gap:10px; padding:9px 0; border-bottom:1px solid var(--line)}
-  .wk-dot{width:10px; height:10px; border-radius:50%; background:var(--card); box-shadow:inset 0 0 0 2.5px var(--mint); flex:0 0 auto; margin-top:6px}
+  .wk-dot{width:14px; height:14px; padding:0; border:none; border-radius:50%; background:var(--card); cursor:pointer;
+    box-shadow:inset 0 0 0 2.5px var(--mint); flex:0 0 auto; margin-top:5px; position:relative; transition:all .18s}
+  .wk-dot:hover{box-shadow:inset 0 0 0 3px var(--mint)}
+  .wk-dot.on{background:var(--mint); box-shadow:inset 0 0 0 2.5px var(--mint)}
+  .wk-dot.on::after{content:"\2713"; position:absolute; inset:0; display:grid; place-items:center;
+    color:var(--on-accent); font-size:9px; font-weight:900; line-height:1}
+  .wk-goal.done .wk-text{color:var(--ink-faint); text-decoration:line-through}
+  .wk-goal.done{opacity:.75}
+  .ws-item.done .ws-tx{color:var(--ink-faint); text-decoration:line-through}
+  .ws-item.done .ws-dot{background:var(--mint); opacity:.6}
+  .wp-goal.done{opacity:.5; text-decoration:line-through}
   .wk-goal.linked .wk-dot{box-shadow:inset 0 0 0 2.5px var(--sky), 0 0 10px -2px var(--sky)}
   .wk-main{flex:1; min-width:0; display:flex; flex-direction:column; align-items:flex-start; gap:6px}
   .wk-text{width:100%; box-sizing:border-box; font:inherit; font-size:14.5px; font-weight:560; line-height:1.45; color:var(--ink); background:transparent; border:none; padding:0; resize:none; overflow:hidden}
@@ -2951,6 +2963,21 @@
     ["§","Oremus."],
     ["+","Deus, qui per resurrectionem Filii tui, Domini nostri Iesu Christi, mundum laetificare dignatus es: praesta, quaesumus, ut per eius Genetricem Virginem Mariam perpetuae capiamus gaudia vitae. Per eundem Christum Dominum nostrum. Amen."]
   ];
+  // Ostersonntag nach dem Gaußschen Verfahren
+  function easterDay(y){
+    const a=y%19, b=Math.floor(y/100), c=y%100;
+    const d=Math.floor(b/4), e=b%4, f=Math.floor((b+8)/25), g=Math.floor((b-f+1)/3);
+    const h=(19*a+b-d-g+15)%30, i=Math.floor(c/4), k=c%4;
+    const l=(32+2*e+2*i-h-k)%7, m=Math.floor((a+11*h+22*l)/451);
+    const mo=Math.floor((h+l-7*m+114)/31), da=((h+l-7*m+114)%31)+1;
+    return ymd(new Date(y, mo-1, da));
+  }
+  // Osterzeit: Ostersonntag bis einschließlich Pfingsten
+  function isEastertide(k){
+    k=k||today;
+    const e=easterDay(parseInt(k.slice(0,4),10));
+    return k>=e && k<=addDays(e,49);
+  }
   let ang=null, angTimer=null, angLastFired="", reginaOpen=false;
   function loadAng(){
     if(!ang) ang=read(ANGELUS,{on:true, notify:false, times:ANGELUS_TIMES.slice(), log:{}});
@@ -2991,9 +3018,8 @@
   }
   function fireAngelus(t){
     try{ if(ang.notify && "Notification" in window && Notification.permission==="granted"){
-      new Notification("Angelus · "+t, {body:"Der Engel des Herrn brachte Maria die Botschaft.", tag:"angelus-"+t});
+      new Notification("Angelus", {tag:"angelus-"+t, silent:true, renotify:false});
     } }catch(e){}
-    try{ playGong(); }catch(e){}
     openAngelus(t);
   }
   async function askAngelusNotify(){
@@ -3015,7 +3041,7 @@
       const [h,m]=t.split(":");
       return ["BEGIN:VEVENT","UID:angelus-"+t.replace(":","")+"-"+ds+"@heute",
         "DTSTAMP:"+stamp,"DTSTART:"+ds+"T"+h+m+"00","DURATION:PT5M",
-        "RRULE:FREQ=DAILY","SUMMARY:Angelus","DESCRIPTION:Der Engel des Herrn brachte Maria die Botschaft.",
+        "RRULE:FREQ=DAILY","SUMMARY:Angelus",
         "BEGIN:VALARM","TRIGGER:PT0M","ACTION:DISPLAY","DESCRIPTION:Angelus","END:VALARM","END:VEVENT"].join("\r\n");
     }).join("\r\n");
     const ics=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Heute//Angelus//DE","CALSCALE:GREGORIAN",ev,"END:VCALENDAR"].join("\r\n");
@@ -3041,6 +3067,7 @@
       angLines(hr?ANGELUS_TEXT_HR:ANGELUS_TEXT);
 
     // Regina caeli — aufklappbar, für die Osterzeit
+    if(isEastertide()){
     const reg=document.createElement("div"); reg.className="ang-reg"+(reginaOpen?" open":"");
     const rh=document.createElement("button"); rh.type="button"; rh.className="ang-reg-h";
     rh.innerHTML=`<span>Regina caeli</span><span class="ang-reg-s">Osterzeit</span><span class="ang-reg-c">⌄</span>`;
@@ -3054,6 +3081,7 @@
       reg.appendChild(body);
     }
     box.appendChild(reg);
+    }
 
     const acts=document.createElement("div"); acts.className="ang-acts";
     if(t){
@@ -4069,9 +4097,14 @@
     chk.title="Status: "+STATUS_LABEL[t.status||"open"];
     chk.setAttribute("aria-label","Status: "+STATUS_LABEL[t.status||"open"]);
     chk.addEventListener("click",()=>{ t.status=STATUS_CYCLE[t.status||"open"]; saveFocus(); syncFocusToPrios(); buildFokus(); });
-    const txt=document.createElement("input"); txt.type="text"; txt.className="ftask-text"; txt.value=t.text||""; txt.placeholder="Aufgabe\u2026";
-    txt.addEventListener("input",()=>{ t.text=txt.value; saveFocus(); });
+    const txt=document.createElement("textarea"); txt.className="ftask-text"; txt.rows=1;
+    txt.value=t.text||""; txt.placeholder="Aufgabe\u2026";
+    const grow=()=>{ txt.style.height="auto"; txt.style.height=(txt.scrollHeight||22)+"px"; };
+    txt.addEventListener("input",()=>{ t.text=txt.value; saveFocus(); grow(); });
     txt.addEventListener("blur",()=>syncFocusToPrios());
+    // Zeilenumbruch statt Absenden: der Text soll vollständig sichtbar bleiben
+    txt.addEventListener("keydown",e=>{ if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); txt.blur(); } });
+    requestAnimationFrame(grow);
     const del=document.createElement("button"); del.className="ftask-del"; del.type="button"; del.textContent="\u00d7";
     del.addEventListener("click",()=>{ focus.tasks=focus.tasks.filter(x=>x.id!==t.id); saveFocus(); syncFocusToPrios(); buildFokus(); });
     row.append(chk,txt,del);
@@ -4195,7 +4228,7 @@
       const list=document.createElement("div"); list.className="ws-list";
       pts.forEach(p=>{
         const par=parentTextOf(p,"quarter");
-        const it=document.createElement("div"); it.className="ws-item";
+        const it=document.createElement("div"); it.className="ws-item"+(p.done?" done":"");
         it.innerHTML=`<span class="ws-dot"></span><span class="ws-tx">${esc(p.text.trim())}</span>`+
           (par?`<span class="ws-par">↳ ${esc(par)}</span>`:"");
         list.appendChild(it);
@@ -4228,8 +4261,11 @@
       goals.appendChild(e);
     }
     pts.forEach(p=>{
-      const row=document.createElement("div"); row.className="wk-goal"+(p.parent?" linked":"");
-      const dot=document.createElement("span"); dot.className="wk-dot";
+      const row=document.createElement("div"); row.className="wk-goal"+(p.parent?" linked":"")+(p.done?" done":"");
+      const dot=document.createElement("button"); dot.type="button"; dot.className="wk-dot"+(p.done?" on":"");
+      dot.title=p.done?"erledigt":"als erledigt markieren";
+      dot.setAttribute("aria-label",p.done?"erledigt":"als erledigt markieren");
+      dot.addEventListener("click",()=>{ p.done=!p.done; saveVision(); buildPrios(); });
       const main=document.createElement("div"); main.className="wk-main";
       const ta=document.createElement("textarea"); ta.className="wk-text"; ta.rows=1; ta.value=p.text||""; ta.placeholder="Wochenziel…";
       const grow=()=>{ ta.style.height="auto"; ta.style.height=(ta.scrollHeight||24)+"px"; };
@@ -4398,7 +4434,7 @@
     if(wpOffset===0 && goals.length){
       const g=document.createElement("div"); g.className="wp-goals";
       g.innerHTML=`<span class="wp-goals-k">Diese Woche</span>`+
-        goals.map(p=>`<span class="wp-goal">${esc(p.text.trim())}</span>`).join("");
+        goals.map(p=>`<span class="wp-goal${p.done?" done":""}">${esc(p.text.trim())}</span>`).join("");
       panel.appendChild(g);
     }
 
@@ -4927,7 +4963,7 @@
       const pts=(vision.week.points||[]).filter(p=>(p.text||"").trim());
       const rep=weekReport(vision.weekKey);
       if(pts.length || rep.mins>0 || rep.active>0){
-        vision.archive.weeks.unshift({key:vision.weekKey, num:vision.weekNum||null, points:pts.map(p=>({text:p.text.trim(), parentText:p.parentText||parentTextOf(p,"quarter")}))});
+        vision.archive.weeks.unshift({key:vision.weekKey, num:vision.weekNum||null, points:pts.map(p=>({text:p.text.trim(), done:!!p.done, parentText:p.parentText||parentTextOf(p,"quarter")}))});
         vision.archive.weeks=vision.archive.weeks.slice(0,60);
       }
       vision.week.points=[]; changed=true;

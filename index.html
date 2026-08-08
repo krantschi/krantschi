@@ -880,6 +880,29 @@
   #view-vizija.flip-in{animation:vizFlipIn .6s cubic-bezier(.2,.8,.25,1) both}
   @keyframes vizFlipIn{from{transform:rotateY(-90deg) scale(.96); opacity:0} to{transform:none; opacity:1}}
   .dot.secret{cursor:pointer; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none}
+  /* ---------- Vizija in Prosa ---------- */
+  .eyebrow.secret{cursor:pointer; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none}
+  .panel.prosa-panel{position:relative; background:linear-gradient(170deg,#1B1A16 0%,#141310 55%,#0E0D0B 100%);
+    box-shadow:0 0 0 1px rgba(255,255,255,.06), 0 26px 60px -28px #000;
+    --sheen:255,255,255; --ink:#F2EEE4; --ink-soft:rgba(242,238,228,.72); --ink-faint:rgba(242,238,228,.4);
+    --line:rgba(255,255,255,.09)}
+  .panel.prosa-panel::before{content:""; position:absolute; inset:0; pointer-events:none; opacity:.55;
+    background:radial-gradient(620px 320px at 78% -10%, rgba(227,178,95,.16), transparent 64%)}
+  .panel.prosa-panel > *{position:relative; z-index:1}
+  .prosa-dot{background:var(--brass); box-shadow:0 0 14px -1px rgba(227,178,95,.8)}
+  .panel.prosa-panel .eyebrow{color:rgba(242,238,228,.8)}
+  .panel.prosa-panel .vis-hint{color:rgba(242,238,228,.35)}
+  .prosa-back{margin-left:auto; font:inherit; font-size:11.5px; font-weight:650; color:rgba(242,238,228,.55);
+    background:rgba(255,255,255,.06); border:none; border-radius:999px; padding:5px 13px; cursor:pointer}
+  .prosa-back:hover{color:#fff; background:rgba(255,255,255,.13)}
+  .prosa-wrap{padding:4px 24px 6px}
+  .prosa-text{width:100%; box-sizing:border-box; min-height:260px; resize:none; overflow:hidden;
+    font-family:var(--serif); font-size:16.5px; line-height:1.75; color:#F2EEE4; letter-spacing:.003em;
+    background:transparent; border:none; padding:0}
+  .prosa-text:focus{outline:none}
+  .prosa-text::placeholder{color:rgba(242,238,228,.3); font-style:italic; line-height:1.7}
+  .prosa-foot{display:flex; padding:10px 24px 18px; margin-top:6px; border-top:1px solid rgba(255,255,255,.08)}
+  .prosa-count{margin-left:auto; font-size:10.5px; color:rgba(242,238,228,.32); font-variant-numeric:tabular-nums}
   .panel.anti-panel{position:relative; background:linear-gradient(168deg,#17131C 0%,#100E14 55%,#0A090C 100%);
     box-shadow:0 0 0 1px rgba(255,255,255,.06), 0 26px 60px -28px #000;
     --sheen:255,255,255; --ink:#EDE9E4; --ink-soft:rgba(237,233,228,.72); --ink-faint:rgba(237,233,228,.42);
@@ -1871,6 +1894,7 @@
   if(!Array.isArray(vision.archive.weeks)) vision.archive.weeks=[];
   if(!Array.isArray(vision.archive.quarters)) vision.archive.quarters=[];
   if(!vision.anti||!Array.isArray(vision.anti.points)) vision.anti={points:(vision.anti&&vision.anti.points)||[]};
+  if(typeof vision.prosa!=="string") vision.prosa="";
   let lockinLog=read(LOCKIN,{});
   let lockinCfg=read(LOCKCFG,null);
   if(!lockinCfg || !Array.isArray(lockinCfg.items) || !lockinCfg.items.length){
@@ -1957,7 +1981,7 @@
     document.body.classList.toggle("tab-prios", t==="prios");
     document.body.classList.toggle("tab-fokus", t==="fokus");
     // Die Rückseite schließt sich beim Verlassen — sie soll nicht offen liegen bleiben.
-    if(t!=="vizija") antiOn=false;
+    if(t!=="vizija"){ antiOn=false; prosaOn=false; }
     if(t!=="fokus") lernOn=false;   // versteckte Ansicht bleibt nicht offen liegen
     if(t==="vizija"){ buildVision(); playVizijaIntro(); }
     if(t==="fokus") buildFokus();
@@ -5190,7 +5214,19 @@
     return box;
   }
 
-  let antiOn=false, flipping=false;
+  let antiOn=false, prosaOn=false, flipping=false;
+  function toggleProsa(){
+    if(flipping) return; flipping=true;
+    const view=document.getElementById("view-vizija");
+    view.classList.add("flipping");
+    setTimeout(()=>{
+      prosaOn=!prosaOn; if(prosaOn) antiOn=false;
+      buildVision();
+      const v=document.getElementById("view-vizija");
+      v.classList.remove("flipping"); v.classList.add("flip-in");
+      setTimeout(()=>{ v.classList.remove("flip-in"); flipping=false; }, 620);
+    }, 340);
+  }
   function flipVizija(){
     if(flipping) return; flipping=true;
     const view=document.getElementById("view-vizija");
@@ -5220,6 +5256,41 @@
     "Wer zahlt den Preis dafür außer dir?",
     "Welche Gewohnheit trägt dich dorthin?"
   ];
+  /* ---------- Vizija in Prosa: der zusammenhängende Text ---------- */
+  function buildProsa(view){
+    const panel=document.createElement("section"); panel.className="panel prosa-panel";
+    const head=document.createElement("div"); head.className="panel-head";
+    head.innerHTML=`<span class="dot prosa-dot"></span><span class="eyebrow">Vizija</span><span class="vis-hint">im Zusammenhang</span>`;
+    const back=document.createElement("button"); back.className="prosa-back"; back.type="button"; back.textContent="zurück";
+    back.addEventListener("click",toggleProsa);
+    head.appendChild(back);
+    armSecret(head.querySelector(".dot"), toggleProsa);
+    panel.appendChild(head);
+
+    const wrap=document.createElement("div"); wrap.className="prosa-wrap";
+    const ta=document.createElement("textarea"); ta.className="prosa-text"; ta.rows=8;
+    ta.value=vision.prosa||"";
+    ta.placeholder="Schreib es, als wäre es schon so. Kein Stichwort, sondern ein Bild — ein Tag darin, wie er sich anfühlt, wer da ist, wovon du lebst, woran du dich hältst.";
+    const grow=()=>{ ta.style.height="auto"; ta.style.height=Math.max(260,ta.scrollHeight)+"px"; };
+    ta.addEventListener("input",()=>{ vision.prosa=ta.value; saveVision(); grow(); updateCount(); });
+    wrap.appendChild(ta);
+    panel.appendChild(wrap);
+
+    const foot=document.createElement("div"); foot.className="prosa-foot";
+    const cnt=document.createElement("span"); cnt.className="prosa-count";
+    function updateCount(){
+      const t=(vision.prosa||"").trim();
+      const w=t?t.split(/\s+/).length:0;
+      cnt.textContent = w ? (w+(w===1?" Wort":" Wörter")) : "";
+    }
+    updateCount(); foot.appendChild(cnt);
+    panel.appendChild(foot);
+
+    view.appendChild(panel);
+    requestAnimationFrame(grow);
+  }
+
+
   function buildAntiVizija(view){
     const panel=document.createElement("section"); panel.className="panel anti-panel";
 
@@ -5276,6 +5347,7 @@
     if(visionTimer){ clearInterval(visionTimer); visionTimer=null; }
     const view=document.getElementById("view-vizija"); view.innerHTML="";
     if(antiOn){ buildAntiVizija(view); return; }
+    if(prosaOn){ buildProsa(view); return; }
     const panel=document.createElement("section"); panel.className="panel vizija-panel cascade";
     panel.style.setProperty("--c","var(--violet)"); panel.style.setProperty("--c-tint","var(--violet-tint)");
 
@@ -5284,8 +5356,9 @@
     panel.appendChild(aurora);
 
     const head=document.createElement("div"); head.className="panel-head reveal";
-    head.innerHTML=`<span class="dot secret" title="…"></span><span class="eyebrow">Vizija</span><span class="vis-hint">Nordstern → Jahr → Quartal → Woche</span>`;
+    head.innerHTML=`<span class="dot secret" title="…"></span><span class="eyebrow secret">Vizija</span><span class="vis-hint">Nordstern → Jahr → Quartal → Woche</span>`;
     armSecret(head.querySelector(".dot"));
+    armSecret(head.querySelector(".eyebrow"), toggleProsa);
     panel.appendChild(head);
 
     const flow=document.createElement("div"); flow.className="vflow";

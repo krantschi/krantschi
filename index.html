@@ -250,7 +250,8 @@
   .streak.hot{color:var(--amber)}
 
   /* ---------- Video am Lock-In-Datum ---------- */
-  .lockin-item.is-date{position:relative}
+  .lockin-item.is-date{position:relative; cursor:pointer; -webkit-appearance:none; appearance:none;
+    width:100%; box-sizing:border-box; text-align:left; font:inherit}
   .li-vid{position:absolute; right:12px; top:50%; transform:translateY(-50%);
     width:22px; height:22px; display:grid; place-items:center; border:none; border-radius:50%;
     font-size:8px; line-height:1; cursor:pointer; color:var(--ink-faint); background:transparent;
@@ -2666,22 +2667,38 @@
       b.title=vidHas?("Video abspielen"+(rec&&rec.name?" · "+rec.name:"")):"Video hinterlegen";
     });
   }
+  // Muss synchron aus dem Klick heraus laufen und im Dokument hängen,
+  // sonst verweigert Safari die Dateiauswahl.
   function pickVideo(){
-    const inp=document.createElement("input"); inp.type="file"; inp.accept="video/*";
+    let inp=document.getElementById("vidPick");
+    if(inp) inp.remove();
+    inp=document.createElement("input");
+    inp.type="file"; inp.accept="video/*"; inp.id="vidPick";
+    inp.style.cssText="position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0";
+    document.body.appendChild(inp);
     inp.addEventListener("change",async()=>{
-      const f=inp.files&&inp.files[0]; if(!f) return;
+      const f=inp.files&&inp.files[0];
+      if(!f){ inp.remove(); return; }
       try{
         await vidPut(f,f.name);
         await refreshVidBadge();
         toast("Video hinterlegt");
-        openVideo();
-      }catch(e){ alert("Das Video konnte nicht gespeichert werden. Vielleicht ist es zu groß für den Gerätespeicher."); }
+        playStored();
+      }catch(e){
+        alert("Das Video konnte nicht gespeichert werden ("+(e&&e.name||"Fehler")+"). Womöglich ist die Datei zu groß für den Gerätespeicher.");
+      }
+      inp.remove();
     });
     inp.click();
   }
-  async function openVideo(){
+  function openVideo(){
+    // vidHas ist beim Start ermittelt — so bleibt der Klick synchron
+    if(!vidHas){ pickVideo(); return; }
+    playStored();
+  }
+  async function playStored(){
     const rec=await vidGet();
-    if(!rec){ pickVideo(); return; }
+    if(!rec){ vidHas=false; return; }
     document.querySelectorAll(".vid-overlay").forEach(x=>x.remove());
     const ov=document.createElement("div"); ov.className="vid-overlay open";
     const box=document.createElement("div"); box.className="vid-box";
@@ -2748,15 +2765,18 @@
           del.addEventListener("click",()=>{ commitLockinEdits(); lockinCfg.items=lockinCfg.items.filter(x=>x.id!==it.id); saveLockinCfg(); buildLockIn(); });
           row.append(inp,del); panel.appendChild(row);
         }else{
-          const btn=document.createElement("button"); btn.className="lockin-item"+(it.date?" is-date":""); btn.type="button";
+          const btn=document.createElement(it.date?"div":"button"); btn.className="lockin-item"+(it.date?" is-date":""); if(!it.date) btn.type="button";
           btn.setAttribute("aria-pressed", on?"true":"false");
           btn.innerHTML=`<span class="todo-check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span><span class="lockin-item-label"></span>`;
           btn.querySelector(".lockin-item-label").textContent=itemLabel(it,D);
           if(!ed) btn.addEventListener("click",()=>toggleLockin(it.id));
           if(it.date){
+            btn.setAttribute("role","button"); btn.tabIndex=0;
+            if(!ed) btn.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggleLockin(it.id); } });
             const vb=document.createElement("button"); vb.type="button"; vb.className="li-vid"+(vidHas?" has":"");
             vb.innerHTML="▶"; vb.title=vidHas?"Video abspielen":"Video hinterlegen";
-            vb.addEventListener("click",e=>{ e.stopPropagation(); openVideo(); });
+            vb.setAttribute("aria-label",vidHas?"Video abspielen":"Video hinterlegen");
+            vb.addEventListener("click",e=>{ e.preventDefault(); e.stopPropagation(); openVideo(); });
             btn.appendChild(vb);
           }
           panel.appendChild(btn);

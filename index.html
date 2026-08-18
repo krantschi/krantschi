@@ -259,6 +259,9 @@
   .li-vid:hover{opacity:1; color:var(--brass); box-shadow:inset 0 0 0 1.2px var(--brass)}
   .li-vid.has{opacity:.8; color:var(--brass); box-shadow:inset 0 0 0 1.2px color-mix(in srgb, var(--brass) 55%, transparent)}
   .li-vid.has:hover{opacity:1; background:var(--brass); color:var(--on-accent)}
+  .vidsrc-note{font-size:12px; line-height:1.55; color:var(--ink-faint); margin:-4px 0 12px}
+  .vid-err{font-size:12px; line-height:1.5; color:var(--rose); background:rgba(212,115,106,.12);
+    border-radius:8px; padding:9px 12px}
   .vid-overlay{position:fixed; inset:0; z-index:100; display:flex; align-items:center; justify-content:center;
     padding:16px; background:rgba(0,0,0,.82); backdrop-filter:blur(6px)}
   .vid-box{width:100%; max-width:900px; display:flex; flex-direction:column; gap:10px}
@@ -288,6 +291,20 @@
   .ang-cal{margin-left:0}
   .ang-notify:hover,.ang-cal:hover{opacity:1; color:var(--brass)}
   .ang-notify.on{color:var(--brass); opacity:1}
+  /* Litanei der Demut */
+  .ang-row.lit-row{margin-top:7px; padding-top:7px; border-top:1px solid var(--line)}
+  .lit-open{font-family:var(--serif); font-size:13.5px; font-style:italic; font-weight:600; color:var(--ink-soft);
+    background:transparent; border:none; cursor:pointer; padding:2px 0; text-align:left}
+  .lit-open:hover{color:var(--brass)}
+  .lit-open.done{color:var(--mint)}
+  .lit-mark{margin-left:auto; font-size:12px; font-weight:800; color:var(--mint)}
+  .lit-box{max-width:460px}
+  .lit-head{margin:0 0 16px; font-family:var(--serif); font-size:16px; font-style:italic; line-height:1.5;
+    color:#F3EEE4; padding-bottom:12px; border-bottom:1px solid rgba(255,255,255,.1)}
+  .ang-l.lit-l{margin:0 0 11px; font-size:14.5px; line-height:1.5}
+  .lit-r{display:block; font-size:12.5px; font-style:italic; color:var(--brass); opacity:.85; margin-top:1px}
+  .lit-sep{margin:18px 0 12px; font-size:10px; font-weight:800; letter-spacing:.1em; text-transform:uppercase;
+    color:rgba(237,233,228,.45); padding-top:12px; border-top:1px solid rgba(255,255,255,.1)}
   /* Gebetstext */
   .ang-overlay{position:fixed; inset:0; z-index:95; display:flex; align-items:center; justify-content:center;
     padding:20px; background:rgba(0,0,0,.6); backdrop-filter:blur(4px)}
@@ -2213,8 +2230,14 @@
     }
     return d;
   }
-  function stripImages(d){
+  // Bei Platznot fliegt zuerst das Video, dann die Bilder — Daten haben Vorrang
+  function stripVideo(d){
     const o=Object.assign({},d);
+    try{ const m=JSON.parse(o[VIDMETA]||"null"); if(m&&m.data){ delete m.data; o[VIDMETA]=JSON.stringify(m); } }catch(e){}
+    return o;
+  }
+  function stripImages(d){
+    const o=stripVideo(d);
     try{ const v=JSON.parse(o[VIS]||"null"); if(v){ v.images=[]; o[VIS]=JSON.stringify(v); } }catch(e){}
     try{ const c=JSON.parse(o[CFG]||"null"); if(c&&c.habits){ c.habits.forEach(h=>{ if(h.challenge) delete h.challenge.image; }); o[CFG]=JSON.stringify(c); } }catch(e){}
     return o;
@@ -2234,6 +2257,8 @@
       if(k && k.indexOf("ht_")===0 && SYNC_EXCLUDE.indexOf(k)<0) del.push(k); }
     del.forEach(k=>localStorage.removeItem(k));
     Object.keys(d).forEach(k=>localStorage.setItem(k,d[k]));
+    // Ein übertragenes Video sofort in die lokale Ablage übernehmen
+    setTimeout(()=>{ try{ adoptSyncedVideo(); }catch(e){} },0);
   }
   function scheduleSync(k){
     if(!syncReady) return;
@@ -2269,6 +2294,8 @@
     if(!syncOn()||syncBusy) return "busy";
     let data=collectSyncData(), noImages=false;
     let plain=JSON.stringify(data);
+    // Video zählt großzügiger, weil es bewusst mitgeschickt wird
+    if(plain.length>4000000){ data=stripVideo(data); plain=JSON.stringify(data); }
     if(plain.length>400000){ data=stripImages(data); plain=JSON.stringify(data); noImages=true; }
     if(!force && plain===lastPushedPlain) return "same";
     syncBusy=true; setSyncStatus("sichert …");
@@ -2627,6 +2654,27 @@
   /* ---------- Video am Lock-In-Datum ----------
      Liegt in IndexedDB: fasst große Dateien und bleibt vom Geräte-Abgleich unberührt. */
   const VIDDB="ht_video", VIDKEY="lockin-video";
+  const VIDLINK="ht_videolink_v1";   // nur die Adresse — klein genug für den Geräte-Abgleich
+  const vidLink=()=>read(VIDLINK,"");
+  // Freigabelinks gängiger Dienste in direkt abspielbare Adressen umschreiben
+  function directVideoURL(u){
+    u=(u||"").trim(); if(!u) return "";
+    try{
+      const url=new URL(u);
+      const h=url.hostname.replace(/^www\./,"");
+      if(h==="dropbox.com"||h==="dl.dropboxusercontent.com"){
+        url.hostname="dl.dropboxusercontent.com"; url.searchParams.delete("dl"); url.searchParams.set("raw","1");
+        return url.toString();
+      }
+      if(h==="drive.google.com"){
+        const m=u.match(/\/d\/([A-Za-z0-9_-]+)/)||u.match(/[?&]id=([A-Za-z0-9_-]+)/);
+        if(m) return "https://drive.google.com/uc?export=download&id="+m[1];
+      }
+      // Nextcloud/ownCloud: /s/TOKEN -> /s/TOKEN/download
+      if(/\/s\/[A-Za-z0-9]+$/.test(url.pathname)) return u.replace(/\/$/,"")+"/download";
+      return u;
+    }catch(e){ return ""; }
+  }
   function vidDB(){
     return new Promise((res,rej)=>{
       const r=indexedDB.open(VIDDB,1);
@@ -2662,6 +2710,11 @@
   let vidHas=false;
   async function refreshVidBadge(){
     const rec=await vidGet(); vidHas=!!rec;
+    const lk=vidLink();
+    if(lk){
+      document.querySelectorAll(".li-vid").forEach(b=>{ b.classList.add("has"); b.title="Video abspielen · Link"; });
+      return;
+    }
     document.querySelectorAll(".li-vid").forEach(b=>{
       b.classList.toggle("has",vidHas);
       b.title=vidHas?("Video abspielen"+(rec&&rec.name?" · "+rec.name:"")):"Video hinterlegen";
@@ -2669,6 +2722,66 @@
   }
   // Muss synchron aus dem Klick heraus laufen und im Dokument hängen,
   // sonst verweigert Safari die Dateiauswahl.
+  // Videos bis zu dieser Größe reisen im normalen Abgleich mit.
+  // Darüber würde der Gist platzen und der gesamte Sync scheitern.
+  const VID_SYNC_MAX=2.5*1024*1024;
+  const VIDMETA="ht_videometa_v1";
+  const b64FromBlob=b=>new Promise((res,rej)=>{
+    const r=new FileReader(); r.onload=()=>res(String(r.result).split(",")[1]); r.onerror=rej; r.readAsDataURL(b);
+  });
+  const blobFromB64=(d,type)=>{
+    const bin=atob(d); const arr=new Uint8Array(bin.length);
+    for(let i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+    return new Blob([arr],{type:type||"video/mp4"});
+  };
+  // Kleines Video in den Abgleich legen; großes nur vermerken
+  async function publishVideo(file){
+    if(file.size<=VID_SYNC_MAX){
+      const d=await b64FromBlob(file);
+      write(VIDMETA,{name:file.name, type:file.type, size:file.size, data:d, ts:Date.now()});
+      return "sync";
+    }
+    write(VIDMETA,{name:file.name, type:file.type, size:file.size, ts:Date.now()});
+    return "local";
+  }
+  // Auf dem zweiten Gerät: liegt ein übertragenes Video vor, aber lokal keines?
+  async function adoptSyncedVideo(){
+    const meta=read(VIDMETA,null);
+    if(!meta||!meta.data) return false;
+    const have=await vidGet();
+    if(have && have.ts===meta.ts) return false;
+    try{
+      await vidPut(blobFromB64(meta.data,meta.type), meta.name);
+      await refreshVidBadge();
+      return true;
+    }catch(e){ return false; }
+  }
+
+  // Große Dateien passen nicht in den Abgleich — einmal auf den Link-Weg hinweisen
+  function offerLinkHint(){
+    if(read("ht_vidhint_v1",false)) return;
+    write("ht_vidhint_v1",true);
+    const ov=document.createElement("div"); ov.className="ask-ov open";
+    const box=document.createElement("div"); box.className="ask-box";
+    box.innerHTML=`<div class="ask-title">Auch auf dem iPhone?</div>
+      <div class="vidsrc-note">Die Datei ist zu groß für den Geräte-Abgleich. Wenn du sie in deine Cloud legst und den Freigabelink hier einträgst, spielt sie auf allen Geräten — ohne dass du sie erneut hochlädst.</div>`;
+    const inp=document.createElement("input"); inp.type="url"; inp.className="ask-inp";
+    inp.placeholder="Freigabelink (Dropbox, Nextcloud, Drive …)";
+    box.appendChild(inp);
+    const acts=document.createElement("div"); acts.className="ask-acts";
+    const later=document.createElement("button"); later.type="button"; later.className="ask-btn"; later.textContent="später";
+    later.addEventListener("click",()=>ov.remove());
+    const ok=document.createElement("button"); ok.type="button"; ok.className="ask-btn ok"; ok.textContent="Link sichern";
+    ok.addEventListener("click",()=>{
+      const v=inp.value.trim(); if(!v){ ov.remove(); return; }
+      if(!directVideoURL(v)){ alert("Diesen Link erkenne ich nicht."); return; }
+      write(VIDLINK,v); refreshVidBadge(); ov.remove(); toast("Link gesichert — gilt auf allen Geräten");
+    });
+    acts.append(later,ok); box.appendChild(acts); ov.appendChild(box);
+    ov.addEventListener("click",e=>{ if(e.target===ov) ov.remove(); });
+    document.body.appendChild(ov);
+  }
+
   function pickVideo(){
     let inp=document.getElementById("vidPick");
     if(inp) inp.remove();
@@ -2681,8 +2794,10 @@
       if(!f){ inp.remove(); return; }
       try{
         await vidPut(f,f.name);
+        const how=await publishVideo(f);
         await refreshVidBadge();
-        toast("Video hinterlegt");
+        if(how==="sync"){ toast("Video hinterlegt — kommt auch aufs iPhone"); }
+        else { toast("Video hinterlegt — nur auf diesem Gerät"); setTimeout(offerLinkHint,900); }
         playStored();
       }catch(e){
         alert("Das Video konnte nicht gespeichert werden ("+(e&&e.name||"Fehler")+"). Womöglich ist die Datei zu groß für den Gerätespeicher.");
@@ -2692,30 +2807,78 @@
     inp.click();
   }
   function openVideo(){
+    const lk=directVideoURL(vidLink());
+    if(lk){ showVideo(lk, vidLink(), true); return; }
     // vidHas ist beim Start ermittelt — so bleibt der Klick synchron
-    if(!vidHas){ pickVideo(); return; }
+    if(!vidHas){ askVideoSource(); return; }
     playStored();
+  }
+  // Beim ersten Mal die Wahl lassen: Link (überall) oder Datei (nur dieses Gerät)
+  function askVideoSource(){
+    const ov=document.createElement("div"); ov.className="ask-ov open";
+    const box=document.createElement("div"); box.className="ask-box";
+    box.innerHTML=`<div class="ask-title">Video hinterlegen</div>
+      <div class="vidsrc-note">Ein Link aus deiner Cloud gilt auf allen Geräten. Eine Datei bleibt nur auf diesem.</div>`;
+    const inp=document.createElement("input"); inp.type="url"; inp.className="ask-inp";
+    inp.placeholder="Freigabelink (Dropbox, Nextcloud, Drive …)";
+    box.appendChild(inp);
+    const acts=document.createElement("div"); acts.className="ask-acts";
+    const file=document.createElement("button"); file.type="button"; file.className="ask-btn"; file.textContent="Datei wählen";
+    file.addEventListener("click",()=>{ ov.remove(); pickVideo(); });
+    const ok=document.createElement("button"); ok.type="button"; ok.className="ask-btn ok"; ok.textContent="Link sichern";
+    const save=()=>{
+      const v=inp.value.trim(); if(!v) return;
+      if(!directVideoURL(v)){ alert("Diesen Link erkenne ich nicht."); return; }
+      write(VIDLINK,v); ov.remove(); refreshVidBadge(); toast("Link gesichert — gilt auf allen Geräten");
+      showVideo(directVideoURL(v), v, true);
+    };
+    ok.addEventListener("click",save);
+    inp.addEventListener("keydown",e=>{ if(e.key==="Enter") save(); });
+    const cancel=document.createElement("button"); cancel.type="button"; cancel.className="ask-btn"; cancel.textContent="Abbrechen";
+    cancel.addEventListener("click",()=>ov.remove());
+    acts.append(cancel,file,ok); box.appendChild(acts); ov.appendChild(box);
+    ov.addEventListener("click",e=>{ if(e.target===ov) ov.remove(); });
+    document.body.appendChild(ov);
+    setTimeout(()=>inp.focus(),40);
   }
   async function playStored(){
     const rec=await vidGet();
     if(!rec){ vidHas=false; return; }
+    const url=URL.createObjectURL(rec.blob);
+    showVideo(url, rec.name||"Video", false);
+  }
+  function showVideo(src, name, isLink){
     document.querySelectorAll(".vid-overlay").forEach(x=>x.remove());
     const ov=document.createElement("div"); ov.className="vid-overlay open";
     const box=document.createElement("div"); box.className="vid-box";
     const v=document.createElement("video");
     v.className="vid-el"; v.controls=true; v.autoplay=true; v.playsInline=true;
-    const url=URL.createObjectURL(rec.blob); v.src=url;
+    if(isLink) v.crossOrigin="anonymous";
+    v.src=src;
     box.appendChild(v);
+    const err=document.createElement("div"); err.className="vid-err"; err.hidden=true;
+    v.addEventListener("error",()=>{
+      err.hidden=false;
+      err.textContent = isLink
+        ? "Der Link liefert keine abspielbare Datei. Er muss direkt auf das Video zeigen, nicht auf eine Vorschauseite."
+        : "Die gespeicherte Datei lässt sich nicht abspielen.";
+    });
+    box.appendChild(err);
     const bar=document.createElement("div"); bar.className="vid-bar";
-    const nm=document.createElement("span"); nm.className="vid-name"; nm.textContent=rec.name||"Video";
-    const swap=document.createElement("button"); swap.type="button"; swap.className="vid-act"; swap.textContent="anderes";
-    swap.addEventListener("click",()=>{ close(); pickVideo(); });
+    const nm=document.createElement("span"); nm.className="vid-name";
+    nm.textContent=(isLink?"↗ ":"")+(name||"Video");
+    const swap=document.createElement("button"); swap.type="button"; swap.className="vid-act"; swap.textContent="ändern";
+    swap.addEventListener("click",()=>{ close(); askVideoSource(); });
     const rm=document.createElement("button"); rm.type="button"; rm.className="vid-act"; rm.textContent="entfernen";
-    rm.addEventListener("click",async()=>{ await vidDel(); await refreshVidBadge(); close(); toast("Video entfernt"); });
+    rm.addEventListener("click",async()=>{
+      if(isLink){ write(VIDLINK,""); }
+      else { await vidDel(); }
+      await refreshVidBadge(); close(); toast("Video entfernt");
+    });
     const cl=document.createElement("button"); cl.type="button"; cl.className="vid-act close"; cl.textContent="schließen";
     cl.addEventListener("click",()=>close());
     bar.append(nm,swap,rm,cl); box.appendChild(bar); ov.appendChild(box);
-    function close(){ try{ v.pause(); }catch(e){} URL.revokeObjectURL(url); ov.remove(); }
+    function close(){ try{ v.pause(); }catch(e){} if(!isLink){ try{ URL.revokeObjectURL(src); }catch(e){} } ov.remove(); }
     ov.addEventListener("click",e=>{ if(e.target===ov) close(); });
     document.body.appendChild(ov);
   }
@@ -3251,6 +3414,95 @@
       loadAng(); ang.lang = (ang.lang==="hr"?"de":"hr"); saveAng(); openAngelus(t);
     });
   }
+  /* ---------- Litanei der Demut ----------
+     Kardinal Rafael Merry del Val (1865–1930), überlieferter Wortlaut. */
+  const LITANEI_HEAD="O Jesus, sanftmütig und demütig von Herzen, erhöre mich.";
+  const LITANEI_BEFREI=[
+    "Von dem Verlangen, geschätzt zu werden,",
+    "von dem Verlangen, geliebt zu werden,",
+    "von dem Verlangen, gepriesen zu werden,",
+    "von dem Verlangen, geehrt zu werden,",
+    "von dem Verlangen, gelobt zu werden,",
+    "von dem Verlangen, anderen vorgezogen zu werden,",
+    "von dem Verlangen, um Rat gefragt zu werden,",
+    "von dem Verlangen, anerkannt zu werden,",
+    "von der Furcht, gedemütigt zu werden,",
+    "von der Furcht, verachtet zu werden,",
+    "von der Furcht, zurechtgewiesen zu werden,",
+    "von der Furcht, verleumdet zu werden,",
+    "von der Furcht, vergessen zu werden,",
+    "von der Furcht, verspottet zu werden,",
+    "von der Furcht, Unrecht zu erleiden,",
+    "von der Furcht, verdächtigt zu werden,"
+  ];
+  const LITANEI_GNADE=[
+    "dass andere mehr geliebt werden als ich,",
+    "dass andere höher geschätzt werden als ich,",
+    "dass andere in der Meinung der Welt wachsen und ich abnehme,",
+    "dass andere gewählt werden und ich beiseite gesetzt werde,",
+    "dass andere gelobt werden und ich unbeachtet bleibe,",
+    "dass andere in allem mir vorgezogen werden,",
+    "dass andere heiliger werden als ich, wenn ich nur so heilig werde, wie ich es sein soll,"
+  ];
+  const LITANEI_HR_HEAD="Isuse, krotka i ponizna srca, usliši me.";
+  const LITANEI_HR_BEFREI=[
+    "Od želje da budem cijenjen,","od želje da budem ljubljen,","od želje da budem hvaljen,",
+    "od želje da budem čašćen,","od želje da budem pohvaljen,","od želje da budem drugima pretpostavljen,",
+    "od želje da se za savjet mene pita,","od želje da budem priznat,",
+    "od straha da budem ponižen,","od straha da budem prezren,","od straha da budem ukoren,",
+    "od straha da budem oklevetan,","od straha da budem zaboravljen,","od straha da budem ismijan,",
+    "od straha da mi se nanese nepravda,","od straha da budem osumnjičen,"
+  ];
+  const LITANEI_HR_GNADE=[
+    "da drugi budu ljubljeniji od mene,","da drugi budu cjenjeniji od mene,",
+    "da drugi rastu u očima svijeta, a ja da se umanjujem,",
+    "da drugi budu izabrani, a ja ostavljen po strani,",
+    "da drugi budu hvaljeni, a ja neprimijećen,",
+    "da mi drugi u svemu budu pretpostavljeni,",
+    "da drugi postanu svetiji od mene, samo ako i ja postanem svet koliko trebam biti,"
+  ];
+  let litOpen=false;
+  const litPrayed=()=>((loadAng().lit||{})[today]===true);
+  function markLit(){
+    loadAng();
+    ang.lit=ang.lit||{};
+    if(ang.lit[today]) delete ang.lit[today]; else ang.lit[today]=true;
+    const cut=addDays(today,-40);
+    Object.keys(ang.lit).forEach(k=>{ if(k<cut) delete ang.lit[k]; });
+    saveAng(); renderHeute();
+  }
+  function openLitanei(){
+    document.querySelectorAll(".ang-overlay").forEach(x=>x.remove());
+    loadAng();
+    const hr=(ang.lang==="hr");
+    const head = hr?LITANEI_HR_HEAD:LITANEI_HEAD;
+    const bf   = hr?LITANEI_HR_BEFREI:LITANEI_BEFREI;
+    const gn   = hr?LITANEI_HR_GNADE:LITANEI_GNADE;
+    const rBefrei = hr?"oslobodi me, Isuse.":"befreie mich, o Jesus.";
+    const rGnade  = hr?"daj mi milost da to želim.":"gib mir die Gnade, es zu wünschen.";
+    const ov=document.createElement("div"); ov.className="ang-overlay open";
+    const box=document.createElement("div"); box.className="ang-box lit-box";
+    const h=document.createElement("div"); h.className="ang-h";
+    h.innerHTML=`<span class="ang-k secret">${hr?"Litanija poniznosti":"Litanei der Demut"}</span>`+
+      (hr?`<span class="ang-lang">hrvatski</span>`:``);
+    armSecret(h.querySelector(".ang-k"), ()=>{ ang.lang=(ang.lang==="hr")?"de":"hr"; saveAng(); openLitanei(); });
+    box.appendChild(h);
+    let html=`<p class="lit-head">${esc(head)}</p>`;
+    html+=bf.map(l=>`<p class="ang-l lit-l">${esc(l)}<span class="lit-r">${esc(rBefrei)}</span></p>`).join("");
+    html+=`<p class="lit-sep">${hr?"Da drugi…":"Um die Gnade, zu wünschen…"}</p>`;
+    html+=gn.map(l=>`<p class="ang-l lit-l">${esc(l)}<span class="lit-r">${esc(rGnade)}</span></p>`).join("");
+    const body=document.createElement("div"); body.innerHTML=html; box.appendChild(body);
+    const acts=document.createElement("div"); acts.className="ang-acts";
+    const done=document.createElement("button"); done.type="button"; done.className="ang-btn ok";
+    done.textContent=litPrayed()?"gebetet ✓":"gebetet";
+    done.addEventListener("click",()=>{ markLit(); ov.remove(); });
+    const close=document.createElement("button"); close.type="button"; close.className="ang-btn"; close.textContent="schließen";
+    close.addEventListener("click",()=>ov.remove());
+    acts.append(done,close); box.appendChild(acts); ov.appendChild(box);
+    ov.addEventListener("click",e=>{ if(e.target===ov) ov.remove(); });
+    document.body.appendChild(ov);
+  }
+
   function renderAngelus(){
     const host=document.getElementById("angelus"); if(!host) return;
     loadAng(); host.innerHTML="";
@@ -3278,6 +3530,18 @@
     cal.addEventListener("click",angelusICS);
     row.appendChild(cal);
     card.appendChild(row);
+
+    // Litanei der Demut — zweite Zeile derselben Karte
+    const lrow=document.createElement("div"); lrow.className="ang-row lit-row";
+    lrow.innerHTML=`<span class="ang-bell">✦</span>`;
+    const lbtn=document.createElement("button"); lbtn.type="button";
+    lbtn.className="lit-open"+(litPrayed()?" done":"");
+    lbtn.textContent="Litanei der Demut";
+    lbtn.addEventListener("click",openLitanei);
+    lrow.appendChild(lbtn);
+    if(litPrayed()){ const m=document.createElement("span"); m.className="lit-mark"; m.textContent="✓"; lrow.appendChild(m); }
+    card.appendChild(lrow);
+
     host.appendChild(card);
   }
 
@@ -5702,7 +5966,7 @@
   // Abgeleitete Schlüssel beim Verlassen der Seite verwerfen
   window.addEventListener("pagehide",forgetKeys);
   document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="hidden") forgetKeys(); });
-  refreshVidBadge();
+  refreshVidBadge().then(adoptSyncedVideo);
   startAngelusWatch();
   document.getElementById("themeMini").addEventListener("click",cycleTheme);
   applyTheme();

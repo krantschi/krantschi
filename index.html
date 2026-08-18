@@ -305,6 +305,30 @@
   .lit-r{display:block; font-size:12.5px; font-style:italic; color:var(--brass); opacity:.85; margin-top:1px}
   .lit-sep{margin:18px 0 12px; font-size:10px; font-weight:800; letter-spacing:.1em; text-transform:uppercase;
     color:rgba(237,233,228,.45); padding-top:12px; border-top:1px solid rgba(255,255,255,.1)}
+  /* Krunica */
+  .ang-row.kru-row{margin-top:7px; padding-top:7px; border-top:1px solid var(--line)}
+  .kru-sub{display:block; font-size:10.5px; font-style:normal; font-weight:650; color:var(--brass); opacity:.85; margin-top:1px}
+  .kru-box{max-width:480px}
+  .kru-tabs{display:flex; flex-wrap:wrap; gap:4px; margin-bottom:14px}
+  .kru-tab{font:inherit; font-size:11px; font-weight:650; color:rgba(237,233,228,.5); background:rgba(255,255,255,.05);
+    border:none; border-radius:999px; padding:5px 11px; cursor:pointer; transition:all .16s}
+  .kru-tab:hover{color:#fff; background:rgba(255,255,255,.12)}
+  .kru-tab.heute{box-shadow:inset 0 0 0 1px rgba(227,178,95,.5)}
+  .kru-tab.on{color:#12160E; background:var(--brass); box-shadow:none}
+  .kru-title{display:flex; align-items:baseline; gap:9px; margin-bottom:14px; padding-bottom:10px;
+    border-bottom:1px solid rgba(255,255,255,.1); font-family:var(--serif); font-size:17px; font-style:italic;
+    font-weight:650; color:#F3EEE4}
+  .kru-today{font-family:var(--font); font-size:9.5px; font-style:normal; font-weight:800; letter-spacing:.08em;
+    text-transform:uppercase; color:var(--brass); background:rgba(227,178,95,.15); border-radius:999px; padding:2px 8px}
+  .kru-sec{margin-bottom:16px}
+  .kru-sec-h{font-size:9.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase;
+    color:rgba(237,233,228,.42); margin-bottom:7px}
+  .ang-l.kru-l{display:flex; gap:10px; margin:0 0 8px; font-size:14.5px; line-height:1.45}
+  .kru-n{flex:0 0 auto; width:18px; height:18px; margin-top:2px; display:grid; place-items:center; border-radius:50%;
+    font-family:var(--font); font-size:10px; font-weight:800; color:var(--brass); box-shadow:inset 0 0 0 1.2px rgba(227,178,95,.5)}
+  .kru-t{flex:1}
+  .kru-note{margin:10px 0 0; font-size:11.5px; line-height:1.5; color:rgba(237,233,228,.42); font-style:italic}
+  .kru-fat{font-size:14px; line-height:1.55; color:rgba(237,233,228,.85)}
   /* Gebetstext */
   .ang-overlay{position:fixed; inset:0; z-index:95; display:flex; align-items:center; justify-content:center;
     padding:20px; background:rgba(0,0,0,.6); backdrop-filter:blur(4px)}
@@ -3503,6 +3527,132 @@
     document.body.appendChild(ov);
   }
 
+  /* ---------- Krunica / Rosenkranz ----------
+     Wochentagsordnung nach überliefertem Brauch; die lichtreichen Geheimnisse
+     hat Johannes Paul II. 2002 hinzugefügt (Rosarium Virginis Mariae). */
+  const KRUNICA=[
+    { id:"radosna", de:"Freudenreiche Geheimnisse", hr:"Radosna otajstva", days:[1,6],
+      de5:["den du, o Jungfrau, vom Heiligen Geist empfangen hast",
+           "den du, o Jungfrau, zu Elisabet getragen hast",
+           "den du, o Jungfrau, in Betlehem geboren hast",
+           "den du, o Jungfrau, im Tempel aufgeopfert hast",
+           "den du, o Jungfrau, im Tempel wiedergefunden hast"],
+      hr5:["koga si, Djevice, po Duhu Svetom začela",
+           "koga si, Djevice, Elizabeti u pohode nosila",
+           "koga si, Djevice, u Betlehemu rodila",
+           "koga si, Djevice, u hramu prikazala",
+           "koga si, Djevice, u hramu našla"] },
+    { id:"svjetla", de:"Lichtreiche Geheimnisse", hr:"Otajstva svjetla", days:[4],
+      de5:["der von Johannes getauft worden ist",
+           "der sich bei der Hochzeit zu Kana offenbart hat",
+           "der uns das Reich Gottes verkündet hat",
+           "der auf dem Berg verklärt worden ist",
+           "der uns die Eucharistie geschenkt hat"],
+      hr5:["koji je na Jordanu kršten bio",
+           "koji nam se na svadbi u Kani objavio",
+           "koji nam je kraljevstvo Božje navijestio",
+           "koji se na gori preobrazio",
+           "koji nam je euharistiju ustanovio"] },
+    { id:"zalosna", de:"Schmerzhafte Geheimnisse", hr:"Žalosna otajstva", days:[2,5],
+      de5:["der für uns Blut geschwitzt hat",
+           "der für uns gegeißelt worden ist",
+           "der für uns mit Dornen gekrönt worden ist",
+           "der für uns das schwere Kreuz getragen hat",
+           "der für uns gekreuzigt worden ist"],
+      hr5:["koji se za nas krvlju znojio",
+           "koji je za nas bičevan bio",
+           "koji je za nas trnjem okrunjen bio",
+           "koji je za nas teški križ nosio",
+           "koji je za nas raspet bio"] },
+    { id:"slavna", de:"Glorreiche Geheimnisse", hr:"Slavna otajstva", days:[0,3],
+      de5:["der von den Toten auferstanden ist",
+           "der in den Himmel aufgefahren ist",
+           "der uns den Heiligen Geist gesandt hat",
+           "der dich, o Jungfrau, in den Himmel aufgenommen hat",
+           "der dich, o Jungfrau, im Himmel gekrönt hat"],
+      hr5:["koji je od mrtvih uskrsnuo",
+           "koji je na nebo uzašao",
+           "koji je Duha Svetoga poslao",
+           "koji je tebe, Djevice, na nebo uzeo",
+           "koji je tebe, Djevice, na nebu okrunio"] }
+  ];
+  // Sonntag = 0 … Samstag = 6
+  const krunicaToday=()=>KRUNICA.find(k=>k.days.includes(new Date().getDay()))||KRUNICA[0];
+  const krunicaPrayed=()=>((loadAng().kru||{})[today]===true);
+  function markKrunica(){
+    loadAng(); ang.kru=ang.kru||{};
+    if(ang.kru[today]) delete ang.kru[today]; else ang.kru[today]=true;
+    const cut=addDays(today,-40);
+    Object.keys(ang.kru).forEach(k=>{ if(k<cut) delete ang.kru[k]; });
+    saveAng(); renderHeute();
+  }
+  let kruSet=null;   // null = Geheimnis des Tages
+  function openKrunica(setId){
+    document.querySelectorAll(".ang-overlay").forEach(x=>x.remove());
+    loadAng();
+    const hr=(ang.lang==="hr");
+    const cur = setId ? KRUNICA.find(k=>k.id===setId) : krunicaToday();
+    kruSet = setId || null;
+    const ov=document.createElement("div"); ov.className="ang-overlay open";
+    const box=document.createElement("div"); box.className="ang-box kru-box";
+
+    const h=document.createElement("div"); h.className="ang-h";
+    h.innerHTML=`<span class="ang-k secret">${hr?"Krunica":"Rosenkranz"}</span>`+(hr?`<span class="ang-lang">hrvatski</span>`:``);
+    armSecret(h.querySelector(".ang-k"), ()=>{ ang.lang=hr?"de":"hr"; saveAng(); openKrunica(kruSet); });
+    box.appendChild(h);
+
+    // Geheimnis des Tages, andere Sätze wählbar
+    const tabs=document.createElement("div"); tabs.className="kru-tabs";
+    KRUNICA.forEach(k=>{
+      const isToday=(k.id===krunicaToday().id);
+      const b=document.createElement("button"); b.type="button";
+      b.className="kru-tab"+(k.id===cur.id?" on":"")+(isToday?" heute":"");
+      b.textContent=hr?k.hr:k.de;
+      b.title=isToday?(hr?"današnja otajstva":"Geheimnisse des heutigen Tages"):"";
+      b.addEventListener("click",()=>openKrunica(k.id));
+      tabs.appendChild(b);
+    });
+    box.appendChild(tabs);
+
+    const title=document.createElement("div"); title.className="kru-title";
+    title.innerHTML=`<span>${esc(hr?cur.hr:cur.de)}</span>`+
+      (cur.id===krunicaToday().id?`<span class="kru-today">${hr?"danas":"heute"}</span>`:``);
+    box.appendChild(title);
+
+    // Eröffnung
+    const open=document.createElement("div"); open.className="kru-sec";
+    open.innerHTML=`<div class="kru-sec-h">${hr?"Početak":"Eröffnung"}</div>`+
+      (hr?`<p class="ang-l">Vjerovanje · Oče naš · tri Zdravo Marijo · Slava Ocu</p>`
+         :`<p class="ang-l">Glaubensbekenntnis · Vater unser · drei Ave Maria · Ehre sei dem Vater</p>`);
+    box.appendChild(open);
+
+    // Die fünf Gesätze
+    const dec=document.createElement("div"); dec.className="kru-sec";
+    dec.innerHTML=`<div class="kru-sec-h">${hr?"Otajstva":"Gesätze"}</div>`;
+    const list=(hr?cur.hr5:cur.de5).map((l,i)=>
+      `<p class="ang-l kru-l"><span class="kru-n">${i+1}</span><span class="kru-t">${esc(l)}</span></p>`).join("");
+    dec.innerHTML+=list;
+    dec.innerHTML+=`<p class="kru-note">${hr?"Uz svako otajstvo: Oče naš · deset Zdravo Marijo · Slava Ocu · O moj Isuse":"Zu jedem Gesätz: Vater unser · zehn Ave Maria · Ehre sei dem Vater · O mein Jesus"}</p>`;
+    box.appendChild(dec);
+
+    // Fatima-Gebet, in Međugorje fest zum Rosenkranz gehörend
+    const fat=document.createElement("div"); fat.className="kru-sec";
+    fat.innerHTML=`<div class="kru-sec-h">${hr?"O moj Isuse":"O mein Jesus"}</div>`+
+      (hr?`<p class="ang-l kru-fat">O moj Isuse, oprosti nam naše grijehe, očuvaj nas od paklenoga ognja, dovedi u raj sve duše, a osobito one kojima je najpotrebnije tvoje milosrđe.</p>`
+         :`<p class="ang-l kru-fat">O mein Jesus, verzeih uns unsere Sünden, bewahre uns vor dem Feuer der Hölle, führe alle Seelen in den Himmel, besonders jene, die deiner Barmherzigkeit am meisten bedürfen.</p>`);
+    box.appendChild(fat);
+
+    const acts=document.createElement("div"); acts.className="ang-acts";
+    const done=document.createElement("button"); done.type="button"; done.className="ang-btn ok";
+    done.textContent=krunicaPrayed()?"gebetet ✓":"gebetet";
+    done.addEventListener("click",()=>{ markKrunica(); ov.remove(); });
+    const close=document.createElement("button"); close.type="button"; close.className="ang-btn"; close.textContent="schließen";
+    close.addEventListener("click",()=>ov.remove());
+    acts.append(done,close); box.appendChild(acts); ov.appendChild(box);
+    ov.addEventListener("click",e=>{ if(e.target===ov) ov.remove(); });
+    document.body.appendChild(ov);
+  }
+
   function renderAngelus(){
     const host=document.getElementById("angelus"); if(!host) return;
     loadAng(); host.innerHTML="";
@@ -3541,6 +3691,18 @@
     lrow.appendChild(lbtn);
     if(litPrayed()){ const m=document.createElement("span"); m.className="lit-mark"; m.textContent="✓"; lrow.appendChild(m); }
     card.appendChild(lrow);
+
+    // Krunica — mit dem Geheimnis des heutigen Tages
+    const kru=krunicaToday();
+    const krow=document.createElement("div"); krow.className="ang-row kru-row";
+    krow.innerHTML=`<span class="ang-bell">✦</span>`;
+    const kbtn=document.createElement("button"); kbtn.type="button";
+    kbtn.className="lit-open"+(krunicaPrayed()?" done":"");
+    kbtn.innerHTML=`Krunica<span class="kru-sub">${esc(ang.lang==="hr"?kru.hr:kru.de)}</span>`;
+    kbtn.addEventListener("click",()=>openKrunica(null));
+    krow.appendChild(kbtn);
+    if(krunicaPrayed()){ const m=document.createElement("span"); m.className="lit-mark"; m.textContent="✓"; krow.appendChild(m); }
+    card.appendChild(krow);
 
     host.appendChild(card);
   }

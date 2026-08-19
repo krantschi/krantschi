@@ -12,6 +12,8 @@
   media-src 'self' https: blob:;
   font-src 'self';
   connect-src 'self' https://api.github.com http://localhost:* http://127.0.0.1:*;
+  worker-src 'self';
+  manifest-src 'self';
   frame-src https://www.youtube-nocookie.com https://open.spotify.com https://embed.music.apple.com;
   form-action 'none';
   base-uri 'none';
@@ -274,6 +276,16 @@
     background:rgba(255,255,255,.08); border:none; border-radius:999px; padding:6px 14px; cursor:pointer}
   .vid-act:hover{color:#fff; background:rgba(255,255,255,.16)}
   .vid-act.close{color:#12160E; background:var(--brass)}
+  /* Hinweis auf eine neue Fassung */
+  .upd-bar{position:fixed; left:50%; transform:translateX(-50%); z-index:120;
+    bottom:calc(16px + env(safe-area-inset-bottom));
+    display:flex; align-items:center; gap:10px; padding:9px 10px 9px 16px; border-radius:999px;
+    background:var(--card); box-shadow:0 0 0 1px rgba(var(--sheen),.09), 0 18px 40px -18px rgba(0,0,0,.7);
+    font-size:12.5px; font-weight:650; color:var(--ink-soft)}
+  .upd-btn{font:inherit; font-size:12px; font-weight:750; color:var(--on-accent); background:var(--brass);
+    border:none; border-radius:999px; padding:6px 14px; cursor:pointer}
+  .upd-x{width:22px; height:22px; border:none; background:transparent; color:var(--ink-faint);
+    font-size:15px; line-height:1; cursor:pointer}
   /* ---------- Angelus ---------- */
   .ang-card{margin-bottom:10px; padding:9px 16px; border-radius:12px; background:var(--card); box-shadow:var(--shadow)}
   .ang-row{display:flex; align-items:center; gap:9px; flex-wrap:wrap}
@@ -943,6 +955,63 @@
   #view-vizija.flip-in{animation:vizFlipIn .6s cubic-bezier(.2,.8,.25,1) both}
   @keyframes vizFlipIn{from{transform:rotateY(-90deg) scale(.96); opacity:0} to{transform:none; opacity:1}}
   .dot.secret{cursor:pointer; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none}
+  /* ---------- Vizija: Lese-Ansicht ---------- */
+  .vread{padding-bottom:6px}
+  .vr-head{display:flex; align-items:center; gap:10px; padding:15px 20px 10px}
+  .vr-edit{margin-left:auto; font:inherit; font-size:11px; font-weight:650; color:var(--ink-faint);
+    background:transparent; border:none; border-radius:999px; padding:4px 10px; cursor:pointer;
+    opacity:.5; transition:opacity .16s, color .16s}
+  .vr-edit:hover{opacity:1; color:var(--brass)}
+  .vr-edit.on{opacity:1; color:var(--brass); box-shadow:inset 0 0 0 1px var(--brass)}
+  /* Nordstern */
+  .vr-star{position:relative; margin:0 16px 18px; border-radius:16px; overflow:hidden; isolation:isolate;
+    min-height:150px; display:flex; align-items:flex-end}
+  .vr-bg{position:absolute; inset:0; background-size:cover; background-position:center; cursor:zoom-in;
+    filter:saturate(.85) brightness(.42); transform:scale(1.02)}
+  .vr-star::after{content:""; position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(180deg, rgba(10,12,18,.15) 0%, rgba(10,12,18,.55) 55%, rgba(10,12,18,.88) 100%)}
+  .vr-star:not(:has(.vr-bg)){background:linear-gradient(155deg,#242A45 0%,#1A1F35 55%,#141826 100%);
+    box-shadow:inset 0 0 0 1px rgba(var(--sheen),.07)}
+  .vr-star-in{position:relative; z-index:2; padding:26px 22px 20px; width:100%}
+  .vr-big{margin:0 0 8px; font-family:var(--serif); font-size:21px; line-height:1.4; font-weight:520;
+    color:#F6F3EC; letter-spacing:-.004em; text-shadow:0 1px 12px rgba(0,0,0,.6)}
+  .vr-big:last-of-type{margin-bottom:0}
+  .vr-big.empty{color:rgba(246,243,236,.45); font-style:italic}
+  .vr-more{margin-top:12px; font:inherit; font-size:11.5px; font-weight:650; color:var(--brass);
+    background:rgba(227,178,95,.14); border:none; border-radius:999px; padding:5px 13px; cursor:pointer}
+  .vr-more:hover{background:var(--brass); color:var(--on-accent)}
+  /* Zeitzeile */
+  .vr-time{display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:0 20px 16px;
+    font-size:11px; font-weight:600; color:var(--ink-faint)}
+  .vr-sep{opacity:.4}
+  .vr-rest{color:var(--t3)}
+  .vr-bar{flex:1 0 100%; height:3px; border-radius:999px; background:var(--track); overflow:hidden; margin-top:5px}
+  .vr-bar>span{display:block; height:100%; border-radius:999px; background:var(--t3)}
+  /* Die Kette als eine Linie */
+  .vr-chain{position:relative; margin:0 20px 4px; padding-left:16px}
+  .vr-chain::before{content:""; position:absolute; left:4px; top:8px; bottom:22px; width:1.5px;
+    background:linear-gradient(180deg,var(--t2),var(--t3) 50%,var(--t4))}
+  .vr-station{position:relative; padding:0 0 20px}
+  .vr-st-h{display:flex; align-items:center; gap:9px; margin-bottom:7px}
+  .vr-node{position:absolute; left:-16px; width:9px; height:9px; border-radius:50%; background:var(--card);
+    box-shadow:0 0 0 2px var(--sc); margin-left:0}
+  .vr-station.leer .vr-node{box-shadow:0 0 0 1.5px var(--track)}
+  .vr-st-l{font-size:9.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--sc)}
+  .vr-station.leer .vr-st-l{color:var(--ink-faint)}
+  .vr-goal{margin-bottom:6px}
+  .vr-g-t{display:block; font-family:var(--serif); font-size:15px; line-height:1.45; color:var(--ink)}
+  .vr-g-p{display:block; font-size:10.5px; color:var(--ink-faint); margin-top:1px}
+  .vr-goal.leer{font-family:var(--serif); font-style:italic; font-size:13px; color:var(--ink-faint)}
+  .vr-goto{font:inherit; font-size:11px; font-weight:650; color:var(--t4); background:transparent; border:none;
+    cursor:pointer; padding:2px 0; opacity:.75}
+  .vr-goto:hover{opacity:1}
+  /* Fuß */
+  .vr-foot{display:flex; gap:8px; padding:12px 20px 16px; margin-top:4px; border-top:1px solid var(--line)}
+  .vr-flink{display:inline-flex; align-items:center; gap:6px; font:inherit; font-size:11.5px; font-weight:650;
+    color:var(--ink-faint); background:transparent; border:none; cursor:pointer; padding:4px 0; opacity:.7}
+  .vr-flink:hover{opacity:1; color:var(--brass)}
+  .vr-fc{font-size:10px; font-weight:800; color:var(--brass); background:rgba(227,178,95,.15);
+    border-radius:999px; padding:1px 7px}
   /* ---------- Vizija in Prosa ---------- */
   .eyebrow.secret{cursor:pointer; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none}
   .panel.prosa-panel{position:relative; background:linear-gradient(170deg,#1B1A16 0%,#141310 55%,#0E0D0B 100%);
@@ -1851,6 +1920,7 @@
   const FOCUS="ht_focus_v1";
   const LERN="ht_lernplan_v1";
   const ANGELUS="ht_angelus_v1";
+  const APP_VERSION="2026-08-18";   // wird beim Aktualisieren hochgezählt
   const LOCKIN="ht_lockin_v1";
   const LOCKTXT="ht_lockintext_v1", CRYPTO="ht_crypto_v1", CAL="ht_cal_v1", QUOTES="ht_quotes_v1", LOCKCFG="ht_lockin_cfg_v1", SCHATZ="ht_schatz_v1", GOSPELC="ht_gospel_v1";
   const MAX_PRIOS=8;
@@ -2044,7 +2114,7 @@
     document.body.classList.toggle("tab-prios", t==="prios");
     document.body.classList.toggle("tab-fokus", t==="fokus");
     // Die Rückseite schließt sich beim Verlassen — sie soll nicht offen liegen bleiben.
-    if(t!=="vizija"){ antiOn=false; prosaOn=false; }
+    if(t!=="vizija"){ antiOn=false; prosaOn=false; visEdit=false; }
     if(t!=="fokus") lernOn=false;   // versteckte Ansicht bleibt nicht offen liegen
     if(t==="vizija"){ buildVision(); playVizijaIntro(); }
     if(t==="fokus") buildFokus();
@@ -5895,23 +5965,127 @@
     view.appendChild(panel);
   }
 
+  let visEdit=false;
   function buildVision(){
     scopeRollover();
     if(visionTimer){ clearInterval(visionTimer); visionTimer=null; }
     const view=document.getElementById("view-vizija"); view.innerHTML="";
     if(antiOn){ buildAntiVizija(view); return; }
     if(prosaOn){ buildProsa(view); return; }
-    const panel=document.createElement("section"); panel.className="panel vizija-panel cascade";
-    panel.style.setProperty("--c","var(--violet)"); panel.style.setProperty("--c-tint","var(--violet-tint)");
+    if(visEdit){ buildVisionEdit(view); return; }
+    buildVisionRead(view);
+  }
+
+  /* ---------- Lesen: der Normalzustand ---------- */
+  function buildVisionRead(view){
+    const panel=document.createElement("section"); panel.className="panel vizija-panel vread";
+    panel.style.setProperty("--c","var(--t1)"); panel.style.setProperty("--c-tint","var(--t1-tint)");
 
     const aurora=document.createElement("div"); aurora.className="aurora"; aurora.setAttribute("aria-hidden","true");
     aurora.innerHTML=`<span class="orb o1"></span><span class="orb o2"></span><span class="orb o3"></span>`;
     panel.appendChild(aurora);
 
-    const head=document.createElement("div"); head.className="panel-head reveal";
-    head.innerHTML=`<span class="dot secret" title="…"></span><span class="eyebrow secret">Vizija</span><span class="vis-hint">Nordstern → Jahr → Quartal → Woche</span>`;
+    // Kopfzeile: nur Titel, versteckte Zugänge, Bearbeiten
+    const head=document.createElement("div"); head.className="vr-head reveal";
+    head.innerHTML=`<span class="dot secret" title="…"></span><span class="eyebrow secret">Vizija</span>`;
     armSecret(head.querySelector(".dot"));
     armSecret(head.querySelector(".eyebrow"), toggleProsa);
+    const eb=document.createElement("button"); eb.type="button"; eb.className="vr-edit"; eb.textContent="bearbeiten";
+    eb.addEventListener("click",()=>{ visEdit=true; buildVision(); });
+    head.appendChild(eb);
+    panel.appendChild(head);
+
+    // Nordstern groß, mit Bild als Grund
+    const star=document.createElement("div"); star.className="vr-star reveal";
+    const bigs=(vision.points||[]).filter(p=>(p.text||"").trim());
+    if(vision.images&&vision.images.length){
+      const bg=document.createElement("div"); bg.className="vr-bg";
+      bg.style.backgroundImage=`url(${vision.images[0].src})`;
+      bg.addEventListener("click",()=>openLightbox(vision.images[0].src));
+      star.appendChild(bg);
+    }
+    const inner=document.createElement("div"); inner.className="vr-star-in";
+    if(bigs.length){
+      inner.innerHTML=bigs.map(p=>`<p class="vr-big">${esc(p.text.trim())}</p>`).join("");
+    }else{
+      inner.innerHTML=`<p class="vr-big empty">Worauf läuft alles hinaus?</p>`;
+    }
+    if((vision.prosa||"").trim()){
+      const more=document.createElement("button"); more.type="button"; more.className="vr-more";
+      more.textContent="weiterlesen";
+      more.addEventListener("click",toggleProsa);
+      inner.appendChild(more);
+    }
+    star.appendChild(inner); panel.appendChild(star);
+
+    // Eine Zeile Zeit statt eines eigenen Blocks
+    const qi=quarterInfo(), wi=weekInfo();
+    const line=document.createElement("div"); line.className="vr-time reveal";
+    line.innerHTML=`<span>${qi.label} ${qi.year}</span><span class="vr-sep">·</span>
+      <span class="vr-rest">noch ${qi.remaining} Tage</span><span class="vr-sep">·</span>
+      <span>KW ${wi.num}, Tag ${wi.dayNo}</span>`;
+    const bar=document.createElement("div"); bar.className="vr-bar"; bar.innerHTML=`<span style="width:${qi.pct}%"></span>`;
+    line.appendChild(bar);
+    panel.appendChild(line);
+
+    // Die Kette als eine Linie
+    const chain=document.createElement("div"); chain.className="vr-chain reveal";
+    [["year","Jahr","var(--t2)"],["quarter","Quartal","var(--t3)"],["week","Diese Woche","var(--t4)"]].forEach(([key,lbl,col])=>{
+      const pts=(visPoints(key)||[]).filter(p=>(p.text||"").trim());
+      const st=document.createElement("div"); st.className="vr-station"+(pts.length?"":" leer");
+      st.style.setProperty("--sc",col);
+      let html=`<div class="vr-st-h"><span class="vr-node"></span><span class="vr-st-l">${lbl}</span></div>`;
+      if(pts.length){
+        html+=pts.map(p=>{
+          const par=key!=="year"?parentTextOf(p,key==="week"?"quarter":"year"):"";
+          return `<div class="vr-goal"><span class="vr-g-t">${esc(p.text.trim())}</span>`+
+                 (par?`<span class="vr-g-p">↳ ${esc(par)}</span>`:``)+`</div>`;
+        }).join("");
+      }else{
+        html+=`<div class="vr-goal leer">noch nichts festgelegt</div>`;
+      }
+      st.innerHTML=html;
+      if(key==="week"){
+        const go=document.createElement("button"); go.type="button"; go.className="vr-goto";
+        go.textContent="zur Wochenansicht →";
+        go.addEventListener("click",()=>{ state.priosSub="woche"; setTab("prios"); });
+        st.appendChild(go);
+      }
+      chain.appendChild(st);
+    });
+    panel.appendChild(chain);
+
+    // Fuß: Verlauf und Zitate als ruhige Zeilen
+    const foot=document.createElement("div"); foot.className="vr-foot reveal";
+    const n=(vision.archive.weeks||[]).length+(vision.archive.quarters||[]).length;
+    const av=document.createElement("button"); av.type="button"; av.className="vr-flink";
+    av.innerHTML=`Verlauf<span class="vr-fc">${n}</span>`;
+    av.addEventListener("click",()=>{ visEdit=true; scopeArchOpen=true; buildVision();
+      setTimeout(()=>{ const el=document.querySelector(".sarch"); if(el&&el.scrollIntoView) el.scrollIntoView({behavior:"smooth",block:"center"}); },60); });
+    foot.appendChild(av);
+    const qn=(read(QUOTES,[])||[]).length;
+    if(qn){
+      const qv=document.createElement("button"); qv.type="button"; qv.className="vr-flink";
+      qv.innerHTML=`Sätze<span class="vr-fc">${qn}</span>`;
+      qv.addEventListener("click",()=>{ visEdit=true; buildVision();
+        setTimeout(()=>{ const el=document.querySelector(".quotes,.quote-feature"); if(el&&el.scrollIntoView) el.scrollIntoView({behavior:"smooth",block:"center"}); },60); });
+      foot.appendChild(qv);
+    }
+    panel.appendChild(foot);
+
+    view.appendChild(panel);
+  }
+
+  /* ---------- Bearbeiten: das bisherige Werkzeug ---------- */
+  function buildVisionEdit(view){
+    const panel=document.createElement("section"); panel.className="panel vizija-panel cascade";
+    panel.style.setProperty("--c","var(--violet)"); panel.style.setProperty("--c-tint","var(--violet-tint)");
+
+    const head=document.createElement("div"); head.className="panel-head";
+    head.innerHTML=`<span class="dot"></span><span class="eyebrow">Vizija bearbeiten</span>`;
+    const done=document.createElement("button"); done.type="button"; done.className="vr-edit on"; done.textContent="fertig";
+    done.addEventListener("click",()=>{ visEdit=false; buildVision(); });
+    head.appendChild(done);
     panel.appendChild(head);
 
     const flow=document.createElement("div"); flow.className="vflow";
@@ -5925,47 +6099,18 @@
     flow.appendChild(renderVisTier({key:"quarter", num:"III", kicker:"Dieses Quartal",
       grad:"linear-gradient(120deg,#548A9C,#3B6A78 55%,#274852)", accent:"var(--t3)", tint:"var(--t3-tint)",
       placeholder:"Was wird in diesen ~90 Tagen wahr?", coupleTo:"year", coupleLabel:"Jahresziel",
-      meta:`Tag ${qi.dayNo} von ${qi.total}`}));
+      meta:`Tag ${qi.dayNo} von ${qi.total} · noch ${qi.remaining}`}));
     flow.appendChild(renderVisTier({key:"week", num:"IV", kicker:"Diese Woche",
       grad:"linear-gradient(120deg,#D2A25C,#A87F3E 55%,#75552A)", accent:"var(--t4)", tint:"var(--t4-tint)",
       placeholder:"Welches Stück vom Quartal holst du dir in diesen 7 Tagen?", coupleTo:"quarter", coupleLabel:"Quartalsziel",
       meta:`KW ${wi.num} · Tag ${wi.dayNo} von 7`}));
     panel.appendChild(flow);
 
-    // Verlauf: abgeschlossene Wochen und Quartale
     panel.appendChild(renderScopeArchive());
 
-    // Quartals-Countdown am Fuß
-    const info=quarterInfo();
-    const hero=document.createElement("div"); hero.className="vis-hero reveal q";
-    hero.innerHTML=`
-      <div class="vis-hero-glow"></div>
-      <div class="vis-hero-in">
-        <div class="vis-hero-top">
-          <span class="vis-hero-label">${info.label} · ${info.year}</span>
-          <span class="vis-hero-count">noch ${info.remaining} Tage</span>
-        </div>
-        <div class="vis-hero-bar"><span style="width:${info.pct}%"></span></div>
-        <div class="vis-hero-sub">Tag ${info.dayNo} von ${info.total} · ${info.pct}%</div>
-      </div>`;
-    panel.appendChild(hero);
-
-    // Bilder + Zitate (zur großen Vizija gehörig, ganz unten)
+    // Bilder gehören zur großen Vizija — hier, wo man sie pflegt
     const imgWrap=document.createElement("div"); imgWrap.className="vis-images";
     panel.appendChild(imgWrap);
-    if(vision.images.length){
-      const show=document.createElement("div"); show.className="slideshow reveal";
-      vision.images.forEach((img,i)=>{
-        const im=document.createElement("img"); im.className="slide"+(i===0?" active":""); im.src=img.src; im.alt="Vision";
-        im.addEventListener("click",()=>openLightbox(img.src));
-        show.appendChild(im);
-      });
-      imgWrap.appendChild(show);
-      if(vision.images.length>1){
-        const slides=show.querySelectorAll(".slide"); let idx=0;
-        visionTimer=setInterval(()=>{ slides[idx].classList.remove("active"); idx=(idx+1)%slides.length; slides[idx].classList.add("active"); },3000);
-      }
-    }
     buildQuotes(panel);
     const board=document.createElement("div"); board.className="board";
     vision.images.forEach(img=>{
@@ -6174,6 +6319,41 @@
   // Kalibrierung beim Öffnen — einmalig, danach ruhig
   document.body.classList.add("boot");
   setTimeout(()=>document.body.classList.remove("boot"), 1700);
+
+  /* ---------- Offline-Speicher (nur im Web, nicht bei lokaler Datei) ----------
+     Der Service Worker legt die App im Gerät ab: sofortiger Start, läuft ohne Netz. */
+  (function(){
+    if(!("serviceWorker" in navigator)) return;
+    if(location.protocol!=="https:" && location.hostname!=="localhost") return;
+    navigator.serviceWorker.register("sw.js").then(reg=>{
+      // Auf eine neuere Fassung prüfen und beim nächsten Start übernehmen
+      reg.addEventListener("updatefound",()=>{
+        const nw=reg.installing; if(!nw) return;
+        nw.addEventListener("statechange",()=>{
+          if(nw.state==="installed" && navigator.serviceWorker.controller){
+            showUpdateHint(reg);
+          }
+        });
+      });
+      setTimeout(()=>{ try{ reg.update(); }catch(e){} }, 4000);
+    }).catch(()=>{});
+    let reloading=false;
+    navigator.serviceWorker.addEventListener("controllerchange",()=>{
+      if(reloading) return; reloading=true; location.reload();
+    });
+  })();
+  function showUpdateHint(reg){
+    if(document.getElementById("updBar")) return;
+    const bar=document.createElement("div"); bar.id="updBar"; bar.className="upd-bar";
+    bar.innerHTML=`<span>Neue Fassung bereit</span>`;
+    const b=document.createElement("button"); b.type="button"; b.className="upd-btn"; b.textContent="laden";
+    b.addEventListener("click",()=>{
+      const w=reg.waiting; if(w){ w.postMessage({type:"SKIP_WAITING"}); } else location.reload();
+    });
+    const x=document.createElement("button"); x.type="button"; x.className="upd-x"; x.textContent="×";
+    x.addEventListener("click",()=>bar.remove());
+    bar.append(b,x); document.body.appendChild(bar);
+  }
 })();
 </script>
 </body>

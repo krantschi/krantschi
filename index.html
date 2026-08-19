@@ -286,6 +286,85 @@
     border:none; border-radius:999px; padding:6px 14px; cursor:pointer}
   .upd-x{width:22px; height:22px; border:none; background:transparent; color:var(--ink-faint);
     font-size:15px; line-height:1; cursor:pointer}
+  /* ---------- Gebetszeile und Gebetsort ---------- */
+  .ang-line{width:100%; display:flex; align-items:center; gap:9px; margin-bottom:10px; padding:11px 16px;
+    border:none; border-radius:12px; background:var(--card); box-shadow:var(--shadow); cursor:pointer; text-align:left}
+  .al-ic{color:var(--brass); font-size:12px; opacity:.85}
+  .al-t{font-family:var(--serif); font-size:13.5px; font-style:italic; color:var(--ink-soft)}
+  .al-dots{margin-left:auto; display:flex; gap:4px}
+  .al-d{width:7px; height:7px; border-radius:50%; background:var(--track)}
+  .al-d.on{background:var(--mint)}
+  .al-ch{font-size:15px; color:var(--ink-faint)}
+  .geb-overlay{position:fixed; inset:0; z-index:96; display:flex; align-items:center; justify-content:center;
+    padding:20px; background:rgba(0,0,0,.6); backdrop-filter:blur(4px)}
+  .geb-box{width:100%; max-width:420px; max-height:84vh; overflow-y:auto; padding:18px; border-radius:16px;
+    background:linear-gradient(168deg,#1A1723 0%,#12101A 60%,#0C0B10 100%); --sheen:255,255,255; color:#EDE9E4;
+    box-shadow:0 0 0 1px rgba(255,255,255,.07), 0 30px 70px -26px #000}
+  .geb-h{display:flex; align-items:center; gap:10px; margin-bottom:14px}
+  .geb-back{width:26px; height:26px; border:none; border-radius:50%; background:rgba(255,255,255,.07);
+    color:rgba(237,233,228,.7); font-size:16px; line-height:1; cursor:pointer}
+  .geb-k{font-family:var(--serif); font-size:16px; font-style:italic; font-weight:650; color:#F3EEE4;
+    cursor:pointer; -webkit-user-select:none; user-select:none}
+  .geb-d{margin-left:auto; font-size:11px; color:rgba(237,233,228,.45)}
+  .geb-card{display:block; width:100%; text-align:left; margin-bottom:8px; padding:12px 14px; border:none;
+    border-radius:12px; background:rgba(255,255,255,.05); box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+  .geb-card.row{display:flex; align-items:baseline; gap:9px; cursor:pointer}
+  .geb-card.row:hover{background:rgba(255,255,255,.1)}
+  .geb-card.done{box-shadow:inset 0 0 0 1px rgba(63,207,174,.35)}
+  .geb-c-h{font-size:9.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase;
+    color:rgba(237,233,228,.45); margin-bottom:8px}
+  .geb-c-t{font-family:var(--serif); font-size:14.5px; color:#EDE9E4}
+  .geb-c-s{font-size:11px; color:var(--brass)}
+  .geb-ck{margin-left:auto; color:var(--mint); font-weight:800; font-size:13px}
+  .geb-times{display:flex; gap:6px}
+  .geb-time{font:inherit; font-size:12px; font-weight:650; color:rgba(237,233,228,.55); background:transparent;
+    border:none; border-radius:999px; padding:5px 12px; cursor:pointer; font-variant-numeric:tabular-nums;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+  .geb-time:hover{color:#fff; box-shadow:inset 0 0 0 1px var(--brass)}
+  .geb-time.next{color:var(--brass); box-shadow:inset 0 0 0 1.4px var(--brass)}
+  .geb-time.done{color:var(--mint); box-shadow:inset 0 0 0 1px rgba(63,207,174,.5)}
+  .geb-strip{display:flex; align-items:center; gap:5px; margin-top:14px; padding-top:12px;
+    border-top:1px solid rgba(255,255,255,.09)}
+  .gs-l{font-size:10.5px; color:rgba(237,233,228,.35); margin-right:4px}
+  .gs-d{width:10px; height:10px; border-radius:3px; background:rgba(255,255,255,.09)}
+  .gs-d.l1{background:rgba(63,207,174,.3)} .gs-d.l2{background:rgba(63,207,174,.55)}
+  .gs-d.l3{background:rgba(63,207,174,.8)} .gs-d.l4{background:var(--mint)}
+  .geb-foot{display:flex; gap:10px; margin-top:12px}
+  .geb-flink{font:inherit; font-size:11px; font-weight:650; color:rgba(237,233,228,.45); background:transparent;
+    border:none; cursor:pointer; padding:3px 0}
+  .geb-flink:hover{color:var(--brass)}
+  .geb-flink.on{color:var(--brass)}
+  /* ---------- Prios: eine Achse ---------- */
+  .axis{margin-left:auto; display:flex; gap:2px; background:rgba(var(--sheen),.06); border-radius:999px; padding:2px}
+  .axis-btn{font:inherit; font-size:12px; font-weight:650; color:var(--ink-faint); background:transparent;
+    border:none; border-radius:999px; padding:5px 14px; cursor:pointer; transition:all .16s}
+  .axis-btn.on{color:var(--on-accent); background:var(--brass)}
+  .axis-back{margin-left:auto; font:inherit; font-size:11.5px; font-weight:650; color:var(--ink-faint);
+    background:transparent; border:none; cursor:pointer; opacity:.7}
+  .axis-back:hover{opacity:1; color:var(--brass)}
+  .prios-foot{display:flex; gap:14px; padding:12px 20px 4px; margin-top:10px; border-top:1px solid var(--line)}
+  .pf-link{display:inline-flex; align-items:center; gap:6px; font:inherit; font-size:11.5px; font-weight:650;
+    color:var(--ink-faint); background:transparent; border:none; cursor:pointer; padding:2px 0; opacity:.7}
+  .pf-link:hover{opacity:1; color:var(--brass)}
+  .pf-c{font-size:10px; font-weight:800; color:var(--brass); background:rgba(227,178,95,.15);
+    border-radius:999px; padding:1px 7px}
+  /* ---------- Tageszeit: was nicht dran ist, tritt zurück ---------- */
+  body.ph-morgen .cat.tages:not(:hover),
+  body.ph-tag .cat.lockin:not(:hover),
+  body.ph-tag .cat.tages:not(:hover),
+  body.ph-abend .cat.lockin:not(:hover){ opacity:.55; transition:opacity .2s ease}
+  body.ph-morgen .cat.tages:hover,
+  body.ph-tag .cat.lockin:hover,
+  body.ph-tag .cat.tages:hover,
+  body.ph-abend .cat.lockin:hover{ opacity:1 }
+  body.ph-morgen .lockin .lockin-title,
+  body.ph-abend .tages .lockin-title{ color:var(--brass) }
+  /* Bilanz im Tagesabschluss */
+  .tag-bilanz{display:flex; flex-wrap:wrap; gap:6px 14px; margin:2px 0 12px; padding-bottom:11px;
+    border-bottom:1px solid var(--line)}
+  .tag-bilanz span{font-size:11px; color:var(--ink-faint); display:flex; align-items:baseline; gap:4px}
+  .tag-bilanz strong{font-size:15px; font-weight:750; color:var(--ink); font-variant-numeric:tabular-nums}
+  .tag-bilanz .tb-offen{flex-basis:100%; color:var(--ink-faint); font-style:italic}
   /* ---------- Angelus ---------- */
   .ang-card{margin-bottom:10px; padding:9px 16px; border-radius:12px; background:var(--card); box-shadow:var(--shadow)}
   .ang-row{display:flex; align-items:center; gap:9px; flex-wrap:wrap}
@@ -669,9 +748,13 @@
   .fhd-tasks-h{font-family:var(--display); font-style:italic; font-size:12px; font-weight:700; color:var(--ink-soft); margin:8px 0 3px}
   .fhd-task{font-family:var(--display); font-size:12.5px; color:var(--ink-soft); padding:1px 0}
   /* Fokuszeiten im Tagesplan */
-  .tl-focus-env{position:absolute; left:44px; right:6px; background:rgba(58,111,224,.06); border-left:2px solid rgba(58,111,224,.3); border-radius:4px; pointer-events:none; z-index:0}
-  .tl-focus-blk{position:absolute; left:50px; right:10px; background:var(--sky-tint); box-shadow:inset 0 0 0 1px rgba(58,111,224,.35); border-radius:6px; padding:3px 8px; display:flex; align-items:baseline; gap:8px; pointer-events:none; z-index:1; overflow:hidden}
-  .tl-focus-blk.live{background:rgba(58,111,224,.14)}
+  .tl-focus-env{position:absolute; right:0; width:26px; background:rgba(58,111,224,.05); border-radius:4px; pointer-events:none; z-index:0}
+  /* Gelaufenes: schmaler Streifen rechts, damit Geplantes die Fläche behält */
+  .tl-focus-blk{position:absolute; right:4px; width:18px; background:var(--mint); border-radius:3px;
+    padding:0; pointer-events:none; z-index:1; overflow:hidden; opacity:.75}
+  .tl-focus-blk .tlf-n,.tl-focus-blk .tlf-t{display:none}
+  .tl-blk,.tl-block{right:34px}
+  .tl-focus-blk.live{opacity:1; box-shadow:0 0 10px -2px var(--mint)}
   .tlf-n{font-family:var(--display); font-size:11.5px; font-weight:700; font-style:italic; color:var(--sky)}
   .tlf-t{font-size:10.5px; color:var(--sky); font-variant-numeric:tabular-nums}
   /* Gedanken */
@@ -842,6 +925,66 @@
   /* ---------- Tagesansicht (frei ziehbare Blöcke) ---------- */
   .timeline{margin-top:14px}
   .tl-hint{margin-left:auto; font-size:10.5px; color:var(--ink-faint); font-weight:650; letter-spacing:.02em}
+  .todo-time{margin-left:8px; font-size:10.5px; font-weight:700; color:var(--brass);
+    background:rgba(227,178,95,.14); border-radius:999px; padding:1px 7px; vertical-align:middle;
+    font-variant-numeric:tabular-nums}
+  .tl-blk.done{opacity:.5}
+  .tl-blk.done .tlb-tx{text-decoration:line-through}
+  .wp-blk.done{opacity:.45}
+  /* Wochenabschluss */
+  .wabs-panel{padding-bottom:16px}
+  .wabs-sec{font-size:9.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); margin:16px 20px 8px}
+  .wabs-bil,.wabs-ziele,.wabs-fragen,.wabs-next{padding:0 20px}
+  .wabs-bil .sa-stats,.wabs-bil .sa-week{margin-left:0; margin-right:0}
+  .wabs-z{width:100%; display:flex; align-items:center; gap:10px; background:transparent; border:none; cursor:pointer;
+    padding:8px 0; text-align:left; border-bottom:1px solid var(--line)}
+  .wz-dot{width:11px; height:11px; flex:0 0 auto; border-radius:50%; box-shadow:inset 0 0 0 2px var(--track)}
+  .wabs-z.done .wz-dot{background:var(--mint); box-shadow:none}
+  .wz-t{font-family:var(--serif); font-size:14.5px; color:var(--ink)}
+  .wabs-z.done .wz-t{color:var(--ink-faint); text-decoration:line-through}
+  .wabs-f{margin-bottom:12px}
+  .wf-q{font-family:var(--serif); font-size:13.5px; font-style:italic; color:var(--ink-soft); margin-bottom:4px}
+  .wf-a{width:100%; box-sizing:border-box; font-family:var(--serif); font-size:14.5px; line-height:1.55; color:var(--ink);
+    background:transparent; border:none; border-bottom:1px solid var(--line); padding:4px 2px; resize:none; overflow:hidden}
+  .wf-a:focus{outline:none; border-bottom-color:var(--brass)}
+  .wabs-go{width:100%; font:inherit; font-size:13.5px; font-weight:700; color:var(--on-accent); background:var(--brass);
+    border:none; border-radius:11px; padding:12px; cursor:pointer; margin-bottom:8px}
+  .wabs-quart{width:100%; font:inherit; font-size:12px; font-weight:650; color:var(--ink-faint); background:transparent;
+    border:none; cursor:pointer; padding:4px}
+  .vr-flink.stark{color:var(--brass); opacity:1}
+  /* Rückblick */
+  .rueck-titel{font-family:var(--serif); font-size:22px; font-weight:650; color:var(--ink); padding:4px 20px 12px}
+  .rueck-stats{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; padding:0 20px 4px}
+  .rs{display:flex; flex-direction:column; gap:2px; padding:10px 12px; border-radius:10px; background:rgba(var(--sheen),.05)}
+  .rs strong{font-size:21px; font-weight:750; color:var(--ink); font-variant-numeric:tabular-nums; line-height:1}
+  .rs span{font-size:10px; color:var(--ink-faint)}
+  .rueck-ziele,.rueck-habits{padding:0 20px}
+  .rz{display:flex; align-items:baseline; gap:9px; padding:6px 0; border-bottom:1px solid var(--line)}
+  .rz-c{color:var(--mint); font-weight:800; font-size:12px}
+  .rz-t{flex:1; font-family:var(--serif); font-size:14px; color:var(--ink)}
+  .rz-e{font-size:10px; color:var(--ink-faint)}
+  .rueck-leer{font-family:var(--serif); font-style:italic; font-size:13px; color:var(--ink-faint); padding:4px 0 8px}
+  .rh{display:flex; align-items:center; gap:10px; padding:5px 0}
+  .rh-n{flex:0 0 40%; font-size:12.5px; color:var(--ink-soft); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .rh-bar{flex:1; height:5px; border-radius:999px; background:var(--track); overflow:hidden}
+  .rh-bar>span{display:block; height:100%; border-radius:999px; background:var(--mint)}
+  .rh-p{font-size:11px; font-weight:700; color:var(--ink-faint); font-variant-numeric:tabular-nums; min-width:30px; text-align:right}
+  .sarch.bare{border-top:none; margin-top:0}
+  /* Suche */
+  .such-ov{position:fixed; inset:0; z-index:98; display:flex; align-items:flex-start; justify-content:center;
+    padding:60px 20px 20px; background:rgba(0,0,0,.55); backdrop-filter:blur(4px)}
+  .such-box{width:100%; max-width:520px; max-height:78vh; display:flex; flex-direction:column;
+    background:var(--card); border-radius:16px; overflow:hidden;
+    box-shadow:0 0 0 1px rgba(var(--sheen),.08), 0 30px 70px -26px rgba(0,0,0,.8)}
+  .such-inp{width:100%; box-sizing:border-box; font:inherit; font-size:16px; color:var(--ink); background:transparent;
+    border:none; border-bottom:1px solid var(--line); padding:16px 18px}
+  .such-inp:focus{outline:none}
+  .such-res{overflow-y:auto; padding:6px 0 10px}
+  .such-hint{font-size:12.5px; color:var(--ink-faint); padding:14px 18px; line-height:1.5}
+  .such-t{padding:9px 18px; border-bottom:1px solid var(--line)}
+  .st-m{font-size:9.5px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:3px}
+  .st-x{font-family:var(--serif); font-size:13.5px; line-height:1.5; color:var(--ink-soft)}
+  .st-x mark{background:rgba(227,178,95,.28); color:var(--ink); border-radius:3px; padding:0 2px}
   /* ---------- Wochenplan ---------- */
   .tl-switch{margin-left:10px; display:flex; gap:2px; background:rgba(var(--sheen),.06); border-radius:999px; padding:2px}
   .tls-btn{font:inherit; font-size:11.5px; font-weight:700; color:var(--ink-faint); background:transparent; border:none;
@@ -878,6 +1021,17 @@
     color:var(--sky); background:var(--sky-tint); box-shadow:inset 0 0 0 1px rgba(115,150,219,.3);
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap; pointer-events:none}
   .wp-focus{position:absolute; left:0; width:3px; border-radius:2px; background:var(--mint); opacity:.75; pointer-events:none}
+  .wp-body{touch-action:pan-y}
+  .wp-ghost{position:absolute; left:2px; right:2px; border-radius:5px; pointer-events:none; z-index:3;
+    background:rgba(227,178,95,.32); box-shadow:inset 0 0 0 1.5px var(--brass);
+    font-size:8.5px; font-weight:750; color:var(--on-accent); text-align:center; line-height:1.5;
+    overflow:hidden; font-variant-numeric:tabular-nums}
+  .wp-blk{cursor:grab; touch-action:none}
+  .wp-blk.zieht{cursor:grabbing; z-index:5; opacity:.92; box-shadow:0 10px 24px -8px rgba(0,0,0,.7)}
+  .wpb-grip{position:absolute; left:0; right:0; bottom:0; height:7px; cursor:ns-resize}
+  .wpb-grip::after{content:""; position:absolute; left:50%; bottom:2px; transform:translateX(-50%);
+    width:16px; height:2px; border-radius:2px; background:rgba(0,0,0,.25)}
+  .wp-blk{position:absolute}
   .wp-blk{position:absolute; left:2px; right:2px; border-radius:5px; padding:2px 5px; cursor:pointer;
     background:var(--brass); color:var(--on-ink); box-shadow:0 4px 12px -6px rgba(0,0,0,.6); overflow:hidden}
   .wp-blk:hover{filter:brightness(1.08)}
@@ -1048,6 +1202,16 @@
   .anti-back{margin-left:auto; font:inherit; font-size:11.5px; font-weight:700; color:rgba(237,233,228,.6);
     background:rgba(255,255,255,.06); border:none; border-radius:999px; padding:5px 13px; cursor:pointer}
   .anti-back:hover{color:#fff; background:rgba(255,255,255,.13)}
+  .anti-edit{margin-left:auto; font:inherit; font-size:11px; font-weight:650; color:rgba(242,238,228,.5);
+    background:transparent; border:none; border-radius:999px; padding:4px 10px; cursor:pointer; transition:all .16s}
+  .anti-edit:hover{color:#fff}
+  .anti-edit.on{color:#C4564D; box-shadow:inset 0 0 0 1px #C4564D}
+  .panel.anti-panel .anti-back{margin-left:8px}
+  .anti-read{padding:6px 22px 4px}
+  .ar-row{display:flex; align-items:flex-start; gap:13px; padding:11px 0; border-bottom:1px solid rgba(255,255,255,.07)}
+  .ar-mark{flex:0 0 auto; margin-top:5px; font-size:13px; font-weight:800; color:#C4564D}
+  .ar-t{margin:0; font-family:var(--serif); font-size:17.5px; font-weight:520; line-height:1.5; color:#F7F4EF;
+    letter-spacing:-.004em; text-shadow:0 1px 0 rgba(0,0,0,.55)}
   .anti-intro{margin:2px 20px 18px; font-family:var(--font); font-size:13px; line-height:1.62;
     color:rgba(237,233,228,.62); max-width:46ch; letter-spacing:.004em}
   .anti-list{display:flex; flex-direction:column; gap:0; padding:0 20px 4px}
@@ -1223,6 +1387,13 @@
   .vgoal::before{content:""; position:absolute; left:-14px; top:19px; width:10px; height:2px; background:var(--c-tint)}
   .vgoal-dot{width:10px; height:10px; border-radius:50%; background:var(--card); box-shadow:inset 0 0 0 2.5px var(--c); flex:0 0 auto; margin-top:6px}
   .vgoal-main{flex:1; min-width:0; display:flex; flex-direction:column; align-items:flex-start; gap:6px}
+  .vgoal-dot{border:none; cursor:pointer; padding:0}
+  .vgoal.erreicht .vgoal-dot{background:var(--mint); box-shadow:0 0 10px -2px var(--mint)}
+  .vgoal.erreicht .vgoal-dot::after{content:"\2713"; display:block; color:var(--on-accent); font-size:8px; font-weight:800; line-height:10px}
+  .vgoal.erreicht .vgoal-text{color:var(--ink-faint); text-decoration:line-through}
+  .vgoal-kids{display:inline-block; margin-top:4px; font-size:10px; font-weight:700; letter-spacing:.03em;
+    color:var(--ink-faint); background:rgba(var(--sheen),.07); border-radius:999px; padding:2px 9px}
+  .vgoal-kids.leer{color:var(--rose); background:rgba(212,115,106,.12)}
   .vgoal-text{width:100%; box-sizing:border-box; font:inherit; font-size:14.5px; font-weight:560; line-height:1.45;
     color:var(--ink); background:transparent; border:none; padding:1px 0; resize:none; overflow:hidden; display:block}
   .vgoal-text:focus{outline:none}
@@ -1679,8 +1850,8 @@
   .tl-now{background:var(--brass); box-shadow:0 0 14px -2px rgba(227,178,95,.7)}
   .tl-block,.tl-event{background:var(--raised); box-shadow:inset 0 0 0 1px rgba(var(--sheen),.06)}
   .tl-b-time,.tl-ev-time{font-family:var(--mono); font-size:9.5px; letter-spacing:.05em}
-  .tl-focus-env{background:rgba(227,178,95,.05); border-left:2px solid rgba(227,178,95,.32)}
-  .tl-focus-blk{background:rgba(227,178,95,.13); box-shadow:inset 0 0 0 1px rgba(227,178,95,.34)}
+  .tl-focus-env{background:rgba(63,207,174,.07)}
+  .tl-focus-blk{background:var(--mint)}
   .tlf-n{font-family:var(--mono); font-size:10px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; font-style:normal; color:var(--brass)}
   .tlf-t{font-family:var(--mono); font-size:9.5px; color:var(--brass); opacity:.85}
 
@@ -1783,6 +1954,7 @@
       <button data-tab="prios" type="button">Prios &amp; ToDos</button>
       <button data-tab="heute" type="button" class="active">Heute</button>
       <button data-tab="vizija" type="button">Vizija</button>
+      <button id="findMini" class="theme-mini" type="button" aria-label="Suchen" title="Suchen">⌕</button>
       <button id="themeMini" class="theme-mini" type="button" aria-label="Ansicht wechseln"></button>
     </nav>
 
@@ -1844,6 +2016,7 @@
         <button class="sync-btn wide" id="syncBtn" type="button"><span class="sync-ic">⟳</span> <span id="syncLabel">Abgleich einrichten</span></button>
         <button class="sync-btn" id="loadBtn" type="button">↓ Laden</button>
         <button class="sync-btn" id="saveBtn" type="button">↑ Sichern</button>
+        <button class="sync-btn" id="bkBtn" type="button" title="Alles als Datei sichern">⤓ Datei</button>
       </div>
       <div class="wipe-bar" id="wipeBar" hidden>
         <div class="wipe-title">Aufräumen</div>
@@ -1920,7 +2093,7 @@
   const FOCUS="ht_focus_v1";
   const LERN="ht_lernplan_v1";
   const ANGELUS="ht_angelus_v1";
-  const APP_VERSION="2026-08-18";   // wird beim Aktualisieren hochgezählt
+  const APP_VERSION="2026-08-19";   // wird beim Aktualisieren hochgezählt
   const LOCKIN="ht_lockin_v1";
   const LOCKTXT="ht_lockintext_v1", CRYPTO="ht_crypto_v1", CAL="ht_cal_v1", QUOTES="ht_quotes_v1", LOCKCFG="ht_lockin_cfg_v1", SCHATZ="ht_schatz_v1", GOSPELC="ht_gospel_v1";
   const MAX_PRIOS=8;
@@ -2114,7 +2287,7 @@
     document.body.classList.toggle("tab-prios", t==="prios");
     document.body.classList.toggle("tab-fokus", t==="fokus");
     // Die Rückseite schließt sich beim Verlassen — sie soll nicht offen liegen bleiben.
-    if(t!=="vizija"){ antiOn=false; prosaOn=false; visEdit=false; }
+    if(t!=="vizija"){ antiOn=false; prosaOn=false; visEdit=false; wabsOn=false; rueckOn=false; verlaufOn=false; }
     if(t!=="fokus") lernOn=false;   // versteckte Ansicht bleibt nicht offen liegen
     if(t==="vizija"){ buildVision(); playVizijaIntro(); }
     if(t==="fokus") buildFokus();
@@ -3166,6 +3339,31 @@
   }
 
   /* ---------- Tagesabschluss (Textfeld unter den Habits, verschlüsselbar) ---------- */
+  // Was der Tag hergab — aus Fokus, Habits und Prios
+  function dayBilanz(){
+    const bits=[];
+    try{
+      const fx=readFocus();
+      if(fx.day===today){
+        const min=dayProductive(fx.blocks), nb=(fx.blocks||[]).length;
+        if(min>0) bits.push(`<span><strong>${min}</strong> min Fokus</span>`);
+        if(nb>0) bits.push(`<span><strong>${nb}</strong> ${nb===1?"Block":"Blöcke"}</span>`);
+      }
+    }catch(e){}
+    try{
+      const c=coreHabits().length, d=coreDone(today);
+      if(c) bits.push(`<span><strong>${d}/${c}</strong> Habits</span>`);
+      const offen=config.habits.filter(h=>{ const cat=(config.cats||[]).find(x=>x.id===h.cat); return cat && !cat.bonus && !isDone(h.id,today) && !isMiss(h.id,today); }).map(h=>h.name);
+      if(offen.length && offen.length<=3) bits.push(`<span class="tb-offen">offen: ${esc(offen.join(", "))}</span>`);
+    }catch(e){}
+    try{
+      ensurePrios();
+      const p=priosOf().filter(x=>(x.text||"").trim());
+      const pd=p.filter(isDoneI).length;
+      if(p.length) bits.push(`<span><strong>${pd}/${p.length}</strong> ${p.length===1?"Priorität":"Prioritäten"}</span>`);
+    }catch(e){}
+    return bits.length?bits.join(""):"";
+  }
   function buildTagesabschluss(){
     const D=state.viewDate, ro=!canEdit();
     const root=document.getElementById("tagesabschluss"); if(!root) return; root.innerHTML="";
@@ -3178,6 +3376,10 @@
     sec.appendChild(head);
     if(state.tagOpen){
       const panel=document.createElement("div"); panel.className="lockin-panel";
+      if(isToday()){
+        const b=dayBilanz();
+        if(b){ const bd=document.createElement("div"); bd.className="tag-bilanz"; bd.innerHTML=b; panel.appendChild(bd); }
+      }
       const wrap=document.createElement("div"); wrap.className="lockin-text tages-text";
       if(isEnc(cur)){
         const mask=document.createElement("div"); mask.className="enc-mask"; mask.textContent="· · · · ·"; mask.title="Antippen zum Öffnen";
@@ -3321,6 +3523,21 @@
     ["+","Allmächtiger Gott, gieße deine Gnade in unsere Herzen ein. Durch die Botschaft des Engels haben wir die Menschwerdung Christi, deines Sohnes, erkannt. Lass uns durch sein Leiden und Kreuz zur Herrlichkeit der Auferstehung gelangen. Darum bitten wir durch Christus, unseren Herrn. Amen."]
   ];
   // Kroatisch — überlieferter Wortlaut
+  const ANGELUS_TEXT_LAT=[
+    ["V.","Angelus Domini nuntiavit Mariae,"],
+    ["R.","et concepit de Spiritu Sancto."],
+    ["","Ave Maria …"],
+    ["V.","Ecce ancilla Domini,"],
+    ["R.","fiat mihi secundum verbum tuum."],
+    ["","Ave Maria …"],
+    ["V.","Et Verbum caro factum est,"],
+    ["R.","et habitavit in nobis."],
+    ["","Ave Maria …"],
+    ["V.","Ora pro nobis, sancta Dei Genetrix,"],
+    ["R.","ut digni efficiamur promissionibus Christi."],
+    ["","Oremus."],
+    ["","Gratiam tuam, quaesumus, Domine, mentibus nostris infunde; ut qui, Angelo nuntiante, Christi Filii tui incarnationem cognovimus, per passionem eius et crucem ad resurrectionis gloriam perducamur. Per eundem Christum Dominum nostrum. Amen."]
+  ];
   const ANGELUS_TEXT_HR=[
     ["V.","Anđeo Gospodnji navjestio Mariji,"],
     ["R.","i ona začne po Duhu Svetom."],
@@ -3391,7 +3608,7 @@
     if(!ang) ang=read(ANGELUS,{on:true, notify:false, times:ANGELUS_TIMES.slice(), log:{}});
     if(!Array.isArray(ang.times)||!ang.times.length) ang.times=ANGELUS_TIMES.slice();
     if(!ang.log||typeof ang.log!=="object") ang.log={};
-    if(ang.lang!=="hr") ang.lang="de";
+    if(ang.lang!=="hr" && ang.lang!=="la") ang.lang="de";
     return ang;
   }
   const saveAng=()=>write(ANGELUS,ang);
@@ -3465,14 +3682,21 @@
     if(r==="+") return `<p class="ang-oration">${esc(l)}</p>`;
     return `<p class="ang-l${r?"":" ang-ave"}">${r?`<span class="ang-r">${r}</span>`:""}${esc(l)}</p>`;
   }).join("");
+  // Sprachen im Kreis: deutsch → kroatisch → lateinisch
+  const LANG_ORDER=["de","hr","la"];
+  const LANG_LABEL={de:"", hr:"hrvatski", la:"latine"};
+  const nextLang=l=>LANG_ORDER[(LANG_ORDER.indexOf(l||"de")+1)%LANG_ORDER.length];
+  const angText=l=> l==="hr"?ANGELUS_TEXT_HR : l==="la"?ANGELUS_TEXT_LAT : ANGELUS_TEXT;
   function openAngelus(t){
     document.querySelectorAll(".ang-overlay").forEach(x=>x.remove());
     loadAng();
     const hr = ang.lang==="hr";
     const ov=document.createElement("div"); ov.className="ang-overlay open";
     const box=document.createElement("div"); box.className="ang-box";
-    box.innerHTML=`<div class="ang-h"><span class="ang-k secret">Angelus</span>${hr?`<span class="ang-lang">hrvatski</span>`:""}<span class="ang-t">${esc(t||"")}</span></div>`+
-      angLines(hr?ANGELUS_TEXT_HR:ANGELUS_TEXT);
+    const lg=LANG_LABEL[ang.lang]||"";
+    const titel = ang.lang==="hr"?"Anđeo Gospodnji" : ang.lang==="la"?"Angelus Domini" : "Angelus";
+    box.innerHTML=`<div class="ang-h"><span class="ang-k secret">${titel}</span>${lg?`<span class="ang-lang">${lg}</span>`:""}<span class="ang-t">${esc(t||"")}</span></div>`+
+      angLines(angText(ang.lang));
 
     // Regina caeli — aufklappbar, für die Osterzeit
     if(isEastertide()){
@@ -3483,9 +3707,10 @@
     reg.appendChild(rh);
     if(reginaOpen){
       const body=document.createElement("div"); body.className="ang-reg-b";
-      body.innerHTML=angLines(hr?REGINA_TEXT_HR:REGINA_TEXT)
-        +`<div class="ang-lat-h">Regina caeli · lateinisch</div>`
-        +`<div class="ang-lat">${angLines(REGINA_TEXT_LAT)}</div>`;
+      body.innerHTML = ang.lang==="la" ? angLines(REGINA_TEXT_LAT)
+        : angLines(ang.lang==="hr"?REGINA_TEXT_HR:REGINA_TEXT)
+          +`<div class="ang-lat-h">Regina caeli · lateinisch</div>`
+          +`<div class="ang-lat">${angLines(REGINA_TEXT_LAT)}</div>`;
       reg.appendChild(body);
     }
     box.appendChild(reg);
@@ -3505,7 +3730,7 @@
     document.body.appendChild(ov);
     // Titel gedrückt halten wechselt die Sprache
     armSecret(box.querySelector(".ang-k"), ()=>{
-      loadAng(); ang.lang = (ang.lang==="hr"?"de":"hr"); saveAng(); openAngelus(t);
+      loadAng(); ang.lang = nextLang(ang.lang); saveAng(); openAngelus(t);
     });
   }
   /* ---------- Litanei der Demut ----------
@@ -3568,7 +3793,7 @@
   function openLitanei(){
     document.querySelectorAll(".ang-overlay").forEach(x=>x.remove());
     loadAng();
-    const hr=(ang.lang==="hr");
+    const hr=(ang.lang==="hr");   // Latein gibt es hier nicht, dann gilt Deutsch
     const head = hr?LITANEI_HR_HEAD:LITANEI_HEAD;
     const bf   = hr?LITANEI_HR_BEFREI:LITANEI_BEFREI;
     const gn   = hr?LITANEI_HR_GNADE:LITANEI_GNADE;
@@ -3727,57 +3952,117 @@
     const host=document.getElementById("angelus"); if(!host) return;
     loadAng(); host.innerHTML="";
     if(!ang.on) return;
-    const card=document.createElement("section"); card.className="ang-card";
     const nx=nextAngelus();
-    const row=document.createElement("div"); row.className="ang-row";
-    row.innerHTML=`<span class="ang-bell">✦</span><span class="ang-name">Angelus</span>`;
-    const times=document.createElement("div"); times.className="ang-times";
+    const row=document.createElement("button"); row.type="button"; row.className="ang-line";
+    const dots=ang.times.slice().sort().map(t=>`<span class="al-d${angPrayed(t)?" on":""}"></span>`).join("");
+    const rest=[litPrayed()?"":"L", krunicaPrayed()?"":"K"].filter(Boolean).length;
+    row.innerHTML=`<span class="al-ic">✦</span>
+      <span class="al-t">Angelus ${esc(nx.time)}</span>
+      <span class="al-dots">${dots}</span>
+      <span class="al-ch">›</span>`;
+    row.title="Gebet";
+    row.addEventListener("click",openGebet);
+    host.appendChild(row);
+  }
+
+  /* ---------- Der Gebetsort ---------- */
+  function openGebet(){
+    document.querySelectorAll(".geb-overlay").forEach(x=>x.remove());
+    loadAng();
+    const hr=(ang.lang==="hr");
+    const ov=document.createElement("div"); ov.className="geb-overlay open";
+    const box=document.createElement("div"); box.className="geb-box";
+
+    const h=document.createElement("div"); h.className="geb-h";
+    const back=document.createElement("button"); back.type="button"; back.className="geb-back"; back.innerHTML="‹";
+    back.setAttribute("aria-label","zurück");
+    back.addEventListener("click",()=>ov.remove());
+    const ttl=document.createElement("span"); ttl.className="geb-k secret"; ttl.textContent=hr?"Molitva":"Gebet";
+    armSecret(ttl, ()=>{ ang.lang=hr?"de":"hr"; saveAng(); ov.remove(); openGebet(); });
+    const dt=document.createElement("span"); dt.className="geb-d";
+    dt.textContent=new Date(today+"T00:00:00").toLocaleDateString("de-DE",{weekday:"long"});
+    h.append(back,ttl,dt); box.appendChild(h);
+
+    // Angelus
+    const a=document.createElement("div"); a.className="geb-card ang";
+    a.innerHTML=`<div class="geb-c-h">${hr?"Anđeo Gospodnji":"Angelus"}</div>`;
+    const times=document.createElement("div"); times.className="geb-times";
+    const nx=nextAngelus();
     ang.times.slice().sort().forEach(t=>{
       const b=document.createElement("button"); b.type="button";
-      b.className="ang-time"+(angPrayed(t)?" done":"")+(t===nx.time&&nx.today?" next":"");
-      b.textContent=t; b.title=angPrayed(t)?"gebetet":"Text öffnen";
-      b.addEventListener("click",()=>openAngelus(t));
+      b.className="geb-time"+(angPrayed(t)?" done":"")+(t===nx.time&&nx.today?" next":"");
+      b.textContent=t;
+      b.addEventListener("click",()=>{ ov.remove(); openAngelus(t); });
       times.appendChild(b);
     });
-    row.appendChild(times);
-    const bell=document.createElement("button"); bell.type="button"; bell.className="ang-notify"+(ang.notify?" on":"");
-    bell.textContent=ang.notify?"Meldung an":"Meldung";
-    bell.title="Benachrichtigung, solange die App geöffnet ist";
-    bell.addEventListener("click",askAngelusNotify);
-    row.appendChild(bell);
-    const cal=document.createElement("button"); cal.type="button"; cal.className="ang-cal"; cal.textContent="Kalender";
-    cal.title="Wiederkehrende Termine mit Wecker als Datei — funktioniert auch bei geschlossener App";
-    cal.addEventListener("click",angelusICS);
-    row.appendChild(cal);
-    card.appendChild(row);
+    a.appendChild(times); box.appendChild(a);
 
-    // Litanei der Demut — zweite Zeile derselben Karte
-    const lrow=document.createElement("div"); lrow.className="ang-row lit-row";
-    lrow.innerHTML=`<span class="ang-bell">✦</span>`;
-    const lbtn=document.createElement("button"); lbtn.type="button";
-    lbtn.className="lit-open"+(litPrayed()?" done":"");
-    lbtn.textContent="Litanei der Demut";
-    lbtn.addEventListener("click",openLitanei);
-    lrow.appendChild(lbtn);
-    if(litPrayed()){ const m=document.createElement("span"); m.className="lit-mark"; m.textContent="✓"; lrow.appendChild(m); }
-    card.appendChild(lrow);
-
-    // Krunica — mit dem Geheimnis des heutigen Tages
+    // Krunica mit dem Geheimnis des Tages
     const kru=krunicaToday();
-    const krow=document.createElement("div"); krow.className="ang-row kru-row";
-    krow.innerHTML=`<span class="ang-bell">✦</span>`;
-    const kbtn=document.createElement("button"); kbtn.type="button";
-    kbtn.className="lit-open"+(krunicaPrayed()?" done":"");
-    kbtn.innerHTML=`Krunica<span class="kru-sub">${esc(ang.lang==="hr"?kru.hr:kru.de)}</span>`;
-    kbtn.addEventListener("click",()=>openKrunica(null));
-    krow.appendChild(kbtn);
-    if(krunicaPrayed()){ const m=document.createElement("span"); m.className="lit-mark"; m.textContent="✓"; krow.appendChild(m); }
-    card.appendChild(krow);
+    const k=document.createElement("button"); k.type="button"; k.className="geb-card row"+(krunicaPrayed()?" done":"");
+    k.innerHTML=`<span class="geb-c-t">Krunica</span><span class="geb-c-s">${esc(hr?kru.hr:kru.de)}</span>`+
+      (krunicaPrayed()?`<span class="geb-ck">✓</span>`:``);
+    k.addEventListener("click",()=>{ ov.remove(); openKrunica(null); });
+    box.appendChild(k);
 
-    host.appendChild(card);
+    // Litanei
+    const l=document.createElement("button"); l.type="button"; l.className="geb-card row"+(litPrayed()?" done":"");
+    l.innerHTML=`<span class="geb-c-t">${hr?"Litanija poniznosti":"Litanei der Demut"}</span>`+
+      (litPrayed()?`<span class="geb-ck">✓</span>`:``);
+    l.addEventListener("click",()=>{ ov.remove(); openLitanei(); });
+    box.appendChild(l);
+
+    // Sieben Tage
+    const strip=document.createElement("div"); strip.className="geb-strip";
+    let sh=`<span class="gs-l">7 Tage</span>`;
+    for(let i=6;i>=0;i--){
+      const kd=addDays(today,-i);
+      const n=((ang.log&&ang.log[kd])||[]).length + (((ang.lit||{})[kd])?1:0) + (((ang.kru||{})[kd])?1:0);
+      const lvl=n===0?0:n<=1?1:n<=2?2:n<=3?3:4;
+      sh+=`<span class="gs-d l${lvl}" title="${kd}"></span>`;
+    }
+    strip.innerHTML=sh; box.appendChild(strip);
+
+    // Kalenderdatei und Meldung, dezent
+    const foot=document.createElement("div"); foot.className="geb-foot";
+    const bell=document.createElement("button"); bell.type="button"; bell.className="geb-flink"+(ang.notify?" on":"");
+    bell.textContent=ang.notify?"Meldung an":"Meldung";
+    bell.addEventListener("click",()=>{ askAngelusNotify(); ov.remove(); setTimeout(openGebet,120); });
+    const cal=document.createElement("button"); cal.type="button"; cal.className="geb-flink"; cal.textContent="Kalender";
+    cal.addEventListener("click",angelusICS);
+    foot.append(bell,cal); box.appendChild(foot);
+
+    ov.appendChild(box);
+    ov.addEventListener("click",e=>{ if(e.target===ov) ov.remove(); });
+    document.body.appendChild(ov);
+  }
+
+  /* ---------- Tageszeit: was jetzt dran ist ----------
+     Morgen bis Lock In erledigt oder 11:00 · Tag danach · Abend ab 20:30 */
+  const PHASE_MORGEN_BIS=11*60, PHASE_ABEND_AB=20*60+30;
+  function dayPhase(){
+    if(!isToday()) return "tag";
+    const n=nowMin();
+    if(n>=PHASE_ABEND_AB) return "abend";
+    if(n<PHASE_MORGEN_BIS && !lockinAll(today)) return "morgen";
+    return "tag";
+  }
+  let phaseSet="";
+  function applyPhase(){
+    const ph=dayPhase();
+    document.body.classList.remove("ph-morgen","ph-tag","ph-abend");
+    document.body.classList.add("ph-"+ph);
+    const key=state.viewDate+"|"+ph;
+    if(phaseSet===key) return;
+    phaseSet=key;
+    if(!isToday()) return;
+    if(ph==="morgen"){ state.lockinOpen=true; state.tagOpen=false; }
+    else if(ph==="abend"){ state.tagOpen=true; state.lockinOpen=false; }
+    else { state.lockinOpen=false; state.tagOpen=false; }
   }
 
   function renderHeute(){
+    applyPhase();
     renderAngelus();
     buildRing(); buildStrip(); buildHeader(); buildLockIn(); buildCats(); buildTagesabschluss(); buildSchatzBtn(); renderCalendar();
     const complete=dayComplete(state.viewDate);
@@ -3896,10 +4181,11 @@
   function seedPrios(){ return [{id:uid(),text:"",done:false}]; }
   // Leere Zusatz-Slots einklappen, damit der Tag mit einer klaren Priorität beginnt
   function trimPrios(){
-    if(!prios||!Array.isArray(prios.items)) return;
-    while(prios.items.length>1){
-      const last=prios.items[prios.items.length-1];
-      if((last.text||"").trim()==="" && !last.done) prios.items.pop(); else break;
+    if(!prios||!Array.isArray(prios.all)) return;
+    let ps=priosOf();
+    while(ps.length>1){
+      const last=ps[ps.length-1];
+      if((last.text||"").trim()==="" && last.status!=="done"){ delItem(last.id); ps=priosOf(); } else break;
     }
   }
   let priosTrimmed=false;
@@ -3909,30 +4195,71 @@
       prios={ day:today, items:seedPrios(), todos:(old||[]).map(t=>({id:t.id||uid(),text:t.text||"",done:!!t.done})), park:[], archive:[] };
       savePrios();
     }
+    migrateItems();
     if(prios.day!==today){
       const oldDay=prios.day;
-      const doneP=(prios.items||[]).filter(it=>it.text.trim() && it.done).map(it=>({id:uid(),text:it.text.trim(),type:"prio",day:oldDay,doneAt:it.doneAt||null}));
-      const doneT=(prios.todos||[]).filter(t=>(t.text||"").trim() && t.done).map(t=>({id:uid(),text:t.text.trim(),type:"todo",day:oldDay,doneAt:t.doneAt||null}));
-      prios.archive=doneP.concat(doneT, prios.archive||[]).slice(0,500);
-      const carryP=(prios.items||[]).filter(it=>it.text.trim() && !it.done).map(it=>({id:uid(),text:it.text.trim(),type:"prio"}));
-      const carryT=(prios.todos||[]).filter(t=>(t.text||"").trim() && !t.done).map(t=>({id:uid(),text:t.text.trim(),type:"todo"}));
-      prios.park=carryP.concat(carryT, prios.park||[]);
-      prios.items=seedPrios();
-      prios.todos=[];
+      // Erledigtes ins Archiv, Offenes auf den Parkplatz (Datum entfernen)
+      const erledigt=prios.all.filter(x=>x.day===oldDay && x.status==="done" && (x.text||"").trim());
+      prios.archive=erledigt.map(x=>({id:uid(), text:x.text.trim(), type:x.prio?"prio":"todo", day:oldDay, doneAt:x.doneAt||null}))
+                            .concat(prios.archive||[]).slice(0,500);
+      prios.all=prios.all.filter(x=>!(x.day===oldDay && x.status==="done"));
+      prios.all.forEach(x=>{ if(x.day===oldDay){ x.day=null; x.prio=false; x.focus=false; delete x.start; delete x.dur; } });
+      prios.all=prios.all.filter(x=>(x.text||"").trim() || x.day===today);
       prios.day=today;
       savePrios();
     }
-    prios.items=prios.items||seedPrios();
-    if(!priosTrimmed){ trimPrios(); priosTrimmed=true; }   // nur einmal beim Start, damit "+" nicht sofort wieder eingeklappt wird
-    prios.todos=prios.todos||[]; prios.park=prios.park||[]; prios.archive=prios.archive||[];
+    if(!prios.all.some(x=>x.day===today && x.prio)) prios.all.push(newItem({prio:true}));
+    if(!priosTrimmed){ trimPrios(); priosTrimmed=true; }
+    prios.archive=prios.archive||[];
   }
+
+  /* ---------- Ein Bestand für alle Vorhaben ----------
+     Ein Eintrag, mehrere Merkmale: Datum, Priorität, Uhrzeit, Fokus.
+     Die Ansichten sind Filter darauf. Die alten Speicher bleiben unangetastet. */
+  function newItem(o){
+    return Object.assign({id:uid(), text:"", status:"open", day:today, prio:false, focus:false,
+                          created:new Date().toISOString()}, o||{});
+  }
+  function migrateItems(){
+    if(Array.isArray(prios.all)) return;
+    const all=[];
+    (prios.items||[]).forEach(it=>{ all.push(newItem({text:it.text||"", prio:true,
+      status:it.done?"done":"open", doneAt:it.doneAt||null, start:it.start, dur:it.dur})); });
+    (prios.todos||[]).forEach(t=>{
+      if(t.focusMirror) return;                      // die Spiegelung entfällt
+      all.push(newItem({text:t.text||"", status:t.done?"done":"open", doneAt:t.doneAt||null,
+        start:t.start, dur:t.dur, sub:t.sub||undefined})); });
+    (prios.park||[]).forEach(p=>{ all.push(newItem({text:p.text||"", day:null, prio:p.type==="prio"})); });
+    (prios.blockers||[]).forEach(b=>{ all.push(newItem({text:b.text||"", day:b.day, start:b.start, dur:b.dur, fixed:true})); });
+    try{
+      const fx=readFocus();
+      if(fx && fx.day===today) (fx.tasks||[]).forEach(t=>{
+        if(!(t.text||"").trim()) return;
+        const gleich=all.find(x=>x.day===today && x.text.trim()===t.text.trim());
+        if(gleich){ gleich.focus=true; if(t.status==="done") gleich.status="done"; else if(t.status==="started") gleich.status="started"; }
+        else all.push(newItem({text:t.text, focus:true, status:t.status||"open"}));
+      });
+    }catch(e){}
+    prios.all=all;
+    savePrios();
+  }
+  // Ansichten als Filter
+  const allItems   = ()=>{ ensurePrios(); return prios.all; };
+  const priosOf    = ()=>prios.all.filter(x=>x.day===today && x.prio);
+  const todosOf    = ()=>prios.all.filter(x=>x.day===today && !x.prio);
+  const parkOf     = ()=>prios.all.filter(x=>x.day===null);
+  const focusOf    = ()=>prios.all.filter(x=>x.day===today && x.focus);
+  const isDoneI    = x=>x.status==="done";
+  function addItem(o){ ensurePrios(); const it=newItem(o); prios.all.push(it); savePrios(); return it; }
+  function delItem(id){ prios.all=prios.all.filter(x=>x.id!==id); savePrios(); }
   function setDone(obj,val){
-    obj.done=val;
+    obj.status = val ? "done" : "open";
     obj.doneAt = val ? new Date().toISOString() : null;
     savePrios(); buildPrios();
+    if(state.tab==="fokus") buildFokus();
   }
-  const allTasks=()=> prios.items.filter(i=>i.text.trim()).map(i=>({o:i,type:"prio"}))
-                     .concat(prios.todos.map(t=>({o:t,type:"todo"})));
+  const allTasks=()=> prios.all.filter(x=>x.day===today && (x.text||"").trim())
+                        .map(x=>({o:x, type:x.prio?"prio":"todo"}));
   const findTask=id=> allTasks().find(x=>x.o.id===id);
 
   /* ==================== FOKUS-BLOCKER ==================== */
@@ -3987,27 +4314,8 @@
     if(!b.prod){ const sp=blockSpan(b); if(sp>0) b.prod=String(sp); }
     saveFocus(); syncFocusToPrios(); buildFokus();
   }
-  const FOCUS_LABEL="Tagesfokus";
-  // Tagesfokus-ToDo (mit Teilaufgaben + Stand) und Fokuszeiten in Prios spiegeln
-  function syncFocusToPrios(){
-    ensurePrios();
-    prios.todos=prios.todos||[];
-    // Die Tagesfokus-ToDo ist ein Nachweis über getane Arbeit:
-    // sie erscheint erledigt und listet nur, was wirklich erledigt oder begonnen wurde.
-    const done=(focus.tasks||[]).filter(t=>(t.text||"").trim() && (t.status==="done"||t.status==="started"));
-    let mirror=prios.todos.find(t=>t.focusMirror);
-    if(done.length){
-      if(!mirror){ mirror={id:uid(), text:FOCUS_LABEL, focusMirror:true}; prios.todos.unshift(mirror); }
-      mirror.text=FOCUS_LABEL;
-      mirror.sub=done.map(t=>({id:uid(), fbId:t.id, text:t.text.trim(), done:t.status==="done", started:t.status==="started"}));
-      mirror.done=true;
-      if(!mirror.doneAt) mirror.doneAt=new Date().toISOString();
-    }else if(mirror){
-      prios.todos=prios.todos.filter(t=>!t.focusMirror);
-    }
-    savePrios();
-    if(state.tab==="prios") buildPrios();
-  }
+  // Die Spiegelung entfällt: Fokus-Aufgaben sind Einträge im gemeinsamen Bestand
+  function syncFocusToPrios(){ if(state.tab==="prios") buildPrios(); }
 
   /* ---------- Fokusuhr (Flow / Pause, Gong) ---------- */
   const TIMER="ht_focustimer_v1";
@@ -4696,10 +5004,11 @@
       right.appendChild(lp);
     }
     const tlist=document.createElement("div"); tlist.className="ftask-list";
-    if(!focus.tasks.length){ const e=document.createElement("div"); e.className="ftask-empty"; e.textContent="Woran arbeitest du heute?"; tlist.appendChild(e); }
-    focus.tasks.forEach(t=>tlist.appendChild(renderTask(t)));
+    const fitems=focusOf();
+    if(!fitems.length){ const e=document.createElement("div"); e.className="ftask-empty"; e.textContent="Woran arbeitest du heute?"; tlist.appendChild(e); }
+    fitems.forEach(t=>tlist.appendChild(renderTask(t)));
     const add=document.createElement("button"); add.className="ftask-add"; add.type="button"; add.textContent="+ Aufgabe";
-    add.addEventListener("click",()=>{ focus.tasks.push({id:uid(),text:"",status:"open"}); saveFocus(); buildFokus();
+    add.addEventListener("click",()=>{ addItem({focus:true}); buildFokus();
       const ins=document.querySelectorAll(".ftask-text"); if(ins.length)ins[ins.length-1].focus(); });
     tlist.appendChild(add); right.appendChild(tlist); cols.appendChild(right);
 
@@ -4743,17 +5052,18 @@
     const chk=document.createElement("button"); chk.className="ftask-chk"; chk.type="button";
     chk.title="Status: "+STATUS_LABEL[t.status||"open"];
     chk.setAttribute("aria-label","Status: "+STATUS_LABEL[t.status||"open"]);
-    chk.addEventListener("click",()=>{ t.status=STATUS_CYCLE[t.status||"open"]; saveFocus(); syncFocusToPrios(); buildFokus(); });
+    chk.addEventListener("click",()=>{ t.status=STATUS_CYCLE[t.status||"open"];
+      t.doneAt = t.status==="done" ? new Date().toISOString() : null; savePrios(); syncFocusToPrios(); buildFokus(); });
     const txt=document.createElement("textarea"); txt.className="ftask-text"; txt.rows=1;
     txt.value=t.text||""; txt.placeholder="Aufgabe\u2026";
     const grow=()=>{ txt.style.height="auto"; txt.style.height=(txt.scrollHeight||22)+"px"; };
-    txt.addEventListener("input",()=>{ t.text=txt.value; saveFocus(); grow(); });
+    txt.addEventListener("input",()=>{ t.text=txt.value; savePrios(); grow(); });
     txt.addEventListener("blur",()=>syncFocusToPrios());
     // Zeilenumbruch statt Absenden: der Text soll vollständig sichtbar bleiben
     txt.addEventListener("keydown",e=>{ if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); txt.blur(); } });
     requestAnimationFrame(grow);
     const del=document.createElement("button"); del.className="ftask-del"; del.type="button"; del.textContent="\u00d7";
-    del.addEventListener("click",()=>{ focus.tasks=focus.tasks.filter(x=>x.id!==t.id); saveFocus(); syncFocusToPrios(); buildFokus(); });
+    del.addEventListener("click",()=>{ delItem(t.id); syncFocusToPrios(); buildFokus(); });
     row.append(chk,txt,del);
     return row;
   }
@@ -4816,7 +5126,7 @@
       const row=document.createElement("div"); row.className="fth-item";
       const t=document.createElement("span"); t.className="fth-tx"; t.textContent=g.text;
       const toTodo=document.createElement("button"); toTodo.className="fth-to"; toTodo.type="button"; toTodo.textContent="zu ToDos"; toTodo.title="als ToDo übernehmen";
-      toTodo.addEventListener("click",()=>{ ensurePrios(); prios.todos=prios.todos||[]; prios.todos.push({id:uid(),text:g.text,done:false}); savePrios();
+      toTodo.addEventListener("click",()=>{ addItem({text:g.text});
         focus.thoughts=focus.thoughts.filter(x=>x.id!==g.id); saveFocus(); buildFokus(); toast("Zu ToDos hinzugefügt."); });
       const del=document.createElement("button"); del.className="fth-del"; del.type="button"; del.textContent="×";
       del.addEventListener("click",()=>{ focus.thoughts=focus.thoughts.filter(x=>x.id!==g.id); saveFocus(); buildFokus(); });
@@ -4831,19 +5141,30 @@
     const view=document.getElementById("view-prios"); view.innerHTML="";
     const panel=document.createElement("section"); panel.className="panel";
     panel.style.setProperty("--c","var(--rose)"); panel.style.setProperty("--c-tint","var(--rose-tint)");
-    const pc=prios.park.length;
+    const pc=parkOf().length;
     scopeRollover();
     const wc=(vision.week.points||[]).filter(p=>(p.text||"").trim()).length;
     const sub=state.priosSub;
     const head=document.createElement("div"); head.className="panel-head";
-    head.innerHTML=`<span class="dot"></span><span class="eyebrow">Prios &amp; ToDos</span>
-      <div class="subtabs">
-        <button class="subtab ${sub==='heute'?'active':''}" data-sub="heute" type="button">Heute</button>
-        <button class="subtab ${sub==='woche'?'active':''}" data-sub="woche" type="button">Woche${wc?` <span class="badge">${wc}</span>`:''}</button>
-        <button class="subtab ${sub==='park'?'active':''}" data-sub="park" type="button">Parkplatz${pc?` <span class="badge">${pc}</span>`:''}</button>
-      </div>`;
+    const titel = sub==='park'?'Parkplatz' : sub==='archiv'?'Archiv' : 'Prios &amp; ToDos';
+    head.innerHTML=`<span class="dot"></span><span class="eyebrow">${titel}</span>`;
+    // Eine Achse: Tag ↔ Woche. Parkplatz und Archiv sind Lager, keine Zeitansichten.
+    if(sub==='heute'||sub==='woche'){
+      const ax=document.createElement("div"); ax.className="axis";
+      [["heute","Tag"],["woche","Woche"]].forEach(([k,l])=>{
+        const b=document.createElement("button"); b.type="button"; b.className="axis-btn"+(sub===k?" on":"");
+        b.innerHTML=l+(k==='woche'&&wc?` <span class="badge">${wc}</span>`:'');
+        b.addEventListener("click",()=>{ state.priosSub=k; buildPrios(); });
+        ax.appendChild(b);
+      });
+      head.appendChild(ax);
+    }else{
+      const back=document.createElement("button"); back.type="button"; back.className="axis-back";
+      back.textContent="zurück";
+      back.addEventListener("click",()=>{ state.priosSub="heute"; buildPrios(); });
+      head.appendChild(back);
+    }
     panel.appendChild(head);
-    head.querySelectorAll(".subtab").forEach(b=>b.addEventListener("click",()=>{ state.priosSub=b.dataset.sub; buildPrios(); }));
     if(sub==='heute') buildWeekStrip(panel);
     if(sub==='park') buildParkplatz(panel);
     else if(sub==='archiv') buildArchiv(panel);
@@ -4851,11 +5172,17 @@
     else buildHeuteList(panel);
     view.appendChild(panel);
     view.classList.toggle("single", sub!=='heute');
-    if(sub==='heute'){ buildTimeline(view); }
-    if(sub!=='archiv'){
-      const link=document.createElement("button"); link.className="archiv-link"; link.type="button"; link.textContent="Archiv ansehen";
-      link.addEventListener("click",()=>{ state.priosSub="archiv"; buildPrios(); });
-      view.appendChild(link);
+    // Die Zeitachse folgt der Achse oben: Tag zeigt den Tagesplan, Woche das Wochenraster
+    if(sub==='heute'){ tlMode="day"; buildTimeline(view); }
+    else if(sub==='woche'){ tlMode="week"; buildTimeline(view); }
+    if(sub==='heute'||sub==='woche'){
+      const foot=document.createElement("div"); foot.className="prios-foot";
+      const pk=document.createElement("button"); pk.type="button"; pk.className="pf-link";
+      pk.innerHTML=`Parkplatz${pc?`<span class="pf-c">${pc}</span>`:''}`;
+      pk.addEventListener("click",()=>{ state.priosSub="park"; buildPrios(); });
+      const ar=document.createElement("button"); ar.type="button"; ar.className="pf-link"; ar.textContent="Archiv";
+      ar.addEventListener("click",()=>{ state.priosSub="archiv"; buildPrios(); });
+      foot.append(pk,ar); view.appendChild(foot);
     }
   }
   // Wochenziele als Auswahlgrundlage für den Tag
@@ -4957,25 +5284,28 @@
   }
 
   function buildHeuteList(panel){
+    const ps=priosOf();
     const lblP=document.createElement("div"); lblP.className="sub-label"; lblP.textContent="Prioritäten";
     panel.appendChild(lblP);
-    prios.items.forEach((it,idx)=>{
-      const row=document.createElement("div"); row.className="prio-row"+(it.done?" done":"");
-      if(it.text.trim()){ row.draggable=true; row.addEventListener("dragstart",e=>{ e.dataTransfer.setData("text/plain",it.id); }); }
+    ps.forEach((it,idx)=>{
+      const row=document.createElement("div"); row.className="prio-row"+(isDoneI(it)?" done":"");
+      if((it.text||"").trim()){ row.draggable=true; row.addEventListener("dragstart",e=>{ e.dataTransfer.setData("text/plain",it.id); }); }
       const check=document.createElement("button"); check.className="todo-check"; check.type="button"; check.setAttribute("aria-label","Erledigt umschalten");
       check.innerHTML=`<svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>`;
-      check.addEventListener("click",()=>setDone(it,!it.done));
-      const inp=document.createElement("input"); inp.type="text"; inp.value=it.text; inp.placeholder=(prios.items.length>1?`Priorität ${idx+1} …`:"Die eine Sache heute …"); inp.setAttribute("aria-label","Priorität");
+      check.addEventListener("click",()=>setDone(it,!isDoneI(it)));
+      const inp=document.createElement("input"); inp.type="text"; inp.value=it.text||"";
+      inp.placeholder=(ps.length>1?`Priorität ${idx+1} …`:"Die eine Sache heute …"); inp.setAttribute("aria-label","Priorität");
       inp.addEventListener("input",()=>{ it.text=inp.value; savePrios(); });
       inp.addEventListener("blur",()=>buildPrios());
       const dot=document.createElement("button"); dot.className="prio-dot"; dot.type="button"; dot.title="In normale ToDo umwandeln"; dot.setAttribute("aria-label","In normale ToDo umwandeln");
-      dot.addEventListener("click",()=>demotePrio(it));
+      dot.addEventListener("click",()=>{ it.prio=false; savePrios(); buildPrios(); });
       row.append(check,inp,dot); panel.appendChild(row);
     });
-    if(prios.items.length<3){
+    if(ps.length<3){
       const addP=document.createElement("button"); addP.className="prio-more"; addP.type="button";
       addP.textContent="+"; addP.title="Weitere Priorität"; addP.setAttribute("aria-label","Weitere Priorität hinzufügen");
-      addP.addEventListener("click",()=>{ prios.items.push({id:uid(),text:"",done:false}); savePrios(); buildPrios(); const ins=document.querySelectorAll(".prio-row input"); if(ins.length) ins[ins.length-1].focus(); });
+      addP.addEventListener("click",()=>{ addItem({prio:true}); buildPrios();
+        const ins=document.querySelectorAll(".prio-row input"); if(ins.length) ins[ins.length-1].focus(); });
       panel.appendChild(addP);
     }
     const lblT=document.createElement("div"); lblT.className="sub-label with-line"; lblT.textContent="Weitere ToDos";
@@ -4983,32 +5313,31 @@
     const add=document.createElement("div"); add.className="add-row";
     const input=document.createElement("input"); input.type="text"; input.maxLength=90; input.placeholder="Weitere ToDo hinzufügen …"; input.setAttribute("aria-label","Neue ToDo");
     const addBtn=document.createElement("button"); addBtn.className="add-btn"; addBtn.type="button"; addBtn.textContent="+"; addBtn.setAttribute("aria-label","Hinzufügen");
-    const commit=()=>{ const v=input.value.trim(); if(!v) return; prios.todos.push({id:uid(),text:v,done:false}); savePrios(); buildPrios(); const ni=document.querySelector("#view-prios .add-row input"); if(ni) ni.focus(); };
+    const commit=()=>{ const v=input.value.trim(); if(!v) return; addItem({text:v}); buildPrios();
+      const ni=document.querySelector("#view-prios .add-row input"); if(ni) ni.focus(); };
     addBtn.addEventListener("click",commit);
     input.addEventListener("keydown",e=>{ if(e.key==="Enter") commit(); });
     add.append(input,addBtn); panel.appendChild(add);
-    prios.todos.forEach(t=>{
-      const row=document.createElement("div"); row.className="todo"+(t.done?" done":"");
+    todosOf().forEach(t=>{
+      const row=document.createElement("div"); row.className="todo"+(isDoneI(t)?" done":"")+(t.status==="started"?" started":"");
       row.draggable=true; row.addEventListener("dragstart",e=>{ e.dataTransfer.setData("text/plain",t.id); });
       const check=document.createElement("button"); check.className="todo-check"; check.type="button"; check.setAttribute("aria-label","Erledigt umschalten");
       check.innerHTML=`<svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>`;
-      check.addEventListener("click",()=>setDone(t,!t.done));
-      const txt=document.createElement("span"); txt.className="todo-text"; txt.textContent=t.text;
-      txt.addEventListener("click",()=>setDone(t,!t.done));
-      const del=document.createElement("button"); del.className="row-del"; del.type="button"; del.textContent="×"; del.setAttribute("aria-label","Löschen");
-      del.addEventListener("click",()=>{ prios.todos=prios.todos.filter(x=>x.id!==t.id); savePrios(); buildPrios(); });
-      if(t.fromFocus) txt.classList.add("from-focus");
-      row.append(check,txt,del); panel.appendChild(row);
-      // Fokus-Teilaufgaben unter der ToDo
-      if(t.sub && t.sub.length){
-        const sub=document.createElement("div"); sub.className="todo-sub";
-        t.sub.forEach(su=>{
-          const sr=document.createElement("div"); sr.className="todo-sub-row"+(su.done?" done":su.started?" started":"");
-          sr.innerHTML=`<span class="tsub-dot">${su.done?"✓":su.started?"◐":"○"}</span><span class="tsub-tx">${esc(su.text)}</span>`;
-          sub.appendChild(sr);
-        });
-        panel.appendChild(sub);
+      check.addEventListener("click",()=>setDone(t,!isDoneI(t)));
+      const txt=document.createElement("span"); txt.className="todo-text"+(t.focus?" from-focus":""); txt.textContent=t.text||"";
+      txt.addEventListener("click",()=>setDone(t,!isDoneI(t)));
+      if(t.fixed && typeof t.start==="number"){
+        const tm=document.createElement("span"); tm.className="todo-time";
+        tm.textContent=fMinToClock(t.start);
+        tm.title="Feste Zeit — im Tagesplan eingetragen";
+        txt.appendChild(tm);
       }
+      const up=document.createElement("button"); up.className="todo-up"; up.type="button"; up.textContent="↑";
+      up.title="Zur Priorität machen"; up.setAttribute("aria-label","Zur Priorität machen");
+      up.addEventListener("click",()=>{ if(priosOf().length>=3){ toast("Höchstens drei Prioritäten"); return; } t.prio=true; savePrios(); buildPrios(); });
+      const del=document.createElement("button"); del.className="row-del"; del.type="button"; del.textContent="×"; del.setAttribute("aria-label","Löschen");
+      del.addEventListener("click",()=>{ delItem(t.id); buildPrios(); if(state.tab==="fokus") buildFokus(); });
+      row.append(check,txt,up,del); panel.appendChild(row);
     });
   }
 
@@ -5027,18 +5356,13 @@
     savePrios();
   }
   /* ---------- Blocker: feste Zeiten, die im Voraus gesetzt werden ---------- */
-  const blockers=()=>{ ensurePrios(); if(!Array.isArray(prios.blockers)) prios.blockers=[]; return prios.blockers; };
-  const blockersFor=d=>blockers().filter(b=>b.day===d).sort((a,b)=>a.start-b.start);
+  // Ein Blocker ist ein Vorhaben mit fester Zeit — derselbe Bestand wie alle Einträge
+  const blockers=()=>{ ensurePrios(); return prios.all.filter(x=>x.fixed); };
+  const blockersFor=d=>prios.all.filter(x=>x.fixed && x.day===d && typeof x.start==="number").sort((a,b)=>a.start-b.start);
   function addBlocker(day,start,dur,text){
-    blockers().push({id:uid(), day, start:clampMin(start), dur:Math.max(TL_MINDUR,dur||60), text:text||""});
-    savePrios();
+    addItem({text:text||"", day, start:clampMin(start), dur:Math.max(TL_MINDUR,dur||60), fixed:true});
   }
-  function pruneBlockers(){
-    // Vergangenes aufräumen, damit die Liste nicht endlos wächst
-    const cut=addDays(today,-14);
-    const b=blockers(); const keep=b.filter(x=>x.day>=cut);
-    if(keep.length!==b.length){ prios.blockers=keep; savePrios(); }
-  }
+  function pruneBlockers(){ /* Blocker sind Einträge — der Tageswechsel räumt sie mit auf */ }
 
   const WP_PXMIN=26/60;   // Wochenspalten sind schmaler als die Tagesansicht
   let tlMode="day", wpOffset=0;   // 0 = laufende Woche, +1 = nächste
@@ -5105,6 +5429,7 @@
 
     dayKeys.forEach((k,i)=>{
       const col=document.createElement("div"); col.className="wp-col"+(k===today?" today":"")+(k<today?" past":"");
+      col.dataset.day=k;
       const dt=new Date(k+"T00:00:00");
       const hd=document.createElement("div"); hd.className="wp-colhead";
       hd.innerHTML=`<span class="wp-wd">${WD[i]}</span><span class="wp-dd">${dt.getDate()}</span>`;
@@ -5139,21 +5464,16 @@
       });
       // Blocker
       blockersFor(k).forEach(b=>{
-        const el=document.createElement("div"); el.className="wp-blk";
+        const el=document.createElement("div"); el.className="wp-blk"+(isDoneI(b)?" done":"");
         el.style.top=((b.start-TL_START)*WP_PXMIN)+"px";
         el.style.height=Math.max(13,b.dur*WP_PXMIN-1)+"px";
         el.title=(b.text||"Blocker")+" · "+fMinToClock(b.start)+"–"+fMinToClock(b.start+b.dur);
-        el.innerHTML=`<span class="wpb-tx">${esc(b.text||"Blocker")}</span>`;
-        el.addEventListener("click",e=>{ e.stopPropagation(); editBlocker(b); });
+        el.innerHTML=`<span class="wpb-tx">${esc(b.text||"Blocker")}</span><span class="wpb-grip"></span>`;
+        wpDragBlocker(el,b,grid);
         body.appendChild(el);
       });
-      // Neue Blocker durch Tippen
-      body.addEventListener("click",e=>{
-        const r=body.getBoundingClientRect();
-        const y=e.clientY-r.top;
-        const raw=TL_START+Math.round((y/WP_PXMIN)/30)*30;
-        openNewBlocker(k, clampMin(raw));
-      });
+      // Ziehen legt einen Zeitraum an — wie im Kalender
+      wpDragCreate(body,k);
       col.appendChild(body);
       grid.appendChild(col);
     });
@@ -5187,7 +5507,12 @@
         const from=document.createElement("input"); from.type="time"; from.className="ask-time"; from.value=opts.from||"09:00";
         const lab=document.createElement("label"); lab.textContent="Dauer";
         const dur=document.createElement("select"); dur.className="ask-dur";
-        [30,45,60,90,120,180,240].forEach(m=>{ const o=document.createElement("option"); o.value=m; o.textContent=m+" min"; if(m===(opts.dur||60))o.selected=true; dur.appendChild(o); });
+        const gewuenscht=opts.dur||60;
+        const werte=[15,30,45,60,90,120,180,240];
+        if(werte.indexOf(gewuenscht)<0) werte.push(gewuenscht);   // aufgezogene Spanne übernehmen
+        werte.sort((a,b)=>a-b).forEach(m=>{ const o=document.createElement("option"); o.value=m;
+          o.textContent = m>=60 ? (m%60?Math.floor(m/60)+" h "+(m%60)+" min":Math.floor(m/60)+" h") : m+" min";
+          if(m===gewuenscht)o.selected=true; dur.appendChild(o); });
         row.append(from,lab,dur); box.appendChild(row);
         box.__from=from; box.__dur=dur;
       }
@@ -5218,24 +5543,124 @@
       from:fMinToClock(start), dur:60});
     if(!r||r.deleted||!r.text) return;
     ensurePrios();
-    prios.todos=prios.todos||[];
-    prios.todos.push({id:uid(), text:r.text, done:false,
+    addItem({text:r.text,
       start:clampMin(r.start!=null?r.start:start), dur:Math.max(TL_MINDUR,r.dur||60), fromTimeline:true});
     savePrios(); buildPrios();
     toast("Aufgabe eingeplant");
   }
-  async function openNewBlocker(day,start){
+  /* ---------- Ziehen im Wochenraster ---------- */
+  const WP_SNAP=15;
+  const wpY2min=y=>TL_START+Math.round((y/WP_PXMIN)/WP_SNAP)*WP_SNAP;
+  const wpMin2y=m=>(m-TL_START)*WP_PXMIN;
+  const wpClamp=m=>Math.max(TL_START,Math.min(TL_END-WP_SNAP,m));
+
+  // Auf leerer Fläche einen Zeitraum aufziehen
+  function wpDragCreate(body,day){
+    let von=null, ghost=null, gezogen=false, halten=null;
+    const start=e=>{
+      if(e.target.closest(".wp-blk")) return;
+      const r=body.getBoundingClientRect();
+      von=wpClamp(wpY2min(e.clientY-r.top));
+      gezogen=false;
+      const los=()=>{
+        ghost=document.createElement("div"); ghost.className="wp-ghost";
+        ghost.style.top=wpMin2y(von)+"px"; ghost.style.height=Math.max(6,WP_SNAP*WP_PXMIN)+"px";
+        body.appendChild(ghost);
+        body.setPointerCapture&&body.setPointerCapture(e.pointerId);
+      };
+      // Maus zieht sofort, Finger erst nach kurzem Halten — sonst ließe sich nicht mehr scrollen
+      if(e.pointerType==="mouse") los();
+      else halten=setTimeout(()=>{ halten=null; los(); if(navigator.vibrate) try{navigator.vibrate(12);}catch(x){} },260);
+    };
+    const move=e=>{
+      if(halten){ clearTimeout(halten); halten=null; }
+      if(von==null||!ghost) return;
+      e.preventDefault();
+      const r=body.getBoundingClientRect();
+      const jetzt=wpClamp(wpY2min(e.clientY-r.top));
+      const a=Math.min(von,jetzt), b=Math.max(von,jetzt)+WP_SNAP;
+      if(Math.abs(jetzt-von)>=WP_SNAP) gezogen=true;
+      ghost.style.top=wpMin2y(a)+"px";
+      ghost.style.height=Math.max(6,(b-a)*WP_PXMIN)+"px";
+      ghost.dataset.von=a; ghost.dataset.bis=b;
+      ghost.textContent=fMinToClock(a)+"–"+fMinToClock(b);
+    };
+    const ende=e=>{
+      if(halten){ clearTimeout(halten); halten=null; }
+      if(von==null) return;
+      const g=ghost; const v=von; von=null; ghost=null;
+      if(g){ const a=parseInt(g.dataset.von,10), b=parseInt(g.dataset.bis,10); g.remove();
+        if(gezogen && !isNaN(a) && !isNaN(b)){ openNewBlocker(day, a, b-a); return; } }
+      openNewBlocker(day, v);
+    };
+    body.addEventListener("pointerdown",start);
+    body.addEventListener("pointermove",move);
+    body.addEventListener("pointerup",ende);
+    body.addEventListener("pointercancel",()=>{ if(halten){clearTimeout(halten);halten=null;} if(ghost){ghost.remove();ghost=null;} von=null; });
+  }
+
+  // Bestehenden Blocker verschieben oder in der Höhe ändern
+  function wpDragBlocker(el,b,grid){
+    let art=null, y0=0, start0=0, dur0=0, bewegt=false, halten=null;
+    const los=e=>{
+      art = e.target.classList.contains("wpb-grip") ? "dauer" : "zug";
+      y0=e.clientY; start0=b.start; dur0=b.dur; bewegt=false;
+      el.classList.add("zieht");
+      el.setPointerCapture&&el.setPointerCapture(e.pointerId);
+    };
+    const start=e=>{
+      e.stopPropagation();
+      if(e.pointerType==="mouse") los(e);
+      else { const ev={clientY:e.clientY,target:e.target,pointerId:e.pointerId};
+             halten=setTimeout(()=>{ halten=null; los(ev); if(navigator.vibrate) try{navigator.vibrate(12);}catch(x){} },260); }
+    };
+    const move=e=>{
+      if(halten){ if(Math.abs(e.clientY-y0)>6){ clearTimeout(halten); halten=null; } return; }
+      if(!art) return;
+      e.preventDefault(); e.stopPropagation();
+      const dmin=Math.round(((e.clientY-y0)/WP_PXMIN)/WP_SNAP)*WP_SNAP;
+      if(Math.abs(dmin)>=WP_SNAP) bewegt=true;
+      if(art==="zug"){
+        b.start=wpClamp(start0+dmin);
+        // Über den Spalten: der Tag wechselt mit
+        const sp=[...grid.querySelectorAll(".wp-col")].find(c=>{ const r=c.getBoundingClientRect();
+          return e.clientX>=r.left && e.clientX<=r.right; });
+        if(sp && sp.dataset.day && sp.dataset.day!==b.day){ b.day=sp.dataset.day; bewegt=true; }
+      }else{
+        b.dur=Math.max(WP_SNAP, dur0+dmin);
+      }
+      el.style.top=wpMin2y(b.start)+"px";
+      el.style.height=Math.max(13,b.dur*WP_PXMIN-1)+"px";
+      el.title=(b.text||"Blocker")+" · "+fMinToClock(b.start)+"–"+fMinToClock(b.start+b.dur);
+    };
+    const ende=e=>{
+      if(halten){ clearTimeout(halten); halten=null; }
+      el.classList.remove("zieht");
+      if(!art){ e.stopPropagation(); editBlocker(b); return; }
+      art=null;
+      if(bewegt){ savePrios(); buildPrios(); }
+      else editBlocker(b);
+      e.stopPropagation();
+    };
+    el.addEventListener("pointerdown",start);
+    el.addEventListener("pointermove",move);
+    el.addEventListener("pointerup",ende);
+    el.addEventListener("pointercancel",()=>{ if(halten){clearTimeout(halten);halten=null;} art=null; el.classList.remove("zieht"); buildPrios(); });
+  }
+
+  async function openNewBlocker(day,start,dauer){
+    const d0=dauer||60;
     const r=await askText({title:"Blocker eintragen", placeholder:"Wofür ist die Zeit reserviert?",
-      times:true, from:fMinToClock(start), dur:60});
+      times:true, from:fMinToClock(start), dur:d0});
     if(!r||r.deleted) return;
-    addBlocker(day, r.start!=null?r.start:start, r.dur||60, r.text||"Blocker");
+    addBlocker(day, r.start!=null?r.start:start, r.dur||d0, r.text||"Blocker");
     buildPrios();
   }
   async function editBlocker(b){
     const r=await askText({title:"Blocker bearbeiten", value:b.text||"", times:true,
       from:fMinToClock(b.start), dur:b.dur, allowDelete:true});
     if(!r) return;
-    if(r.deleted){ prios.blockers=blockers().filter(x=>x.id!==b.id); savePrios(); buildPrios(); return; }
+    if(r.deleted){ delItem(b.id); buildPrios(); return; }
     b.text=r.text||"Blocker";
     if(r.start!=null){ b.start=clampMin(r.start); b.dur=r.dur||b.dur; }
     savePrios(); buildPrios();
@@ -5246,15 +5671,9 @@
     const panel=document.createElement("section"); panel.className="panel timeline";
     panel.style.setProperty("--c","var(--sky)"); panel.style.setProperty("--c-tint","var(--sky-tint)");
     const head=document.createElement("div"); head.className="panel-head";
-    head.innerHTML=`<span class="dot"></span><span class="eyebrow">${tlMode==="day"?"Tagesansicht":"Wochenansicht"}</span>`+
-      `<span class="tl-hint">${tlMode==="day"?"gedrückt halten legt an":""}</span>`;
-    const sw=document.createElement("div"); sw.className="tl-switch";
-    [["day","Tag"],["week","Woche"]].forEach(([k,lbl])=>{
-      const b=document.createElement("button"); b.type="button"; b.className="tls-btn"+(tlMode===k?" on":""); b.textContent=lbl;
-      b.addEventListener("click",()=>{ tlMode=k; buildPrios(); });
-      sw.appendChild(b);
-    });
-    head.appendChild(sw);
+    head.innerHTML=`<span class="dot"></span><span class="eyebrow">${tlMode==="week"?"Blocker":"Tagesansicht"}</span>`+
+      `<span class="tl-hint">${tlMode==="week"?"":"gedrückt halten legt an"}</span>`;
+
     panel.appendChild(head);
     if(tlMode==="week"){ buildWeekPlan(panel); view.appendChild(panel); return; }
 
@@ -5357,7 +5776,7 @@
 
     // Blocker dieses Tages
     blockersFor(state.viewDate).forEach(b=>{
-      const el=document.createElement("div"); el.className="tl-blk";
+      const el=document.createElement("div"); el.className="tl-blk"+(isDoneI(b)?" done":"");
       el.style.top=min2y(b.start)+"px";
       el.style.height=Math.max(18,b.dur*TL_PXMIN-2)+"px";
       el.innerHTML=`<span class="tlb-tx">${esc(b.text||"Blocker")}</span><span class="tlb-t">${fMinToClock(b.start)}–${fMinToClock(b.start+b.dur)}</span>`;
@@ -5414,8 +5833,8 @@
 /* ---------- Archiv ---------- */
   function todayDoneEntries(){
     const out=[];
-    prios.items.forEach(i=>{ if(i.text.trim()&&i.done) out.push({text:i.text,type:"prio",day:prios.day,doneAt:i.doneAt}); });
-    prios.todos.forEach(t=>{ if(t.text.trim()&&t.done) out.push({text:t.text,type:"todo",day:prios.day,doneAt:t.doneAt}); });
+    prios.all.filter(x=>x.day===today && x.status==="done" && (x.text||"").trim())
+      .forEach(x=>out.push({text:x.text,type:x.prio?"prio":"todo",day:prios.day,doneAt:x.doneAt}));
     return out;
   }
   function buildArchiv(panel){
@@ -5445,25 +5864,24 @@
     });
   }
   function demotePrio(it){
-    prios.items=prios.items.filter(x=>x.id!==it.id);
-    if(it.text.trim()) prios.todos.unshift({id:uid(),text:it.text.trim(),done:it.done});
+    it.prio=false;
     savePrios(); buildPrios();
   }
   function parkBackOne(p){
-    if(p.type==="todo"){ prios.todos.push({id:uid(),text:p.text,done:false}); }
-    else { const slot=prios.items.find(x=>!x.text.trim()); if(slot){ slot.text=p.text; } else { prios.todos.push({id:uid(),text:p.text,done:false}); } }
-    prios.park=prios.park.filter(x=>x.id!==p.id);
+    // Kein Kopieren mehr — der Eintrag bekommt einfach ein Datum
+    p.day=today; p.status="open";
+    if(p.prio && priosOf().length>3) p.prio=false;
     state.priosSub="heute"; savePrios(); buildPrios();
   }
   function parkBackAll(){
-    prios.park.forEach(p=>{
-      if(p.type==="todo"){ prios.todos.push({id:uid(),text:p.text,done:false}); }
-      else { const slot=prios.items.find(x=>!x.text.trim()); if(slot){ slot.text=p.text; } else { prios.todos.push({id:uid(),text:p.text,done:false}); } }
+    parkOf().forEach(p=>{
+      p.day=today; p.status="open"; p.prio=false;
     });
-    prios.park=[]; state.priosSub="heute"; savePrios(); buildPrios();
+    state.priosSub="heute"; savePrios(); buildPrios();
   }
   function buildParkplatz(panel){
-    if(prios.park.length===0){
+    const pk=parkOf();
+    if(pk.length===0){
       const e=document.createElement("div"); e.className="empty";
       e.textContent="Leer. Hier sammeln sich Prios und ToDos, die du an einem Tag nicht abgehakt hast.";
       panel.appendChild(e); return;
@@ -5471,8 +5889,8 @@
     const all=document.createElement("button"); all.className="ghost-add mint"; all.type="button"; all.textContent="↩ Alle zu Heute holen";
     all.addEventListener("click",parkBackAll);
     panel.appendChild(all);
-    prios.park.forEach(p=>{
-      const isTodo=(p.type==="todo");
+    pk.forEach(p=>{
+      const isTodo=!p.prio;
       const row=document.createElement("div"); row.className="park-row"+(isTodo?" muted":"");
       const txt=document.createElement("span"); txt.className="park-text"; txt.textContent=p.text;
       const back=document.createElement("button"); back.className="park-back"; back.type="button"; back.textContent="→ Heute";
@@ -5575,7 +5993,7 @@
     const now=new Date(), y=now.getFullYear(), q=Math.floor(now.getMonth()/3), sm=q*3;
     const start=ymd(new Date(y,sm,1)), end=ymd(new Date(y,sm+3,0));
     const total=daysBetween(start,end)+1, dayNo=Math.min(total,daysBetween(start,today)+1);
-    return {label:"Q"+(q+1), year:y, dayNo, total, remaining:total-dayNo, pct:Math.round(dayNo/total*100)};
+    return {label:"Q"+(q+1), year:y, start, end, dayNo, total, remaining:total-dayNo, pct:Math.round(dayNo/total*100)};
   }
   // ISO-Woche: Montag als Wochenstart
   function weekStart(d){ const x=new Date(d.getFullYear(),d.getMonth(),d.getDate()); const wd=(x.getDay()+6)%7; x.setDate(x.getDate()-wd); return x; }
@@ -5692,9 +6110,12 @@
       inner.appendChild(e);
     }
     pts.forEach(p=>{
-      const row=document.createElement("div"); row.className="vgoal"+(coupleTo && p.parent?" linked":"");
+      const row=document.createElement("div"); row.className="vgoal"+(coupleTo && p.parent?" linked":"")+(p.done?" erreicht":"");
       row.dataset.id=p.id;
-      const dot=document.createElement("span"); dot.className="vgoal-dot";
+      const dot=document.createElement("button"); dot.type="button"; dot.className="vgoal-dot";
+      dot.title=p.done?"erreicht — antippen zum Zurücknehmen":"als erreicht markieren";
+      dot.setAttribute("aria-label",dot.title);
+      dot.addEventListener("click",()=>{ p.done=!p.done; p.doneAt=p.done?new Date().toISOString():null; saveVision(); buildVision(); });
       const main=document.createElement("div"); main.className="vgoal-main";
       const inp=document.createElement("textarea"); inp.className="vgoal-text"; inp.rows=1;
       inp.value=p.text; inp.placeholder="Ziel…"; inp.setAttribute("aria-label","Ziel");
@@ -5703,6 +6124,15 @@
       main.appendChild(inp);
       row.append(dot,main);
       requestAnimationFrame(grow);
+      // Was hängt an diesem Ziel? Ein Ziel ohne Anker ist ein frommer Wunsch.
+      const kinder = key==="big"?"year" : key==="year"?"quarter" : key==="quarter"?"week" : null;
+      if(kinder && (p.text||"").trim()){
+        const ks=(visPoints(kinder)||[]).filter(x=>x.parent===p.id && (x.text||"").trim());
+        const nk=document.createElement("span"); nk.className="vgoal-kids"+(ks.length?"":" leer");
+        nk.textContent = ks.length ? ks.length+(ks.length===1?" Ziel darunter":" Ziele darunter") : "ohne Anker";
+        nk.title = ks.length ? ks.map(x=>x.text.trim()).join(" · ") : "Noch kein Ziel der nächsten Ebene ist damit verknüpft";
+        main.appendChild(nk);
+      }
       if(coupleTo){
         const parents=visPoints(coupleTo).filter(x=>x.text&&x.text.trim());
         const link=document.createElement("button"); link.type="button"; link.className="vgoal-link"+(p.parent?" set":"");
@@ -5914,57 +6344,252 @@
   }
 
 
+  let antiEdit=false;
   function buildAntiVizija(view){
     const panel=document.createElement("section"); panel.className="panel anti-panel";
 
     const head=document.createElement("div"); head.className="panel-head";
     head.innerHTML=`<span class="dot anti-dot"></span><span class="eyebrow">Anti-Vizija</span><span class="vis-hint">Was du nicht werden willst</span>`;
+    const eb=document.createElement("button"); eb.className="anti-edit"+(antiEdit?" on":""); eb.type="button";
+    eb.textContent=antiEdit?"fertig":"bearbeiten";
+    eb.addEventListener("click",()=>{ antiEdit=!antiEdit; buildVision(); });
     const back=document.createElement("button"); back.className="anti-back"; back.type="button";
     back.innerHTML=`<span>Zurück zur Vizija</span>`;
-    back.addEventListener("click",flipVizija);
-    head.appendChild(back);
-    armSecret(head.querySelector(".dot"));
+    back.addEventListener("click",()=>{ antiEdit=false; flipVizija(); });
+    head.append(eb,back);
+    armSecret(head.querySelector(".dot"), ()=>{ antiEdit=false; flipVizija(); });
     panel.appendChild(head);
 
-    const intro=document.createElement("p"); intro.className="anti-intro";
-    intro.textContent="Nicht um dich schlechtzumachen. Um zu sehen, wovon du dich abwendest — damit die andere Seite Gewicht bekommt.";
-    panel.appendChild(intro);
-
-    const list=document.createElement("div"); list.className="anti-list";
     const pts=vision.anti.points;
-    if(!pts.length){
-      const e=document.createElement("div"); e.className="anti-empty";
-      e.textContent=ANTI_PROMPTS[0];
-      list.appendChild(e);
-    }
-    pts.forEach((p,i)=>{
-      const row=document.createElement("div"); row.className="anti-row";
-      const mark=document.createElement("span"); mark.className="anti-mark"; mark.textContent="✕";
-      const ta=document.createElement("textarea"); ta.className="anti-text"; ta.rows=1;
-      ta.value=p.text||""; ta.placeholder=ANTI_PROMPTS[i%ANTI_PROMPTS.length];
-      const grow=()=>{ ta.style.height="auto"; ta.style.height=(ta.scrollHeight||26)+"px"; };
-      ta.addEventListener("input",()=>{ p.text=ta.value; saveVision(); grow(); });
-      requestAnimationFrame(grow);
-      const del=document.createElement("button"); del.className="row-del"; del.type="button"; del.textContent="×";
-      del.addEventListener("click",()=>{ const j=pts.findIndex(x=>x.id===p.id); if(j>=0)pts.splice(j,1); saveVision(); buildVision(); });
-      row.append(mark,ta,del);
-      list.appendChild(row);
-    });
-    const add=document.createElement("button"); add.className="anti-add"; add.type="button"; add.textContent="+ Zeile";
-    add.addEventListener("click",()=>{ pts.push({id:uid(),text:""}); saveVision(); buildVision();
-      const ins=document.querySelectorAll(".anti-text"); if(ins.length)ins[ins.length-1].focus(); });
-    list.appendChild(add);
-    panel.appendChild(list);
+    const aktiv=pts.filter(p=>(p.text||"").trim());
 
-    // Der Ausweg steht immer am Fuß — die Rückseite ist kein Ort zum Bleiben.
+    if(!antiEdit){
+      // Lesen: die Sätze allein, ohne Werkzeug
+      const list=document.createElement("div"); list.className="anti-read";
+      if(!aktiv.length){
+        const e=document.createElement("div"); e.className="anti-empty";
+        e.textContent=ANTI_PROMPTS[0];
+        list.appendChild(e);
+      }else{
+        aktiv.forEach(p=>{
+          const row=document.createElement("div"); row.className="ar-row";
+          row.innerHTML=`<span class="ar-mark">✕</span><p class="ar-t">${esc(p.text.trim())}</p>`;
+          list.appendChild(row);
+        });
+      }
+      panel.appendChild(list);
+    }else{
+      const intro=document.createElement("p"); intro.className="anti-intro";
+      intro.textContent="Nicht um dich schlechtzumachen. Um zu sehen, wovon du dich abwendest — damit die andere Seite Gewicht bekommt.";
+      panel.appendChild(intro);
+
+      const list=document.createElement("div"); list.className="anti-list";
+      if(!pts.length){
+        const e=document.createElement("div"); e.className="anti-empty";
+        e.textContent=ANTI_PROMPTS[0];
+        list.appendChild(e);
+      }
+      pts.forEach((p,i)=>{
+        const row=document.createElement("div"); row.className="anti-row";
+        const mark=document.createElement("span"); mark.className="anti-mark"; mark.textContent="✕";
+        const ta=document.createElement("textarea"); ta.className="anti-text"; ta.rows=1;
+        ta.value=p.text||""; ta.placeholder=ANTI_PROMPTS[i%ANTI_PROMPTS.length];
+        const grow=()=>{ ta.style.height="auto"; ta.style.height=(ta.scrollHeight||26)+"px"; };
+        ta.addEventListener("input",()=>{ p.text=ta.value; saveVision(); grow(); });
+        requestAnimationFrame(grow);
+        const del=document.createElement("button"); del.className="row-del"; del.type="button"; del.textContent="×";
+        del.addEventListener("click",()=>{ const j=pts.findIndex(x=>x.id===p.id); if(j>=0)pts.splice(j,1); saveVision(); buildVision(); });
+        row.append(mark,ta,del);
+        list.appendChild(row);
+      });
+      const add=document.createElement("button"); add.className="anti-add"; add.type="button"; add.textContent="+ Zeile";
+      add.addEventListener("click",()=>{ pts.push({id:uid(),text:""}); saveVision(); buildVision();
+        const ins=document.querySelectorAll(".anti-text"); if(ins.length)ins[ins.length-1].focus(); });
+      list.appendChild(add);
+      panel.appendChild(list);
+    }
+
     const foot=document.createElement("button"); foot.className="anti-foot"; foot.type="button";
     foot.innerHTML=`<span class="af-line">Und jetzt das Gegenteil davon</span><span class="af-arrow">↻</span>`;
-    foot.addEventListener("click",flipVizija);
+    foot.addEventListener("click",()=>{ antiEdit=false; flipVizija(); });
     panel.appendChild(foot);
 
     view.appendChild(panel);
   }
 
+  /* ---------- Wochenabschluss ---------- */
+  const WABS="ht_wabschluss_v1";
+  const WFRAGEN=[
+    "Was ist diese Woche wahr geworden?",
+    "Woran bist du hängengeblieben?",
+    "Was hat dich getragen?",
+    "Was nimmst du in die nächste Woche mit?"
+  ];
+  let wabsOn=false;
+  const wabsAll=()=>read(WABS,{});
+  function buildWabschluss(view){
+    const wi=weekInfo(), rep=weekReport(wi.key);
+    const store=wabsAll(); const rec=store[wi.key]||{answers:{},done:false};
+    const panel=document.createElement("section"); panel.className="panel wabs-panel";
+
+    const head=document.createElement("div"); head.className="panel-head";
+    head.innerHTML=`<span class="dot"></span><span class="eyebrow">Wochenabschluss</span><span class="vis-hint">KW ${wi.num}</span>`;
+    const back=document.createElement("button"); back.type="button"; back.className="vr-edit"; back.textContent="zurück";
+    back.addEventListener("click",()=>{ wabsOn=false; buildVision(); });
+    head.appendChild(back); panel.appendChild(head);
+
+    // Die Bilanz zuerst — man schreibt nicht ins Leere
+    const bil=document.createElement("div"); bil.className="wabs-bil";
+    const max=Math.max(60,...rep.days.map(x=>x.min));
+    bil.innerHTML=`<div class="wabs-sec">Was war</div>
+      <div class="sa-stats"><span><strong>${rep.mins}</strong>min Fokus</span><span><strong>${rep.blocks}</strong>Blöcke</span><span><strong>${rep.full}</strong>volle Tage</span></div>
+      <div class="sa-week">`+rep.days.map(x=>`
+        <div class="sa-day${x.full?" full":""}${x.future?" future":""}${(x.min||x.done)?"":" idle"}">
+          <span class="sa-bar"><span style="height:${Math.round(x.min/max*100)}%"></span></span>
+          <span class="sa-wd">${x.wd}</span><span class="sa-min">${x.min?x.min+"′":"–"}</span></div>`).join("")+`</div>`;
+    panel.appendChild(bil);
+
+    // Die Wochenziele mit Haken
+    const zw=(vision.week.points||[]).filter(p=>(p.text||"").trim());
+    if(zw.length){
+      const zl=document.createElement("div"); zl.className="wabs-ziele";
+      zl.innerHTML=`<div class="wabs-sec">Vorgenommen</div>`;
+      zw.forEach(p=>{
+        const r=document.createElement("button"); r.type="button"; r.className="wabs-z"+(p.done?" done":"");
+        r.innerHTML=`<span class="wz-dot"></span><span class="wz-t">${esc(p.text.trim())}</span>`;
+        r.addEventListener("click",()=>{ p.done=!p.done; p.doneAt=p.done?new Date().toISOString():null; saveVision(); buildVision(); });
+        zl.appendChild(r);
+      });
+      panel.appendChild(zl);
+    }
+
+    // Vier Fragen
+    const fr=document.createElement("div"); fr.className="wabs-fragen";
+    fr.innerHTML=`<div class="wabs-sec">Rückblick</div>`;
+    WFRAGEN.forEach((q,i)=>{
+      const b=document.createElement("div"); b.className="wabs-f";
+      b.innerHTML=`<div class="wf-q">${esc(q)}</div>`;
+      const ta=document.createElement("textarea"); ta.className="wf-a"; ta.rows=2;
+      ta.value=(rec.answers&&rec.answers["q"+i])||""; ta.placeholder="…";
+      const grow=()=>{ ta.style.height="auto"; ta.style.height=Math.max(44,ta.scrollHeight)+"px"; };
+      ta.addEventListener("input",()=>{ const st=wabsAll(); const r=st[wi.key]||{answers:{}};
+        r.answers=r.answers||{}; r.answers["q"+i]=ta.value; st[wi.key]=r; write(WABS,st); grow(); });
+      requestAnimationFrame(grow);
+      b.appendChild(ta); fr.appendChild(b);
+    });
+    panel.appendChild(fr);
+
+    // Der Übergang: neue Woche ableiten
+    const nx=document.createElement("div"); nx.className="wabs-next";
+    nx.innerHTML=`<div class="wabs-sec">Und jetzt</div>`;
+    const go=document.createElement("button"); go.type="button"; go.className="wabs-go";
+    go.textContent="Wochenziele für die nächste Woche setzen →";
+    go.addEventListener("click",()=>{ wabsOn=false; visEdit=true; buildVision();
+      setTimeout(()=>{ const el=document.querySelector('.vtier[data-level="week"]'); if(el&&el.scrollIntoView) el.scrollIntoView({behavior:"smooth",block:"center"}); },80); });
+    nx.appendChild(go);
+    const q=document.createElement("button"); q.type="button"; q.className="wabs-quart";
+    q.textContent="Quartalsziele ansehen";
+    q.addEventListener("click",()=>{ wabsOn=false; visEdit=true; buildVision(); });
+    nx.appendChild(q);
+    panel.appendChild(nx);
+
+    view.appendChild(panel);
+  }
+
+  /* ---------- Rückblick auf Quartal und Jahr ---------- */
+  let rueckOn=false, rueckSpanne="quartal";
+  function buildRueckblick(view){
+    const panel=document.createElement("section"); panel.className="panel rueck-panel";
+    const head=document.createElement("div"); head.className="panel-head";
+    head.innerHTML=`<span class="dot"></span><span class="eyebrow">Rückblick</span>`;
+    const ax=document.createElement("div"); ax.className="axis";
+    [["quartal","Quartal"],["jahr","Jahr"]].forEach(([k,l])=>{
+      const b=document.createElement("button"); b.type="button"; b.className="axis-btn"+(rueckSpanne===k?" on":""); b.textContent=l;
+      b.addEventListener("click",()=>{ rueckSpanne=k; buildVision(); }); ax.appendChild(b);
+    });
+    const back=document.createElement("button"); back.type="button"; back.className="vr-edit"; back.textContent="zurück";
+    back.addEventListener("click",()=>{ rueckOn=false; buildVision(); });
+    head.append(ax,back); panel.appendChild(head);
+
+    const jahr=(rueckSpanne==="jahr");
+    const von = jahr ? today.slice(0,4)+"-01-01" : quarterInfo().start;
+    const bis = today;
+    const r=spanReport(von,bis);
+    const titel=document.createElement("div"); titel.className="rueck-titel";
+    titel.textContent = jahr ? today.slice(0,4) : quarterInfo().label+" "+quarterInfo().year;
+    panel.appendChild(titel);
+
+    const st=document.createElement("div"); st.className="rueck-stats";
+    st.innerHTML=`
+      <div class="rs"><strong>${r.tage}</strong><span>Tage getrackt</span></div>
+      <div class="rs"><strong>${r.voll}</strong><span>volle Tage</span></div>
+      <div class="rs"><strong>${Math.round(r.mins/60)}</strong><span>Stunden Fokus</span></div>
+      <div class="rs"><strong>${r.blocks}</strong><span>Fokusblöcke</span></div>
+      <div class="rs"><strong>${r.streak}</strong><span>längste Serie</span></div>
+      <div class="rs"><strong>${r.erledigt}</strong><span>erledigte ToDos</span></div>`;
+    panel.appendChild(st);
+
+    // Erreichte Ziele
+    const zz=[];
+    ["quarter","year","big"].forEach(k=>{ (visPoints(k)||[]).forEach(p=>{ if(p.done && (p.text||"").trim())
+      zz.push({text:p.text.trim(), ebene:k==="quarter"?"Quartal":k==="year"?"Jahr":"Vizija"}); }); });
+    (vision.archive.quarters||[]).forEach(q=>(q.points||[]).forEach(p=>{ if(p.done) zz.push({text:p.text, ebene:q.key}); }));
+    const zl=document.createElement("div"); zl.className="rueck-ziele";
+    zl.innerHTML=`<div class="wabs-sec">Erreicht</div>`+
+      (zz.length?zz.map(z=>`<div class="rz"><span class="rz-c">✓</span><span class="rz-t">${esc(z.text)}</span><span class="rz-e">${esc(z.ebene)}</span></div>`).join("")
+                :`<div class="rueck-leer">Noch nichts abgehakt. Ziele lassen sich in der Vizija als erreicht markieren.</div>`);
+    panel.appendChild(zl);
+
+    // Habits über die Spanne
+    if(r.habits.length){
+      const hb=document.createElement("div"); hb.className="rueck-habits";
+      hb.innerHTML=`<div class="wabs-sec">Gewohnheiten</div>`+
+        r.habits.map(h=>`<div class="rh"><span class="rh-n">${esc(h.name)}</span>
+          <span class="rh-bar"><span style="width:${h.pct}%"></span></span>
+          <span class="rh-p">${h.pct}%</span></div>`).join("");
+      panel.appendChild(hb);
+    }
+    view.appendChild(panel);
+  }
+  // Zahlen über eine Zeitspanne
+  function spanReport(von,bis){
+    const fx=readFocus(); const byDay={};
+    (fx.archive||[]).forEach(d=>{ if(d&&d.day) byDay[d.day]=d; });
+    if(fx.day) byDay[fx.day]={day:fx.day,blocks:fx.blocks||[]};
+    let mins=0, blocks=0, voll=0, tage=0, streak=0, cur=0;
+    const core=coreHabits(); const zaehler={};
+    core.forEach(h=>zaehler[h.id]=0);
+    for(let k=von; k<=bis; k=addDays(k,1)){
+      const f=byDay[k];
+      if(f){ mins+=dayProductive(f.blocks); blocks+=(f.blocks||[]).length; }
+      const d=coreDone(k);
+      if(d>0 || (f&&(f.blocks||[]).length)) tage++;
+      if(dayComplete(k)){ voll++; cur++; streak=Math.max(streak,cur); } else cur=0;
+      core.forEach(h=>{ if(isDone(h.id,k)) zaehler[h.id]++; });
+    }
+    const spanne=Math.max(1, daysBetween(von,bis)+1);
+    const habits=core.map(h=>({name:h.name.replace(/^\S+\s+/,""), pct:Math.round(zaehler[h.id]/spanne*100)}))
+                     .sort((a,b)=>b.pct-a.pct);
+    let erledigt=0;
+    try{ ensurePrios(); erledigt=(prios.archive||[]).filter(a=>a.day>=von&&a.day<=bis).length
+      + prios.all.filter(x=>x.status==="done"&&x.day>=von&&x.day<=bis).length; }catch(e){}
+    return {mins,blocks,voll,tage,streak,habits,erledigt};
+  }
+
+  let verlaufOn=false;
+  function buildVerlauf(view){
+    const panel=document.createElement("section"); panel.className="panel";
+    const head=document.createElement("div"); head.className="panel-head";
+    head.innerHTML=`<span class="dot"></span><span class="eyebrow">Verlauf</span><span class="vis-hint">was du wolltest — und was daraus wurde</span>`;
+    const back=document.createElement("button"); back.type="button"; back.className="vr-edit"; back.textContent="zurück";
+    back.addEventListener("click",()=>{ verlaufOn=false; buildVision(); });
+    head.appendChild(back); panel.appendChild(head);
+    scopeArchOpen=true;
+    const a=renderScopeArchive(); a.classList.add("bare");
+    const h=a.querySelector(".sarch-head"); if(h) h.hidden=true;
+    panel.appendChild(a);
+    view.appendChild(panel);
+  }
   let visEdit=false;
   function buildVision(){
     scopeRollover();
@@ -5972,6 +6597,9 @@
     const view=document.getElementById("view-vizija"); view.innerHTML="";
     if(antiOn){ buildAntiVizija(view); return; }
     if(prosaOn){ buildProsa(view); return; }
+    if(wabsOn){ buildWabschluss(view); return; }
+    if(rueckOn){ buildRueckblick(view); return; }
+    if(verlaufOn){ buildVerlauf(view); return; }
     if(visEdit){ buildVisionEdit(view); return; }
     buildVisionRead(view);
   }
@@ -6058,19 +6686,15 @@
     // Fuß: Verlauf und Zitate als ruhige Zeilen
     const foot=document.createElement("div"); foot.className="vr-foot reveal";
     const n=(vision.archive.weeks||[]).length+(vision.archive.quarters||[]).length;
-    const av=document.createElement("button"); av.type="button"; av.className="vr-flink";
-    av.innerHTML=`Verlauf<span class="vr-fc">${n}</span>`;
-    av.addEventListener("click",()=>{ visEdit=true; scopeArchOpen=true; buildVision();
-      setTimeout(()=>{ const el=document.querySelector(".sarch"); if(el&&el.scrollIntoView) el.scrollIntoView({behavior:"smooth",block:"center"}); },60); });
-    foot.appendChild(av);
+    const mk=(txt,cnt,fn,cls)=>{ const b=document.createElement("button"); b.type="button"; b.className="vr-flink"+(cls?" "+cls:"");
+      b.innerHTML=esc(txt)+(cnt?`<span class="vr-fc">${cnt}</span>`:``); b.addEventListener("click",fn); return b; };
+    // Sonntag oder Montag: der Abschluss rückt nach vorn
+    const wd=new Date().getDay();
+    foot.appendChild(mk("Wochenabschluss",0,()=>{ wabsOn=true; buildVision(); }, (wd===0||wd===1)?"stark":""));
+    foot.appendChild(mk("Rückblick",0,()=>{ rueckOn=true; buildVision(); }));
+    foot.appendChild(mk("Verlauf",n,()=>{ verlaufOn=true; buildVision(); }));
     const qn=(read(QUOTES,[])||[]).length;
-    if(qn){
-      const qv=document.createElement("button"); qv.type="button"; qv.className="vr-flink";
-      qv.innerHTML=`Sätze<span class="vr-fc">${qn}</span>`;
-      qv.addEventListener("click",()=>{ visEdit=true; buildVision();
-        setTimeout(()=>{ const el=document.querySelector(".quotes,.quote-feature"); if(el&&el.scrollIntoView) el.scrollIntoView({behavior:"smooth",block:"center"}); },60); });
-      foot.appendChild(qv);
-    }
+    if(qn) foot.appendChild(mk("Sätze",qn,()=>{ visEdit=true; buildVision(); }));
     panel.appendChild(foot);
 
     view.appendChild(panel);
@@ -6275,6 +6899,16 @@
   document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="hidden") forgetKeys(); });
   refreshVidBadge().then(adoptSyncedVideo);
   startAngelusWatch();
+  (function(){
+    const b=document.getElementById("bkBtn"); if(!b) return;
+    b.addEventListener("click",backupExport);
+    let t=null;
+    const st=()=>{ t=setTimeout(()=>{ t=null; backupImport(); },700); };
+    const cl=()=>{ if(t){ clearTimeout(t); t=null; } };
+    b.addEventListener("mousedown",st); b.addEventListener("touchstart",st,{passive:true});
+    ["mouseup","mouseleave","touchend","touchcancel"].forEach(e=>b.addEventListener(e,cl));
+  })();
+  document.getElementById("findMini").addEventListener("click",openSuche);
   document.getElementById("themeMini").addEventListener("click",cycleTheme);
   applyTheme();
   document.getElementById("editBtn").addEventListener("click",toggleEdit);
@@ -6319,6 +6953,121 @@
   // Kalibrierung beim Öffnen — einmalig, danach ruhig
   document.body.classList.add("boot");
   setTimeout(()=>document.body.classList.remove("boot"), 1700);
+
+  /* ---------- Suche über alles Offene ----------
+     Verschlüsselte Texte bleiben außen vor — sie sind ja bewusst zu. */
+  function sammleTexte(){
+    const out=[];
+    try{ Object.keys(lockinText||{}).forEach(d=>{ const e=lockinText[d]||{};
+      Object.keys(e).forEach(id=>{ const v=e[id];
+        if(typeof v==="string" && v.trim()) out.push({d, wo:id==="tagesabschluss"?"Tagesabschluss":"Lock In", t:v}); }); }); }catch(e){}
+    try{ ensurePrios();
+      prios.all.forEach(x=>{ if((x.text||"").trim()) out.push({d:x.day||"", wo:x.prio?"Priorität":x.fixed?"Blocker":"ToDo", t:x.text}); });
+      (prios.archive||[]).forEach(a=>{ if((a.text||"").trim()) out.push({d:a.day||"", wo:"Archiv", t:a.text}); }); }catch(e){}
+    try{ const fx=readFocus();
+      (fx.thoughts||[]).forEach(g=>{ if((g.text||"").trim()) out.push({d:fx.day, wo:"Gedanke", t:g.text}); });
+      (fx.archive||[]).forEach(a=>(a.tasks||[]).forEach(t=>{ if((t.text||"").trim()) out.push({d:a.day, wo:"Fokus", t:t.text}); })); }catch(e){}
+    try{ ["big","year","quarter","week"].forEach(k=>(visPoints(k)||[]).forEach(p=>{ if((p.text||"").trim())
+      out.push({d:"", wo:k==="big"?"Vizija":k==="year"?"Jahr":k==="quarter"?"Quartal":"Woche", t:p.text}); }));
+      if((vision.prosa||"").trim()) out.push({d:"", wo:"Vizija-Text", t:vision.prosa});
+      (vision.anti.points||[]).forEach(p=>{ if((p.text||"").trim()) out.push({d:"", wo:"Anti-Vizija", t:p.text}); }); }catch(e){}
+    try{ (read(QUOTES,[])||[]).forEach(q=>{ if((q.text||"").trim()) out.push({d:"", wo:"Satz", t:q.text+(q.author?" — "+q.author:"")}); }); }catch(e){}
+    try{ const w=read(WABS,{}); Object.keys(w).forEach(k=>{ const a=(w[k]||{}).answers||{};
+      Object.keys(a).forEach(q=>{ if((a[q]||"").trim()) out.push({d:k, wo:"Wochenabschluss", t:a[q]}); }); }); }catch(e){}
+    return out;
+  }
+  function openSuche(){
+    document.querySelectorAll(".such-ov").forEach(x=>x.remove());
+    const ov=document.createElement("div"); ov.className="such-ov open";
+    const box=document.createElement("div"); box.className="such-box";
+    const inp=document.createElement("input"); inp.type="search"; inp.className="such-inp";
+    inp.placeholder="In allem suchen …"; inp.setAttribute("aria-label","Suchen");
+    const res=document.createElement("div"); res.className="such-res";
+    box.append(inp,res); ov.appendChild(box);
+    ov.addEventListener("click",e=>{ if(e.target===ov) ov.remove(); });
+    inp.addEventListener("keydown",e=>{ if(e.key==="Escape") ov.remove(); });
+    let alle=null;
+    const lauf=()=>{
+      const q=inp.value.trim().toLowerCase();
+      res.innerHTML="";
+      if(q.length<2){ res.innerHTML=`<div class="such-hint">Mindestens zwei Zeichen. Verschlüsselte Texte bleiben außen vor.</div>`; return; }
+      if(!alle) alle=sammleTexte();
+      const tr=alle.filter(x=>x.t.toLowerCase().includes(q)).slice(0,60);
+      if(!tr.length){ res.innerHTML=`<div class="such-hint">Nichts gefunden.</div>`; return; }
+      res.innerHTML=tr.map(x=>{
+        const i=x.t.toLowerCase().indexOf(q);
+        const von=Math.max(0,i-40), aus=x.t.slice(von, i+q.length+70);
+        const teil=esc(aus.slice(0,i-von))+"<mark>"+esc(aus.substr(i-von,q.length))+"</mark>"+esc(aus.slice(i-von+q.length));
+        return `<div class="such-t"><div class="st-m">${esc(x.wo)}${x.d?" · "+esc(x.d):""}</div><div class="st-x">${von>0?"…":""}${teil}${x.t.length>i+q.length+70?"…":""}</div></div>`;
+      }).join("");
+    };
+    inp.addEventListener("input",lauf);
+    document.body.appendChild(ov); setTimeout(()=>inp.focus(),40); lauf();
+  }
+
+  /* ---------- Sicherung: alles in eine Datei ---------- */
+  function collectAll(){
+    const o={}; 
+    for(let i=0;i<localStorage.length;i++){
+      const k=localStorage.key(i);
+      if(k&&k.indexOf("ht_")===0 && k!==SYNC) o[k]=localStorage.getItem(k);
+    }
+    return o;
+  }
+  async function backupExport(){
+    const data=collectAll();
+    const meta={app:"Heute", version:APP_VERSION, at:new Date().toISOString(), keys:Object.keys(data).length};
+    let payload;
+    const schuetzen=confirm("Sicherung mit Passwort schützen?\n\nOK = verschlüsselte Datei (empfohlen)\nAbbrechen = offene Datei, überall lesbar");
+    let pw=null;
+    if(schuetzen){
+      pw=await askPassword({title:"Sicherung schützen", confirm:true,
+        note:"Ohne dieses Passwort lässt sich die Sicherung später nicht mehr öffnen."});
+      if(pw==null) return;
+    }
+    if(!pw){ payload={...meta, plain:data}; }
+    else{
+      try{
+        const salt=window.crypto.getRandomValues(new Uint8Array(16));
+        const enc=await encWith(pw, salt, JSON.stringify(data));
+        payload={...meta, salt:b64(salt), iv:enc.iv, ct:enc.ct, it:enc.it};
+      }catch(e){ alert("Verschlüsseln fehlgeschlagen."); return; }
+    }
+    const blob=new Blob([JSON.stringify(payload)],{type:"application/json"});
+    const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+    a.download="heute-sicherung-"+today+".json";
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },800);
+    toast("Sicherung erstellt · "+meta.keys+" Bereiche");
+  }
+  function backupImport(){
+    let inp=document.getElementById("bkPick"); if(inp) inp.remove();
+    inp=document.createElement("input"); inp.type="file"; inp.accept="application/json,.json"; inp.id="bkPick";
+    inp.style.cssText="position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0";
+    document.body.appendChild(inp);
+    inp.addEventListener("change",async()=>{
+      const f=inp.files&&inp.files[0]; if(!f){ inp.remove(); return; }
+      try{
+        const txt=await f.text();
+        const pl=JSON.parse(txt);
+        let data=pl.plain;
+        if(!data && pl.ct){
+          const pw=await askPassword({title:"Passwort der Sicherung"});
+          if(pw==null){ inp.remove(); return; }
+          try{ data=JSON.parse(await decWith(pw, unb64(pl.salt), {iv:pl.iv, ct:pl.ct, it:pl.it})); }
+          catch(e){ alert("Falsches Passwort."); inp.remove(); return; }
+        }
+        if(!data||typeof data!=="object"){ alert("Das ist keine Sicherung von Heute."); inp.remove(); return; }
+        const n=Object.keys(data).length;
+        if(!confirm("Sicherung vom "+(pl.at||"?").slice(0,10)+" einspielen?\n\n"+n+" Bereiche ersetzen deine jetzigen Daten. Das lässt sich nicht rückgängig machen.")){ inp.remove(); return; }
+        Object.keys(data).forEach(k=>{ try{ localStorage.setItem(k,data[k]); }catch(e){} });
+        alert("Eingespielt. Die App lädt jetzt neu.");
+        location.reload();
+      }catch(e){ alert("Die Datei konnte nicht gelesen werden."); }
+      inp.remove();
+    });
+    inp.click();
+  }
 
   /* ---------- Offline-Speicher (nur im Web, nicht bei lokaler Datei) ----------
      Der Service Worker legt die App im Gerät ab: sofortiger Start, läuft ohne Netz. */

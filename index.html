@@ -25,6 +25,10 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Heute">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#080B14">
 <meta name="robots" content="noindex, nofollow">
 <title>Heute</title>
@@ -931,29 +935,121 @@
   .tl-blk.done{opacity:.5}
   .tl-blk.done .tlb-tx{text-decoration:line-through}
   .wp-blk.done{opacity:.45}
-  /* Wochenabschluss */
-  .wabs-panel{padding-bottom:16px}
-  .wabs-sec{font-size:9.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); margin:16px 20px 8px}
-  .wabs-bil,.wabs-ziele,.wabs-fragen,.wabs-next{padding:0 20px}
-  .wabs-bil .sa-stats,.wabs-bil .sa-week{margin-left:0; margin-right:0}
-  .wabs-z{width:100%; display:flex; align-items:center; gap:10px; background:transparent; border:none; cursor:pointer;
-    padding:8px 0; text-align:left; border-bottom:1px solid var(--line)}
-  .wz-dot{width:11px; height:11px; flex:0 0 auto; border-radius:50%; box-shadow:inset 0 0 0 2px var(--track)}
-  .wabs-z.done .wz-dot{background:var(--mint); box-shadow:none}
-  .wz-t{font-family:var(--serif); font-size:14.5px; color:var(--ink)}
-  .wabs-z.done .wz-t{color:var(--ink-faint); text-decoration:line-through}
-  .wabs-f{margin-bottom:12px}
-  .wf-q{font-family:var(--serif); font-size:13.5px; font-style:italic; color:var(--ink-soft); margin-bottom:4px}
-  .wf-a{width:100%; box-sizing:border-box; font-family:var(--serif); font-size:14.5px; line-height:1.55; color:var(--ink);
-    background:transparent; border:none; border-bottom:1px solid var(--line); padding:4px 2px; resize:none; overflow:hidden}
-  .wf-a:focus{outline:none; border-bottom-color:var(--brass)}
-  .wabs-go{width:100%; font:inherit; font-size:13.5px; font-weight:700; color:var(--on-accent); background:var(--brass);
-    border:none; border-radius:11px; padding:12px; cursor:pointer; margin-bottom:8px}
-  .wabs-quart{width:100%; font:inherit; font-size:12px; font-weight:650; color:var(--ink-faint); background:transparent;
-    border:none; cursor:pointer; padding:4px}
+  /* Command Center */
+  .cc-panel{padding-bottom:18px}
+  .cc-alle{width:calc(100% - 40px); margin:0 20px 12px; display:flex; align-items:center; gap:8px;
+    font:inherit; font-size:11.5px; font-weight:650; color:var(--ink-faint); background:rgba(var(--sheen),.05);
+    border:none; border-radius:9px; padding:8px 12px; cursor:pointer; box-shadow:inset 0 0 0 1px var(--line)}
+  .cc-alle:hover{color:var(--brass); box-shadow:inset 0 0 0 1px var(--brass)}
+  .cc-alle-n{font-size:10px; font-weight:800; color:var(--brass); background:rgba(227,178,95,.15);
+    border-radius:999px; padding:1px 7px}
+  .cc-z-n{width:18px; flex:0 0 auto; font-size:11px; font-weight:800; color:var(--ink-faint);
+    font-variant-numeric:tabular-nums}
+  .cc-ord{font:inherit; font-size:13px; line-height:1; color:var(--ink-faint); background:transparent;
+    border:none; cursor:pointer; padding:2px 4px; opacity:.55}
+  .cc-ord:hover{opacity:1; color:var(--brass)}
+  .cc-ord:disabled{opacity:.15; cursor:default}
+  .cc-ord-hint{font-size:10.5px; line-height:1.5; color:var(--ink-faint); padding:8px 0 0; font-style:italic}
+  /* Wochenziel ins Raster ziehen */
+  .wp-goal.ziehbar{cursor:grab; touch-action:none; -webkit-user-select:none; user-select:none}
+  .wp-goal.ziehbar.haelt{opacity:.4}
+  .wp-fliegt{position:fixed; z-index:120; transform:translate(-50%,-140%); pointer-events:none;
+    font-size:11.5px; font-weight:700; color:var(--on-accent); background:var(--brass);
+    border-radius:999px; padding:5px 12px; white-space:nowrap;
+    box-shadow:0 12px 26px -10px rgba(0,0,0,.7)}
+  .wp-col.ziel .wp-body{background:rgba(227,178,95,.15); box-shadow:inset 0 0 0 1.5px var(--brass)}
+  .cc-prog{display:flex; gap:5px; padding:2px 20px 14px}
+  .cc-dot{flex:1; height:4px; border:none; border-radius:999px; background:var(--track); cursor:pointer; padding:0; transition:background .2s}
+  .cc-dot.done{background:rgba(63,207,174,.55)}
+  .cc-dot.on{background:var(--brass)}
+  .cc-kopf{display:flex; align-items:center; gap:11px; padding:0 20px 4px}
+  .cc-n{width:24px; height:24px; flex:0 0 auto; display:grid; place-items:center; border-radius:50%;
+    font-size:11px; font-weight:800; color:var(--brass); box-shadow:inset 0 0 0 1.3px var(--brass)}
+  .cc-t{font-family:var(--serif); font-size:19px; font-weight:650; color:var(--ink)}
+  .cc-uhr{margin-left:auto; font:inherit; font-size:11px; font-weight:700; color:var(--ink-faint);
+    background:transparent; border:none; border-radius:999px; padding:4px 11px; cursor:pointer;
+    box-shadow:inset 0 0 0 1px var(--line); font-variant-numeric:tabular-nums}
+  .cc-uhr:hover{color:var(--brass); box-shadow:inset 0 0 0 1px var(--brass)}
+  .cc-frage{margin:0 20px 14px; font-family:var(--serif); font-size:14px; font-style:italic; line-height:1.55; color:var(--ink-soft)}
+  .cc-body{padding:0 20px}
+  .cc-ta{width:100%; box-sizing:border-box; font-family:var(--serif); font-size:15px; line-height:1.6; color:var(--ink);
+    background:rgba(var(--sheen),.045); border:none; border-radius:11px; padding:12px 14px; resize:none; overflow:hidden;
+    box-shadow:inset 0 0 0 1px var(--line)}
+  .cc-ta:focus{outline:none; box-shadow:inset 0 0 0 1.4px var(--brass)}
+  .cc-ta.klein{font-size:13.5px; padding:8px 11px}
+  .cc-feld{margin-bottom:2px}
+  .cc-feld-akt{display:flex; gap:6px; margin-top:4px}
+  .cc-quelle{margin-bottom:12px}
+  .cc-q-h{font-size:9.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:7px}
+  .cc-q-z{display:flex; gap:9px; font-size:12.5px; line-height:1.5; color:var(--ink-soft); padding:4px 0; border-bottom:1px solid var(--line)}
+  .cc-q-d{flex:0 0 52px; font-size:10.5px; color:var(--ink-faint); font-variant-numeric:tabular-nums}
+  .cc-q-leer{font-family:var(--serif); font-style:italic; font-size:13px; line-height:1.55; color:var(--ink-faint)}
+  .cc-link{display:block; width:100%; text-align:left; margin:10px 0; font:inherit; font-size:12px; font-weight:650;
+    color:var(--brass); background:rgba(227,178,95,.1); border:none; border-radius:9px; padding:9px 12px; cursor:pointer}
+  .cc-link:hover{background:var(--brass); color:var(--on-accent)}
+  .cc-ziele{display:flex; flex-direction:column; margin-bottom:6px}
+  .cc-z{display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--line)}
+  .cc-star{font:inherit; font-size:15px; line-height:1; color:var(--track); background:transparent; border:none; cursor:pointer; padding:0}
+  .cc-z.top .cc-star{color:var(--brass)}
+  .cc-z-t{flex:1; font-family:var(--serif); font-size:14.5px; color:var(--ink)}
+  .cc-z.top .cc-z-t{font-weight:640}
+  .cc-z.done .cc-z-t{color:var(--ink-faint); text-decoration:line-through}
+  .cc-z-dot{width:9px; height:9px; flex:0 0 auto; border-radius:50%; box-shadow:inset 0 0 0 2px var(--t4)}
+  .cc-z-in{flex:1; font:inherit; font-size:14.5px; color:var(--ink); background:transparent; border:none; padding:2px 0}
+  .cc-z-in:focus{outline:none}
+  .cc-add{align-self:flex-start; font:inherit; font-size:12px; font-weight:650; color:var(--brass);
+    background:transparent; border:none; cursor:pointer; padding:10px 0}
+  .cc-quart-mini{margin-bottom:14px; padding:10px 12px; border-radius:10px; background:rgba(var(--sheen),.045)}
+  .cc-qm-h{font-size:9px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:6px}
+  .cc-qm{display:flex; align-items:baseline; gap:8px; font-size:12.5px; color:var(--ink-soft); padding:2px 0}
+  .cc-qm-n{font-size:10px; font-weight:800; color:var(--t3); min-width:11px}
+  .cc-qm.done{color:var(--ink-faint); text-decoration:line-through}
+  .cc-staq{display:flex; flex-direction:column; gap:10px; margin-bottom:4px}
+  .cc-linie{padding:10px 12px; border-radius:10px; background:rgba(var(--sheen),.045)}
+  .cc-l-h{font-size:9.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--lc); margin-bottom:6px}
+  .cc-l-h2{display:inline-block; font-size:12px; color:var(--ink-soft); margin:0 10px 3px 0}
+  .cc-metas{display:flex; flex-direction:column; gap:12px; margin-top:14px}
+  .cc-meta{padding:12px; border-radius:12px; background:rgba(var(--sheen),.045); box-shadow:inset 0 0 0 1px var(--line)}
+  .cc-meta-k{display:flex; align-items:center; gap:8px; margin-bottom:10px}
+  .cc-meta-t{flex:1; font-family:var(--serif); font-size:15px; font-weight:600; color:var(--ink); background:transparent; border:none; padding:0}
+  .cc-meta-t:focus{outline:none}
+  .cc-meta-q{margin-bottom:8px}
+  .cc-mq{font-size:11px; font-weight:700; color:var(--brass); margin-bottom:3px}
+  .cc-raus{display:flex; gap:6px; margin-top:4px}
+  .cc-mini{font:inherit; font-size:10.5px; font-weight:650; color:var(--ink-faint); background:transparent;
+    border:none; border-radius:999px; padding:4px 10px; cursor:pointer; box-shadow:inset 0 0 0 1px var(--line)}
+  .cc-mini:hover{color:var(--brass); box-shadow:inset 0 0 0 1px var(--brass)}
+  .cc-vis-t{margin:0 0 10px; font-family:var(--serif); font-size:15.5px; line-height:1.65; color:var(--ink)}
+  .cc-vis-t.dim{color:var(--ink-faint); font-style:italic}
+  .cc-vis-z{display:flex; flex-wrap:wrap; gap:6px; margin-top:14px}
+  .cc-vis-z span{font-size:12px; font-weight:650; color:var(--t4); background:rgba(227,178,95,.14); border-radius:999px; padding:4px 11px}
+  .cc-nav{display:flex; gap:8px; padding:18px 20px 0; margin-top:10px; border-top:1px solid var(--line)}
+  .cc-zur{font:inherit; font-size:12.5px; font-weight:650; color:var(--ink-faint); background:transparent; border:none; cursor:pointer; padding:11px 14px}
+  .cc-weiter{flex:1; font:inherit; font-size:13.5px; font-weight:700; color:var(--on-accent); background:var(--brass);
+    border:none; border-radius:11px; padding:12px; cursor:pointer}
   .vr-flink.stark{color:var(--brass); opacity:1}
   /* Rückblick */
   .rueck-titel{font-family:var(--serif); font-size:22px; font-weight:650; color:var(--ink); padding:4px 20px 12px}
+  .rueck-titel{display:flex; align-items:baseline; gap:10px}
+  .rueck-span{font-size:11px; font-weight:600; color:var(--ink-faint)}
+  .rueck-block{padding:0 20px}
+  .rz-bar{height:6px; border-radius:999px; background:var(--track); overflow:hidden; margin-bottom:6px}
+  .rz-bar>span{display:block; height:100%; border-radius:999px; background:var(--mint)}
+  .rz-quote{font-size:11.5px; color:var(--ink-faint); margin-bottom:10px}
+  .rz-quote strong{font-size:15px; color:var(--ink)}
+  .rz2{display:flex; align-items:baseline; gap:9px; flex-wrap:wrap; padding:7px 0; border-bottom:1px solid var(--line)}
+  .rz2-c{font-weight:800; font-size:12px; color:var(--track)}
+  .rz2.ok .rz2-c{color:var(--mint)}
+  .rz2-t{flex:1; min-width:120px; font-family:var(--serif); font-size:14px; color:var(--ink)}
+  .rz2.offen .rz2-t{color:var(--ink-soft)}
+  .rz2-e{font-size:9.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-faint)}
+  .rz2-k{font-size:10px; color:var(--ink-faint); background:rgba(var(--sheen),.07); border-radius:999px; padding:1px 7px}
+  .rh2{display:flex; gap:10px; padding:6px 0; border-bottom:1px solid var(--line)}
+  .rh2-d{flex:0 0 54px; font-size:10.5px; color:var(--ink-faint); font-variant-numeric:tabular-nums}
+  .rh2-t{flex:1; font-family:var(--serif); font-size:13.5px; line-height:1.5; color:var(--ink-soft)}
+  .rueck-mehr{font-size:11px; color:var(--ink-faint); padding:8px 0; font-style:italic}
+  .rueck-beste{margin-top:10px; font-size:12px; color:var(--ink-faint)}
+  .rueck-beste strong{color:var(--brass)}
   .rueck-stats{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; padding:0 20px 4px}
   .rs{display:flex; flex-direction:column; gap:2px; padding:10px 12px; border-radius:10px; background:rgba(var(--sheen),.05)}
   .rs strong{font-size:21px; font-weight:750; color:var(--ink); font-variant-numeric:tabular-nums; line-height:1}
@@ -1109,6 +1205,72 @@
   #view-vizija.flip-in{animation:vizFlipIn .6s cubic-bezier(.2,.8,.25,1) both}
   @keyframes vizFlipIn{from{transform:rotateY(-90deg) scale(.96); opacity:0} to{transform:none; opacity:1}}
   .dot.secret{cursor:pointer; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none}
+  /* ---------- Die Schau ---------- */
+  .schau{position:fixed; inset:0; z-index:130; cursor:pointer; overflow:hidden; background:#07080C;
+    animation:schauAuf .7s ease both}
+  @keyframes schauAuf{from{opacity:0}to{opacity:1}}
+  .schau-bilder{position:absolute; inset:0}
+  .schau-b{position:absolute; inset:0; background-size:cover; background-position:center;
+    opacity:0; transition:opacity 2.4s ease; filter:saturate(.85) brightness(.4)}
+  .schau-b.an{opacity:1; animation:schauZoom 26s ease-in-out infinite alternate}
+  @keyframes schauZoom{from{transform:scale(1.02)}to{transform:scale(1.11)}}
+  .schau::after{content:""; position:absolute; inset:0; pointer-events:none;
+    background:radial-gradient(120% 90% at 50% 20%, transparent 30%, rgba(7,8,12,.75) 100%)}
+  .schau-in{position:relative; z-index:2; height:100%; display:flex; flex-direction:column;
+    justify-content:center; gap:26px; padding:40px 32px; max-width:640px; margin:0 auto}
+  .schau-stern{margin:0; font-family:var(--serif); font-size:clamp(24px,5.4vw,38px); font-weight:520;
+    line-height:1.32; letter-spacing:-.01em; color:#F8F5EE; text-shadow:0 2px 24px rgba(0,0,0,.75);
+    animation:schauRein 1.5s cubic-bezier(.2,.8,.25,1) both}
+  .schau-stern.leer{color:rgba(248,245,238,.4); font-style:italic}
+  .schau-stern:nth-of-type(2){animation-delay:.18s}
+  .schau-stern:nth-of-type(3){animation-delay:.36s}
+  @keyframes schauRein{from{opacity:0; transform:translateY(14px)}to{opacity:1; transform:none}}
+  .schau-satz{padding-top:22px; border-top:1px solid rgba(255,255,255,.14); animation:schauRein 1.5s .7s cubic-bezier(.2,.8,.25,1) both}
+  .schau-mark{display:block; font-family:var(--serif); font-size:34px; line-height:.6; color:var(--brass); opacity:.7}
+  .schau-q{margin:8px 0 0; font-family:var(--serif); font-style:italic; font-size:clamp(15px,2.9vw,19px);
+    line-height:1.6; color:rgba(248,245,238,.86)}
+  .schau-by{margin:8px 0 0; font-size:12px; letter-spacing:.06em; color:rgba(248,245,238,.42)}
+  .schau-raus{position:absolute; left:0; right:0; bottom:calc(24px + env(safe-area-inset-bottom));
+    text-align:center; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase;
+    color:rgba(248,245,238,.28); z-index:2; animation:schauRein 1.4s 1.6s both}
+  @media (prefers-reduced-motion:reduce){ .schau-b.an{animation:none} .schau-stern,.schau-satz,.schau-raus{animation:none} }
+  .vr-akt{display:flex; gap:7px; margin-top:12px}
+  .vr-schau{font:inherit; font-size:11.5px; font-weight:700; letter-spacing:.04em; color:var(--on-accent);
+    background:var(--brass); border:none; border-radius:999px; padding:5px 15px; cursor:pointer}
+  /* Der Satz im Heute-Tab */
+  .satz{width:100%; display:flex; align-items:baseline; gap:9px; flex-wrap:wrap; margin-bottom:10px;
+    padding:11px 16px; border:none; border-radius:12px; background:var(--card); box-shadow:var(--shadow);
+    cursor:pointer; text-align:left}
+  .satz-mark{font-family:var(--serif); font-size:19px; line-height:.6; color:var(--brass); opacity:.65}
+  .satz-t{flex:1; min-width:0; font-family:var(--serif); font-style:italic; font-size:13.5px; line-height:1.5; color:var(--ink-soft)}
+  .satz-by{font-size:10.5px; color:var(--ink-faint)}
+  .satz-w{font-size:9px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--brass);
+    background:rgba(227,178,95,.15); border-radius:999px; padding:2px 8px}
+  .satz.woche{box-shadow:var(--shadow), inset 0 0 0 1px rgba(227,178,95,.25)}
+  /* Bild einem Satz zuordnen */
+  .quote-img{width:26px; height:26px; flex:0 0 auto; border:none; border-radius:7px; cursor:pointer;
+    background-size:cover; background-position:center; background-color:rgba(var(--sheen),.08);
+    color:var(--ink-faint); font-size:12px; box-shadow:inset 0 0 0 1px var(--line)}
+  .quote-img.set{box-shadow:inset 0 0 0 1.4px var(--brass)}
+  .bildwahl{position:fixed; inset:0; z-index:99; display:flex; align-items:center; justify-content:center;
+    padding:20px; background:rgba(0,0,0,.6); backdrop-filter:blur(4px)}
+  .bw-box{width:100%; max-width:380px; padding:16px; border-radius:16px; background:var(--card);
+    box-shadow:0 0 0 1px rgba(var(--sheen),.08), 0 30px 60px -24px rgba(0,0,0,.8)}
+  .bw-h{font-family:var(--serif); font-size:15px; font-weight:650; color:var(--ink); margin-bottom:12px}
+  .bw-leer{font-size:12.5px; color:var(--ink-faint); font-style:italic}
+  .bw-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:7px}
+  .bw-i{aspect-ratio:1; border:none; border-radius:9px; cursor:pointer; background-size:cover; background-position:center}
+  .bw-i.on{box-shadow:0 0 0 2px var(--card), 0 0 0 3.5px var(--brass)}
+  .bw-weg{margin-top:12px; width:100%; font:inherit; font-size:11.5px; font-weight:650; color:var(--ink-faint);
+    background:transparent; border:none; cursor:pointer; padding:6px}
+  /* Satz der Woche im Command Center */
+  .cc-satz{margin-top:18px; padding-top:14px; border-top:1px solid var(--line)}
+  .cc-satz-l{display:flex; flex-direction:column; gap:5px}
+  .cc-satz-b{text-align:left; font:inherit; background:rgba(var(--sheen),.045); border:none; border-radius:9px;
+    padding:8px 11px; cursor:pointer; box-shadow:inset 0 0 0 1px transparent}
+  .cc-satz-b.on{box-shadow:inset 0 0 0 1.3px var(--brass); background:rgba(227,178,95,.1)}
+  .cs-t{display:block; font-family:var(--serif); font-style:italic; font-size:13px; line-height:1.5; color:var(--ink)}
+  .cs-by{display:block; font-size:10px; color:var(--ink-faint); margin-top:2px}
   /* ---------- Vizija: Lese-Ansicht ---------- */
   .vread{padding-bottom:6px}
   .vr-head{display:flex; align-items:center; gap:10px; padding:15px 20px 10px}
@@ -2005,6 +2167,7 @@
         <div class="strip" id="strip"></div>
       </section>
       <div id="angelus"></div>
+      <div id="tagessatz"></div>
       <div id="lockin"></div>
       <div id="cats"></div>
       <div id="tagesabschluss"></div>
@@ -2092,8 +2255,10 @@
   const PRIOS="ht_prios_v2";
   const FOCUS="ht_focus_v1";
   const LERN="ht_lernplan_v1";
+  const WABS="ht_command_v1";   // Command-Center-Texte, strikt lokal
+  const WSATZ="ht_wochensatz_v1";  // Satz der Woche
   const ANGELUS="ht_angelus_v1";
-  const APP_VERSION="2026-08-19";   // wird beim Aktualisieren hochgezählt
+  const APP_VERSION="2026-08-20";   // wird beim Aktualisieren hochgezählt
   const LOCKIN="ht_lockin_v1";
   const LOCKTXT="ht_lockintext_v1", CRYPTO="ht_crypto_v1", CAL="ht_cal_v1", QUOTES="ht_quotes_v1", LOCKCFG="ht_lockin_cfg_v1", SCHATZ="ht_schatz_v1", GOSPELC="ht_gospel_v1";
   const MAX_PRIOS=8;
@@ -2287,11 +2452,12 @@
     document.body.classList.toggle("tab-prios", t==="prios");
     document.body.classList.toggle("tab-fokus", t==="fokus");
     // Die Rückseite schließt sich beim Verlassen — sie soll nicht offen liegen bleiben.
-    if(t!=="vizija"){ antiOn=false; prosaOn=false; visEdit=false; wabsOn=false; rueckOn=false; verlaufOn=false; }
+    if(t!=="vizija"){ antiOn=false; prosaOn=false; visEdit=false; ccOn=false; rueckOn=false; verlaufOn=false; ccStop(); }
     if(t!=="fokus") lernOn=false;   // versteckte Ansicht bleibt nicht offen liegen
     if(t==="vizija"){ buildVision(); playVizijaIntro(); }
     if(t==="fokus") buildFokus();
     if(t==="prios") buildPrios();
+    if(t==="heute") renderHeute();   // Tageszeit, Satz und Gebetszeile aktualisieren
   }
   function playVizijaIntro(){
     const v=document.getElementById("view-vizija"); if(!v) return;
@@ -2472,7 +2638,7 @@
   const GH_API="https://api.github.com";
   const GIST_DESC="heute-tracker-sync";
   const GIST_FILE="heute.json";
-  const SYNC_EXCLUDE=[LOCKTXT, CRYPTO, TAB, SYNC];   // Texte bleiben strikt lokal
+  const SYNC_EXCLUDE=[LOCKTXT, CRYPTO, TAB, SYNC, WABS];   // Texte bleiben strikt lokal
   var syncCfg=null, syncReady=false, syncTimer=null, syncBusy=false, lastPushedPlain="";
   try{ syncCfg=JSON.parse(localStorage.getItem("ht_sync_v1")||"null"); }catch(e){ syncCfg=null; }
   function syncOn(){ return !!(syncCfg && syncCfg.token && syncCfg.pw); }
@@ -2712,8 +2878,18 @@
       f1.onkeydown=e=>{ if(e.key==="Enter" && !opts.confirm) ok.onclick(); };
     });
   }
+  // Muss ALLE Orte kennen, an denen etwas abgelegt sein kann.
+  // Sonst hielte die App vorhandene Texte für nicht vorhanden, legte ein neues Salz an
+  // und machte damit alles bisher Abgelegte unlesbar.
   function hasEncryptedData(){
     for(const d in lockinText){ const day=lockinText[d]; if(!day) continue; for(const id in day){ if(isEnc(day[id])) return true; } }
+    try{
+      const cc=read(WABS,{});
+      for(const k in cc){ const r=cc[k]||{};
+        for(const id in (r.a||{})){ if(isEnc(r.a[id])) return true; }
+        for(const m of (r.meta||[])){ for(const q in (m.a||{})){ if(isEnc(m.a[q])) return true; } }
+      }
+    }catch(e){}
     return false;
   }
   async function ensurePassphrase(){
@@ -4063,6 +4239,7 @@
 
   function renderHeute(){
     applyPhase();
+    renderSatz();
     renderAngelus();
     buildRing(); buildStrip(); buildHeader(); buildLockIn(); buildCats(); buildTagesabschluss(); buildSchatzBtn(); renderCalendar();
     const complete=dayComplete(state.viewDate);
@@ -5404,8 +5581,14 @@
     const goals=(vision.week.points||[]).filter(p=>(p.text||"").trim());
     if(wpOffset===0 && goals.length){
       const g=document.createElement("div"); g.className="wp-goals";
-      g.innerHTML=`<span class="wp-goals-k">Diese Woche</span>`+
-        goals.map(p=>`<span class="wp-goal${p.done?" done":""}">${esc(p.text.trim())}</span>`).join("");
+      g.innerHTML=`<span class="wp-goals-k">Diese Woche</span>`;
+      goals.forEach(p=>{
+        const c=document.createElement("span");
+        c.className="wp-goal"+(p.done?" done":"")+(p.done?"":" ziehbar");
+        c.textContent=p.text.trim();
+        if(!p.done) c.title="Ins Raster ziehen, um Zeit dafür zu blocken";
+        g.appendChild(c);
+      });
       panel.appendChild(g);
     }
 
@@ -5478,6 +5661,8 @@
       grid.appendChild(col);
     });
     panel.appendChild(grid);
+    // Jetzt, wo das Raster steht, werden die Ziele greifbar
+    panel.querySelectorAll(".wp-goal.ziehbar").forEach(c=>wpZielZiehen(c,c.textContent,grid));
 
     // Fuß: was in der Woche schon zusammengekommen ist
     const rep=weekReport(start);
@@ -5548,6 +5733,62 @@
     savePrios(); buildPrios();
     toast("Aufgabe eingeplant");
   }
+  /* ---------- Ein Wochenziel ins Raster ziehen ---------- */
+  function wpZielZiehen(chip,text,grid){
+    let schwebt=null, halten=null, aktiv=false;
+    const los=(x,y)=>{
+      aktiv=true;
+      schwebt=document.createElement("div"); schwebt.className="wp-fliegt"; schwebt.textContent=text;
+      document.body.appendChild(schwebt);
+      setzen(x,y);
+      chip.classList.add("haelt");
+    };
+    const setzen=(x,y)=>{
+      if(!schwebt) return;
+      schwebt.style.left=x+"px"; schwebt.style.top=y+"px";
+      // Zielspalte hervorheben
+      grid.querySelectorAll(".wp-col").forEach(c=>c.classList.remove("ziel"));
+      const sp=ueber(x,y);
+      if(sp){ sp.col.classList.add("ziel"); schwebt.textContent=text+" · "+fMinToClock(sp.min); }
+      else schwebt.textContent=text;
+    };
+    const ueber=(x,y)=>{
+      const col=[...grid.querySelectorAll(".wp-col")].find(c=>{ const r=c.getBoundingClientRect();
+        return x>=r.left && x<=r.right && y>=r.top && y<=r.bottom; });
+      if(!col||!col.dataset.day) return null;
+      const b=col.querySelector(".wp-body"); if(!b) return null;
+      const r=b.getBoundingClientRect();
+      if(y<r.top||y>r.bottom) return null;
+      return {col, day:col.dataset.day, min:wpClamp(wpY2min(y-r.top))};
+    };
+    const start=e=>{
+      e.preventDefault();
+      if(e.pointerType==="mouse") los(e.clientX,e.clientY);
+      else { const x=e.clientX,y=e.clientY;
+        halten=setTimeout(()=>{ halten=null; los(x,y); if(navigator.vibrate) try{navigator.vibrate(12);}catch(g){} },240); }
+      chip.setPointerCapture&&chip.setPointerCapture(e.pointerId);
+    };
+    const move=e=>{ if(halten){ clearTimeout(halten); halten=null; } if(aktiv){ e.preventDefault(); setzen(e.clientX,e.clientY); } };
+    const ende=e=>{
+      if(halten){ clearTimeout(halten); halten=null; }
+      grid.querySelectorAll(".wp-col").forEach(c=>c.classList.remove("ziel"));
+      chip.classList.remove("haelt");
+      if(!aktiv) return;
+      aktiv=false;
+      const ziel=ueber(e.clientX,e.clientY);
+      if(schwebt){ schwebt.remove(); schwebt=null; }
+      if(!ziel) return;
+      addBlocker(ziel.day, ziel.min, 60, text);
+      buildPrios();
+      toast("Zeit geblockt · "+fMinToClock(ziel.min));
+    };
+    chip.addEventListener("pointerdown",start);
+    chip.addEventListener("pointermove",move);
+    chip.addEventListener("pointerup",ende);
+    chip.addEventListener("pointercancel",()=>{ if(halten){clearTimeout(halten);halten=null;} if(schwebt){schwebt.remove();schwebt=null;} aktiv=false; chip.classList.remove("haelt");
+      grid.querySelectorAll(".wp-col").forEach(c=>c.classList.remove("ziel")); });
+  }
+
   /* ---------- Ziehen im Wochenraster ---------- */
   const WP_SNAP=15;
   const wpY2min=y=>TL_START+Math.round((y/WP_PXMIN)/WP_SNAP)*WP_SNAP;
@@ -5934,6 +6175,32 @@
     if(changed){ saveSchatz(); if(document.getElementById("schatzList")) buildSchatzList(); buildSchatzBtn(); }
     qsyncing=false;
   }
+  // Welches Bild gehört zu diesem Satz?
+  function waehleBild(q){
+    document.querySelectorAll(".bildwahl").forEach(x=>x.remove());
+    const imgs=vision.images||[];
+    const ov=document.createElement("div"); ov.className="bildwahl open";
+    const box=document.createElement("div"); box.className="bw-box";
+    box.innerHTML=`<div class="bw-h">Bild für diesen Satz</div>`;
+    if(!imgs.length) box.innerHTML+=`<div class="bw-leer">Noch keine Bilder in der Vizija.</div>`;
+    const g=document.createElement("div"); g.className="bw-grid";
+    imgs.forEach(im=>{
+      const b=document.createElement("button"); b.type="button"; b.className="bw-i"+(q.imgId===im.id?" on":"");
+      b.style.backgroundImage=`url(${im.src})`;
+      b.addEventListener("click",()=>{ q.imgId=(q.imgId===im.id?null:im.id); saveQuotes(); ov.remove(); buildVision(); });
+      g.appendChild(b);
+    });
+    box.appendChild(g);
+    if(q.imgId){
+      const w=document.createElement("button"); w.type="button"; w.className="bw-weg"; w.textContent="Zuordnung lösen";
+      w.addEventListener("click",()=>{ q.imgId=null; saveQuotes(); ov.remove(); buildVision(); });
+      box.appendChild(w);
+    }
+    ov.appendChild(box);
+    ov.addEventListener("click",e=>{ if(e.target===ov) ov.remove(); });
+    document.body.appendChild(ov);
+  }
+
   function buildQuotes(panel){
     if(quoteTimer){ clearInterval(quoteTimer); quoteTimer=null; }
     const lbl=document.createElement("div"); lbl.className="sub-label with-line reveal"; lbl.textContent="Zitate";
@@ -5965,9 +6232,16 @@
       const t=document.createElement("div"); t.className="quote-text"; t.textContent=q.text;
       const a=document.createElement("div"); a.className="quote-by"; a.textContent=q.author||"";
       wrap.append(t,a);
+      // Ein Bild dazu — daraus wird die Karte, die die Schau zeigt
+      const bild=document.createElement("button"); bild.className="quote-img"+(q.imgId?" set":""); bild.type="button";
+      const zug=(vision.images||[]).find(i=>i.id===q.imgId);
+      if(zug){ bild.style.backgroundImage=`url(${zug.src})`; bild.textContent=""; }
+      else bild.textContent="◵";
+      bild.title=zug?"Bild wechseln":"Bild zuordnen";
+      bild.addEventListener("click",e=>{ e.stopPropagation(); waehleBild(q); });
       const del=document.createElement("button"); del.className="row-del"; del.type="button"; del.textContent="×"; del.setAttribute("aria-label","Zitat löschen");
       del.addEventListener("click",()=>{ quotes=quotes.filter(x=>x.id!==q.id); saveQuotes(); buildVision(); });
-      row.append(bar,wrap,del); panel.appendChild(row);
+      row.append(bar,wrap,bild,del); panel.appendChild(row);
     });
 
     const add=document.createElement("div"); add.className="add-row quote-add";
@@ -5979,6 +6253,80 @@
     qt.addEventListener("keydown",e=>{ if(e.key==="Enter") commit(); });
     qa.addEventListener("keydown",e=>{ if(e.key==="Enter") commit(); });
     add.append(qt,qa,btn); panel.appendChild(add);
+  }
+
+  function renderSatz(){
+    const host=document.getElementById("tagessatz"); if(!host) return;
+    host.innerHTML="";
+    const q=heutigerSatz(); if(!q) return;
+    const w=!!satzDerWoche();
+    const el=document.createElement("button"); el.type="button"; el.className="satz"+(w?" woche":"");
+    el.innerHTML=`<span class="satz-mark">“</span><span class="satz-t">${esc(q.text)}</span>`+
+      (q.author?`<span class="satz-by">${esc(q.author)}</span>`:``)+
+      (w?`<span class="satz-w">Woche</span>`:``);
+    el.title="Zur Schau";
+    el.addEventListener("click",openSchau);
+    host.appendChild(el);
+  }
+
+  /* ---------- Der Satz, der dir heute begegnet ----------
+     Erst der Satz der Woche, sonst einer vom Datum bestimmt — den ganzen Tag derselbe. */
+  const wSatz=()=>read(WSATZ,null);
+  function setWochensatz(id){
+    const wi=weekInfo();
+    if(!id) write(WSATZ,null); else write(WSATZ,{week:wi.key, id});
+  }
+  function satzDerWoche(){
+    const w=wSatz(); if(!w||w.week!==weekInfo().key) return null;
+    return (quotes||[]).find(q=>q.id===w.id)||null;
+  }
+  function satzDesTages(){
+    const qs=quotes||[]; if(!qs.length) return null;
+    // Aus dem Datum eine Zahl — dadurch bleibt es den ganzen Tag derselbe Satz
+    let h=0; for(let i=0;i<today.length;i++) h=(h*31+today.charCodeAt(i))>>>0;
+    return qs[h%qs.length];
+  }
+  const heutigerSatz=()=>satzDerWoche()||satzDesTages();
+
+  /* ---------- Die Schau: ein Moment statt einer Seite ---------- */
+  let schauTimer=null;
+  function openSchau(){
+    document.querySelectorAll(".schau").forEach(x=>x.remove());
+    const q=heutigerSatz();
+    // Ein Bild: das zum Satz gehörige, sonst wechselnd
+    const imgs=(vision.images||[]);
+    let bild=null;
+    if(q && q.imgId) bild=imgs.find(i=>i.id===q.imgId)||null;
+    const ov=document.createElement("div"); ov.className="schau";
+    const lagen=document.createElement("div"); lagen.className="schau-bilder";
+    const reihe = bild ? [bild] : imgs;
+    reihe.forEach((im,i)=>{
+      const d=document.createElement("div"); d.className="schau-b"+(i===0?" an":"");
+      d.style.backgroundImage=`url(${im.src})`;
+      lagen.appendChild(d);
+    });
+    ov.appendChild(lagen);
+    const in_=document.createElement("div"); in_.className="schau-in";
+    const stern=(vision.points||[]).filter(p=>(p.text||"").trim()).map(p=>p.text.trim());
+    in_.innerHTML=stern.length
+      ? stern.map(t=>`<p class="schau-stern">${esc(t)}</p>`).join("")
+      : `<p class="schau-stern leer">Worauf läuft alles hinaus?</p>`;
+    if(q){
+      in_.innerHTML+=`<div class="schau-satz"><span class="schau-mark">“</span>
+        <p class="schau-q">${esc(q.text)}</p>${q.author?`<p class="schau-by">— ${esc(q.author)}</p>`:``}</div>`;
+    }
+    ov.appendChild(in_);
+    const raus=document.createElement("div"); raus.className="schau-raus"; raus.textContent="tippen zum Schließen";
+    ov.appendChild(raus);
+    const zu=()=>{ if(schauTimer){ clearInterval(schauTimer); schauTimer=null; } ov.remove(); };
+    ov.addEventListener("click",zu);
+    document.body.appendChild(ov);
+    // Bilder wechseln langsam, nur wenn mehrere und keines fest zugeordnet
+    if(reihe.length>1){
+      let i=0; const bs=lagen.querySelectorAll(".schau-b");
+      schauTimer=setInterval(()=>{ if(document.hidden) return;
+        bs[i].classList.remove("an"); i=(i+1)%bs.length; bs[i].classList.add("an"); },11000);
+    }
   }
 
   /* ---------- Vizija ---------- */
@@ -6417,83 +6765,371 @@
     view.appendChild(panel);
   }
 
-  /* ---------- Wochenabschluss ---------- */
-  const WABS="ht_wabschluss_v1";
-  const WFRAGEN=[
-    "Was ist diese Woche wahr geworden?",
-    "Woran bist du hängengeblieben?",
-    "Was hat dich getragen?",
-    "Was nimmst du in die nächste Woche mit?"
+  /* ---------- Command Center: der wöchentliche Reset ----------
+     Acht Schritte, einer nach dem anderen. Rau statt perfekt — 3 bis 5 Minuten je Schritt. */
+  const CC_STEPS=[
+    {id:"wins",  t:"Wins",            f:"Was waren letzte Woche deine größten Einsichten und Fortschritte?"},
+    {id:"apex",  t:"Apex Vision",     f:"Beschreibe das Leben, das du führen willst — als hättest du es schon. Gesundheit, Finanzen, Berufung, Beziehungen, Erholung."},
+    {id:"quart", t:"Quartals-SCOPE",  f:"Stimmt das noch? Was ist gerade wirklich das Wichtigste?"},
+    {id:"woche", t:"Wochen-SCOPE",    f:"Wie packst du diese Woche deine Pflichten und Quartalsziele an?"},
+    {id:"staq",  t:"STAQ",            f:"Welche Gewohnheiten tragen genau diese Woche? Hardline, Mainline, Softline."},
+    {id:"meta",  t:"Metascript",      f:"Was liegt dir gerade auf Herz und Verstand?"},
+    {id:"msg",   t:"Nachricht an dich",f:"Schreib deinem heutigen Ich aus der Sicht dessen, der diesen Plan mit Freude durchzieht."},
+    {id:"vis",   t:"Visualisierung",  f:"Geh die Woche im Geist durch."}
   ];
-  let wabsOn=false;
-  const wabsAll=()=>read(WABS,{});
-  function buildWabschluss(view){
-    const wi=weekInfo(), rep=weekReport(wi.key);
-    const store=wabsAll(); const rec=store[wi.key]||{answers:{},done:false};
-    const panel=document.createElement("section"); panel.className="panel wabs-panel";
+  const META_Q=["Was will ich?","Wie gewinne ich?","Wer werde ich sein?"];
+  let ccOn=false, ccStep=0, ccTimer=null, ccRest=0;
+  const ccAll=()=>read(WABS,{});
+  function ccRec(){ const st=ccAll(), k=weekInfo().key; return st[k]||(st[k]={a:{},meta:[],done:false}); }
+  function ccSave(fn){ const st=ccAll(), k=weekInfo().key; const r=st[k]||{a:{},meta:[]}; fn(r); st[k]=r; write(WABS,st); }
+  function ccStop(){ if(ccTimer){ clearInterval(ccTimer); ccTimer=null; } }
+
+  // Alle abgelegten Texte eines Command Centers zählen
+  function ccZuCount(rec){
+    let n=0;
+    for(const id in (rec.a||{})) if(isEnc(rec.a[id])) n++;
+    for(const m of (rec.meta||[])) for(const q in (m.a||{})) if(isEnc(m.a[q])) n++;
+    return n;
+  }
+  // Mit einer Passworteingabe alles öffnen — was nicht passt, bleibt zu
+  async function ccAlleOeffnen(rec){
+    const pw=await ensurePassphrase(); if(pw==null) return;
+    let auf=0, fehl=0;
+    const salt=unb64(cryptoRec.salt);
+    for(const id in (rec.a||{})){
+      const v=rec.a[id]; if(!isEnc(v)) continue;
+      try{ rec.a[id]=await decWith(pw,salt,v); auf++; }catch(e){ fehl++; }
+    }
+    for(const m of (rec.meta||[])){
+      for(const q in (m.a||{})){
+        const v=m.a[q]; if(!isEnc(v)) continue;
+        try{ m.a[q]=await decWith(pw,salt,v); auf++; }catch(e){ fehl++; }
+      }
+    }
+    ccSave(r=>{ r.a=rec.a; r.meta=rec.meta; });
+    buildVision();
+    toast(fehl ? (auf+" geöffnet, "+fehl+" nicht") : (auf===1?"Text geöffnet":auf+" Texte geöffnet"));
+  }
+
+  function buildCommand(view){
+    ccStop();
+    const wi=weekInfo(), rec=ccRec();
+    const panel=document.createElement("section"); panel.className="panel cc-panel";
 
     const head=document.createElement("div"); head.className="panel-head";
-    head.innerHTML=`<span class="dot"></span><span class="eyebrow">Wochenabschluss</span><span class="vis-hint">KW ${wi.num}</span>`;
+    head.innerHTML=`<span class="dot"></span><span class="eyebrow">Command Center</span><span class="vis-hint">KW ${wi.num}</span>`;
     const back=document.createElement("button"); back.type="button"; back.className="vr-edit"; back.textContent="zurück";
-    back.addEventListener("click",()=>{ wabsOn=false; buildVision(); });
+    back.addEventListener("click",()=>{ ccStop(); ccOn=false; buildVision(); });
     head.appendChild(back); panel.appendChild(head);
 
-    // Die Bilanz zuerst — man schreibt nicht ins Leere
-    const bil=document.createElement("div"); bil.className="wabs-bil";
-    const max=Math.max(60,...rep.days.map(x=>x.min));
-    bil.innerHTML=`<div class="wabs-sec">Was war</div>
-      <div class="sa-stats"><span><strong>${rep.mins}</strong>min Fokus</span><span><strong>${rep.blocks}</strong>Blöcke</span><span><strong>${rep.full}</strong>volle Tage</span></div>
-      <div class="sa-week">`+rep.days.map(x=>`
-        <div class="sa-day${x.full?" full":""}${x.future?" future":""}${(x.min||x.done)?"":" idle"}">
-          <span class="sa-bar"><span style="height:${Math.round(x.min/max*100)}%"></span></span>
-          <span class="sa-wd">${x.wd}</span><span class="sa-min">${x.min?x.min+"′":"–"}</span></div>`).join("")+`</div>`;
-    panel.appendChild(bil);
-
-    // Die Wochenziele mit Haken
-    const zw=(vision.week.points||[]).filter(p=>(p.text||"").trim());
-    if(zw.length){
-      const zl=document.createElement("div"); zl.className="wabs-ziele";
-      zl.innerHTML=`<div class="wabs-sec">Vorgenommen</div>`;
-      zw.forEach(p=>{
-        const r=document.createElement("button"); r.type="button"; r.className="wabs-z"+(p.done?" done":"");
-        r.innerHTML=`<span class="wz-dot"></span><span class="wz-t">${esc(p.text.trim())}</span>`;
-        r.addEventListener("click",()=>{ p.done=!p.done; p.doneAt=p.done?new Date().toISOString():null; saveVision(); buildVision(); });
-        zl.appendChild(r);
-      });
-      panel.appendChild(zl);
+    // Fortschritt
+    // Wie viele Texte liegen abgelegt? Dann lohnt ein Griff für alle.
+    const zu=ccZuCount(rec);
+    if(zu>0){
+      const alle=document.createElement("button"); alle.type="button"; alle.className="cc-alle";
+      alle.innerHTML=`<span class="cc-alle-n">${zu}</span>${zu===1?"abgelegter Text":"abgelegte Texte"} · alle öffnen`;
+      alle.addEventListener("click",()=>ccAlleOeffnen(rec));
+      panel.appendChild(alle);
     }
 
-    // Vier Fragen
-    const fr=document.createElement("div"); fr.className="wabs-fragen";
-    fr.innerHTML=`<div class="wabs-sec">Rückblick</div>`;
-    WFRAGEN.forEach((q,i)=>{
-      const b=document.createElement("div"); b.className="wabs-f";
-      b.innerHTML=`<div class="wf-q">${esc(q)}</div>`;
-      const ta=document.createElement("textarea"); ta.className="wf-a"; ta.rows=2;
-      ta.value=(rec.answers&&rec.answers["q"+i])||""; ta.placeholder="…";
-      const grow=()=>{ ta.style.height="auto"; ta.style.height=Math.max(44,ta.scrollHeight)+"px"; };
-      ta.addEventListener("input",()=>{ const st=wabsAll(); const r=st[wi.key]||{answers:{}};
-        r.answers=r.answers||{}; r.answers["q"+i]=ta.value; st[wi.key]=r; write(WABS,st); grow(); });
-      requestAnimationFrame(grow);
-      b.appendChild(ta); fr.appendChild(b);
+    const prog=document.createElement("div"); prog.className="cc-prog";
+    CC_STEPS.forEach((st,i)=>{
+      const d=document.createElement("button"); d.type="button";
+      d.className="cc-dot"+(i===ccStep?" on":"")+(ccFertig(st,rec)?" done":"");
+      d.title=(i+1)+". "+st.t;
+      d.addEventListener("click",()=>{ ccStep=i; buildVision(); });
+      prog.appendChild(d);
     });
-    panel.appendChild(fr);
+    panel.appendChild(prog);
 
-    // Der Übergang: neue Woche ableiten
-    const nx=document.createElement("div"); nx.className="wabs-next";
-    nx.innerHTML=`<div class="wabs-sec">Und jetzt</div>`;
-    const go=document.createElement("button"); go.type="button"; go.className="wabs-go";
-    go.textContent="Wochenziele für die nächste Woche setzen →";
-    go.addEventListener("click",()=>{ wabsOn=false; visEdit=true; buildVision();
-      setTimeout(()=>{ const el=document.querySelector('.vtier[data-level="week"]'); if(el&&el.scrollIntoView) el.scrollIntoView({behavior:"smooth",block:"center"}); },80); });
-    nx.appendChild(go);
-    const q=document.createElement("button"); q.type="button"; q.className="wabs-quart";
-    q.textContent="Quartalsziele ansehen";
-    q.addEventListener("click",()=>{ wabsOn=false; visEdit=true; buildVision(); });
-    nx.appendChild(q);
-    panel.appendChild(nx);
+    const step=CC_STEPS[ccStep];
+    const kopf=document.createElement("div"); kopf.className="cc-kopf";
+    kopf.innerHTML=`<span class="cc-n">${ccStep+1}</span><span class="cc-t">${esc(step.t)}</span>`;
+    const uhr=document.createElement("button"); uhr.type="button"; uhr.className="cc-uhr";
+    uhr.textContent=ccRest?fmtMMSS(ccRest):"4 min";
+    uhr.title="Zeitfenster setzen — rau statt perfekt";
+    uhr.addEventListener("click",()=>{
+      if(ccTimer){ ccStop(); ccRest=0; uhr.textContent="4 min"; return; }
+      ccRest=240;
+      ccTimer=setInterval(()=>{ ccRest--; uhr.textContent=fmtMMSS(ccRest);
+        if(ccRest<=0){ ccStop(); uhr.textContent="fertig"; try{playGong();}catch(e){} } },1000);
+    });
+    kopf.appendChild(uhr); panel.appendChild(kopf);
 
+    const frage=document.createElement("p"); frage.className="cc-frage"; frage.textContent=step.f;
+    panel.appendChild(frage);
+
+    const body=document.createElement("div"); body.className="cc-body";
+    ccBody(step,rec,body,wi);
+    panel.appendChild(body);
+
+    // Weiter
+    const nav=document.createElement("div"); nav.className="cc-nav";
+    if(ccStep>0){ const z=document.createElement("button"); z.type="button"; z.className="cc-zur"; z.textContent="zurück";
+      z.addEventListener("click",()=>{ ccStop(); ccStep--; buildVision(); }); nav.appendChild(z); }
+    const w=document.createElement("button"); w.type="button"; w.className="cc-weiter";
+    w.textContent = ccStep<CC_STEPS.length-1 ? "weiter" : "Command Center abschließen";
+    w.addEventListener("click",()=>{
+      ccStop(); ccRest=0;
+      if(ccStep<CC_STEPS.length-1){ ccStep++; buildVision(); }
+      else { ccSave(r=>{ r.done=true; r.at=new Date().toISOString(); }); ccOn=false; ccStep=0;
+             buildVision(); toast("Die Woche steht."); }
+    });
+    nav.appendChild(w); panel.appendChild(nav);
     view.appendChild(panel);
+  }
+  const fmtMMSS=s=>Math.floor(Math.max(0,s)/60)+":"+String(Math.max(0,s)%60).padStart(2,"0");
+  function ccFertig(st,rec){
+    if(st.id==="meta") return (rec.meta||[]).some(m=>(m.text||"").trim());
+    if(st.id==="quart") return (vision.quarter.points||[]).some(p=>(p.text||"").trim());
+    if(st.id==="woche") return (vision.week.points||[]).some(p=>(p.text||"").trim());
+    if(st.id==="vis") return !!rec.done;
+    const v=(rec.a||{})[st.id];
+    return isEnc(v) || (typeof v==="string" && v.trim().length>0);
+  }
+  /* Ein Schreibfeld, das sich merkt — mit demselben Schutz wie der Tagesabschluss.
+     Der Text kann abgelegt werden; dann steht dort nur noch eine ruhige Zeile. */
+  function ccFeld(rec,id,ph,rows){ return ccSicher(
+    ()=>((rec.a||{})[id]),
+    v=>ccSave(r=>{ r.a=r.a||{}; r.a[id]=v; }),
+    ph, rows); }
+
+  function ccSicher(hol,leg,ph,rows){
+    const wrap=document.createElement("div"); wrap.className="cc-feld";
+    const cur=hol();
+    if(isEnc(cur)){
+      const mask=document.createElement("div"); mask.className="enc-mask"; mask.textContent="· · · · ·";
+      mask.title="Antippen zum Öffnen";
+      const key=document.createElement("button"); key.className="key-btn open"; key.type="button";
+      key.textContent="öffnen"; key.title="Text sichtbar machen";
+      const oeffne=async()=>{
+        const pw=await ensurePassphrase(); if(pw==null) return;
+        try{ const t=await decWith(pw, unb64(cryptoRec.salt), cur); leg(t); buildVision(); }
+        catch(e){ alert("Konnte nicht öffnen (falsches Passwort?)."); }
+      };
+      key.addEventListener("click",oeffne);
+      mask.addEventListener("click",oeffne);
+      const del=document.createElement("button"); del.className="key-btn del"; del.type="button"; del.textContent="löschen";
+      del.addEventListener("click",async()=>{
+        const pw=await ensurePassphrase(); if(pw==null) return;
+        try{ await decWith(pw, unb64(cryptoRec.salt), cur); }
+        catch(e){ alert("Falsches Passwort — es wurde nichts gelöscht."); return; }
+        if(!confirm("Diesen Text endgültig löschen? Das lässt sich nicht rückgängig machen.")) return;
+        leg(""); buildVision(); toast("Text gelöscht");
+      });
+      const zeile=document.createElement("div"); zeile.className="cc-feld-akt"; zeile.append(key,del);
+      wrap.append(mask,zeile);
+      return wrap;
+    }
+    const ta=document.createElement("textarea"); ta.className="cc-ta"; ta.rows=rows||4;
+    ta.value=(typeof cur==="string"?cur:"")||""; ta.placeholder=ph||"…";
+    const grow=()=>{ ta.style.height="auto"; ta.style.height=Math.max(90,ta.scrollHeight)+"px"; };
+    ta.addEventListener("input",()=>{ leg(ta.value); grow(); });
+    requestAnimationFrame(grow);
+    wrap.appendChild(ta);
+    // Der Knopf ist immer da, tritt aber erst hervor, wenn etwas dasteht
+    const key=document.createElement("button"); key.className="key-btn"; key.type="button";
+    key.textContent="ablegen"; key.title="Text geschützt ablegen";
+    key.hidden=!(ta.value||"").trim();
+    ta.addEventListener("input",()=>{ key.hidden=!(ta.value||"").trim(); });
+    key.addEventListener("click",async()=>{
+      const t=ta.value; if(!t.trim()){ alert("Hier steht noch nichts."); return; }
+      const pw=await ensurePassphrase(); if(pw==null) return;
+      try{ const payload=await encWith(pw, unb64(cryptoRec.salt), t); leg(payload); buildVision(); }
+      catch(e){ alert("Ablegen fehlgeschlagen."); }
+    });
+    const zeile=document.createElement("div"); zeile.className="cc-feld-akt"; zeile.appendChild(key);
+    wrap.appendChild(zeile);
+    return wrap;
+  }
+
+  function ccBody(step,rec,body,wi){
+    if(step.id==="wins"){
+      // Die täglichen Wins der letzten Woche als Gedächtnisstütze
+      const gefunden=[];
+      for(let i=7;i>=1;i--){ const k=addDays(today,-i); const v=(lockinText[k]||{}).wins;
+        if(typeof v==="string" && v.trim()) gefunden.push({k, t:v.trim()}); }
+      const box=document.createElement("div"); box.className="cc-quelle";
+      if(gefunden.length){
+        box.innerHTML=`<div class="cc-q-h">Deine Notizen der letzten sieben Tage</div>`+
+          gefunden.map(g=>`<div class="cc-q-z"><span class="cc-q-d">${fmtShort(g.k)}</span><span>${esc(g.t.slice(0,180))}</span></div>`).join("");
+      }else{
+        box.innerHTML=`<div class="cc-q-leer">Keine offenen Notizen gefunden. Tägliche Wins im Lock In festzuhalten macht diesen Schritt leicht.</div>`;
+      }
+      body.appendChild(box);
+      body.appendChild(ccFeld(rec,"wins","Fortschritte, Einsichten, kleine Siege …",5));
+      return;
+    }
+    if(step.id==="apex"){
+      if((vision.prosa||"").trim()){
+        const b=document.createElement("button"); b.type="button"; b.className="cc-link";
+        b.textContent="Deinen Vizija-Text öffnen →";
+        b.addEventListener("click",()=>{ ccStop(); ccOn=false; prosaOn=true; buildVision(); });
+        body.appendChild(b);
+      }
+      body.appendChild(ccFeld(rec,"apex","Ich wache auf und …",6));
+      return;
+    }
+    if(step.id==="quart"){
+      const pts=(vision.quarter.points||[]).filter(p=>(p.text||"").trim());
+      const l=document.createElement("div"); l.className="cc-ziele";
+      if(!pts.length){ l.innerHTML=`<div class="cc-q-leer">Noch keine Quartalsziele.</div>`; }
+      // In Prioritätsreihenfolge bringen — was oben steht, ist das Wichtigste
+      const alle=vision.quarter.points||[];
+      pts.forEach((p,i)=>{
+        const r=document.createElement("div"); r.className="cc-z"+(p.done?" done":"");
+        const n=document.createElement("span"); n.className="cc-z-n"; n.textContent=(i+1);
+        const t=document.createElement("span"); t.className="cc-z-t"; t.textContent=p.text.trim();
+        const up=document.createElement("button"); up.type="button"; up.className="cc-ord"; up.textContent="↑";
+        up.title="weiter nach oben"; up.disabled=(i===0);
+        up.addEventListener("click",()=>{
+          const a=alle.indexOf(p), b=alle.indexOf(pts[i-1]);
+          if(a<0||b<0) return; alle.splice(a,1); alle.splice(b,0,p); saveVision(); buildVision();
+        });
+        r.append(n,t,up); l.appendChild(r);
+      });
+      const hinweis=document.createElement("div"); hinweis.className="cc-ord-hint";
+      hinweis.textContent="Die Reihenfolge ist die Priorität. Zu viele Prioritäten heißt keine.";
+      l.appendChild(hinweis);
+      body.appendChild(l);
+      const b=document.createElement("button"); b.type="button"; b.className="cc-link";
+      b.textContent="Quartalsziele bearbeiten →";
+      b.addEventListener("click",()=>{ ccStop(); ccOn=false; visEdit=true; buildVision(); });
+      body.appendChild(b);
+      body.appendChild(ccFeld(rec,"quart","Was ändert sich? Was bleibt?",3));
+      return;
+    }
+    if(step.id==="woche"){
+      // Die Quartalsziele klein daneben — daran richtet sich die Woche aus
+      const qp=(vision.quarter.points||[]).filter(p=>(p.text||"").trim());
+      if(qp.length){
+        const q=document.createElement("div"); q.className="cc-quart-mini";
+        q.innerHTML=`<div class="cc-qm-h">Quartal · in dieser Reihenfolge</div>`+
+          qp.map((p,i)=>`<div class="cc-qm${p.done?" done":""}"><span class="cc-qm-n">${i+1}</span><span>${esc(p.text.trim())}</span></div>`).join("");
+        body.appendChild(q);
+      }
+      const pts=vision.week.points||[];
+      const l=document.createElement("div"); l.className="cc-ziele";
+      pts.forEach(p=>{
+        const r=document.createElement("div"); r.className="cc-z";
+        const dot=document.createElement("span"); dot.className="cc-z-dot";
+        const ta=document.createElement("input"); ta.type="text"; ta.className="cc-z-in";
+        ta.value=p.text||""; ta.placeholder="Wochenziel …";
+        ta.addEventListener("input",()=>{ p.text=ta.value; saveVision(); });
+        const del=document.createElement("button"); del.className="row-del"; del.type="button"; del.textContent="×";
+        del.addEventListener("click",()=>{ const i=pts.findIndex(x=>x.id===p.id); if(i>=0)pts.splice(i,1); saveVision(); buildVision(); });
+        r.append(dot,ta,del); l.appendChild(r);
+      });
+      const add=document.createElement("button"); add.type="button"; add.className="cc-add"; add.textContent="+ Wochenziel";
+      add.addEventListener("click",()=>{ pts.push({id:uid(),text:""}); saveVision(); buildVision();
+        const i=document.querySelectorAll(".cc-z-in"); if(i.length)i[i.length-1].focus(); });
+      l.appendChild(add); body.appendChild(l);
+      const b=document.createElement("button"); b.type="button"; b.className="cc-link";
+      b.textContent="Zeiten in der Wochenansicht blocken →";
+      b.addEventListener("click",()=>{ ccStop(); ccOn=false; state.priosSub="woche"; setTab("prios"); });
+      body.appendChild(b);
+      return;
+    }
+    if(step.id==="staq"){
+      const l=document.createElement("div"); l.className="cc-staq";
+      (config.cats||[]).forEach(c=>{
+        const hs=config.habits.filter(h=>h.cat===c.id);
+        const g=document.createElement("div"); g.className="cc-linie";
+        g.innerHTML=`<div class="cc-l-h" style="--lc:${c.color}">${esc(c.title)}</div>`+
+          (hs.length?hs.map(h=>`<span class="cc-l-h2">${esc(h.name)}</span>`).join(""):`<span class="cc-q-leer">leer</span>`);
+        l.appendChild(g);
+      });
+      body.appendChild(l);
+      const b=document.createElement("button"); b.type="button"; b.className="cc-link";
+      b.textContent="Gewohnheiten anpassen →";
+      b.addEventListener("click",()=>{ ccStop(); ccOn=false; setTab("heute"); setTimeout(()=>{ if(!state.editing) toggleEdit(); },120); });
+      body.appendChild(b);
+      body.appendChild(ccFeld(rec,"staq","Was ändere ich für diese Woche? Feiertage, Fristen, besondere Umstände …",3));
+      return;
+    }
+    if(step.id==="meta"){
+      rec.meta=rec.meta||[];
+      const scan=document.createElement("div"); scan.className="cc-scan";
+      scan.innerHTML=`<div class="cc-q-h">Scan · Schmerz und Leidenschaft</div>`;
+      const sf=ccFeld(rec,"scan","Alles, was gerade zieht — ungeordnet, roh …",4);
+      scan.appendChild(sf); body.appendChild(scan);
+
+      const l=document.createElement("div"); l.className="cc-metas";
+      rec.meta.forEach((m,i)=>{
+        const c=document.createElement("div"); c.className="cc-meta";
+        const tt=document.createElement("input"); tt.type="text"; tt.className="cc-meta-t";
+        tt.value=m.text||""; tt.placeholder="Der Punkt mit der größten Ladung …";
+        tt.addEventListener("input",()=>{ m.text=tt.value; ccSave(r=>{ r.meta=rec.meta; }); });
+        const del=document.createElement("button"); del.className="row-del"; del.type="button"; del.textContent="×";
+        del.addEventListener("click",()=>{ rec.meta.splice(i,1); ccSave(r=>{ r.meta=rec.meta; }); buildVision(); });
+        const kopf=document.createElement("div"); kopf.className="cc-meta-k"; kopf.append(tt,del);
+        c.appendChild(kopf);
+        META_Q.forEach((q,qi)=>{
+          const qd=document.createElement("div"); qd.className="cc-meta-q";
+          qd.innerHTML=`<div class="cc-mq">${esc(q)}</div>`;
+          qd.appendChild(ccSicher(
+            ()=>(m.a||{})["q"+qi],
+            v=>{ m.a=m.a||{}; m.a["q"+qi]=v; ccSave(r=>{ r.meta=rec.meta; }); },
+            "…", 2));
+          c.appendChild(qd);
+        });
+        // Der Ausgang: daraus wird eine Gewohnheit oder ein Schritt
+        const raus=document.createElement("div"); raus.className="cc-raus";
+        const zuTodo=document.createElement("button"); zuTodo.type="button"; zuTodo.className="cc-mini";
+        zuTodo.textContent="als Schritt in die Woche";
+        zuTodo.addEventListener("click",()=>{
+          const t=(m.text||"").trim(); if(!t){ toast("Erst benennen"); return; }
+          vision.week.points=vision.week.points||[]; vision.week.points.push({id:uid(),text:t}); saveVision();
+          toast("Als Wochenziel übernommen");
+        });
+        const zuHabit=document.createElement("button"); zuHabit.type="button"; zuHabit.className="cc-mini";
+        zuHabit.textContent="als Gewohnheit";
+        zuHabit.addEventListener("click",()=>{ ccStop(); ccOn=false; setTab("heute");
+          setTimeout(()=>{ if(!state.editing) toggleEdit(); },120); });
+        raus.append(zuTodo,zuHabit); c.appendChild(raus);
+        l.appendChild(c);
+      });
+      const add=document.createElement("button"); add.type="button"; add.className="cc-add"; add.textContent="+ Metascript-Eintrag";
+      add.addEventListener("click",()=>{ rec.meta.push({text:"",a:{}}); ccSave(r=>{ r.meta=rec.meta; }); buildVision(); });
+      l.appendChild(add); body.appendChild(l);
+      return;
+    }
+    if(step.id==="msg"){
+      const h=document.createElement("div"); h.className="cc-quelle";
+      h.innerHTML=`<div class="cc-q-leer">Setz einen Timer auf zwei bis fünf Minuten und schreib frei — Ermutigung, Zuversicht, was du dir merken sollst.</div>`;
+      body.appendChild(h);
+      body.appendChild(ccFeld(rec,"msg","Lieber ich, …",8));
+      return;
+    }
+    if(step.id==="vis"){
+      const l=document.createElement("div"); l.className="cc-vis";
+      l.innerHTML=`<p class="cc-vis-t">Sieh dich durch diese Woche gehen. Du ziehst deine Ziele durch, hältst deine Gewohnheiten, zeigst dich als der, der du sein willst.</p>
+        <p class="cc-vis-t">Sieh dich beim nächsten Command Center sitzen und deine Wins aufschreiben.</p>
+        <p class="cc-vis-t dim">Halt das Gefühl einen Moment. Als wäre es schon so.</p>`;
+      const wi2=weekInfo();
+      const z=(vision.week.points||[]).filter(p=>(p.text||"").trim());
+      if(z.length) l.innerHTML+=`<div class="cc-vis-z">`+z.map(p=>`<span>${esc(p.text.trim())}</span>`).join("")+`</div>`;
+      body.appendChild(l);
+      // Ein Satz, der die Woche über bleibt
+      if((quotes||[]).length){
+        const w=document.createElement("div"); w.className="cc-satz";
+        w.innerHTML=`<div class="wabs-sec">Satz für diese Woche</div>`;
+        const jetzt=satzDerWoche();
+        const liste=document.createElement("div"); liste.className="cc-satz-l";
+        quotes.forEach(q=>{
+          const b=document.createElement("button"); b.type="button"; b.className="cc-satz-b"+(jetzt&&jetzt.id===q.id?" on":"");
+          b.innerHTML=`<span class="cs-t">${esc(q.text)}</span>`+(q.author?`<span class="cs-by">${esc(q.author)}</span>`:``);
+          b.addEventListener("click",()=>{ setWochensatz(jetzt&&jetzt.id===q.id?null:q.id); buildVision(); });
+          liste.appendChild(b);
+        });
+        w.appendChild(liste);
+        const s2=document.createElement("button"); s2.type="button"; s2.className="cc-link"; s2.textContent="Schau öffnen →";
+        s2.addEventListener("click",openSchau);
+        w.appendChild(s2);
+        body.appendChild(w);
+      }
+      return;
+    }
   }
 
   /* ---------- Rückblick auf Quartal und Jahr ---------- */
@@ -6512,37 +7148,68 @@
     head.append(ax,back); panel.appendChild(head);
 
     const jahr=(rueckSpanne==="jahr");
-    const von = jahr ? today.slice(0,4)+"-01-01" : quarterInfo().start;
+    const qi=quarterInfo();
+    const von = jahr ? today.slice(0,4)+"-01-01" : qi.start;
     const bis = today;
     const r=spanReport(von,bis);
+
     const titel=document.createElement("div"); titel.className="rueck-titel";
-    titel.textContent = jahr ? today.slice(0,4) : quarterInfo().label+" "+quarterInfo().year;
+    titel.innerHTML=`<span>${jahr?today.slice(0,4):qi.label+" "+qi.year}</span>`+
+      `<span class="rueck-span">${fmtShort(von)} – ${fmtShort(bis)}</span>`;
     panel.appendChild(titel);
 
-    const st=document.createElement("div"); st.className="rueck-stats";
-    st.innerHTML=`
-      <div class="rs"><strong>${r.tage}</strong><span>Tage getrackt</span></div>
-      <div class="rs"><strong>${r.voll}</strong><span>volle Tage</span></div>
-      <div class="rs"><strong>${Math.round(r.mins/60)}</strong><span>Stunden Fokus</span></div>
-      <div class="rs"><strong>${r.blocks}</strong><span>Fokusblöcke</span></div>
-      <div class="rs"><strong>${r.streak}</strong><span>längste Serie</span></div>
-      <div class="rs"><strong>${r.erledigt}</strong><span>erledigte ToDos</span></div>`;
-    panel.appendChild(st);
+    /* --- Was du dir vorgenommen hattest, und was daraus wurde --- */
+    const ziele=rueckZiele(jahr);
+    const zw=document.createElement("div"); zw.className="rueck-block";
+    zw.innerHTML=`<div class="wabs-sec">Ziele</div>`;
+    if(!ziele.length){
+      zw.innerHTML+=`<div class="rueck-leer">Noch keine Ziele gesetzt. In der Vizija lassen sie sich anlegen und als erreicht markieren.</div>`;
+    }else{
+      const erf=ziele.filter(z=>z.done).length;
+      zw.innerHTML+=`<div class="rz-bar"><span style="width:${Math.round(erf/ziele.length*100)}%"></span></div>
+        <div class="rz-quote"><strong>${erf}</strong> von ${ziele.length} erreicht</div>`;
+      zw.innerHTML+=ziele.map(z=>`
+        <div class="rz2 ${z.done?"ok":"offen"}">
+          <span class="rz2-c">${z.done?"✓":"○"}</span>
+          <span class="rz2-t">${esc(z.text)}</span>
+          <span class="rz2-e">${esc(z.ebene)}</span>
+          ${z.kinder?`<span class="rz2-k">${z.kinderDone}/${z.kinder} darunter</span>`:``}
+        </div>`).join("");
+    }
+    panel.appendChild(zw);
 
-    // Erreichte Ziele
-    const zz=[];
-    ["quarter","year","big"].forEach(k=>{ (visPoints(k)||[]).forEach(p=>{ if(p.done && (p.text||"").trim())
-      zz.push({text:p.text.trim(), ebene:k==="quarter"?"Quartal":k==="year"?"Jahr":"Vizija"}); }); });
-    (vision.archive.quarters||[]).forEach(q=>(q.points||[]).forEach(p=>{ if(p.done) zz.push({text:p.text, ebene:q.key}); }));
-    const zl=document.createElement("div"); zl.className="rueck-ziele";
-    zl.innerHTML=`<div class="wabs-sec">Erreicht</div>`+
-      (zz.length?zz.map(z=>`<div class="rz"><span class="rz-c">✓</span><span class="rz-t">${esc(z.text)}</span><span class="rz-e">${esc(z.ebene)}</span></div>`).join("")
-                :`<div class="rueck-leer">Noch nichts abgehakt. Ziele lassen sich in der Vizija als erreicht markieren.</div>`);
-    panel.appendChild(zl);
+    /* --- Highlights: was du selbst als gut festgehalten hast --- */
+    const hi=rueckHighlights(von,bis);
+    const hw=document.createElement("div"); hw.className="rueck-block";
+    hw.innerHTML=`<div class="wabs-sec">Highlights</div>`;
+    if(!hi.length){
+      hw.innerHTML+=`<div class="rueck-leer">Hier sammelt sich, was du im Lock In und im Command Center als Win festgehalten hast. Abgelegte Texte bleiben außen vor.</div>`;
+    }else{
+      hw.innerHTML+=hi.slice(0,40).map(h=>`
+        <div class="rh2"><span class="rh2-d">${fmtShort(h.d)}</span><span class="rh2-t">${esc(h.t)}</span></div>`).join("");
+      if(hi.length>40) hw.innerHTML+=`<div class="rueck-mehr">… und ${hi.length-40} weitere</div>`;
+    }
+    panel.appendChild(hw);
 
-    // Habits über die Spanne
+    /* --- Die stärkste Woche und die Zahlen --- */
+    const zb=document.createElement("div"); zb.className="rueck-block";
+    zb.innerHTML=`<div class="wabs-sec">In Zahlen</div>
+      <div class="rueck-stats">
+        <div class="rs"><strong>${Math.round(r.mins/60)}</strong><span>Stunden Fokus</span></div>
+        <div class="rs"><strong>${r.voll}</strong><span>volle Tage</span></div>
+        <div class="rs"><strong>${r.streak}</strong><span>längste Serie</span></div>
+        <div class="rs"><strong>${r.tage}</strong><span>aktive Tage</span></div>
+        <div class="rs"><strong>${r.erledigt}</strong><span>erledigt</span></div>
+        <div class="rs"><strong>${r.cc}</strong><span>Command Center</span></div>
+      </div>`;
+    if(r.beste){
+      zb.innerHTML+=`<div class="rueck-beste">Stärkste Woche: <strong>KW ${r.beste.num}</strong> · ${r.beste.mins} min Fokus</div>`;
+    }
+    panel.appendChild(zb);
+
+    /* --- Gewohnheiten --- */
     if(r.habits.length){
-      const hb=document.createElement("div"); hb.className="rueck-habits";
+      const hb=document.createElement("div"); hb.className="rueck-block";
       hb.innerHTML=`<div class="wabs-sec">Gewohnheiten</div>`+
         r.habits.map(h=>`<div class="rh"><span class="rh-n">${esc(h.name)}</span>
           <span class="rh-bar"><span style="width:${h.pct}%"></span></span>
@@ -6551,7 +7218,44 @@
     }
     view.appendChild(panel);
   }
-  // Zahlen über eine Zeitspanne
+
+  // Ziele der Spanne mit ihrem Stand — und wie viel darunter hängt
+  function rueckZiele(jahr){
+    const out=[];
+    const nimm=(key,label,kinderKey)=>{
+      (visPoints(key)||[]).forEach(p=>{
+        const t=(p.text||"").trim(); if(!t) return;
+        const ks=kinderKey?(visPoints(kinderKey)||[]).filter(x=>x.parent===p.id && (x.text||"").trim()):[];
+        out.push({text:t, ebene:label, done:!!p.done, kinder:ks.length, kinderDone:ks.filter(x=>x.done).length});
+      });
+    };
+    if(jahr){ nimm("year","Jahr","quarter"); nimm("quarter","Quartal","week"); }
+    else nimm("quarter","Quartal","week");
+    // Archiviertes mitnehmen
+    (vision.archive.quarters||[]).forEach(q=>(q.points||[]).forEach(p=>{
+      if((p.text||"").trim()) out.push({text:p.text, ebene:q.key, done:!!p.done, kinder:0, kinderDone:0}); }));
+    return out;
+  }
+
+  // Highlights aus offenen Wins — Lock In und Command Center
+  function rueckHighlights(von,bis){
+    const out=[];
+    for(const d in (lockinText||{})){
+      if(d<von||d>bis) continue;
+      const v=(lockinText[d]||{}).wins;
+      if(typeof v==="string" && v.trim()) out.push({d, t:v.trim()});
+    }
+    try{
+      const cc=read(WABS,{});
+      for(const k in cc){
+        if(k<von||k>bis) continue;
+        const v=((cc[k]||{}).a||{}).wins;
+        if(typeof v==="string" && v.trim()) out.push({d:k, t:v.trim()});
+      }
+    }catch(e){}
+    return out.sort((a,b)=>b.d.localeCompare(a.d));
+  }
+
   function spanReport(von,bis){
     const fx=readFocus(); const byDay={};
     (fx.archive||[]).forEach(d=>{ if(d&&d.day) byDay[d.day]=d; });
@@ -6573,7 +7277,27 @@
     let erledigt=0;
     try{ ensurePrios(); erledigt=(prios.archive||[]).filter(a=>a.day>=von&&a.day<=bis).length
       + prios.all.filter(x=>x.status==="done"&&x.day>=von&&x.day<=bis).length; }catch(e){}
-    return {mins,blocks,voll,tage,streak,habits,erledigt};
+    // Stärkste Woche und wie oft du das Command Center gemacht hast
+    let beste=null;
+    try{
+      const wochen={};
+      for(let k=von; k<=bis; k=addDays(k,1)){
+        const f=byDay[k]; if(!f) continue;
+        const ws=ymd(weekStart(new Date(k+"T00:00:00")));
+        wochen[ws]=(wochen[ws]||0)+dayProductive(f.blocks);
+      }
+      let top=null;
+      for(const w in wochen) if(!top||wochen[w]>wochen[top]) top=w;
+      if(top && wochen[top]>0){
+        const t=new Date(top+"T00:00:00"); t.setDate(t.getDate()+3);
+        const jan1=new Date(t.getFullYear(),0,1);
+        const num=1+Math.round(((t-jan1)/86400000-3+((jan1.getDay()+6)%7))/7);
+        beste={num, mins:wochen[top]};
+      }
+    }catch(e){}
+    let cc=0;
+    try{ const c=read(WABS,{}); for(const k in c) if(k>=von&&k<=bis&&(c[k]||{}).done) cc++; }catch(e){}
+    return {mins,blocks,voll,tage,streak,habits,erledigt,beste,cc};
   }
 
   let verlaufOn=false;
@@ -6597,7 +7321,7 @@
     const view=document.getElementById("view-vizija"); view.innerHTML="";
     if(antiOn){ buildAntiVizija(view); return; }
     if(prosaOn){ buildProsa(view); return; }
-    if(wabsOn){ buildWabschluss(view); return; }
+    if(ccOn){ buildCommand(view); return; }
     if(rueckOn){ buildRueckblick(view); return; }
     if(verlaufOn){ buildVerlauf(view); return; }
     if(visEdit){ buildVisionEdit(view); return; }
@@ -6638,12 +7362,19 @@
     }else{
       inner.innerHTML=`<p class="vr-big empty">Worauf läuft alles hinaus?</p>`;
     }
+    const akt=document.createElement("div"); akt.className="vr-akt";
     if((vision.prosa||"").trim()){
       const more=document.createElement("button"); more.type="button"; more.className="vr-more";
       more.textContent="weiterlesen";
       more.addEventListener("click",toggleProsa);
-      inner.appendChild(more);
+      akt.appendChild(more);
     }
+    const schau=document.createElement("button"); schau.type="button"; schau.className="vr-schau";
+    schau.textContent="Schau";
+    schau.title="Einen Moment lang nur das";
+    schau.addEventListener("click",openSchau);
+    akt.appendChild(schau);
+    inner.appendChild(akt);
     star.appendChild(inner); panel.appendChild(star);
 
     // Eine Zeile Zeit statt eines eigenen Blocks
@@ -6690,7 +7421,7 @@
       b.innerHTML=esc(txt)+(cnt?`<span class="vr-fc">${cnt}</span>`:``); b.addEventListener("click",fn); return b; };
     // Sonntag oder Montag: der Abschluss rückt nach vorn
     const wd=new Date().getDay();
-    foot.appendChild(mk("Wochenabschluss",0,()=>{ wabsOn=true; buildVision(); }, (wd===0||wd===1)?"stark":""));
+    foot.appendChild(mk("Command Center",0,()=>{ ccOn=true; ccStep=0; buildVision(); }, (wd===0||wd===1)?"stark":""));
     foot.appendChild(mk("Rückblick",0,()=>{ rueckOn=true; buildVision(); }));
     foot.appendChild(mk("Verlauf",n,()=>{ verlaufOn=true; buildVision(); }));
     const qn=(read(QUOTES,[])||[]).length;

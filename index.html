@@ -356,7 +356,7 @@
   body.ph-morgen .cat.tages:not(:hover),
   body.ph-tag .cat.lockin:not(:hover),
   body.ph-tag .cat.tages:not(:hover),
-  body.ph-abend .cat.lockin:not(:hover){ opacity:.55; transition:opacity .2s ease}
+  body.ph-abend:not(.rhy-abend) .cat.lockin:not(:hover){ opacity:.55; transition:opacity .2s ease}
   body.ph-morgen .cat.tages:hover,
   body.ph-tag .cat.lockin:hover,
   body.ph-tag .cat.tages:hover,
@@ -364,6 +364,11 @@
   body.ph-morgen .lockin .lockin-title,
   body.ph-abend .tages .lockin-title{ color:var(--brass) }
   /* Bilanz im Tagesabschluss */
+  .tag-absicht{display:flex; flex-direction:column; gap:3px; margin:2px 0 10px; padding:9px 12px;
+    border-radius:9px; background:rgba(227,178,95,.1)}
+  .ta-k{font-size:9px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--brass)}
+  .ta-t{font-family:var(--serif); font-size:14px; font-style:italic; line-height:1.5; color:var(--ink)}
+  .tag-hint{font-size:11.5px; line-height:1.5; color:var(--ink-faint); margin:-4px 0 10px}
   .tag-bilanz{display:flex; flex-wrap:wrap; gap:6px 14px; margin:2px 0 12px; padding-bottom:11px;
     border-bottom:1px solid var(--line)}
   .tag-bilanz span{font-size:11px; color:var(--ink-faint); display:flex; align-items:baseline; gap:4px}
@@ -936,6 +941,60 @@
   .tl-blk.done .tlb-tx{text-decoration:line-through}
   .wp-blk.done{opacity:.45}
   /* Command Center */
+  /* ---------- Lock In als Ablauf ---------- */
+  .li-fuer{font-size:9.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--brass);
+    background:rgba(227,178,95,.15); border-radius:999px; padding:2px 8px}
+  .li-rhy{margin-left:auto; font:inherit; font-size:11px; font-weight:650; color:var(--ink-faint);
+    background:transparent; border:none; cursor:pointer; padding:4px 8px; opacity:.7}
+  .li-rhy:hover{opacity:1; color:var(--brass)}
+  .li-edit-bar{display:flex; align-items:center; gap:8px}
+  .li-flow{padding:4px 0 14px}
+  .li-prog{display:flex; gap:4px; padding:6px 16px 12px}
+  .li-kopf{display:flex; align-items:center; gap:10px; padding:0 16px 4px}
+  .li-flow .cc-frage{margin:0 16px 12px}
+  .li-flow .cc-body{padding:0 16px}
+  .li-flow .cc-nav{padding:16px 16px 0; margin-top:10px}
+  .li-hk{font:inherit; font-size:12px; font-weight:700; color:var(--ink-faint); background:transparent;
+    border:none; border-radius:999px; padding:10px 14px; cursor:pointer; box-shadow:inset 0 0 0 1px var(--line)}
+  .li-hk.on{color:var(--mint); box-shadow:inset 0 0 0 1.3px var(--mint)}
+  .li-absicht{font-family:var(--serif); font-size:14.5px; font-style:italic; line-height:1.55; color:var(--ink);
+    padding:9px 12px; border-radius:9px; background:rgba(227,178,95,.1)}
+  .li-absicht.gross{margin-top:14px; font-size:16px; font-style:normal}
+  .li-viz{padding:12px 14px; border-radius:11px; background:rgba(var(--sheen),.05)}
+  .li-viz-t{margin:0 0 6px; font-family:var(--serif); font-size:16px; line-height:1.45; color:var(--ink)}
+  .li-viz-q{margin-top:10px; padding-top:9px; border-top:1px solid var(--line);
+    font-family:var(--serif); font-style:italic; font-size:13px; color:var(--ink-soft)}
+  .li-viz-q span{color:var(--ink-faint); font-style:normal; font-size:11px}
+  .li-quelle{margin-bottom:12px}
+  .li-zieh{width:100%; display:flex; align-items:center; gap:9px; text-align:left; font:inherit; font-size:13px;
+    color:var(--ink-soft); background:transparent; border:none; cursor:pointer; padding:6px 0; border-bottom:1px solid var(--line)}
+  .li-zieh:hover{color:var(--brass)}
+  .li-plus{width:17px; height:17px; flex:0 0 auto; display:grid; place-items:center; border-radius:50%;
+    font-size:12px; color:var(--brass); box-shadow:inset 0 0 0 1.2px var(--brass)}
+  .li-fest{display:flex; gap:9px; font-size:12.5px; color:var(--ink-soft); padding:4px 0}
+  .li-fest.kal{color:var(--sky)}
+  .li-fz{flex:0 0 42px; font-size:11px; color:var(--ink-faint); font-variant-numeric:tabular-nums}
+  .li-tag{margin-top:4px}
+  .li-t{display:flex; align-items:center; gap:8px; padding:5px 0; border-bottom:1px solid var(--line)}
+  .li-t.prio .li-t-in{font-weight:640}
+  .li-t.done .li-t-in{color:var(--ink-faint); text-decoration:line-through}
+  .li-t-in{flex:1; font:inherit; font-size:14px; color:var(--ink); background:transparent; border:none; padding:2px 0}
+  .li-t-in:focus{outline:none}
+  .li-staq{display:flex; flex-direction:column; gap:10px}
+  .li-linie{padding:9px 11px; border-radius:10px; background:rgba(var(--sheen),.045)}
+  .li-h{display:flex; align-items:center; gap:8px; width:100%; text-align:left; font:inherit; font-size:13px;
+    color:var(--ink-soft); background:transparent; border:none; cursor:pointer; padding:4px 0}
+  .li-h-c{width:15px; height:15px; flex:0 0 auto; border-radius:4px; box-shadow:inset 0 0 0 1.6px var(--track)}
+  .li-h.on .li-h-c{background:var(--mint); box-shadow:none}
+  .li-h.on{color:var(--ink-faint); text-decoration:line-through}
+  .li-h.miss .li-h-c{background:var(--rose); box-shadow:none}
+  .li-meta{margin-top:14px}
+  .li-schluss{padding:4px 0}
+  .li-editliste{padding:12px 16px 0; border-top:1px solid var(--line); margin-top:12px}
+  .li-el{display:flex; gap:8px; align-items:center; padding:4px 0}
+  .li-el input{flex:1; font:inherit; font-size:13px; color:var(--ink); background:transparent;
+    border:none; border-bottom:1px solid var(--line); padding:4px 2px}
+  .li-el input:focus{outline:none; border-bottom-color:var(--brass)}
   .cc-panel{padding-bottom:18px}
   .cc-alle{width:calc(100% - 40px); margin:0 20px 12px; display:flex; align-items:center; gap:8px;
     font:inherit; font-size:11.5px; font-weight:650; color:var(--ink-faint); background:rgba(var(--sheen),.05);
@@ -2257,12 +2316,22 @@
   const LERN="ht_lernplan_v1";
   const WABS="ht_command_v1";   // Command-Center-Texte, strikt lokal
   const WSATZ="ht_wochensatz_v1";  // Satz der Woche
+  const LIRHY="ht_lockin_rhythmus_v1";   // "morgen" = morgens für heute, "abend" = abends für morgen  // Satz der Woche
   const ANGELUS="ht_angelus_v1";
-  const APP_VERSION="2026-08-20";   // wird beim Aktualisieren hochgezählt
+  const APP_VERSION="2026-08-21";   // wird beim Aktualisieren hochgezählt
   const LOCKIN="ht_lockin_v1";
   const LOCKTXT="ht_lockintext_v1", CRYPTO="ht_crypto_v1", CAL="ht_cal_v1", QUOTES="ht_quotes_v1", LOCKCFG="ht_lockin_cfg_v1", SCHATZ="ht_schatz_v1", GOSPELC="ht_gospel_v1";
   const MAX_PRIOS=8;
   const LOCKIN_DEFAULT=[
+    {id:"wins",    label:"Wins von gestern",        frage:"Was ist gestern gelungen? Auch Kleines zählt — hier wird der Fortschritt verankert.", text:true, date:true},
+    {id:"absicht", label:"Absicht für heute",       frage:"Eine klare Absicht. Worauf soll dein Tag zeigen? Woran erkennst du am Abend, dass er gelungen ist?", text:true},
+    {id:"vizija",  label:"In Vizija eintauchen",    frage:"Einen Moment beim Nordstern bleiben."},
+    {id:"tag",     label:"Den Tag bauen",           frage:"Zieh aus der Woche, was heute dran ist. Sieben Dinge in der Reihenfolge, wie sie kommen."},
+    {id:"staq",    label:"STAQ",                    frage:"Hardline gehalten? Und trägt die Aufstellung heute noch?"},
+    {id:"meta",    label:"Metascript",              frage:"Kurzer Scan — was liegt an? Dann ein Eintrag dazu.", text:true},
+    {id:"visual",  label:"Komm Heiliger Geist",     frage:"Zum Schluss: der Tag wird übergeben."}
+  ];
+  const LOCKIN_ALT=[
     {id:"wins", label:"", date:true},
     {id:"vizija", label:"In Vizija eintauchen"},
     {id:"prios", label:"Top 3 Prioritäten für heute"},
@@ -3346,88 +3415,308 @@
     });
     saveLockinCfg();
   }
+  /* ---------- Lock In: der tägliche Reset als geführter Ablauf ----------
+     Absicht setzen, den Tag bauen, STAQ, Metascript. Rau statt perfekt, 5 bis 15 Minuten. */
+  let liStep=0, liTimer=null, liRest=0;
+  const liRhythmus=()=>read(LIRHY,"morgen");
+  // Für welchen Tag der Lock-In gilt: morgens für heute, abends für morgen
+  function liTag(){
+    if(!isToday()) return state.viewDate;
+    return liRhythmus()==="abend" ? addDays(today,1) : today;
+  }
+  const liVortag=()=>addDays(liTag(),-1);
+  function liStop(){ if(liTimer){ clearInterval(liTimer); liTimer=null; } }
+  const liSchritte=()=>lockinItems();
+  const liGetan=(D,id)=>!!(lockinLog[D]||{})[id];
+
   function buildLockIn(){
-    const D=state.viewDate, ro=!canEdit(), ed=state.lockinEdit && isToday();
+    const D=liTag(), ro=!canEdit();
+    const fuerMorgen=(D!==state.viewDate);
     const root=document.getElementById("lockin"); root.innerHTML="";
+    const items=liSchritte();
     const sec=document.createElement("section"); sec.className="cat lockin"+(lockinAll(D)?" complete":"");
     const done=lockinDone(D), s=lockinStreak(D);
+
     const head=document.createElement("button");
     head.className="lockin-head"; head.type="button"; head.setAttribute("aria-expanded", state.lockinOpen?"true":"false");
     head.innerHTML=`<span class="lockin-check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
       <span class="lockin-title">Lock In</span>
+      ${fuerMorgen?`<span class="li-fuer">für morgen</span>`:``}
       ${s>0?`<span class="lockin-streak">🔥 ${s}</span>`:""}
-      <span class="lockin-meter">${done}/${lockinItems().length}</span>
+      <span class="lockin-meter">${done}/${items.length}</span>
       <span class="chev" aria-hidden="true">⌄</span>`;
-    head.addEventListener("click",()=>{ if(state.lockinEdit) commitLockinEdits(); state.lockinOpen=!state.lockinOpen; buildLockIn(); });
+    head.addEventListener("click",()=>{ state.lockinOpen=!state.lockinOpen; liStop(); buildLockIn(); });
     sec.appendChild(head);
-    if(state.lockinOpen){
-      const panel=document.createElement("div"); panel.className="lockin-panel";
-      lockinItems().forEach(it=>{
-        const on=lockinOn(it.id,D);
-        if(ed && !it.date){
-          const row=document.createElement("div"); row.className="lockin-item edit";
-          const inp=document.createElement("input"); inp.className="li-name-edit"; inp.dataset.li=it.id; inp.value=it.label; inp.setAttribute("aria-label","Punkt umbenennen");
-          const del=document.createElement("button"); del.className="row-del"; del.type="button"; del.textContent="×"; del.setAttribute("aria-label","Punkt löschen");
-          del.addEventListener("click",()=>{ commitLockinEdits(); lockinCfg.items=lockinCfg.items.filter(x=>x.id!==it.id); saveLockinCfg(); buildLockIn(); });
-          row.append(inp,del); panel.appendChild(row);
-        }else{
-          const btn=document.createElement(it.date?"div":"button"); btn.className="lockin-item"+(it.date?" is-date":""); if(!it.date) btn.type="button";
-          btn.setAttribute("aria-pressed", on?"true":"false");
-          btn.innerHTML=`<span class="todo-check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span><span class="lockin-item-label"></span>`;
-          btn.querySelector(".lockin-item-label").textContent=itemLabel(it,D);
-          if(!ed) btn.addEventListener("click",()=>toggleLockin(it.id));
-          if(it.date){
-            btn.setAttribute("role","button"); btn.tabIndex=0;
-            if(!ed) btn.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggleLockin(it.id); } });
-            const vb=document.createElement("button"); vb.type="button"; vb.className="li-vid"+(vidHas?" has":"");
-            vb.innerHTML="▶"; vb.title=vidHas?"Video abspielen":"Video hinterlegen";
-            vb.setAttribute("aria-label",vidHas?"Video abspielen":"Video hinterlegen");
-            vb.addEventListener("click",e=>{ e.preventDefault(); e.stopPropagation(); openVideo(); });
-            btn.appendChild(vb);
-          }
-          panel.appendChild(btn);
-        }
-        if(TEXT_FIELDS.includes(it.id)){
-          const cur=getText(D,it.id);
-          const wrap=document.createElement("div"); wrap.className="lockin-text";
-          if(isEnc(cur)){
-            const mask=document.createElement("div"); mask.className="enc-mask"; mask.textContent="· · · · ·"; mask.title="Antippen zum Öffnen";
-            const key=document.createElement("button"); key.className="key-btn open"; key.type="button"; key.textContent="öffnen"; key.title="Text sichtbar machen";
-            key.addEventListener("click",()=>unlockField(D,it.id));
-            wrap.append(mask,key);
-            if(!ro) wrap.appendChild(delBtn(D,it.id));
-          }else{
-            const ta=document.createElement("textarea"); ta.className="lockin-ta"; ta.rows=5; ta.placeholder=TEXT_PLACEHOLDER[it.id]||"Notiz für diesen Tag …"; ta.value=(typeof cur==="string")?cur:"";
-            if(ro){ ta.readOnly=true; } else { ta.addEventListener("input",()=>setText(D,it.id,ta.value)); }
-            wrap.appendChild(ta);
-            const key=document.createElement("button"); key.className="key-btn"; key.type="button"; key.textContent="ablegen"; key.title="Text geschützt ablegen";
-            key.addEventListener("click",()=>lockField(D,it.id));
-            wrap.appendChild(key);
-            if(!ro && typeof cur==="string" && cur.trim()) wrap.appendChild(delBtn(D,it.id));
-          }
-          panel.appendChild(wrap);
-        }
+
+    if(state.lockinOpen && items.length){
+      const panel=document.createElement("div"); panel.className="lockin-panel li-flow";
+      if(liStep>=items.length) liStep=items.length-1;
+      if(liStep<0) liStep=0;
+      const st=items[liStep];
+
+      // Fortschritt: ein Strich je Schritt
+      const prog=document.createElement("div"); prog.className="li-prog";
+      items.forEach((x,i)=>{
+        const d=document.createElement("button"); d.type="button";
+        d.className="cc-dot"+(i===liStep?" on":"")+(liGetan(D,x.id)?" done":"");
+        d.title=(i+1)+". "+(x.label||"Wins");
+        d.addEventListener("click",()=>{ liStop(); liStep=i; buildLockIn(); });
+        prog.appendChild(d);
       });
-      if(ed){
-        const addI=document.createElement("button"); addI.className="ghost-add"; addI.type="button"; addI.textContent="+ Punkt";
-        addI.addEventListener("click",()=>{ commitLockinEdits(); lockinCfg.items.push({id:uid(),label:"Neuer Punkt"}); saveLockinCfg(); buildLockIn(); });
-        panel.appendChild(addI);
+      panel.appendChild(prog);
+
+      // Kopf des Schritts
+      const kopf=document.createElement("div"); kopf.className="li-kopf";
+      const titel = st.date ? (st.label||"Wins") : (st.label||"");
+      kopf.innerHTML=`<span class="cc-n">${liStep+1}</span><span class="cc-t">${esc(titel)}</span>`;
+      const uhr=document.createElement("button"); uhr.type="button"; uhr.className="cc-uhr";
+      uhr.textContent=liRest?fmtMMSS(liRest):"10 min";
+      uhr.title="Zeitfenster — rau statt perfekt";
+      uhr.addEventListener("click",()=>{
+        if(liTimer){ liStop(); liRest=0; uhr.textContent="10 min"; return; }
+        liRest=600;
+        liTimer=setInterval(()=>{ liRest--; uhr.textContent=fmtMMSS(liRest);
+          if(liRest<=0){ liStop(); uhr.textContent="fertig"; try{playGong();}catch(e){} } },1000);
+      });
+      kopf.appendChild(uhr); panel.appendChild(kopf);
+
+      if(st.frage){
+        const f=document.createElement("p"); f.className="cc-frage"; f.textContent=st.frage;
+        panel.appendChild(f);
       }
-      if(isToday()){
-        const editBar=document.createElement("div"); editBar.className="li-editbar";
-        const eb=document.createElement("button"); eb.className="li-edit-btn"+(ed?" on":""); eb.type="button"; eb.textContent=ed?"Fertig":"Lock In bearbeiten";
-        eb.addEventListener("click",()=>{ if(ed) commitLockinEdits(); state.lockinEdit=!state.lockinEdit; buildLockIn(); });
-        editBar.appendChild(eb); panel.appendChild(editBar);
+
+      const body=document.createElement("div"); body.className="cc-body";
+      liBody(st,D,body,ro,fuerMorgen);
+      panel.appendChild(body);
+
+      // Erledigt und weiter
+      const nav=document.createElement("div"); nav.className="cc-nav";
+      if(liStep>0){
+        const z=document.createElement("button"); z.type="button"; z.className="cc-zur"; z.textContent="zurück";
+        z.addEventListener("click",()=>{ liStop(); liStep--; buildLockIn(); });
+        nav.appendChild(z);
       }
+      const hk=document.createElement("button"); hk.type="button";
+      hk.className="li-hk"+(liGetan(D,st.id)?" on":"");
+      hk.textContent=liGetan(D,st.id)?"erledigt ✓":"erledigt";
+      hk.disabled=ro;
+      hk.addEventListener("click",()=>toggleLockin(st.id));
+      nav.appendChild(hk);
+      const w=document.createElement("button"); w.type="button"; w.className="cc-weiter";
+      w.textContent = liStep<items.length-1 ? "weiter" : "Lock In abschließen";
+      w.addEventListener("click",()=>{
+        liStop(); liRest=0;
+        if(!liGetan(D,st.id) && !ro) toggleLockin(st.id, true);
+        if(liStep<items.length-1){ liStep++; buildLockIn(); }
+        else { state.lockinOpen=false; liStep=0; buildLockIn(); }
+      });
+      nav.appendChild(w);
+      panel.appendChild(nav);
+
+      // Bearbeiten der Schrittliste bleibt erreichbar
+      if(isToday() && !ro){
+        const bar=document.createElement("div"); bar.className="li-edit-bar";
+        const eb=document.createElement("button"); eb.className="li-edit-btn"+(state.lockinEdit?" on":""); eb.type="button";
+        eb.textContent=state.lockinEdit?"Fertig":"Schritte bearbeiten";
+        eb.addEventListener("click",()=>{ state.lockinEdit=!state.lockinEdit; buildLockIn(); });
+        bar.appendChild(eb);
+        // Wann machst du den Lock-In?
+        const rb=document.createElement("button"); rb.className="li-rhy"; rb.type="button";
+        rb.textContent = liRhythmus()==="abend" ? "abends für morgen" : "morgens für heute";
+        rb.title="Rhythmus umstellen";
+        rb.addEventListener("click",()=>{
+          write(LIRHY, liRhythmus()==="abend" ? "morgen" : "abend");
+          liStep=0; renderHeute();
+          toast(liRhythmus()==="abend" ? "Lock In gilt jetzt dem nächsten Tag" : "Lock In gilt wieder dem heutigen Tag");
+        });
+        bar.appendChild(rb);
+        panel.appendChild(bar);
+      }
+      if(state.lockinEdit) liEditListe(panel);
+
       sec.appendChild(panel);
     }
     root.appendChild(sec);
   }
-  function toggleLockin(id){
+
+  // Ein geschütztes Textfeld für einen Lock-In-Schritt
+  function liFeld(D,id,ph,rows){
+    return ccSicher(()=>getText(D,id), v=>setText(D,id,v), ph, rows, buildLockIn);
+  }
+
+  function liBody(st,D,body,ro,fuerMorgen){
+    /* --- Wins von gestern --- */
+    if(st.id==="wins"){
+      const g=addDays(D,-1);
+      const v=(lockinText[g]||{}).absicht;
+      const ab=(typeof v==="string" && v.trim())?v.trim():null;
+      const q=document.createElement("div"); q.className="cc-quelle";
+      q.innerHTML=ab
+        ? `<div class="cc-q-h">Deine Absicht von gestern</div><div class="li-absicht">${esc(ab)}</div>`
+        : `<div class="cc-q-leer">Gestern war keine Absicht gesetzt. Ab heute steht sie hier.</div>`;
+      body.appendChild(q);
+      body.appendChild(liFeld(D,"wins","Was ist gelungen? Auch Kleines …",4));
+      return;
+    }
+    /* --- Absicht für heute --- */
+    if(st.id==="absicht"){
+      const bsp=document.createElement("div"); bsp.className="cc-quelle";
+      bsp.innerHTML=`<div class="cc-q-leer">Eine Zeile genügt. „Abends präsent bei der Familie, Handy weg." · „Die eine Aufgabe angehen, die ich schiebe."</div>`;
+      body.appendChild(bsp);
+      body.appendChild(liFeld(D,"absicht","Heute geht es um …",3));
+      return;
+    }
+    /* --- In Vizija eintauchen --- */
+    if(st.id==="vizija"){
+      const stern=(vision.points||[]).filter(p=>(p.text||"").trim());
+      const box=document.createElement("div"); box.className="li-viz";
+      box.innerHTML=stern.length
+        ? stern.map(p=>`<p class="li-viz-t">${esc(p.text.trim())}</p>`).join("")
+        : `<p class="cc-q-leer">Noch kein Nordstern gesetzt.</p>`;
+      const q=heutigerSatz();
+      if(q) box.innerHTML+=`<div class="li-viz-q">“ ${esc(q.text)}${q.author?` <span>— ${esc(q.author)}</span>`:``}</div>`;
+      body.appendChild(box);
+      const b=document.createElement("button"); b.type="button"; b.className="cc-link"; b.textContent="Schau öffnen →";
+      b.addEventListener("click",openSchau);
+      body.appendChild(b);
+      return;
+    }
+    /* --- Den Tag bauen --- */
+    if(st.id==="tag"){
+      // Was die Woche vorgibt
+      const zw=(vision.week.points||[]).filter(p=>(p.text||"").trim() && !p.done);
+      if(zw.length){
+        const w=document.createElement("div"); w.className="li-quelle";
+        w.innerHTML=`<div class="cc-q-h">Diese Woche</div>`;
+        zw.forEach(p=>{
+          const r=document.createElement("button"); r.type="button"; r.className="li-zieh";
+          r.innerHTML=`<span class="li-plus">+</span><span>${esc(p.text.trim())}</span>`;
+          r.title="In den Tag übernehmen";
+          r.addEventListener("click",()=>{ addItem({text:p.text.trim(), day:D}); buildLockIn(); toast("Übernommen"); });
+          w.appendChild(r);
+        });
+        body.appendChild(w);
+      }
+      // Was heute ohnehin feststeht
+      const fest=[];
+      blockersFor(D).forEach(b=>fest.push({t:b.text||"Blocker", z:fMinToClock(b.start)}));
+      (calEvents[D]||[]).forEach(ev=>{ if(typeof ev.start==="number") fest.push({t:ev.text||"Termin", z:fMinToClock(ev.start), k:true}); });
+      fest.sort((a,b)=>a.z.localeCompare(b.z));
+      if(fest.length){
+        const f=document.createElement("div"); f.className="li-quelle";
+        f.innerHTML=`<div class="cc-q-h">Steht fest</div>`+
+          fest.map(x=>`<div class="li-fest${x.k?" kal":""}"><span class="li-fz">${esc(x.z)}</span><span>${esc(x.t)}</span></div>`).join("");
+        body.appendChild(f);
+      }
+      // Der Tag selbst
+      const l=document.createElement("div"); l.className="li-tag";
+      l.innerHTML=`<div class="cc-q-h">${fuerMorgen?"Morgen":"Heute"} · in der Reihenfolge</div>`;
+      const heute=prios.all.filter(x=>x.day===D && !x.fixed);
+      if(!heute.length) l.innerHTML+=`<div class="cc-q-leer">Noch nichts eingeplant.</div>`;
+      heute.forEach(x=>{
+        const r=document.createElement("div"); r.className="li-t"+(isDoneI(x)?" done":"")+(x.prio?" prio":"");
+        const t=document.createElement("input"); t.type="text"; t.className="li-t-in"; t.value=x.text||"";
+        t.placeholder="…"; t.disabled=ro;
+        t.addEventListener("input",()=>{ x.text=t.value; savePrios(); });
+        const del=document.createElement("button"); del.className="row-del"; del.type="button"; del.textContent="×";
+        del.addEventListener("click",()=>{ delItem(x.id); buildLockIn(); });
+        r.append(t,del); l.appendChild(r);
+      });
+      const add=document.createElement("button"); add.type="button"; add.className="cc-add"; add.textContent="+ Punkt";
+      add.disabled=ro;
+      add.addEventListener("click",()=>{ addItem({day:D}); buildLockIn();
+        const i=document.querySelectorAll(".li-t-in"); if(i.length)i[i.length-1].focus(); });
+      l.appendChild(add);
+      body.appendChild(l);
+      const b=document.createElement("button"); b.type="button"; b.className="cc-link"; b.textContent="Im Tagesplan anordnen →";
+      b.addEventListener("click",()=>{ state.priosSub="heute"; setTab("prios"); });
+      body.appendChild(b);
+      return;
+    }
+    /* --- STAQ --- */
+    if(st.id==="staq"){
+      const l=document.createElement("div"); l.className="li-staq";
+      (config.cats||[]).forEach(c=>{
+        const hs=config.habits.filter(h=>h.cat===c.id);
+        if(!hs.length) return;
+        const g=document.createElement("div"); g.className="li-linie";
+        g.innerHTML=`<div class="cc-l-h" style="--lc:${c.color}">${esc(c.title)}</div>`;
+        hs.forEach(h=>{
+          const b=document.createElement("button"); b.type="button";
+          b.className="li-h"+(isDone(h.id,D)?" on":"")+(isMiss(h.id,D)?" miss":"");
+          b.innerHTML=`<span class="li-h-c"></span><span>${esc(h.name)}</span>`;
+          b.disabled=ro;
+          b.addEventListener("click",()=>{ toggleHabit(h.id); buildLockIn(); });
+          g.appendChild(b);
+        });
+        l.appendChild(g);
+      });
+      body.appendChild(l);
+      const b=document.createElement("button"); b.type="button"; b.className="cc-link";
+      b.textContent="Aufstellung anpassen →";
+      b.addEventListener("click",()=>{ if(!state.editing) toggleEdit(); });
+      body.appendChild(b);
+      return;
+    }
+    /* --- Metascript --- */
+    if(st.id==="meta"){
+      const sc=document.createElement("div"); sc.className="cc-quelle";
+      sc.innerHTML=`<div class="cc-q-h">Scan</div>`;
+      sc.appendChild(liFeld(D,"meta","Was liegt auf Herz und Verstand? Roh, ungeordnet …",3));
+      body.appendChild(sc);
+      const e=document.createElement("div"); e.className="li-meta";
+      e.innerHTML=`<div class="cc-q-h">Ein Eintrag</div>`;
+      const t=document.createElement("div"); t.className="cc-meta-q";
+      t.innerHTML=`<div class="cc-mq">Der Punkt mit der größten Ladung</div>`;
+      t.appendChild(liFeld(D,"meta_t","…",2));
+      e.appendChild(t);
+      META_Q.forEach((q,i)=>{
+        const d=document.createElement("div"); d.className="cc-meta-q";
+        d.innerHTML=`<div class="cc-mq">${esc(q)}</div>`;
+        d.appendChild(liFeld(D,"meta_q"+i,"…",2));
+        e.appendChild(d);
+      });
+      body.appendChild(e);
+      return;
+    }
+    /* --- Komm Heiliger Geist --- */
+    if(st.id==="visual"){
+      const l=document.createElement("div"); l.className="li-schluss";
+      l.innerHTML=`<p class="cc-vis-t">Der Tag ist gebaut. Übergib ihn.</p>
+        <p class="cc-vis-t dim">Komm, Heiliger Geist, erfülle die Herzen deiner Gläubigen und entzünde in ihnen das Feuer deiner Liebe.</p>`;
+      const ab=getText(D,"absicht");
+      if(typeof ab==="string" && ab.trim())
+        l.innerHTML+=`<div class="li-absicht gross">${esc(ab.trim())}</div>`;
+      body.appendChild(l);
+      return;
+    }
+  }
+
+  // Die Schritte selbst bearbeiten
+  function liEditListe(panel){
+    const box=document.createElement("div"); box.className="li-editliste";
+    const its=lockinItems();
+    its.forEach((it,i)=>{
+      const r=document.createElement("div"); r.className="li-el";
+      const inp=document.createElement("input"); inp.type="text"; inp.value=it.label||"";
+      inp.placeholder=it.date?"Wins":"Schritt";
+      inp.addEventListener("input",()=>{ it.label=inp.value; saveLockinCfg(); });
+      const del=document.createElement("button"); del.className="row-del"; del.type="button"; del.textContent="×";
+      del.addEventListener("click",()=>{ its.splice(i,1); saveLockinCfg(); buildLockIn(); });
+      r.append(inp,del); box.appendChild(r);
+    });
+    const add=document.createElement("button"); add.type="button"; add.className="cc-add"; add.textContent="+ Schritt";
+    add.addEventListener("click",()=>{ its.push({id:uid(),label:""}); saveLockinCfg(); buildLockIn(); });
+    box.appendChild(add);
+    panel.appendChild(box);
+  }
+
+  function toggleLockin(id,nurSetzen){
     if(!canEdit()) return;
     const k=state.viewDate;
     if(!lockinLog[k]) lockinLog[k]={};
-    if(lockinLog[k][id]) delete lockinLog[k][id]; else lockinLog[k][id]=true;
+    if(nurSetzen) lockinLog[k][id]=true;
+    else if(lockinLog[k][id]) delete lockinLog[k][id]; else lockinLog[k][id]=true;
     write(LOCKIN,lockinLog);
     const nowComplete=lockinAll(k);
     buildLockIn();
@@ -3553,8 +3842,18 @@
     if(state.tagOpen){
       const panel=document.createElement("div"); panel.className="lockin-panel";
       if(isToday()){
+        // Die Absicht des Morgens — daran misst sich der Abend
+        const ab=getText(D,"absicht");
+        if(typeof ab==="string" && ab.trim()){
+          const a=document.createElement("div"); a.className="tag-absicht";
+          a.innerHTML=`<span class="ta-k">Deine Absicht</span><span class="ta-t">${esc(ab.trim())}</span>`;
+          panel.appendChild(a);
+        }
         const b=dayBilanz();
         if(b){ const bd=document.createElement("div"); bd.className="tag-bilanz"; bd.innerHTML=b; panel.appendChild(bd); }
+        const h=document.createElement("div"); h.className="tag-hint";
+        h.textContent="Wie ist es gelaufen? Auch wenn es wackelig war — das Festhalten ist der Punkt, nicht die Perfektion.";
+        panel.appendChild(h);
       }
       const wrap=document.createElement("div"); wrap.className="lockin-text tages-text";
       if(isEnc(cur)){
@@ -4220,7 +4519,7 @@
     if(!isToday()) return "tag";
     const n=nowMin();
     if(n>=PHASE_ABEND_AB) return "abend";
-    if(n<PHASE_MORGEN_BIS && !lockinAll(today)) return "morgen";
+    if(n<PHASE_MORGEN_BIS && liRhythmus()!=="abend" && !lockinAll(today)) return "morgen";
     return "tag";
   }
   let phaseSet="";
@@ -4228,12 +4527,17 @@
     const ph=dayPhase();
     document.body.classList.remove("ph-morgen","ph-tag","ph-abend");
     document.body.classList.add("ph-"+ph);
+    document.body.classList.toggle("rhy-abend", liRhythmus()==="abend");
     const key=state.viewDate+"|"+ph;
     if(phaseSet===key) return;
     phaseSet=key;
     if(!isToday()) return;
     if(ph==="morgen"){ state.lockinOpen=true; state.tagOpen=false; }
-    else if(ph==="abend"){ state.tagOpen=true; state.lockinOpen=false; }
+    else if(ph==="abend"){
+      // Abends: erst der Debrief, im Abend-Rhythmus danach der Lock-In für morgen
+      state.tagOpen=true;
+      state.lockinOpen=(liRhythmus()==="abend");
+    }
     else { state.lockinOpen=false; state.tagOpen=false; }
   }
 
@@ -6894,7 +7198,8 @@
     v=>ccSave(r=>{ r.a=r.a||{}; r.a[id]=v; }),
     ph, rows); }
 
-  function ccSicher(hol,leg,ph,rows){
+  function ccSicher(hol,leg,ph,rows,neu){
+    const NEU = neu || buildVision;
     const wrap=document.createElement("div"); wrap.className="cc-feld";
     const cur=hol();
     if(isEnc(cur)){
@@ -6904,7 +7209,7 @@
       key.textContent="öffnen"; key.title="Text sichtbar machen";
       const oeffne=async()=>{
         const pw=await ensurePassphrase(); if(pw==null) return;
-        try{ const t=await decWith(pw, unb64(cryptoRec.salt), cur); leg(t); buildVision(); }
+        try{ const t=await decWith(pw, unb64(cryptoRec.salt), cur); leg(t); NEU(); }
         catch(e){ alert("Konnte nicht öffnen (falsches Passwort?)."); }
       };
       key.addEventListener("click",oeffne);
@@ -6915,7 +7220,7 @@
         try{ await decWith(pw, unb64(cryptoRec.salt), cur); }
         catch(e){ alert("Falsches Passwort — es wurde nichts gelöscht."); return; }
         if(!confirm("Diesen Text endgültig löschen? Das lässt sich nicht rückgängig machen.")) return;
-        leg(""); buildVision(); toast("Text gelöscht");
+        leg(""); NEU(); toast("Text gelöscht");
       });
       const zeile=document.createElement("div"); zeile.className="cc-feld-akt"; zeile.append(key,del);
       wrap.append(mask,zeile);
@@ -6935,7 +7240,7 @@
     key.addEventListener("click",async()=>{
       const t=ta.value; if(!t.trim()){ alert("Hier steht noch nichts."); return; }
       const pw=await ensurePassphrase(); if(pw==null) return;
-      try{ const payload=await encWith(pw, unb64(cryptoRec.salt), t); leg(payload); buildVision(); }
+      try{ const payload=await encWith(pw, unb64(cryptoRec.salt), t); leg(payload); NEU(); }
       catch(e){ alert("Ablegen fehlgeschlagen."); }
     });
     const zeile=document.createElement("div"); zeile.className="cc-feld-akt"; zeile.appendChild(key);

@@ -379,6 +379,21 @@
   .tp-z.ok .tp-c{color:var(--mint)} .tp-z.halb .tp-c{color:var(--amber)}
   .tp-t{flex:1; font-size:13px; color:var(--ink-soft)}
   .tp-z.ok .tp-t{color:var(--ink-faint); text-decoration:line-through}
+  .tag-li{margin:0 0 12px}
+  .tli-h{width:100%; display:flex; align-items:center; gap:9px; font:inherit; font-size:11.5px; font-weight:700;
+    color:var(--ink-faint); background:rgba(var(--sheen),.05); border:none; border-radius:9px; padding:9px 12px; cursor:pointer}
+  .tli-h.on{color:var(--brass)}
+  .tli-n{margin-left:auto; font-size:10px; font-weight:800; color:var(--brass); background:rgba(227,178,95,.15); border-radius:999px; padding:1px 7px}
+  .tli-c{font-size:12px; transition:transform .25s}
+  .tli-h.on .tli-c{transform:rotate(180deg)}
+  .tli-b{padding:10px 4px 0}
+  .tli-z{display:flex; gap:9px; padding:6px 0; border-bottom:1px solid var(--line)}
+  .tli-c2{font-size:12px; font-weight:800; color:var(--track)}
+  .tli-z.ok .tli-c2{color:var(--mint)}
+  .tli-in{flex:1; min-width:0}
+  .tli-l{display:block; font-size:11px; font-weight:700; color:var(--ink-faint)}
+  .tli-t{margin-top:3px; font-family:var(--serif); font-size:13.5px; line-height:1.5; color:var(--ink-soft)}
+  .tli-zu{font-size:12px; letter-spacing:.3em; color:var(--ink-faint); opacity:.5}
   .tag-nav{margin-top:14px; padding-top:12px; border-top:1px solid var(--line)}
   .tag-fertig{width:100%; font:inherit; font-size:13px; font-weight:700; color:var(--on-accent);
     background:var(--brass); border:none; border-radius:11px; padding:11px; cursor:pointer}
@@ -389,6 +404,19 @@
   .li-komm{margin-top:6px; font-size:12.5px; font-style:italic; color:var(--ink-faint)}
   .li-bericht{margin-top:9px; padding:9px 12px; border-radius:9px; background:rgba(var(--sheen),.05);
     font-family:var(--serif); font-size:13.5px; line-height:1.55; color:var(--ink-soft)}
+  .tag-prog{padding:2px 0 10px}
+  .tag-offen{display:flex; flex-direction:column; gap:5px; margin-bottom:4px}
+  .to-z{display:flex; align-items:center; gap:10px; width:100%; text-align:left; font:inherit;
+    background:rgba(var(--sheen),.045); border:none; border-radius:9px; padding:9px 12px; cursor:pointer;
+    box-shadow:inset 0 0 0 1px var(--line); transition:all .16s}
+  .to-z:hover{box-shadow:inset 0 0 0 1.3px var(--mint)}
+  .to-c{font-size:13px; font-weight:800; color:var(--track)}
+  .to-z.halb .to-c{color:var(--amber)}
+  .to-t{flex:1; font-size:13.5px; color:var(--ink)}
+  .to-z2{font-size:10.5px; font-weight:700; color:var(--brass); font-variant-numeric:tabular-nums}
+  .tag-nav .cc-zur{flex:0 0 auto}
+  .tag-nav{display:flex; gap:8px}
+  .tag-uhrzeile{display:flex; justify-content:flex-end; margin:-2px 0 10px}
   .tag-absicht{display:flex; flex-direction:column; gap:3px; margin:2px 0 10px; padding:9px 12px;
     border-radius:9px; background:rgba(227,178,95,.1)}
   .ta-k{font-size:9px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--brass)}
@@ -2464,13 +2492,31 @@
   let lockinCfg=read(LOCKCFG,null);
   if(!lockinCfg || !Array.isArray(lockinCfg.items) || !lockinCfg.items.length){
     lockinCfg={items:LOCKIN_DEFAULT.map(x=>({...x}))}; write(LOCKCFG,lockinCfg);
+  }else{
+    // Bestehende Listen ergänzen: neue Schritte fehlen sonst dauerhaft,
+    // weil die Vorgabe nur beim allerersten Start greift.
+    let neu=false;
+    // Der alte Punkt "prios" ist im neuen "tag" aufgegangen
+    const alt=lockinCfg.items.find(x=>x.id==="prios");
+    if(alt && !lockinCfg.items.some(x=>x.id==="tag")){ alt.id="tag"; if(!alt.label) alt.label="Den Tag bauen"; neu=true; }
+    else if(alt){ lockinCfg.items=lockinCfg.items.filter(x=>x.id!=="prios"); neu=true; }
+    LOCKIN_DEFAULT.forEach((d,i)=>{
+      const da=lockinCfg.items.find(x=>x.id===d.id);
+      if(!da){ lockinCfg.items.splice(Math.min(i,lockinCfg.items.length),0,{...d}); neu=true; }
+      else { // Frage und Kennzeichen nachtragen, den selbst gewählten Namen behalten
+        if(d.frage && !da.frage){ da.frage=d.frage; neu=true; }
+        if(d.date && !da.date){ da.date=true; neu=true; }
+        if(!da.label && d.label){ da.label=d.label; neu=true; }
+      }
+    });
+    if(neu) write(LOCKCFG,lockinCfg);
   }
   let lockinText=read(LOCKTXT,{});
   let cryptoRec=read(CRYPTO,null);
   let quotes=read(QUOTES,[]);
   let schatz=read(SCHATZ,[]);
   let visionTimer=null, quoteTimer=null;
-  const state={editing:false, lastComplete:false, tab:read(TAB,"heute"), lockinOpen:false, lockinComplete:false, priosSub:"heute", viewDate:null, passphrase:null, calOpen:false, calMonth:null, tagOpen:false, lockinEdit:false, backfill:false, chalOpen:{}, chalJustChecked:null, visLevel:"big"};
+  const state={editing:false, lastComplete:false, tab:read(TAB,"heute"), lockinOpen:false, lockinComplete:false, priosSub:"heute", viewDate:null, passphrase:null, calOpen:false, calMonth:null, tagOpen:false, lockinEdit:false, tagLiOpen:false, backfill:false, chalOpen:{}, chalJustChecked:null, visLevel:"big"};
 
   function ymd(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
   const today=ymd(new Date());
@@ -3495,11 +3541,11 @@
       const titel = st.date ? (st.label||"Wins") : (st.label||"");
       kopf.innerHTML=`<span class="cc-n">${liStep+1}</span><span class="cc-t">${esc(titel)}</span>`;
       const uhr=document.createElement("button"); uhr.type="button"; uhr.className="cc-uhr";
-      uhr.textContent=liRest?fmtMMSS(liRest):"10 min";
+      uhr.textContent=liRest?fmtMMSS(liRest):"15 min";
       uhr.title="Zeitfenster — rau statt perfekt";
       uhr.addEventListener("click",()=>{
-        if(liTimer){ liStop(); liRest=0; uhr.textContent="10 min"; return; }
-        liRest=600;
+        if(liTimer){ liStop(); liRest=0; uhr.textContent="15 min"; return; }
+        liRest=900;
         liTimer=setInterval(()=>{ liRest--; uhr.textContent=fmtMMSS(liRest);
           if(liRest<=0){ liStop(); uhr.textContent="fertig"; try{playGong();}catch(e){} } },1000);
       });
@@ -3871,6 +3917,15 @@
     }catch(e){}
     return bits.length?bits.join(""):"";
   }
+  let tagTimer=null, tagRest=0, tagStep=0;
+  function tagStop(){ if(tagTimer){ clearInterval(tagTimer); tagTimer=null; } }
+  // Was heute noch offen ist — Aufgaben, Prioritäten, Blocker
+  function tagOffen(){
+    try{ ensurePrios();
+      return prios.all.filter(x=>x.day===state.viewDate && (x.text||"").trim() && x.status!=="done")
+                      .sort((a,b)=>(a.start??9999)-(b.start??9999));
+    }catch(e){ return []; }
+  }
   function buildTagesabschluss(){
     const D=state.viewDate, ro=!canEdit();
     const root=document.getElementById("tagesabschluss"); if(!root) return; root.innerHTML="";
@@ -3879,10 +3934,70 @@
     const sec=document.createElement("section"); sec.className="cat tages";
     const head=document.createElement("button"); head.className="lockin-head"; head.type="button"; head.setAttribute("aria-expanded", state.tagOpen?"true":"false");
     head.innerHTML=`<span class="tag-icon" aria-hidden="true">🌙</span><span class="lockin-title">Tagesabschluss</span>${has?'<span class="tag-dot"></span>':''}<span class="chev" aria-hidden="true">⌄</span>`;
-    head.addEventListener("click",()=>{ state.tagOpen=!state.tagOpen; buildTagesabschluss(); });
+    head.addEventListener("click",()=>{ state.tagOpen=!state.tagOpen; if(!state.tagOpen){ tagStop(); tagRest=0; tagStep=0; } buildTagesabschluss(); });
     sec.appendChild(head);
     if(state.tagOpen){
       const panel=document.createElement("div"); panel.className="lockin-panel";
+      if(isToday()){
+        // Zwei Schritte: erst aufräumen, dann zurückschauen
+        const pr=document.createElement("div"); pr.className="cc-prog tag-prog";
+        ["Offene Punkte","Rückblick"].forEach((l,i)=>{
+          const d=document.createElement("button"); d.type="button";
+          d.className="cc-dot"+(i===tagStep?" on":"")+(i===0&&tagOffen().length===0?" done":"");
+          d.title=(i+1)+". "+l;
+          d.addEventListener("click",()=>{ tagStep=i; buildTagesabschluss(); });
+          pr.appendChild(d);
+        });
+        panel.appendChild(pr);
+        const kp=document.createElement("div"); kp.className="li-kopf";
+        kp.innerHTML=`<span class="cc-n">${tagStep+1}</span><span class="cc-t">${tagStep===0?"Offene Punkte":"Rückblick"}</span>`;
+        panel.appendChild(kp);
+      }
+      if(isToday() && tagStep===0){
+        // Schritt 1: was noch offen ist, hier abhaken
+        const offen=tagOffen();
+        const f=document.createElement("p"); f.className="cc-frage";
+        f.textContent = offen.length
+          ? "Was ist heute doch noch gelaufen? Hak ab, was erledigt ist."
+          : "Nichts mehr offen. Weiter zum Rückblick.";
+        panel.appendChild(f);
+        const l=document.createElement("div"); l.className="tag-offen";
+        offen.forEach(x=>{
+          const r=document.createElement("button"); r.type="button"; r.className="to-z"+(x.status==="started"?" halb":"");
+          r.innerHTML=`<span class="to-c">${x.status==="started"?"◐":"○"}</span><span class="to-t">${esc(x.text.trim())}</span>`+
+            (x.fixed&&typeof x.start==="number"?`<span class="to-z2">${fMinToClock(x.start)}</span>`:``);
+          r.disabled=ro;
+          r.addEventListener("click",()=>{ setDone(x,true); buildTagesabschluss(); });
+          l.appendChild(r);
+        });
+        if(!offen.length){
+          const e=document.createElement("div"); e.className="cc-q-leer"; e.textContent="Alles abgehakt.";
+          l.appendChild(e);
+        }
+        panel.appendChild(l);
+        const nav=document.createElement("div"); nav.className="cc-nav";
+        const zu=document.createElement("button"); zu.type="button"; zu.className="cc-link";
+        zu.textContent="In den Tagesplan →";
+        zu.addEventListener("click",()=>{ state.priosSub="heute"; setTab("prios"); });
+        const w=document.createElement("button"); w.type="button"; w.className="cc-weiter"; w.textContent="weiter zum Rückblick";
+        w.addEventListener("click",()=>{ tagStep=1; buildTagesabschluss(); });
+        nav.append(zu,w); panel.appendChild(nav);
+        sec.appendChild(panel); root.appendChild(sec); return;
+      }
+      if(isToday()){
+        // Zeitfenster für den Abschluss — rau statt perfekt
+        const uz=document.createElement("div"); uz.className="tag-uhrzeile";
+        const uhr=document.createElement("button"); uhr.type="button"; uhr.className="cc-uhr";
+        uhr.textContent=tagRest?fmtMMSS(tagRest):"15 min";
+        uhr.title="Zeitfenster setzen";
+        uhr.addEventListener("click",()=>{
+          if(tagTimer){ tagStop(); tagRest=0; uhr.textContent="15 min"; return; }
+          tagRest=900;
+          tagTimer=setInterval(()=>{ tagRest--; uhr.textContent=fmtMMSS(tagRest);
+            if(tagRest<=0){ tagStop(); uhr.textContent="fertig"; try{playGong();}catch(e){} } },1000);
+        });
+        uz.appendChild(uhr); panel.appendChild(uz);
+      }
       if(isToday()){
         // Die Absicht des Morgens — und ob sie gehalten hat
         const ab=getText(D,"absicht");
@@ -3923,6 +4038,37 @@
         }catch(e){}
         const b=dayBilanz();
         if(b){ const bd=document.createElement("div"); bd.className="tag-bilanz"; bd.innerHTML=b; panel.appendChild(bd); }
+        // Der Lock-In dieses Tages — aufklappbar, damit du ihn durchgehen kannst
+        const li=document.createElement("div"); li.className="tag-li";
+        const kopf=document.createElement("button"); kopf.type="button"; kopf.className="tli-h"+(state.tagLiOpen?" on":"");
+        const gesetzt=lockinItems().filter(it=>{
+          const v=getText(D,it.id);
+          return lockinOn(it.id,D) || isEnc(v) || (typeof v==="string" && v.trim());
+        }).length;
+        kopf.innerHTML=`<span>Dein Lock In</span><span class="tli-n">${gesetzt}/${lockinItems().length}</span><span class="tli-c">⌄</span>`;
+        kopf.addEventListener("click",()=>{ state.tagLiOpen=!state.tagLiOpen; buildTagesabschluss(); });
+        li.appendChild(kopf);
+        if(state.tagLiOpen){
+          const b=document.createElement("div"); b.className="tli-b";
+          lockinItems().forEach(it=>{
+            const v=getText(D,it.id);
+            const z=document.createElement("div"); z.className="tli-z"+(lockinOn(it.id,D)?" ok":"");
+            let inhalt="";
+            if(isEnc(v)) inhalt=`<span class="tli-zu">· · · · ·</span>`;
+            else if(typeof v==="string" && v.trim()) inhalt=`<div class="tli-t">${esc(v.trim())}</div>`;
+            z.innerHTML=`<span class="tli-c2">${lockinOn(it.id,D)?"✓":"○"}</span>
+              <div class="tli-in"><span class="tli-l">${esc(it.label||"Rückblick")}</span>${inhalt}</div>`;
+            b.appendChild(z);
+          });
+          const auf=document.createElement("button"); auf.type="button"; auf.className="cc-link";
+          auf.textContent="Lock In öffnen und durchgehen →";
+          auf.addEventListener("click",()=>{ state.lockinOpen=true; liStep=0; renderHeute();
+            setTimeout(()=>{ const el=document.getElementById("lockin"); if(el&&el.scrollIntoView) el.scrollIntoView({behavior:"smooth",block:"start"}); },80); });
+          b.appendChild(auf);
+          li.appendChild(b);
+        }
+        panel.appendChild(li);
+
         const h=document.createElement("div"); h.className="tag-hint";
         h.textContent="Wie ist es gelaufen? Auch wenn es wackelig war — das Festhalten ist der Punkt, nicht die Perfektion.";
         panel.appendChild(h);
@@ -3946,9 +4092,13 @@
       panel.appendChild(wrap);
       if(isToday() && !ro){
         const nav=document.createElement("div"); nav.className="tag-nav";
+        const zur=document.createElement("button"); zur.type="button"; zur.className="cc-zur"; zur.textContent="zurück";
+        zur.addEventListener("click",()=>{ tagStep=0; buildTagesabschluss(); });
+        nav.appendChild(zur);
         const fertig=document.createElement("button"); fertig.type="button"; fertig.className="tag-fertig";
         fertig.textContent = liRhythmus()==="abend" ? "Abschließen und morgen planen →" : "Abschließen";
         fertig.addEventListener("click",()=>{
+          tagStop(); tagRest=0; tagStep=0;
           state.tagOpen=false;
           if(liRhythmus()==="abend"){ state.lockinOpen=true; liStep=0; }
           renderHeute();

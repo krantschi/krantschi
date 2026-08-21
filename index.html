@@ -364,6 +364,31 @@
   body.ph-morgen .lockin .lockin-title,
   body.ph-abend .tages .lockin-title{ color:var(--brass) }
   /* Bilanz im Tagesabschluss */
+  .ta-wahl{display:flex; gap:6px; margin-top:8px}
+  .ta-b{font:inherit; font-size:11.5px; font-weight:700; color:var(--ink-faint); background:transparent;
+    border:none; border-radius:999px; padding:5px 13px; cursor:pointer; box-shadow:inset 0 0 0 1px var(--line)}
+  .ta-b.ja.on{color:var(--mint); box-shadow:inset 0 0 0 1.4px var(--mint)}
+  .ta-b.nein.on{color:var(--rose); box-shadow:inset 0 0 0 1.4px var(--rose)}
+  .ta-komm{width:100%; box-sizing:border-box; margin-top:9px; font:inherit; font-size:12.5px; color:var(--ink);
+    background:transparent; border:none; border-bottom:1px solid var(--line); padding:5px 2px}
+  .ta-komm:focus{outline:none; border-bottom-color:var(--brass)}
+  .tag-plan{margin:0 0 12px}
+  .tp-h{font-size:9.5px; font-weight:800; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:6px}
+  .tp-z{display:flex; align-items:baseline; gap:9px; padding:3px 0}
+  .tp-c{font-size:12px; font-weight:800; color:var(--track)}
+  .tp-z.ok .tp-c{color:var(--mint)} .tp-z.halb .tp-c{color:var(--amber)}
+  .tp-t{flex:1; font-size:13px; color:var(--ink-soft)}
+  .tp-z.ok .tp-t{color:var(--ink-faint); text-decoration:line-through}
+  .tag-nav{margin-top:14px; padding-top:12px; border-top:1px solid var(--line)}
+  .tag-fertig{width:100%; font:inherit; font-size:13px; font-weight:700; color:var(--on-accent);
+    background:var(--brass); border:none; border-radius:11px; padding:11px; cursor:pointer}
+  .li-stand{margin-left:8px; font-family:var(--font); font-size:9.5px; font-weight:800; letter-spacing:.05em;
+    text-transform:uppercase; border-radius:999px; padding:2px 8px; font-style:normal}
+  .li-stand.ja{color:var(--mint); background:rgba(63,207,174,.15)}
+  .li-stand.nein{color:var(--rose); background:rgba(212,115,106,.15)}
+  .li-komm{margin-top:6px; font-size:12.5px; font-style:italic; color:var(--ink-faint)}
+  .li-bericht{margin-top:9px; padding:9px 12px; border-radius:9px; background:rgba(var(--sheen),.05);
+    font-family:var(--serif); font-size:13.5px; line-height:1.55; color:var(--ink-soft)}
   .tag-absicht{display:flex; flex-direction:column; gap:3px; margin:2px 0 10px; padding:9px 12px;
     border-radius:9px; background:rgba(227,178,95,.1)}
   .ta-k{font-size:9px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--brass)}
@@ -2323,7 +2348,7 @@
   const LOCKTXT="ht_lockintext_v1", CRYPTO="ht_crypto_v1", CAL="ht_cal_v1", QUOTES="ht_quotes_v1", LOCKCFG="ht_lockin_cfg_v1", SCHATZ="ht_schatz_v1", GOSPELC="ht_gospel_v1";
   const MAX_PRIOS=8;
   const LOCKIN_DEFAULT=[
-    {id:"wins",    label:"Wins von gestern",        frage:"Was ist gestern gelungen? Auch Kleines zählt — hier wird der Fortschritt verankert.", text:true, date:true},
+    {id:"wins",    label:"Rückblick",               frage:"Was war — und was daraus wurde. Der Fortschritt wird hier verankert.", date:true},
     {id:"absicht", label:"Absicht für heute",       frage:"Eine klare Absicht. Worauf soll dein Tag zeigen? Woran erkennst du am Abend, dass er gelungen ist?", text:true},
     {id:"vizija",  label:"In Vizija eintauchen",    frage:"Einen Moment beim Nordstern bleiben."},
     {id:"tag",     label:"Den Tag bauen",           frage:"Zieh aus der Woche, was heute dran ist. Sieben Dinge in der Reihenfolge, wie sie kommen."},
@@ -3508,7 +3533,11 @@
         liStop(); liRest=0;
         if(!liGetan(D,st.id) && !ro) toggleLockin(st.id, true);
         if(liStep<items.length-1){ liStep++; buildLockIn(); }
-        else { state.lockinOpen=false; liStep=0; buildLockIn(); }
+        else {
+          state.lockinOpen=false; liStep=0;
+          buildLockIn();
+          if(liRhythmus()!=="abend") toast("Der Tag ist gebaut. Abends wartet der Abschluss.");
+        }
       });
       nav.appendChild(w);
       panel.appendChild(nav);
@@ -3547,15 +3576,28 @@
   function liBody(st,D,body,ro,fuerMorgen){
     /* --- Wins von gestern --- */
     if(st.id==="wins"){
-      const g=addDays(D,-1);
-      const v=(lockinText[g]||{}).absicht;
-      const ab=(typeof v==="string" && v.trim())?v.trim():null;
+      // Der Debrief des Vortags — hier wird nur gelesen, geschrieben wurde am Abend
+      const g=addDays(D,-1), vt=lockinText[g]||{};
+      const ab=(typeof vt.absicht==="string" && vt.absicht.trim())?vt.absicht.trim():null;
+      const stand=vt.absicht_stand, komm=vt.absicht_komm;
+      const ber=vt.tagesabschluss;
       const q=document.createElement("div"); q.className="cc-quelle";
-      q.innerHTML=ab
-        ? `<div class="cc-q-h">Deine Absicht von gestern</div><div class="li-absicht">${esc(ab)}</div>`
-        : `<div class="cc-q-leer">Gestern war keine Absicht gesetzt. Ab heute steht sie hier.</div>`;
-      body.appendChild(q);
-      body.appendChild(liFeld(D,"wins","Was ist gelungen? Auch Kleines …",4));
+      let h="";
+      if(ab){
+        h+=`<div class="cc-q-h">${fuerMorgen?"Heute":"Gestern"}</div>
+            <div class="li-absicht">${esc(ab)}
+            ${stand?`<span class="li-stand ${stand}">${stand==="ja"?"gehalten":"nicht gehalten"}</span>`:``}</div>`;
+        if(typeof komm==="string" && komm.trim()) h+=`<div class="li-komm">${esc(komm.trim())}</div>`;
+      }
+      if(isEnc(ber)) h+=`<div class="cc-q-leer">Der Bericht ist abgelegt.</div>`;
+      else if(typeof ber==="string" && ber.trim()) h+=`<div class="li-bericht">${esc(ber.trim())}</div>`;
+      else if(!ab) h+=`<div class="cc-q-leer">Noch kein Tagesabschluss vorhanden. Was du abends festhältst, steht am nächsten Morgen hier.</div>`;
+      q.innerHTML=h; body.appendChild(q);
+      const b=document.createElement("button"); b.type="button"; b.className="cc-link";
+      b.textContent=(typeof ber==="string"&&ber.trim())||isEnc(ber) ? "Tagesabschluss ansehen →" : "Tagesabschluss nachholen →";
+      b.addEventListener("click",()=>{ state.viewDate=g; state.tagOpen=true; renderHeute();
+        setTimeout(()=>{ const el=document.getElementById("tagesabschluss"); if(el&&el.scrollIntoView) el.scrollIntoView({behavior:"smooth",block:"center"}); },80); });
+      body.appendChild(b);
       return;
     }
     /* --- Absicht für heute --- */
@@ -3842,13 +3884,43 @@
     if(state.tagOpen){
       const panel=document.createElement("div"); panel.className="lockin-panel";
       if(isToday()){
-        // Die Absicht des Morgens — daran misst sich der Abend
+        // Die Absicht des Morgens — und ob sie gehalten hat
         const ab=getText(D,"absicht");
         if(typeof ab==="string" && ab.trim()){
           const a=document.createElement("div"); a.className="tag-absicht";
           a.innerHTML=`<span class="ta-k">Deine Absicht</span><span class="ta-t">${esc(ab.trim())}</span>`;
+          const stand=getText(D,"absicht_stand");
+          const w=document.createElement("div"); w.className="ta-wahl";
+          [["ja","gehalten"],["nein","nicht gehalten"]].forEach(([v,l])=>{
+            const b=document.createElement("button"); b.type="button";
+            b.className="ta-b "+v+(stand===v?" on":""); b.textContent=l; b.disabled=ro;
+            b.addEventListener("click",()=>{ setText(D,"absicht_stand", stand===v?"":v); buildTagesabschluss(); });
+            w.appendChild(b);
+          });
+          a.appendChild(w);
+          if(stand){
+            const k=getText(D,"absicht_komm");
+            const ki=document.createElement("input"); ki.type="text"; ki.className="ta-komm";
+            ki.value=(typeof k==="string")?k:""; ki.placeholder="Kurz dazu, wenn du magst …"; ki.disabled=ro;
+            ki.addEventListener("input",()=>setText(D,"absicht_komm",ki.value));
+            a.appendChild(ki);
+          }
           panel.appendChild(a);
         }
+        // Plan gegen Wirklichkeit — was du morgens gebaut hast
+        try{
+          ensurePrios();
+          const plan=prios.all.filter(x=>x.day===D && (x.text||"").trim());
+          if(plan.length){
+            const pl=document.createElement("div"); pl.className="tag-plan";
+            const erf=plan.filter(isDoneI).length;
+            pl.innerHTML=`<div class="tp-h">Dein Plan · ${erf} von ${plan.length}</div>`+
+              plan.map(x=>`<div class="tp-z ${isDoneI(x)?"ok":x.status==="started"?"halb":"offen"}">
+                <span class="tp-c">${isDoneI(x)?"✓":x.status==="started"?"◐":"○"}</span>
+                <span class="tp-t">${esc(x.text.trim())}</span></div>`).join("");
+            panel.appendChild(pl);
+          }
+        }catch(e){}
         const b=dayBilanz();
         if(b){ const bd=document.createElement("div"); bd.className="tag-bilanz"; bd.innerHTML=b; panel.appendChild(bd); }
         const h=document.createElement("div"); h.className="tag-hint";
@@ -3856,6 +3928,7 @@
         panel.appendChild(h);
       }
       const wrap=document.createElement("div"); wrap.className="lockin-text tages-text";
+      wrap.dataset.rolle="bericht";
       if(isEnc(cur)){
         const mask=document.createElement("div"); mask.className="enc-mask"; mask.textContent="· · · · ·"; mask.title="Antippen zum Öffnen";
         const key=document.createElement("button"); key.className="key-btn open"; key.type="button"; key.textContent="öffnen"; key.title="Text sichtbar machen";
@@ -3870,7 +3943,22 @@
         wrap.append(ta,key);
         if(!ro && typeof cur==="string" && cur.trim()) wrap.appendChild(delBtn(D,"tagesabschluss"));
       }
-      panel.appendChild(wrap); sec.appendChild(panel);
+      panel.appendChild(wrap);
+      if(isToday() && !ro){
+        const nav=document.createElement("div"); nav.className="tag-nav";
+        const fertig=document.createElement("button"); fertig.type="button"; fertig.className="tag-fertig";
+        fertig.textContent = liRhythmus()==="abend" ? "Abschließen und morgen planen →" : "Abschließen";
+        fertig.addEventListener("click",()=>{
+          state.tagOpen=false;
+          if(liRhythmus()==="abend"){ state.lockinOpen=true; liStep=0; }
+          renderHeute();
+          setTimeout(()=>{ const el=document.getElementById(liRhythmus()==="abend"?"lockin":"cats");
+            if(el&&el.scrollIntoView) el.scrollIntoView({behavior:"smooth",block:"start"}); },80);
+        });
+        nav.appendChild(fertig);
+        panel.appendChild(nav);
+      }
+      sec.appendChild(panel);
     }
     root.appendChild(sec);
   }
@@ -4534,9 +4622,8 @@
     if(!isToday()) return;
     if(ph==="morgen"){ state.lockinOpen=true; state.tagOpen=false; }
     else if(ph==="abend"){
-      // Abends: erst der Debrief, im Abend-Rhythmus danach der Lock-In für morgen
-      state.tagOpen=true;
-      state.lockinOpen=(liRhythmus()==="abend");
+      // Abends zuerst der Debrief; der Lock-In für morgen folgt daraus
+      state.tagOpen=true; state.lockinOpen=false;
     }
     else { state.lockinOpen=false; state.tagOpen=false; }
   }

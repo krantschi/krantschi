@@ -1049,6 +1049,32 @@
     border:none; border-bottom:1px solid var(--line); padding:4px 2px}
   .li-el input:focus{outline:none; border-bottom-color:var(--brass)}
   .cc-panel{padding-bottom:18px}
+  .cc-offen-hin{margin:0 20px 12px; font-size:11px; color:var(--mint); background:rgba(63,207,174,.1);
+    border-radius:8px; padding:6px 11px}
+  .li-sync{margin-top:5px; font-size:10.5px; color:var(--ink-faint); font-style:italic}
+  .li-ref{margin-bottom:12px}
+  .li-ref-h{width:100%; display:flex; align-items:center; gap:8px; font:inherit; font-size:11px; font-weight:700;
+    color:var(--ink-faint); background:rgba(var(--sheen),.045); border:none; border-radius:8px; padding:7px 11px; cursor:pointer}
+  .li-ref-h.on{color:var(--brass)}
+  .li-ref-h .tli-c{margin-left:auto}
+  .li-ref-b{padding:8px 4px 0}
+  .li-ref-z{padding:5px 0; border-bottom:1px solid var(--line)}
+  .li-ref-l{display:block; font-size:10px; font-weight:700; color:var(--ink-faint)}
+  .li-ref-t{margin-top:2px; font-family:var(--serif); font-size:13px; line-height:1.5; color:var(--ink-soft)}
+  .li-meta-bar{display:flex; gap:7px; margin-top:12px; padding-top:10px; border-top:1px solid var(--line)}
+  .ccv-liste{display:flex; flex-direction:column; padding:0 20px 8px}
+  .ccv-z{display:flex; align-items:center; gap:10px; font:inherit; text-align:left; background:transparent;
+    border:none; border-bottom:1px solid var(--line); padding:10px 0; cursor:pointer}
+  .ccv-z.on{color:var(--brass)}
+  .ccv-kw{font-size:13.5px; font-weight:700; color:var(--ink)}
+  .ccv-z.on .ccv-kw{color:var(--brass)}
+  .ccv-d{font-size:11px; color:var(--ink-faint)}
+  .ccv-ok{margin-left:auto; color:var(--mint); font-weight:800; font-size:12px}
+  .ccv-off{margin-left:auto; font-size:10px; color:var(--ink-faint)}
+  .ccv-detail{padding:6px 0 12px}
+  .ccv-m{margin-top:6px; padding:8px 10px; border-radius:8px; background:rgba(var(--sheen),.045)}
+  .ccv-mt{font-family:var(--serif); font-size:13.5px; font-weight:600; color:var(--ink); margin-bottom:4px}
+  .ccv-q{font-size:12.5px; line-height:1.5; color:var(--ink-soft); padding:2px 0}
   .cc-alle{width:calc(100% - 40px); margin:0 20px 12px; display:flex; align-items:center; gap:8px;
     font:inherit; font-size:11.5px; font-weight:650; color:var(--ink-faint); background:rgba(var(--sheen),.05);
     border:none; border-radius:9px; padding:8px 12px; cursor:pointer; box-shadow:inset 0 0 0 1px var(--line)}
@@ -2369,9 +2395,10 @@
   const LERN="ht_lernplan_v1";
   const WABS="ht_command_v1";   // Command-Center-Texte, strikt lokal
   const WSATZ="ht_wochensatz_v1";  // Satz der Woche
-  const LIRHY="ht_lockin_rhythmus_v1";   // "morgen" = morgens für heute, "abend" = abends für morgen  // Satz der Woche
+  const LIRHY="ht_lockin_rhythmus_v1";
+  const ABSICHT="ht_absicht_v1";   // wandert als einziges mit auf das andere Gerät   // "morgen" = morgens für heute, "abend" = abends für morgen  // Satz der Woche
   const ANGELUS="ht_angelus_v1";
-  const APP_VERSION="2026-08-21";   // wird beim Aktualisieren hochgezählt
+  const APP_VERSION="2026-08-24";   // wird beim Aktualisieren hochgezählt
   const LOCKIN="ht_lockin_v1";
   const LOCKTXT="ht_lockintext_v1", CRYPTO="ht_crypto_v1", CAL="ht_cal_v1", QUOTES="ht_quotes_v1", LOCKCFG="ht_lockin_cfg_v1", SCHATZ="ht_schatz_v1", GOSPELC="ht_gospel_v1";
   const MAX_PRIOS=8;
@@ -2516,7 +2543,7 @@
   let quotes=read(QUOTES,[]);
   let schatz=read(SCHATZ,[]);
   let visionTimer=null, quoteTimer=null;
-  const state={editing:false, lastComplete:false, tab:read(TAB,"heute"), lockinOpen:false, lockinComplete:false, priosSub:"heute", viewDate:null, passphrase:null, calOpen:false, calMonth:null, tagOpen:false, lockinEdit:false, tagLiOpen:false, backfill:false, chalOpen:{}, chalJustChecked:null, visLevel:"big"};
+  const state={ metaRefOpen:false,editing:false, lastComplete:false, tab:read(TAB,"heute"), lockinOpen:false, lockinComplete:false, priosSub:"heute", viewDate:null, passphrase:null, calOpen:false, calMonth:null, tagOpen:false, lockinEdit:false, tagLiOpen:false, backfill:false, chalOpen:{}, chalJustChecked:null, visLevel:"big"};
 
   function ymd(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
   const today=ymd(new Date());
@@ -2592,7 +2619,7 @@
     document.body.classList.toggle("tab-prios", t==="prios");
     document.body.classList.toggle("tab-fokus", t==="fokus");
     // Die Rückseite schließt sich beim Verlassen — sie soll nicht offen liegen bleiben.
-    if(t!=="vizija"){ antiOn=false; prosaOn=false; visEdit=false; ccOn=false; rueckOn=false; verlaufOn=false; ccStop(); }
+    if(t!=="vizija"){ antiOn=false; prosaOn=false; visEdit=false; ccOn=false; rueckOn=false; verlaufOn=false; ccVerlauf=false; ccStop(); }
     if(t!=="fokus") lernOn=false;   // versteckte Ansicht bleibt nicht offen liegen
     if(t==="vizija"){ buildVision(); playVizijaIntro(); }
     if(t==="fokus") buildFokus();
@@ -3050,8 +3077,16 @@
     catch(e){ alert("Falsches Passwort."); return null; }
     return pw;
   }
-  const getText=(D,id)=> (lockinText[D] && lockinText[D][id]!==undefined) ? lockinText[D][id] : "";
-  function setText(D,id,val){ if(!lockinText[D]) lockinText[D]={}; lockinText[D][id]=val; write(LOCKTXT,lockinText); }
+  // Die Absicht liegt getrennt, damit sie als einziges abgeglichen werden kann
+  let absichten=read(ABSICHT,{});
+  const getText=(D,id)=>{
+    if(id==="absicht") return absichten[D]!==undefined?absichten[D]:"";
+    return (lockinText[D] && lockinText[D][id]!==undefined) ? lockinText[D][id] : "";
+  };
+  function setText(D,id,val){
+    if(id==="absicht"){ if(val==="") delete absichten[D]; else absichten[D]=val; write(ABSICHT,absichten); return; }
+    if(!lockinText[D]) lockinText[D]={}; lockinText[D][id]=val; write(LOCKTXT,lockinText);
+  }
   const isEnc=v=> v && typeof v==="object" && v.iv && v.ct;
   function refreshTexts(){ buildLockIn(); buildTagesabschluss(); }
   // Text eines Tages löschen. Bei verschlüsseltem Inhalt erst nach richtigem Passwort,
@@ -3488,6 +3523,42 @@
   }
   /* ---------- Lock In: der tägliche Reset als geführter Ablauf ----------
      Absicht setzen, den Tag bauen, STAQ, Metascript. Rau statt perfekt, 5 bis 15 Minuten. */
+  /* ---------- Vorübergehend geöffnet ----------
+     Ein Passwort öffnet alle Felder eines Ablaufs. Beim Abschließen werden genau die
+     wieder abgelegt, die vorher abgelegt waren — ohne erneute Eingabe. */
+  let offenGewesen=null;   // {pw, felder:[{hol,leg}]}
+  function merkeOffen(pw){ offenGewesen={pw, felder:[]}; }
+  function merkeFeld(hol,leg){ if(offenGewesen) offenGewesen.felder.push({hol,leg}); }
+  async function wiederAblegen(){
+    if(!offenGewesen || !offenGewesen.felder.length){ offenGewesen=null; return 0; }
+    const {pw,felder}=offenGewesen; offenGewesen=null;
+    let n=0;
+    try{
+      const salt=unb64(cryptoRec.salt);
+      for(const f of felder){
+        const v=f.hol();
+        if(typeof v==="string" && v.trim()){ f.leg(await encWith(pw,salt,v)); n++; }
+      }
+    }catch(e){}
+    return n;
+  }
+  // Alle abgelegten Felder einer Sammlung mit einem Passwort öffnen
+  async function alleOeffnen(felder, neu){
+    const zu=felder.filter(f=>isEnc(f.hol()));
+    if(!zu.length){ toast("Nichts abgelegt"); return; }
+    const pw=await ensurePassphrase(); if(pw==null) return;
+    merkeOffen(pw);
+    let auf=0, fehl=0;
+    const salt=unb64(cryptoRec.salt);
+    for(const f of zu){
+      try{ f.leg(await decWith(pw,salt,f.hol())); merkeFeld(f.hol,f.leg); auf++; }
+      catch(e){ fehl++; }
+    }
+    if(!auf) offenGewesen=null;
+    neu();
+    toast(fehl ? (auf+" geöffnet, "+fehl+" nicht") : (auf===1?"Ein Feld geöffnet":auf+" Felder geöffnet"));
+  }
+
   let liStep=0, liTimer=null, liRest=0;
   const liRhythmus=()=>read(LIRHY,"morgen");
   // Für welchen Tag der Lock-In gilt: morgens für heute, abends für morgen
@@ -3499,6 +3570,9 @@
   function liStop(){ if(liTimer){ clearInterval(liTimer); liTimer=null; } }
   const liSchritte=()=>lockinItems();
   const liGetan=(D,id)=>!!(lockinLog[D]||{})[id];
+  const LI_TEXTE=["wins","meta","meta_t","meta_q0","meta_q1","meta_q2"];
+  const liFelder=D=>LI_TEXTE.map(id=>({hol:()=>getText(D,id), leg:v=>setText(D,id,v)}));
+  const liZu=D=>liFelder(D).filter(f=>isEnc(f.hol())).length;
 
   function buildLockIn(){
     const D=liTag(), ro=!canEdit();
@@ -3524,6 +3598,18 @@
       if(liStep>=items.length) liStep=items.length-1;
       if(liStep<0) liStep=0;
       const st=items[liStep];
+
+      const zu=liZu(D);
+      if(zu>0){
+        const alle=document.createElement("button"); alle.type="button"; alle.className="cc-alle";
+        alle.innerHTML=`<span class="cc-alle-n">${zu}</span>${zu===1?"abgelegtes Feld":"abgelegte Felder"} · alle öffnen`;
+        alle.addEventListener("click",()=>alleOeffnen(liFelder(D),buildLockIn));
+        panel.appendChild(alle);
+      }else if(offenGewesen && offenGewesen.felder.length){
+        const hin=document.createElement("div"); hin.className="cc-offen-hin";
+        hin.textContent="Geöffnet · wird beim Abschließen wieder abgelegt";
+        panel.appendChild(hin);
+      }
 
       // Fortschritt: ein Strich je Schritt
       const prog=document.createElement("div"); prog.className="li-prog";
@@ -3581,8 +3667,11 @@
         if(liStep<items.length-1){ liStep++; buildLockIn(); }
         else {
           state.lockinOpen=false; liStep=0;
-          buildLockIn();
-          if(liRhythmus()!=="abend") toast("Der Tag ist gebaut. Abends wartet der Abschluss.");
+          wiederAblegen().then(n=>{
+            buildLockIn();
+            if(n) toast(n===1?"Ein Feld wieder abgelegt":n+" Felder wieder abgelegt");
+            else if(liRhythmus()!=="abend") toast("Der Tag ist gebaut. Abends wartet der Abschluss.");
+          });
         }
       });
       nav.appendChild(w);
@@ -3615,8 +3704,10 @@
   }
 
   // Ein geschütztes Textfeld für einen Lock-In-Schritt
-  function liFeld(D,id,ph,rows){
-    return ccSicher(()=>getText(D,id), v=>setText(D,id,v), ph, rows, buildLockIn);
+  function liFeld(D,id,ph,rows,ohneKnopf){
+    const f=ccSicher(()=>getText(D,id), v=>setText(D,id,v), ph, rows, buildLockIn);
+    if(ohneKnopf) f.querySelectorAll(".cc-feld-akt").forEach(x=>x.remove());
+    return f;
   }
 
   function liBody(st,D,body,ro,fuerMorgen){
@@ -3624,7 +3715,8 @@
     if(st.id==="wins"){
       // Der Debrief des Vortags — hier wird nur gelesen, geschrieben wurde am Abend
       const g=addDays(D,-1), vt=lockinText[g]||{};
-      const ab=(typeof vt.absicht==="string" && vt.absicht.trim())?vt.absicht.trim():null;
+      const av=getText(g,"absicht");
+      const ab=(typeof av==="string" && av.trim())?av.trim():null;
       const stand=vt.absicht_stand, komm=vt.absicht_komm;
       const ber=vt.tagesabschluss;
       const q=document.createElement("div"); q.className="cc-quelle";
@@ -3651,7 +3743,12 @@
       const bsp=document.createElement("div"); bsp.className="cc-quelle";
       bsp.innerHTML=`<div class="cc-q-leer">Eine Zeile genügt. „Abends präsent bei der Familie, Handy weg." · „Die eine Aufgabe angehen, die ich schiebe."</div>`;
       body.appendChild(bsp);
-      body.appendChild(liFeld(D,"absicht","Heute geht es um …",3));
+      const f=liFeld(D,"absicht","Heute geht es um …",3);
+      const k=f.querySelector(".key-btn"); if(k) k.remove();   // die Absicht wird abgeglichen, nicht abgelegt
+      const hin=document.createElement("div"); hin.className="li-sync";
+      hin.textContent="Steht auf beiden Geräten.";
+      f.appendChild(hin);
+      body.appendChild(f);
       return;
     }
     /* --- In Vizija eintauchen --- */
@@ -3748,23 +3845,84 @@
     }
     /* --- Metascript --- */
     if(st.id==="meta"){
+      const IDS=["meta","meta_t","meta_q0","meta_q1","meta_q2"];
+      const felder=IDS.map(id=>({id, hol:()=>getText(D,id), leg:v=>setText(D,id,v)}));
+      const zu=felder.filter(f=>isEnc(f.hol())).length;
+
+      // Das Metascript von gestern als Referenz
+      const g=addDays(D,-1);
+      const gIDS=IDS.map(id=>({id, v:getText(g,id)}));
+      if(gIDS.some(x=>isEnc(x.v)||(typeof x.v==="string"&&x.v.trim()))){
+        const rf=document.createElement("div"); rf.className="li-ref";
+        const rh=document.createElement("button"); rh.type="button"; rh.className="li-ref-h"+(state.metaRefOpen?" on":"");
+        rh.innerHTML=`<span>Metascript von ${fuerMorgen?"heute":"gestern"}</span><span class="tli-c">⌄</span>`;
+        rh.addEventListener("click",()=>{ state.metaRefOpen=!state.metaRefOpen; buildLockIn(); });
+        rf.appendChild(rh);
+        if(state.metaRefOpen){
+          const rb=document.createElement("div"); rb.className="li-ref-b";
+          const label={meta:"Scan", meta_t:"Der Punkt", meta_q0:META_Q[0], meta_q1:META_Q[1], meta_q2:META_Q[2]};
+          let leer=true;
+          gIDS.forEach(x=>{
+            if(isEnc(x.v)){ leer=false; rb.innerHTML+=`<div class="li-ref-z"><span class="li-ref-l">${esc(label[x.id])}</span><span class="tli-zu">· · · · ·</span></div>`; }
+            else if(typeof x.v==="string" && x.v.trim()){ leer=false;
+              rb.innerHTML+=`<div class="li-ref-z"><span class="li-ref-l">${esc(label[x.id])}</span><div class="li-ref-t">${esc(x.v.trim())}</div></div>`; }
+          });
+          if(leer) rb.innerHTML=`<div class="cc-q-leer">Nichts festgehalten.</div>`;
+          if(gIDS.some(x=>isEnc(x.v))){
+            const ob=document.createElement("button"); ob.type="button"; ob.className="cc-link"; ob.textContent="Abgelegtes öffnen →";
+            ob.addEventListener("click",()=>alleOeffnen(gIDS.map(x=>({hol:()=>getText(g,x.id), leg:v=>setText(g,x.id,v)})),buildLockIn));
+            rb.appendChild(ob);
+          }
+          rf.appendChild(rb);
+        }
+        body.appendChild(rf);
+      }
+
       const sc=document.createElement("div"); sc.className="cc-quelle";
       sc.innerHTML=`<div class="cc-q-h">Scan</div>`;
-      sc.appendChild(liFeld(D,"meta","Was liegt auf Herz und Verstand? Roh, ungeordnet …",3));
+      sc.appendChild(liFeld(D,"meta","Was liegt auf Herz und Verstand? Roh, ungeordnet …",3,true));
       body.appendChild(sc);
       const e=document.createElement("div"); e.className="li-meta";
       e.innerHTML=`<div class="cc-q-h">Ein Eintrag</div>`;
       const t=document.createElement("div"); t.className="cc-meta-q";
       t.innerHTML=`<div class="cc-mq">Der Punkt mit der größten Ladung</div>`;
-      t.appendChild(liFeld(D,"meta_t","…",2));
+      t.appendChild(liFeld(D,"meta_t","…",2,true));
       e.appendChild(t);
       META_Q.forEach((q,i)=>{
         const d=document.createElement("div"); d.className="cc-meta-q";
         d.innerHTML=`<div class="cc-mq">${esc(q)}</div>`;
-        d.appendChild(liFeld(D,"meta_q"+i,"…",2));
+        d.appendChild(liFeld(D,"meta_q"+i,"…",2,true));
         e.appendChild(d);
       });
       body.appendChild(e);
+
+      // Ein Knopf legt das ganze Metascript ab
+      const bar=document.createElement("div"); bar.className="li-meta-bar";
+      if(zu>0){
+        const auf=document.createElement("button"); auf.type="button"; auf.className="key-btn open";
+        auf.textContent=zu===IDS.length?"alles öffnen":"abgelegte öffnen";
+        auf.addEventListener("click",()=>alleOeffnen(felder,buildLockIn));
+        bar.appendChild(auf);
+      }
+      {
+        const ab=document.createElement("button"); ab.type="button"; ab.className="key-btn";
+        ab.textContent="Metascript ablegen";
+        const pruef=()=>{ ab.hidden=!felder.some(f=>{ const v=f.hol(); return typeof v==="string" && v.trim(); }); };
+        pruef();
+        body.querySelectorAll(".cc-ta").forEach(t=>t.addEventListener("input",pruef));
+        ab.addEventListener("click",async()=>{
+          const pw=await ensurePassphrase(); if(pw==null) return;
+          try{
+            const salt=unb64(cryptoRec.salt);
+            let n=0;
+            for(const f of felder){ const v=f.hol();
+              if(typeof v==="string" && v.trim()){ f.leg(await encWith(pw,salt,v)); n++; } }
+            buildLockIn(); toast(n===1?"Abgelegt":n+" Felder abgelegt");
+          }catch(e){ alert("Ablegen fehlgeschlagen."); }
+        });
+        bar.appendChild(ab);
+      }
+      body.appendChild(bar);
       return;
     }
     /* --- Komm Heiliger Geist --- */
@@ -7333,23 +7491,81 @@
     return n;
   }
   // Mit einer Passworteingabe alles öffnen — was nicht passt, bleibt zu
-  async function ccAlleOeffnen(rec){
-    const pw=await ensurePassphrase(); if(pw==null) return;
-    let auf=0, fehl=0;
-    const salt=unb64(cryptoRec.salt);
-    for(const id in (rec.a||{})){
-      const v=rec.a[id]; if(!isEnc(v)) continue;
-      try{ rec.a[id]=await decWith(pw,salt,v); auf++; }catch(e){ fehl++; }
+  function ccFelder(rec){
+    const out=[];
+    for(const id in (rec.a||{})) out.push({hol:()=>rec.a[id], leg:v=>{ rec.a[id]=v; ccSave(r=>{ r.a=rec.a; }); }});
+    (rec.meta||[]).forEach(m=>{ for(const q in (m.a||{}))
+      out.push({hol:()=>m.a[q], leg:v=>{ m.a[q]=v; ccSave(r=>{ r.meta=rec.meta; }); }}); });
+    return out;
+  }
+  const ccAlleOeffnen=rec=>alleOeffnen(ccFelder(rec),buildVision);
+
+  /* ---------- Verlauf der Command Center ---------- */
+  let ccVerlauf=false, ccWoche=null;
+  function buildCCVerlauf(view){
+    const st=ccAll(), keys=Object.keys(st).sort().reverse();
+    const panel=document.createElement("section"); panel.className="panel";
+    const head=document.createElement("div"); head.className="panel-head";
+    head.innerHTML=`<span class="dot"></span><span class="eyebrow">Command Center</span><span class="vis-hint">Verlauf</span>`;
+    const back=document.createElement("button"); back.type="button"; back.className="vr-edit"; back.textContent="zurück";
+    back.addEventListener("click",()=>{ ccVerlauf=false; ccWoche=null; buildVision(); });
+    head.appendChild(back); panel.appendChild(head);
+
+    if(!keys.length){
+      const e=document.createElement("div"); e.className="rueck-leer"; e.style.padding="0 20px";
+      e.textContent="Noch kein Command Center gemacht.";
+      panel.appendChild(e); view.appendChild(panel); return;
     }
-    for(const m of (rec.meta||[])){
-      for(const q in (m.a||{})){
-        const v=m.a[q]; if(!isEnc(v)) continue;
-        try{ m.a[q]=await decWith(pw,salt,v); auf++; }catch(e){ fehl++; }
+    const l=document.createElement("div"); l.className="ccv-liste";
+    keys.forEach(k=>{
+      const r=st[k]||{};
+      const wn=(()=>{ const t=new Date(k+"T00:00:00"); t.setDate(t.getDate()+3);
+        const j=new Date(t.getFullYear(),0,1);
+        return 1+Math.round(((t-j)/86400000-3+((j.getDay()+6)%7))/7); })();
+      const b=document.createElement("button"); b.type="button"; b.className="ccv-z"+(ccWoche===k?" on":"")+(r.done?" fertig":"");
+      b.innerHTML=`<span class="ccv-kw">KW ${wn}</span><span class="ccv-d">${fmtShort(k)}</span>`+
+        (r.done?`<span class="ccv-ok">✓</span>`:`<span class="ccv-off">offen</span>`);
+      b.addEventListener("click",()=>{ ccWoche=(ccWoche===k?null:k); buildVision(); });
+      l.appendChild(b);
+      if(ccWoche===k){
+        const d=document.createElement("div"); d.className="ccv-detail";
+        const zu=ccFelder(r).filter(f=>isEnc(f.hol())).length;
+        if(zu>0){
+          const auf=document.createElement("button"); auf.type="button"; auf.className="cc-alle";
+          auf.innerHTML=`<span class="cc-alle-n">${zu}</span>abgelegt · öffnen`;
+          auf.addEventListener("click",()=>alleOeffnen(ccFelder(r),buildVision));
+          d.appendChild(auf);
+        }
+        CC_STEPS.forEach(stp=>{
+          const v=(r.a||{})[stp.id];
+          let inhalt="";
+          if(isEnc(v)) inhalt=`<span class="tli-zu">· · · · ·</span>`;
+          else if(typeof v==="string" && v.trim()) inhalt=`<div class="tli-t">${esc(v.trim())}</div>`;
+          if(stp.id==="meta" && (r.meta||[]).length){
+            inhalt+= (r.meta||[]).map(m=>{
+              const t=(m.text||"").trim();
+              const as=Object.keys(m.a||{}).map(q=>{
+                const w=m.a[q];
+                return isEnc(w)?`<div class="ccv-q"><span class="tli-zu">· · · · ·</span></div>`
+                  : (typeof w==="string"&&w.trim())?`<div class="ccv-q">${esc(w.trim())}</div>`:"";
+              }).join("");
+              return (t||as)?`<div class="ccv-m">${t?`<div class="ccv-mt">${esc(t)}</div>`:``}${as}</div>`:"";
+            }).join("");
+          }
+          if(!inhalt) return;
+          const z=document.createElement("div"); z.className="tli-z";
+          z.innerHTML=`<div class="tli-in"><span class="tli-l">${esc(stp.t)}</span>${inhalt}</div>`;
+          d.appendChild(z);
+        });
+        if(!d.querySelector(".tli-z")){
+          const e=document.createElement("div"); e.className="cc-q-leer"; e.textContent="Nichts festgehalten.";
+          d.appendChild(e);
+        }
+        l.appendChild(d);
       }
-    }
-    ccSave(r=>{ r.a=rec.a; r.meta=rec.meta; });
-    buildVision();
-    toast(fehl ? (auf+" geöffnet, "+fehl+" nicht") : (auf===1?"Text geöffnet":auf+" Texte geöffnet"));
+    });
+    panel.appendChild(l);
+    view.appendChild(panel);
   }
 
   function buildCommand(view){
@@ -7387,11 +7603,11 @@
     const kopf=document.createElement("div"); kopf.className="cc-kopf";
     kopf.innerHTML=`<span class="cc-n">${ccStep+1}</span><span class="cc-t">${esc(step.t)}</span>`;
     const uhr=document.createElement("button"); uhr.type="button"; uhr.className="cc-uhr";
-    uhr.textContent=ccRest?fmtMMSS(ccRest):"4 min";
+    uhr.textContent=ccRest?fmtMMSS(ccRest):"45 min";
     uhr.title="Zeitfenster setzen — rau statt perfekt";
     uhr.addEventListener("click",()=>{
-      if(ccTimer){ ccStop(); ccRest=0; uhr.textContent="4 min"; return; }
-      ccRest=240;
+      if(ccTimer){ ccStop(); ccRest=0; uhr.textContent="45 min"; return; }
+      ccRest=2700;
       ccTimer=setInterval(()=>{ ccRest--; uhr.textContent=fmtMMSS(ccRest);
         if(ccRest<=0){ ccStop(); uhr.textContent="fertig"; try{playGong();}catch(e){} } },1000);
     });
@@ -7413,8 +7629,11 @@
     w.addEventListener("click",()=>{
       ccStop(); ccRest=0;
       if(ccStep<CC_STEPS.length-1){ ccStep++; buildVision(); }
-      else { ccSave(r=>{ r.done=true; r.at=new Date().toISOString(); }); ccOn=false; ccStep=0;
-             buildVision(); toast("Die Woche steht."); }
+      else {
+        ccSave(r=>{ r.done=true; r.at=new Date().toISOString(); }); ccOn=false; ccStep=0;
+        wiederAblegen().then(n=>{ buildVision();
+          toast(n ? "Die Woche steht · "+n+" wieder abgelegt" : "Die Woche steht."); });
+      }
     });
     nav.appendChild(w); panel.appendChild(nav);
     view.appendChild(panel);
@@ -7864,6 +8083,7 @@
     if(antiOn){ buildAntiVizija(view); return; }
     if(prosaOn){ buildProsa(view); return; }
     if(ccOn){ buildCommand(view); return; }
+    if(ccVerlauf){ buildCCVerlauf(view); return; }
     if(rueckOn){ buildRueckblick(view); return; }
     if(verlaufOn){ buildVerlauf(view); return; }
     if(visEdit){ buildVisionEdit(view); return; }
@@ -7965,6 +8185,8 @@
     const wd=new Date().getDay();
     foot.appendChild(mk("Command Center",0,()=>{ ccOn=true; ccStep=0; buildVision(); }, (wd===0||wd===1)?"stark":""));
     foot.appendChild(mk("Rückblick",0,()=>{ rueckOn=true; buildVision(); }));
+    const ccn=Object.keys(ccAll()).length;
+    if(ccn) foot.appendChild(mk("CC-Verlauf",ccn,()=>{ ccVerlauf=true; ccWoche=null; buildVision(); }));
     foot.appendChild(mk("Verlauf",n,()=>{ verlaufOn=true; buildVision(); }));
     const qn=(read(QUOTES,[])||[]).length;
     if(qn) foot.appendChild(mk("Sätze",qn,()=>{ visEdit=true; buildVision(); }));
@@ -8168,7 +8390,7 @@
     write(THEME,next); applyTheme();
   }
   // Abgeleitete Schlüssel beim Verlassen der Seite verwerfen
-  window.addEventListener("pagehide",forgetKeys);
+  window.addEventListener("pagehide",()=>{ wiederAblegen(); forgetKeys(); });
   document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="hidden") forgetKeys(); });
   refreshVidBadge().then(adoptSyncedVideo);
   startAngelusWatch();

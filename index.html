@@ -1418,16 +1418,18 @@
   .vr-edit:hover{opacity:1; color:var(--brass)}
   .vr-edit.on{opacity:1; color:var(--brass); box-shadow:inset 0 0 0 1px var(--brass)}
   /* Nordstern */
-  .vr-star{position:relative; margin:0 16px 18px; border-radius:16px; overflow:hidden; isolation:isolate;
-    min-height:150px; display:flex; align-items:flex-end}
+  .vr-star{position:relative; margin:0 0 2px; border-radius:0; overflow:hidden; isolation:isolate;
+    min-height:250px; display:flex; align-items:flex-end}
   .vr-bg{position:absolute; inset:0; background-size:cover; background-position:center; cursor:zoom-in;
-    filter:saturate(.85) brightness(.42); transform:scale(1.02)}
+    filter:saturate(.85) brightness(.4); animation:vrZoom 34s ease-in-out infinite alternate}
+  @keyframes vrZoom{from{transform:scale(1.03)}to{transform:scale(1.1)}}
+  @media (prefers-reduced-motion:reduce){ .vr-bg{animation:none; transform:scale(1.03)} }
   .vr-star::after{content:""; position:absolute; inset:0; pointer-events:none;
     background:linear-gradient(180deg, rgba(10,12,18,.15) 0%, rgba(10,12,18,.55) 55%, rgba(10,12,18,.88) 100%)}
   .vr-star:not(:has(.vr-bg)){background:linear-gradient(155deg,#242A45 0%,#1A1F35 55%,#141826 100%);
     box-shadow:inset 0 0 0 1px rgba(var(--sheen),.07)}
-  .vr-star-in{position:relative; z-index:2; padding:26px 22px 20px; width:100%}
-  .vr-big{margin:0 0 8px; font-family:var(--serif); font-size:21px; line-height:1.4; font-weight:520;
+  .vr-star-in{position:relative; z-index:2; padding:40px 22px 24px; width:100%}
+  .vr-big{margin:0 0 10px; font-family:var(--serif); font-size:28px; line-height:1.28; font-weight:520;
     color:#F6F3EC; letter-spacing:-.004em; text-shadow:0 1px 12px rgba(0,0,0,.6)}
   .vr-big:last-of-type{margin-bottom:0}
   .vr-big.empty{color:rgba(246,243,236,.45); font-style:italic}
@@ -1435,20 +1437,37 @@
     background:rgba(227,178,95,.14); border:none; border-radius:999px; padding:5px 13px; cursor:pointer}
   .vr-more:hover{background:var(--brass); color:var(--on-accent)}
   /* Zeitzeile */
-  .vr-time{display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:0 20px 16px;
-    font-size:11px; font-weight:600; color:var(--ink-faint)}
+  .vr-time{display:flex; flex-direction:column; gap:6px; margin:0 20px 20px; padding-top:12px}
   .vr-sep{opacity:.4}
   .vr-rest{color:var(--t3)}
-  .vr-bar{flex:1 0 100%; height:3px; border-radius:999px; background:var(--track); overflow:hidden; margin-top:5px}
-  .vr-bar>span{display:block; height:100%; border-radius:999px; background:var(--t3)}
+  .vr-bar{display:block; height:2px; border-radius:999px; background:var(--track); overflow:hidden}
+  .vr-bar>span{display:block; height:100%; border-radius:999px; background:linear-gradient(90deg,var(--t2),var(--t3) 60%,var(--t4))}
+  .vr-zeit{font-size:10.5px; font-weight:650; letter-spacing:.03em; color:var(--ink-faint)}
   /* Die Kette als eine Linie */
   .vr-chain{position:relative; margin:0 20px 4px; padding-left:16px}
-  .vr-chain::before{content:""; position:absolute; left:4px; top:8px; bottom:22px; width:1.5px;
-    background:linear-gradient(180deg,var(--t2),var(--t3) 50%,var(--t4))}
+  .vr-chain::before{content:""; position:absolute; left:5px; top:10px; bottom:24px; width:1px;
+    background:linear-gradient(180deg,rgba(var(--sheen),.18),var(--t3) 55%,var(--t4));
+    mask-image:linear-gradient(180deg,transparent,#000 12%,#000 88%,transparent)}
   .vr-station{position:relative; padding:0 0 20px}
-  .vr-st-h{display:flex; align-items:center; gap:9px; margin-bottom:7px}
+  .vr-st-h{display:flex; align-items:center; gap:9px; margin-bottom:7px; padding-right:2px}
   .vr-node{position:absolute; left:-16px; width:9px; height:9px; border-radius:50%; background:var(--card);
-    box-shadow:0 0 0 2px var(--sc); margin-left:0}
+    box-shadow:0 0 0 2px var(--sc)}
+  /* Ferne oben, Nähe unten */
+  .vr-station.f1{opacity:.6}
+  .vr-station.f1 .vr-node{left:-14px; width:6px; height:6px; box-shadow:0 0 0 1.5px var(--sc)}
+  .vr-station.f1 .vr-g-t{font-size:13px; color:var(--ink-soft)}
+  .vr-station.f1 .vr-st-l{font-size:8.5px}
+  .vr-station.f2{opacity:.86}
+  .vr-station.f2 .vr-node{width:9px; height:9px}
+  .vr-station.f2 .vr-g-t{font-size:15px}
+  .vr-station.f3 .vr-node{left:-18px; width:13px; height:13px; background:var(--sc); box-shadow:0 0 12px -2px var(--sc)}
+  .vr-station.f3 .vr-st-l{font-size:10px; letter-spacing:.14em}
+  .vr-station.f3 .vr-g-t{font-size:18px; line-height:1.35}
+  .vr-station.f3{padding-bottom:6px}
+  .vr-st-n{margin-left:auto; font-size:10px; font-weight:750; color:var(--ink-faint);
+    background:rgba(var(--sheen),.07); border-radius:999px; padding:1px 8px; font-variant-numeric:tabular-nums}
+  .vr-st-n.voll{color:var(--mint); background:rgba(63,207,174,.14)}
+  .vr-goal.erreicht .vr-g-t{color:var(--ink-faint); text-decoration:line-through; text-decoration-thickness:1px}
   .vr-station.leer .vr-node{box-shadow:0 0 0 1.5px var(--track)}
   .vr-st-l{font-size:9.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--sc)}
   .vr-station.leer .vr-st-l{color:var(--ink-faint)}
@@ -6649,11 +6668,11 @@
       const st=taskStart(x.o); if(st===null) return;
       const dur=taskDur(x.o);
       const b=document.createElement("div");
-      b.className="tl-block"+(x.o.done?" done":"")+(x.type==="prio"?" prio":"");
+      b.className="tl-block"+(isDoneI(x.o)?" done":"")+(x.o.status==="started"?" started":"")+(x.type==="prio"?" prio":"");
       b.style.top=min2y(st)+"px"; b.style.height=(dur*TL_PXMIN-3)+"px";
       const ck=document.createElement("button"); ck.className="todo-check sm"; ck.type="button"; ck.setAttribute("aria-label","Erledigt umschalten");
       ck.innerHTML=`<svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>`;
-      ck.addEventListener("click",e=>{ e.stopPropagation(); setDone(x.o,!x.o.done); });
+      ck.addEventListener("click",e=>{ e.stopPropagation(); setDone(x.o,!isDoneI(x.o)); });
       const body=document.createElement("div"); body.className="tl-b-body";
       const tx=document.createElement("div"); tx.className="tl-b-text"; tx.textContent=x.o.text;
       const tm=document.createElement("div"); tm.className="tl-b-time"; tm.textContent=fmtMin(st)+"–"+fmtMin(Math.min(st+dur,TL_END));
@@ -8142,24 +8161,36 @@
     // Eine Zeile Zeit statt eines eigenen Blocks
     const qi=quarterInfo(), wi=weekInfo();
     const line=document.createElement("div"); line.className="vr-time reveal";
-    line.innerHTML=`<span>${qi.label} ${qi.year}</span><span class="vr-sep">·</span>
-      <span class="vr-rest">noch ${qi.remaining} Tage</span><span class="vr-sep">·</span>
-      <span>KW ${wi.num}, Tag ${wi.dayNo}</span>`;
-    const bar=document.createElement("div"); bar.className="vr-bar"; bar.innerHTML=`<span style="width:${qi.pct}%"></span>`;
-    line.appendChild(bar);
+    line.innerHTML=`<span class="vr-bar"><span style="width:${qi.pct}%"></span></span>
+      <span class="vr-zeit">${qi.label} ${qi.year} · noch ${qi.remaining} Tage · KW ${wi.num}</span>`;
     panel.appendChild(line);
 
     // Die Kette als eine Linie
     const chain=document.createElement("div"); chain.className="vr-chain reveal";
-    [["year","Jahr","var(--t2)"],["quarter","Quartal","var(--t3)"],["week","Diese Woche","var(--t4)"]].forEach(([key,lbl,col])=>{
+    // Ferne oben, Nähe unten: Größe und Farbigkeit nehmen nach unten zu
+    [["year","Jahr","var(--t2)","f1","quarter"],
+     ["quarter","Quartal","var(--t3)","f2","week"],
+     ["week","Diese Woche","var(--t4)","f3",null]].forEach(([key,lbl,col,tiefe,kinder])=>{
       const pts=(visPoints(key)||[]).filter(p=>(p.text||"").trim());
-      const st=document.createElement("div"); st.className="vr-station"+(pts.length?"":" leer");
+      const st=document.createElement("div"); st.className="vr-station "+tiefe+(pts.length?"":" leer");
       st.style.setProperty("--sc",col);
-      let html=`<div class="vr-st-h"><span class="vr-node"></span><span class="vr-st-l">${lbl}</span></div>`;
+      // Wie viel darunter ist erreicht?
+      let zaehl="";
+      if(pts.length){
+        if(kinder){
+          const ks=(visPoints(kinder)||[]).filter(x=>(x.text||"").trim() && pts.some(p=>p.id===x.parent));
+          if(ks.length) zaehl=`<span class="vr-st-n${ks.every(x=>x.done)?" voll":""}">${ks.filter(x=>x.done).length}/${ks.length}</span>`;
+        }
+        if(!zaehl){
+          const erf=pts.filter(p=>p.done).length;
+          zaehl=`<span class="vr-st-n${erf===pts.length?" voll":""}">${erf}/${pts.length}</span>`;
+        }
+      }
+      let html=`<div class="vr-st-h"><span class="vr-node"></span><span class="vr-st-l">${lbl}</span>${zaehl}</div>`;
       if(pts.length){
         html+=pts.map(p=>{
           const par=key!=="year"?parentTextOf(p,key==="week"?"quarter":"year"):"";
-          return `<div class="vr-goal"><span class="vr-g-t">${esc(p.text.trim())}</span>`+
+          return `<div class="vr-goal${p.done?" erreicht":""}"><span class="vr-g-t">${esc(p.text.trim())}</span>`+
                  (par?`<span class="vr-g-p">↳ ${esc(par)}</span>`:``)+`</div>`;
         }).join("");
       }else{

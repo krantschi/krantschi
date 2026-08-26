@@ -164,6 +164,12 @@
   .gospel-toggle .chev{margin-left:auto; font-size:15px; line-height:1; color:var(--ink-faint); transition:transform .22s ease}
   .gospel-toggle[aria-expanded="true"] .chev{transform:rotate(180deg)}
   .gospel-panel{margin-top:6px; border-top:1px solid var(--line); padding-top:12px; max-height:300px; overflow-y:auto}
+  .gospel-teile{display:flex; flex-wrap:wrap; gap:4px; margin-bottom:9px}
+  .gt-b{font:inherit; font-size:10.5px; font-weight:700; color:var(--ink-faint); background:transparent;
+    border:none; border-radius:999px; padding:4px 10px; cursor:pointer; box-shadow:inset 0 0 0 1px var(--line);
+    transition:all .16s}
+  .gt-b:hover{color:var(--ink-soft)}
+  .gt-b.on{color:var(--on-accent); background:var(--brass); box-shadow:none}
   .gospel-ref{font-size:11.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--sky)}
   .gospel-title{font-size:14.5px; font-weight:680; margin-top:4px; color:var(--ink); line-height:1.3}
   .gospel-text{margin-top:9px; font-size:14px; line-height:1.62; color:var(--ink-soft); white-space:pre-line}
@@ -1204,6 +1210,25 @@
   .rh-bar>span{display:block; height:100%; border-radius:999px; background:var(--mint)}
   .rh-p{font-size:11px; font-weight:700; color:var(--ink-faint); font-variant-numeric:tabular-nums; min-width:30px; text-align:right}
   .sarch.bare{border-top:none; margin-top:0}
+  /* Schnelles Metascript */
+  .msn-ov{position:fixed; inset:0; z-index:97; display:flex; align-items:flex-start; justify-content:center;
+    padding:60px 20px 20px; background:rgba(0,0,0,.55); backdrop-filter:blur(4px)}
+  .msn-box{width:100%; max-width:440px; max-height:80vh; overflow-y:auto; padding:18px; border-radius:16px;
+    background:var(--card); box-shadow:0 0 0 1px rgba(var(--sheen),.08), 0 30px 70px -26px rgba(0,0,0,.8)}
+  .msn-h{font-family:var(--serif); font-size:17px; font-weight:650; color:var(--ink)}
+  .msn-sub{font-size:12px; color:var(--ink-faint); margin:2px 0 12px}
+  .msn-ta{width:100%; box-sizing:border-box; font-family:var(--serif); font-size:15.5px; line-height:1.6;
+    color:var(--ink); background:rgba(var(--sheen),.05); border:none; border-radius:11px; padding:12px 14px;
+    resize:none; overflow:hidden; box-shadow:inset 0 0 0 1px var(--line)}
+  .msn-ta:focus{outline:none; box-shadow:inset 0 0 0 1.4px var(--brass)}
+  .msn-acts{display:flex; gap:8px; margin-top:12px}
+  .msn-liste{margin-top:16px; padding-top:12px; border-top:1px solid var(--line)}
+  .msn-z{display:flex; align-items:baseline; gap:9px; padding:6px 0; border-bottom:1px solid var(--line)}
+  .msn-zt{flex:0 0 40px; font-size:10.5px; color:var(--ink-faint); font-variant-numeric:tabular-nums}
+  .msn-tx{flex:1; font-family:var(--serif); font-size:13.5px; line-height:1.5; color:var(--ink-soft)}
+  .li-notiz{margin-bottom:14px; padding:10px 12px; border-radius:10px; background:rgba(var(--sheen),.045)}
+  .li-nz{display:flex; align-items:baseline; gap:9px; padding:4px 0}
+  .li-nzt{flex:1; font-family:var(--serif); font-size:13px; line-height:1.5; color:var(--ink-soft)}
   /* Suche */
   .such-ov{position:fixed; inset:0; z-index:98; display:flex; align-items:flex-start; justify-content:center;
     padding:60px 20px 20px; background:rgba(0,0,0,.55); backdrop-filter:blur(4px)}
@@ -1526,6 +1551,8 @@
   .anti-edit:hover{color:#fff}
   .anti-edit.on{color:#C4564D; box-shadow:inset 0 0 0 1px #C4564D}
   .panel.anti-panel .anti-back{margin-left:8px}
+  .anti-schutz{display:flex; gap:7px; padding:10px 22px 0; margin-top:8px; border-top:1px solid rgba(255,255,255,.08)}
+  .fth-schutz{display:flex; gap:7px; margin-top:10px; padding-top:9px; border-top:1px solid var(--rule)}
   .anti-read{padding:6px 22px 4px}
   .ar-row{display:flex; align-items:flex-start; gap:13px; padding:11px 0; border-bottom:1px solid rgba(255,255,255,.07)}
   .ar-mark{flex:0 0 auto; margin-top:5px; font-size:13px; font-weight:800; color:#C4564D}
@@ -2273,6 +2300,7 @@
       <button data-tab="prios" type="button">Prios &amp; ToDos</button>
       <button data-tab="heute" type="button" class="active">Heute</button>
       <button data-tab="vizija" type="button">Vizija</button>
+      <button id="msMini" class="theme-mini" type="button" aria-label="Metascript festhalten" title="Metascript festhalten">✎</button>
       <button id="findMini" class="theme-mini" type="button" aria-label="Suchen" title="Suchen">⌕</button>
       <button id="themeMini" class="theme-mini" type="button" aria-label="Ansicht wechseln"></button>
     </nav>
@@ -2311,6 +2339,7 @@
           <span class="chev" aria-hidden="true">⌄</span>
         </button>
         <div class="gospel-panel" id="gospelPanel" hidden>
+          <div class="gospel-teile" id="gospelTeile"></div>
           <div class="gospel-ref" id="gospelRef"></div>
           <div class="gospel-title" id="gospelTitle"></div>
           <div class="gospel-text" id="gospelText">Tippe oben, um das Tagesevangelium zu laden.</div>
@@ -2415,9 +2444,10 @@
   const WABS="ht_command_v1";   // Command-Center-Texte, strikt lokal
   const WSATZ="ht_wochensatz_v1";  // Satz der Woche
   const LIRHY="ht_lockin_rhythmus_v1";
-  const ABSICHT="ht_absicht_v1";   // wandert als einziges mit auf das andere Gerät   // "morgen" = morgens für heute, "abend" = abends für morgen  // Satz der Woche
+  const ABSICHT="ht_absicht_v1";   // wandert als einziges mit auf das andere Gerät
+  const MSNOTIZ="ht_metanotiz_v1";  // spontan Festgehaltenes, strikt lokal   // wandert als einziges mit auf das andere Gerät   // "morgen" = morgens für heute, "abend" = abends für morgen  // Satz der Woche
   const ANGELUS="ht_angelus_v1";
-  const APP_VERSION="2026-08-24";   // wird beim Aktualisieren hochgezählt
+  const APP_VERSION="2026-08-26";   // wird beim Aktualisieren hochgezählt
   const LOCKIN="ht_lockin_v1";
   const LOCKTXT="ht_lockintext_v1", CRYPTO="ht_crypto_v1", CAL="ht_cal_v1", QUOTES="ht_quotes_v1", LOCKCFG="ht_lockin_cfg_v1", SCHATZ="ht_schatz_v1", GOSPELC="ht_gospel_v1";
   const MAX_PRIOS=8;
@@ -2824,7 +2854,7 @@
   const GH_API="https://api.github.com";
   const GIST_DESC="heute-tracker-sync";
   const GIST_FILE="heute.json";
-  const SYNC_EXCLUDE=[LOCKTXT, CRYPTO, TAB, SYNC, WABS];   // Texte bleiben strikt lokal
+  const SYNC_EXCLUDE=[LOCKTXT, CRYPTO, TAB, SYNC, WABS, MSNOTIZ];   // Texte bleiben strikt lokal
   var syncCfg=null, syncReady=false, syncTimer=null, syncBusy=false, lastPushedPlain="";
   try{ syncCfg=JSON.parse(localStorage.getItem("ht_sync_v1")||"null"); }catch(e){ syncCfg=null; }
   function syncOn(){ return !!(syncCfg && syncCfg.token && syncCfg.pw); }
@@ -3076,6 +3106,10 @@
         for(const m of (r.meta||[])){ for(const q in (m.a||{})){ if(isEnc(m.a[q])) return true; } }
       }
     }catch(e){}
+    try{ if((read(MSNOTIZ,[])||[]).some(n=>isEnc(n.t))) return true; }catch(e){}
+    try{ if(isEnc(vision.prosa)) return true;
+         if((vision.anti.points||[]).some(p=>isEnc(p.text))) return true; }catch(e){}
+    try{ const fx=readFocus(); if((fx.thoughts||[]).some(g=>isEnc(g.text))) return true; }catch(e){}
     return false;
   }
   async function ensurePassphrase(){
@@ -3897,6 +3931,26 @@
         body.appendChild(rf);
       }
 
+      // Was du an diesem Tag spontan festgehalten hast — Material für den Eintrag
+      const notiz=msAlle().filter(n=>n.d===D);
+      if(notiz.length){
+        const nz=document.createElement("div"); nz.className="li-notiz";
+        nz.innerHTML=`<div class="cc-q-h">Unterwegs festgehalten · ${notiz.length}</div>`+
+          notiz.map(n=>{
+            const zeit=new Date(n.at).toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});
+            return `<div class="li-nz"><span class="msn-zt">${zeit}</span>`+
+              (isEnc(n.t)?`<span class="tli-zu">· · · · ·</span>`:`<span class="li-nzt">${esc(String(n.t))}</span>`)+`</div>`;
+          }).join("");
+        if(notiz.some(n=>isEnc(n.t))){
+          const ob=document.createElement("button"); ob.type="button"; ob.className="cc-link"; ob.textContent="Abgelegtes öffnen →";
+          ob.addEventListener("click",()=>alleOeffnen(notiz.map(n=>({
+            hol:()=>n.t, leg:v=>{ const l=msAlle(); const x=l.find(y=>y.id===n.id); if(x){ x.t=v; msSave(l); } n.t=v; }
+          })),buildLockIn));
+          nz.appendChild(ob);
+        }
+        body.appendChild(nz);
+      }
+
       const sc=document.createElement("div"); sc.className="cc-quelle";
       sc.innerHTML=`<div class="cc-q-h">Scan</div>`;
       sc.appendChild(liFeld(D,"meta","Was liegt auf Herz und Verstand? Roh, ungeordnet …",3,true));
@@ -4435,8 +4489,8 @@
     ["V.","Evo službenice Gospodnje,"],
     ["R.","neka mi bude po riječi tvojoj."],
     ["","Zdravo, Marijo …"],
-    ["V.","I Riječ tijelom postade"],
-    ["R.","i nastani se među nama."],
+    ["V.","I Riječ je tijelom postala"],
+    ["R.","i prebivala među nama."],
     ["","Zdravo, Marijo …"],
     ["V.","Moli za nas, sveta Bogorodice,"],
     ["R.","da dostojni postanemo obećanja Kristovih."],
@@ -6019,8 +6073,11 @@
     const list=document.createElement("div"); list.className="fth-list";
     focus.thoughts.forEach(g=>{
       const row=document.createElement("div"); row.className="fth-item";
-      const t=document.createElement("span"); t.className="fth-tx"; t.textContent=g.text;
+      const t=document.createElement("span"); t.className="fth-tx";
+      if(isEnc(g.text)){ t.innerHTML=`<span class="tli-zu">· · · · ·</span>`; }
+      else t.textContent=g.text;
       const toTodo=document.createElement("button"); toTodo.className="fth-to"; toTodo.type="button"; toTodo.textContent="zu ToDos"; toTodo.title="als ToDo übernehmen";
+      toTodo.hidden=isEnc(g.text);
       toTodo.addEventListener("click",()=>{ addItem({text:g.text});
         focus.thoughts=focus.thoughts.filter(x=>x.id!==g.id); saveFocus(); buildFokus(); toast("Zu ToDos hinzugefügt."); });
       const del=document.createElement("button"); del.className="fth-del"; del.type="button"; del.textContent="×";
@@ -6028,6 +6085,29 @@
       row.append(t,toTodo,del); list.appendChild(row);
     });
     box.appendChild(list);
+    // Gedanken sind so persönlich wie das Metascript — gemeinsam ablegbar
+    if(focus.thoughts.length){
+      const bar=document.createElement("div"); bar.className="fth-schutz";
+      const zu=focus.thoughts.filter(g=>isEnc(g.text));
+      if(zu.length){
+        const o=document.createElement("button"); o.type="button"; o.className="key-btn open"; o.textContent="öffnen";
+        o.addEventListener("click",()=>alleOeffnen(focus.thoughts.map(g=>({
+          hol:()=>g.text, leg:v=>{ g.text=v; saveFocus(); }})),buildFokus));
+        bar.appendChild(o);
+      }
+      if(focus.thoughts.some(g=>typeof g.text==="string" && g.text.trim())){
+        const a=document.createElement("button"); a.type="button"; a.className="key-btn"; a.textContent="ablegen";
+        a.addEventListener("click",async()=>{
+          const pw=await ensurePassphrase(); if(pw==null) return;
+          try{ const salt=unb64(cryptoRec.salt);
+            for(const g of focus.thoughts){ if(typeof g.text==="string" && g.text.trim()) g.text=await encWith(pw,salt,g.text); }
+            saveFocus(); buildFokus(); toast("Abgelegt");
+          }catch(e){ alert("Ablegen fehlgeschlagen."); }
+        });
+        bar.appendChild(a);
+      }
+      box.appendChild(bar);
+    }
     return box;
   }
 
@@ -7387,6 +7467,22 @@
     panel.appendChild(head);
 
     const wrap=document.createElement("div"); wrap.className="prosa-wrap";
+    if(isEnc(vision.prosa)){
+      const mask=document.createElement("div"); mask.className="enc-mask"; mask.textContent="· · · · ·";
+      mask.title="Antippen zum Öffnen";
+      const oeffne=async()=>{
+        const pw=await ensurePassphrase(); if(pw==null) return;
+        try{ vision.prosa=await decWith(pw, unb64(cryptoRec.salt), vision.prosa); saveVision(); buildVision(); }
+        catch(e){ alert("Konnte nicht öffnen (falsches Passwort?)."); }
+      };
+      mask.addEventListener("click",oeffne);
+      const k=document.createElement("button"); k.className="key-btn open"; k.type="button"; k.textContent="öffnen";
+      k.addEventListener("click",oeffne);
+      const z=document.createElement("div"); z.className="cc-feld-akt"; z.appendChild(k);
+      wrap.append(mask,z); panel.appendChild(wrap);
+      const f2=document.createElement("div"); f2.className="prosa-foot"; panel.appendChild(f2);
+      view.appendChild(panel); return;
+    }
     const ta=document.createElement("textarea"); ta.className="prosa-text"; ta.rows=8;
     ta.value=vision.prosa||"";
     ta.placeholder="Schreib es, als wäre es schon so. Kein Stichwort, sondern ein Bild — ein Tag darin, wie er sich anfühlt, wer da ist, wovon du lebst, woran du dich hältst.";
@@ -7403,6 +7499,17 @@
       cnt.textContent = w ? (w+(w===1?" Wort":" Wörter")) : "";
     }
     updateCount(); foot.appendChild(cnt);
+    if((vision.prosa||"").trim()){
+      const ab=document.createElement("button"); ab.className="key-btn"; ab.type="button"; ab.textContent="ablegen";
+      ab.style.marginRight="auto";
+      ab.addEventListener("click",async()=>{
+        const t=vision.prosa; if(!t.trim()){ alert("Hier steht noch nichts."); return; }
+        const pw=await ensurePassphrase(); if(pw==null) return;
+        try{ vision.prosa=await encWith(pw, unb64(cryptoRec.salt), t); saveVision(); buildVision(); }
+        catch(e){ alert("Ablegen fehlgeschlagen."); }
+      });
+      foot.insertBefore(ab, foot.firstChild);
+    }
     panel.appendChild(foot);
 
     view.appendChild(panel);
@@ -7427,19 +7534,22 @@
     panel.appendChild(head);
 
     const pts=vision.anti.points;
-    const aktiv=pts.filter(p=>(p.text||"").trim());
+    const aktiv=pts.filter(p=>typeof p.text==="string" && p.text.trim());
 
     if(!antiEdit){
       // Lesen: die Sätze allein, ohne Werkzeug
       const list=document.createElement("div"); list.className="anti-read";
-      if(!aktiv.length){
+      // Reihenfolge beibehalten; Abgelegtes erscheint als ruhige Zeile
+      const sichtbar=pts.filter(p=>isEnc(p.text) || (typeof p.text==="string" && p.text.trim()));
+      if(!sichtbar.length){
         const e=document.createElement("div"); e.className="anti-empty";
         e.textContent=ANTI_PROMPTS[0];
         list.appendChild(e);
       }else{
-        aktiv.forEach(p=>{
+        sichtbar.forEach(p=>{
           const row=document.createElement("div"); row.className="ar-row";
-          row.innerHTML=`<span class="ar-mark">✕</span><p class="ar-t">${esc(p.text.trim())}</p>`;
+          const inhalt=isEnc(p.text)?`<span class="tli-zu">· · · · ·</span>`:esc(p.text.trim());
+          row.innerHTML=`<span class="ar-mark">✕</span><p class="ar-t">${inhalt}</p>`;
           list.appendChild(row);
         });
       }
@@ -7458,6 +7568,14 @@
       pts.forEach((p,i)=>{
         const row=document.createElement("div"); row.className="anti-row";
         const mark=document.createElement("span"); mark.className="anti-mark"; mark.textContent="✕";
+        if(isEnc(p.text)){
+          // Abgelegtes bleibt zu — sonst würde es beim Tippen überschrieben
+          const m=document.createElement("div"); m.className="enc-mask"; m.style.flex="1";
+          m.textContent="· · · · ·"; m.title="Oben öffnen, um zu bearbeiten";
+          const del=document.createElement("button"); del.className="row-del"; del.type="button"; del.textContent="×";
+          del.addEventListener("click",()=>{ const j=pts.findIndex(x=>x.id===p.id); if(j>=0)pts.splice(j,1); saveVision(); buildVision(); });
+          row.append(mark,m,del); list.appendChild(row); return;
+        }
         const ta=document.createElement("textarea"); ta.className="anti-text"; ta.rows=1;
         ta.value=p.text||""; ta.placeholder=ANTI_PROMPTS[i%ANTI_PROMPTS.length];
         const grow=()=>{ ta.style.height="auto"; ta.style.height=(ta.scrollHeight||26)+"px"; };
@@ -7473,6 +7591,29 @@
         const ins=document.querySelectorAll(".anti-text"); if(ins.length)ins[ins.length-1].focus(); });
       list.appendChild(add);
       panel.appendChild(list);
+    }
+
+    // Die Rückseite ist so persönlich wie das Metascript — sie lässt sich ablegen
+    if(aktiv.length || pts.some(p=>isEnc(p.text))){
+      const bar=document.createElement("div"); bar.className="anti-schutz";
+      const zu=pts.filter(p=>isEnc(p.text));
+      if(zu.length){
+        const o=document.createElement("button"); o.type="button"; o.className="key-btn open"; o.textContent="öffnen";
+        o.addEventListener("click",()=>alleOeffnen(pts.map(p=>({hol:()=>p.text, leg:v=>{ p.text=v; saveVision(); }})),buildVision));
+        bar.appendChild(o);
+      }
+      if(aktiv.length){
+        const a=document.createElement("button"); a.type="button"; a.className="key-btn"; a.textContent="ablegen";
+        a.addEventListener("click",async()=>{
+          const pw=await ensurePassphrase(); if(pw==null) return;
+          try{ const salt=unb64(cryptoRec.salt);
+            for(const p of pts){ if(typeof p.text==="string" && p.text.trim()) p.text=await encWith(pw,salt,p.text); }
+            saveVision(); buildVision(); toast("Abgelegt");
+          }catch(e){ alert("Ablegen fehlgeschlagen."); }
+        });
+        bar.appendChild(a);
+      }
+      panel.appendChild(bar);
     }
 
     const foot=document.createElement("button"); foot.className="anti-foot"; foot.type="button";
@@ -8331,11 +8472,29 @@
     const m=first.match(/([1-3]?\s?[A-Za-zÄÖÜäöü]{2,}\.?\s+\d+[,\. ]\s?\d+(?:\s?[-–]\s?\d+)?)/);
     return m?m[1].replace(/\s+/g," ").trim():"";
   }
+  let leseTeil=null;   // null = Evangelium
   function renderGospel(d){
     const stelle=d.stelle||extractStelle(d.text);
-    document.getElementById("gospelRef").textContent = stelle || (d.ref||"");
-    document.getElementById("gospelTitle").textContent=d.title||"";
-    document.getElementById("gospelText").textContent=d.text||"";
+    const teile=Array.isArray(d.teile)?d.teile.filter(t=>(t.text||"").trim()):[];
+    const wahl=document.getElementById("gospelTeile");
+    if(wahl){
+      wahl.innerHTML="";
+      // Nur zeigen, wenn es mehr als das Evangelium gibt
+      if(teile.length>1){
+        teile.forEach(t=>{
+          const b=document.createElement("button"); b.type="button";
+          const ist=(leseTeil===t.code)||(leseTeil===null&&t.code==="GSP");
+          b.className="gt-b"+(ist?" on":"");
+          b.textContent=t.label;
+          b.addEventListener("click",()=>{ leseTeil=t.code; renderGospel(d); });
+          wahl.appendChild(b);
+        });
+      }
+    }
+    const akt = teile.find(t=>t.code===(leseTeil||"GSP")) || null;
+    document.getElementById("gospelRef").textContent = akt ? (akt.stelle||akt.label) : (stelle||(d.ref||""));
+    document.getElementById("gospelTitle").textContent = akt && leseTeil && leseTeil!=="GSP" ? akt.label : (d.title||"");
+    document.getElementById("gospelText").textContent = akt ? (akt.text||"") : (d.text||"");
     document.getElementById("gospelSrc").innerHTML = d.source
       ? ("Quelle: "+esc(d.source)+" · <a href=\""+GOSPEL_PAGE+"\" target=\"_blank\" rel=\"noopener noreferrer\">Vatican News</a>")
       : "";
@@ -8345,7 +8504,7 @@
   function gospelStore(){ try{ return JSON.parse(localStorage.getItem(GOSPELC)||"{}"); }catch(e){ return {}; } }
   function gospelSave(date,d){
     const st=gospelStore();
-    st[date]={stelle:d.stelle||"", ref:d.ref||"", title:d.title||"", text:d.text||"", source:d.source||"", papst:d.papst||null};
+    st[date]={stelle:d.stelle||"", ref:d.ref||"", title:d.title||"", text:d.text||"", teile:d.teile||null, source:d.source||"", papst:d.papst||null};
     const keys=Object.keys(st).sort();
     while(keys.length>10){ delete st[keys.shift()]; }
     write(GOSPELC,st);            // write() loest den Abgleich mit aus
@@ -8434,6 +8593,7 @@
     b.addEventListener("mousedown",st); b.addEventListener("touchstart",st,{passive:true});
     ["mouseup","mouseleave","touchend","touchcancel"].forEach(e=>b.addEventListener(e,cl));
   })();
+  document.getElementById("msMini").addEventListener("click",openMetaNotiz);
   document.getElementById("findMini").addEventListener("click",openSuche);
   document.getElementById("themeMini").addEventListener("click",cycleTheme);
   applyTheme();
@@ -8480,6 +8640,74 @@
   document.body.classList.add("boot");
   setTimeout(()=>document.body.classList.remove("boot"), 1700);
 
+  /* ---------- Schnelles Metascript ----------
+     Von überall erreichbar. Zwei Tipps, dann steht es. */
+  const msAlle=()=>read(MSNOTIZ,[]);
+  const msSave=l=>write(MSNOTIZ,l);
+  const msHeute=()=>msAlle().filter(n=>n.d===today);
+  function openMetaNotiz(){
+    document.querySelectorAll(".msn-ov").forEach(x=>x.remove());
+    const ov=document.createElement("div"); ov.className="msn-ov open";
+    const box=document.createElement("div"); box.className="msn-box";
+    box.innerHTML=`<div class="msn-h">Metascript</div>
+      <div class="msn-sub">Was gerade zieht. Roh genügt.</div>`;
+    const ta=document.createElement("textarea"); ta.className="msn-ta"; ta.rows=4;
+    ta.placeholder="…";
+    const grow=()=>{ ta.style.height="auto"; ta.style.height=Math.max(96,ta.scrollHeight)+"px"; };
+    ta.addEventListener("input",grow);
+    box.appendChild(ta);
+
+    const acts=document.createElement("div"); acts.className="msn-acts";
+    const zu=document.createElement("button"); zu.type="button"; zu.className="ask-btn"; zu.textContent="Abbrechen";
+    zu.addEventListener("click",()=>ov.remove());
+    const abl=document.createElement("button"); abl.type="button"; abl.className="ask-btn"; abl.textContent="ablegen";
+    abl.title="Geschützt sichern";
+    const ok=document.createElement("button"); ok.type="button"; ok.className="ask-btn ok"; ok.textContent="sichern";
+    const sichern=async(schuetzen)=>{
+      const t=ta.value.trim(); if(!t){ ov.remove(); return; }
+      let wert=t;
+      if(schuetzen){
+        const pw=await ensurePassphrase(); if(pw==null) return;
+        try{ wert=await encWith(pw, unb64(cryptoRec.salt), t); }
+        catch(e){ alert("Ablegen fehlgeschlagen."); return; }
+      }
+      const l=msAlle();
+      l.unshift({id:uid(), d:today, at:new Date().toISOString(), t:wert});
+      // Nur die letzten Wochen behalten
+      const cut=addDays(today,-60);
+      msSave(l.filter(n=>n.d>=cut).slice(0,300));
+      ov.remove(); renderHeute();
+      toast(schuetzen?"Abgelegt":"Festgehalten");
+    };
+    ok.addEventListener("click",()=>sichern(false));
+    abl.addEventListener("click",()=>sichern(true));
+    ta.addEventListener("keydown",e=>{ if(e.key==="Enter"&&(e.metaKey||e.ctrlKey)) sichern(false);
+      if(e.key==="Escape") ov.remove(); });
+    acts.append(zu,abl,ok); box.appendChild(acts);
+
+    // Was heute schon dasteht
+    const h=msHeute();
+    if(h.length){
+      const l=document.createElement("div"); l.className="msn-liste";
+      l.innerHTML=`<div class="cc-q-h">Heute festgehalten</div>`;
+      h.forEach(n=>{
+        const z=document.createElement("div"); z.className="msn-z";
+        const zeit=new Date(n.at).toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});
+        z.innerHTML=`<span class="msn-zt">${zeit}</span>`+
+          (isEnc(n.t)?`<span class="tli-zu">· · · · ·</span>`:`<span class="msn-tx">${esc(String(n.t))}</span>`);
+        const del=document.createElement("button"); del.className="row-del"; del.type="button"; del.textContent="×";
+        del.addEventListener("click",()=>{ msSave(msAlle().filter(x=>x.id!==n.id)); ov.remove(); openMetaNotiz(); });
+        z.appendChild(del);
+        l.appendChild(z);
+      });
+      box.appendChild(l);
+    }
+    ov.appendChild(box);
+    ov.addEventListener("click",e=>{ if(e.target===ov) ov.remove(); });
+    document.body.appendChild(ov);
+    setTimeout(()=>{ ta.focus(); grow(); },40);
+  }
+
   /* ---------- Suche über alles Offene ----------
      Verschlüsselte Texte bleiben außen vor — sie sind ja bewusst zu. */
   function sammleTexte(){
@@ -8498,6 +8726,7 @@
       if((vision.prosa||"").trim()) out.push({d:"", wo:"Vizija-Text", t:vision.prosa});
       (vision.anti.points||[]).forEach(p=>{ if((p.text||"").trim()) out.push({d:"", wo:"Anti-Vizija", t:p.text}); }); }catch(e){}
     try{ (read(QUOTES,[])||[]).forEach(q=>{ if((q.text||"").trim()) out.push({d:"", wo:"Satz", t:q.text+(q.author?" — "+q.author:"")}); }); }catch(e){}
+    try{ msAlle().forEach(n=>{ if(typeof n.t==="string" && n.t.trim()) out.push({d:n.d, wo:"Metascript", t:n.t}); }); }catch(e){}
     try{ const w=read(WABS,{}); Object.keys(w).forEach(k=>{ const a=(w[k]||{}).answers||{};
       Object.keys(a).forEach(q=>{ if((a[q]||"").trim()) out.push({d:k, wo:"Wochenabschluss", t:a[q]}); }); }); }catch(e){}
     return out;

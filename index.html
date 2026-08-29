@@ -264,6 +264,7 @@
   /* ---------- Video am Lock-In-Datum ---------- */
   .lockin-item.is-date{position:relative; cursor:pointer; -webkit-appearance:none; appearance:none;
     width:100%; box-sizing:border-box; text-align:left; font:inherit}
+  .li-vid.ablauf{position:static; transform:none; margin-left:auto; margin-right:6px}
   .li-vid{position:absolute; right:12px; top:50%; transform:translateY(-50%);
     width:22px; height:22px; display:grid; place-items:center; border:none; border-radius:50%;
     font-size:8px; line-height:1; cursor:pointer; color:var(--ink-faint); background:transparent;
@@ -486,6 +487,22 @@
   .kru-n{flex:0 0 auto; width:18px; height:18px; margin-top:2px; display:grid; place-items:center; border-radius:50%;
     font-family:var(--font); font-size:10px; font-weight:800; color:var(--brass); box-shadow:inset 0 0 0 1.2px rgba(227,178,95,.5)}
   .kru-t{flex:1}
+  .kru-z{margin-bottom:2px}
+  .ang-l.kru-l{align-items:flex-start}
+  .kru-auf{margin-left:auto; flex:0 0 auto; width:20px; height:20px; border:none; border-radius:50%;
+    background:transparent; color:rgba(237,233,228,.4); font-size:12px; line-height:1; cursor:pointer;
+    transition:all .16s}
+  .kru-auf:hover{color:var(--brass); background:rgba(255,255,255,.06)}
+  .kru-auf.on{color:var(--brass); transform:rotate(180deg)}
+  .kru-med{margin:2px 0 10px 28px; padding:10px 12px; border-radius:9px; background:rgba(255,255,255,.045);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+  .km-frucht{font-size:10px; font-weight:800; letter-spacing:.05em; text-transform:uppercase;
+    color:var(--brass); margin-bottom:8px}
+  .km-p{position:relative; padding-left:14px; margin-bottom:6px; font-family:var(--serif); font-size:13.5px;
+    line-height:1.55; color:rgba(237,233,228,.82)}
+  .km-p::before{content:"·"; position:absolute; left:3px; color:var(--brass); opacity:.7}
+  .km-q{margin-top:9px; padding-top:7px; border-top:1px solid rgba(255,255,255,.08);
+    font-size:9.5px; color:rgba(237,233,228,.35)}
   .kru-note{margin:10px 0 0; font-size:11.5px; line-height:1.5; color:rgba(237,233,228,.42); font-style:italic}
   .kru-fat{font-size:14px; line-height:1.55; color:rgba(237,233,228,.85)}
   /* Gebetstext */
@@ -2447,7 +2464,7 @@
   const ABSICHT="ht_absicht_v1";   // wandert als einziges mit auf das andere Gerät
   const MSNOTIZ="ht_metanotiz_v1";  // spontan Festgehaltenes, strikt lokal   // wandert als einziges mit auf das andere Gerät   // "morgen" = morgens für heute, "abend" = abends für morgen  // Satz der Woche
   const ANGELUS="ht_angelus_v1";
-  const APP_VERSION="2026-08-26";   // wird beim Aktualisieren hochgezählt
+  const APP_VERSION="2026-08-29";   // wird beim Aktualisieren hochgezählt
   const LOCKIN="ht_lockin_v1";
   const LOCKTXT="ht_lockintext_v1", CRYPTO="ht_crypto_v1", CAL="ht_cal_v1", QUOTES="ht_quotes_v1", LOCKCFG="ht_lockin_cfg_v1", SCHATZ="ht_schatz_v1", GOSPELC="ht_gospel_v1";
   const MAX_PRIOS=8;
@@ -3688,7 +3705,12 @@
         liTimer=setInterval(()=>{ liRest--; uhr.textContent=fmtMMSS(liRest);
           if(liRest<=0){ liStop(); uhr.textContent="fertig"; try{playGong();}catch(e){} } },1000);
       });
-      kopf.appendChild(uhr); panel.appendChild(kopf);
+      // Das hinterlegte Video — beim Umbau war es verlorengegangen
+      const vb=document.createElement("button"); vb.type="button"; vb.className="li-vid ablauf"+(vidHas?" has":"");
+      vb.innerHTML="▶"; vb.title=vidHas?"Video abspielen":"Video hinterlegen";
+      vb.setAttribute("aria-label",vb.title);
+      vb.addEventListener("click",e=>{ e.preventDefault(); e.stopPropagation(); openVideo(); });
+      kopf.append(vb,uhr); panel.appendChild(kopf);
 
       if(st.frage){
         const f=document.createElement("p"); f.className="cc-frage"; f.textContent=st.frage;
@@ -4483,8 +4505,8 @@
     ["","Gratiam tuam, quaesumus, Domine, mentibus nostris infunde; ut qui, Angelo nuntiante, Christi Filii tui incarnationem cognovimus, per passionem eius et crucem ad resurrectionis gloriam perducamur. Per eundem Christum Dominum nostrum. Amen."]
   ];
   const ANGELUS_TEXT_HR=[
-    ["V.","Anđeo Gospodnji navjestio Mariji,"],
-    ["R.","i ona začne po Duhu Svetom."],
+    ["V.","Anđeo Gospodnji navijestio Mariji,"],
+    ["R.","i ona je začela po Duhu Svetomu."],
     ["","Zdravo, Marijo …"],
     ["V.","Evo službenice Gospodnje,"],
     ["R.","neka mi bude po riječi tvojoj."],
@@ -4495,7 +4517,7 @@
     ["V.","Moli za nas, sveta Bogorodice,"],
     ["R.","da dostojni postanemo obećanja Kristovih."],
     ["§","Pomolimo se."],
-    ["+","Milost svoju, molimo te, Gospodine, ulij u duše naše, da mi, koji smo po anđelovu navještenju spoznali utjelovljenje Krista, Sina tvoga, po muci njegovoj i križu k slavi uskrsnuća privedeni budemo. Po Kristu Gospodinu našemu. Amen."]
+    ["+","Milost svoju, molimo te, Gospodine, ulij u duše naše, da mi, koji smo po anđelovu navještenju spoznali utjelovljenje Krista, Sina tvoga, po muci njegovoj i križu k slavi uskrsnuća privedeni budemo. Po istom Kristu Gospodinu našemu. Amen."]
   ];
   // Regina caeli — in der Osterzeit anstelle des Angelus
   const REGINA_TEXT=[
@@ -4710,19 +4732,19 @@
   const LITANEI_HR_HEAD="Isuse, krotka i ponizna srca, usliši me.";
   const LITANEI_HR_BEFREI=[
     "Od želje da budem cijenjen,","od želje da budem ljubljen,","od želje da budem hvaljen,",
-    "od želje da budem čašćen,","od želje da budem pohvaljen,","od želje da budem drugima pretpostavljen,",
-    "od želje da se za savjet mene pita,","od želje da budem priznat,",
-    "od straha da budem ponižen,","od straha da budem prezren,","od straha da budem ukoren,",
+    "od želje da budem slavljen,","od želje da budem čašćen,","od želje da budem drugima pretpostavljen,",
+    "od želje da me pitaju za savjet,","od želje da budem priznat,",
+    "od straha da budem ponižen,","od straha da budem prezren,","od straha da budem prekoren,",
     "od straha da budem oklevetan,","od straha da budem zaboravljen,","od straha da budem ismijan,",
-    "od straha da mi se nanese nepravda,","od straha da budem osumnjičen,"
+    "od straha da mi ne nanesu nepravdu,","od straha da budem osumnjičen,"
   ];
   const LITANEI_HR_GNADE=[
     "da drugi budu ljubljeniji od mene,","da drugi budu cjenjeniji od mene,",
-    "da drugi rastu u očima svijeta, a ja da se umanjujem,",
+    "da u očima svijeta drugi rastu, a ja da se smanjujem,",
     "da drugi budu izabrani, a ja ostavljen po strani,",
     "da drugi budu hvaljeni, a ja neprimijećen,",
     "da mi drugi u svemu budu pretpostavljeni,",
-    "da drugi postanu svetiji od mene, samo ako i ja postanem svet koliko trebam biti,"
+    "da drugi postanu svetiji od mene, samo ako i ja postanem svet koliko mogu,"
   ];
   let litOpen=false;
   const litPrayed=()=>((loadAng().lit||{})[today]===true);
@@ -4825,6 +4847,242 @@
     Object.keys(ang.kru).forEach(k=>{ if(k<cut) delete ang.kru[k]; });
     saveAng(); renderHeute();
   }
+  /* ---------- Betrachtungen zu den Geheimnissen ----------
+     Nach der Rosenkranz-Methode des hl. Ludwig Maria Grignion von Montfort (1673–1716),
+     aus dem französischen Original übersetzt. Für jedes Geheimnis die erbetene Frucht
+     und zehn Betrachtungspunkte; sie wechseln von Woche zu Woche. */
+  const KRU_MED = {
+    radosna: [
+      { frucht:"tiefe Demut des Herzens",
+        punkte:["den Fall des ungehorsamen Adam beklagen und das Urteil, das auf alle seine Kinder kam",
+          "die Sehnsucht der Patriarchen und Propheten ehren, die um den Messias baten",
+          "die Wünsche und Gebete der Jungfrau ehren, die das Kommen des Messias beschleunigten",
+          "die Liebe des ewigen Vaters, der uns seinen Sohn gegeben hat",
+          "die Liebe des Sohnes, der sich für uns hingegeben hat",
+          "die Sendung und den Gruß des Engels Gabriel",
+          "die jungfräuliche Scheu Marias",
+          "den Glauben und das Ja der Jungfrau",
+          "die Erschaffung der Seele und die Bildung des Leibes Jesu Christi im Schoß Marias durch den Heiligen Geist",
+          "die Anbetung der Engel vor dem fleischgewordenen Wort im Schoß Marias"] },
+      { frucht:"vollkommene Liebe zum Nächsten",
+        punkte:["die Freude im Herzen Marias über die Menschwerdung und das neunmonatige Wohnen des ewigen Wortes in ihrem Schoß",
+          "das Opfer, das Jesus Christus dem Vater darbrachte, als er in die Welt eintrat",
+          "das Wohlgefallen Jesu im demütigen und jungfräulichen Schoß Marias",
+          "den Zweifel des heiligen Josef",
+          "die Erwählung derer, die gerettet werden, zwischen Jesus und Maria beschlossen",
+          "den Eifer Marias beim Besuch ihrer Base",
+          "den Gruß Marias und die Heiligung Johannes des Täufers und seiner Mutter Elisabet",
+          "die Dankbarkeit der Jungfrau gegen Gott im Magnificat",
+          "ihre Liebe und Demut im Dienst an ihrer Base",
+          "wie Jesus und Maria einander zugeordnet sind, und wie wir beiden zugeordnet sein sollen"] },
+      { frucht:"Loslösung von den Gütern der Welt, Liebe zur Armut und zu den Armen",
+        punkte:["die Verachtung und Abweisung, die Maria und Josef in Betlehem erfuhren",
+          "die Armut des Stalles, in dem Gott zur Welt kam",
+          "die hohe Beschauung und die überströmende Liebe Marias, als sie gebären sollte",
+          "den Hervorgang des ewigen Wortes aus dem Schoß Marias ohne Verletzung ihrer Jungfräulichkeit",
+          "die Anbetung und die Lobgesänge der Engel bei der Geburt Jesu Christi",
+          "die hinreißende Schönheit seiner göttlichen Kindheit",
+          "das Kommen der Hirten in den Stall mit ihren kleinen Gaben",
+          "die Beschneidung Jesu Christi und ihre liebenden Schmerzen",
+          "die Beilegung des Namens Jesus und seine Größe",
+          "die Anbetung der Weisen und ihre Gaben"] },
+      { frucht:"die Gabe der Weisheit und die Reinheit des Herzens und des Leibes",
+        punkte:["den Gehorsam Jesu und Marias gegen das Gesetz",
+          "das Opfer, das Jesus dort von seiner Menschheit brachte",
+          "das Opfer, das die Jungfrau dort von ihrer Ehre brachte",
+          "die Freude und die Lobgesänge Simeons und der Prophetin Hanna",
+          "die Auslösung Jesu Christi durch die Gabe zweier Tauben",
+          "die Ermordung der unschuldigen Kinder durch die Grausamkeit des Herodes",
+          "die Flucht Jesu Christi nach Ägypten im Gehorsam Josefs gegen die Stimme des Engels",
+          "seinen verborgenen Aufenthalt in Ägypten",
+          "seine Rückkehr nach Nazaret",
+          "sein Wachsen an Alter und Weisheit"] },
+      { frucht:"unsere Bekehrung und die der Sünder",
+        punkte:["sein verborgenes, mühevolles und gehorsames Leben im Haus zu Nazaret",
+          "die Sorge Marias und Josefs beim Verlust und ihre Freude beim Wiederfinden",
+          "seine Antworten unter den Lehrern im Tempel",
+          "das Wort: Wusstet ihr nicht, dass ich in dem sein muss, was meines Vaters ist?",
+          "die drei Tage des Suchens und was sie uns über das Suchen Gottes lehren",
+          "seine Rückkehr nach Nazaret und seine Unterordnung unter Maria und Josef",
+          "das Nachdenken Marias, die alle diese Worte in ihrem Herzen bewahrte",
+          "die dreißig verborgenen Jahre der Arbeit",
+          "den Gehorsam, den er dem Handwerk und dem Alltag erwies",
+          "die Bekehrung, um die wir für uns selbst und für alle Irrenden bitten"] }
+    ],
+    svjetla: [
+      { frucht:"Offenheit für den Heiligen Geist",
+        punkte:["sein Fasten und seine Versuchung in der Wüste",
+          "seine Taufe durch Johannes den Täufer",
+          "die Demut dessen, der sündenlos ist und sich unter die Sünder stellt",
+          "den geöffneten Himmel über dem Jordan",
+          "den Geist, der herabkam wie eine Taube",
+          "die Stimme des Vaters: Dies ist mein geliebter Sohn",
+          "unsere eigene Taufe und ihre vergessenen Versprechen",
+          "die Sendung, die mit diesem Tag begann",
+          "das Wasser, das seither heiligt",
+          "das Zeugnis des Täufers, der abnehmen wollte, damit jener wachse"] },
+      { frucht:"Vertrauen auf die Fürsprache Marias",
+        punkte:["die Hochzeit, zu der Jesus geladen war und kam",
+          "den Mangel, den Maria zuerst bemerkte",
+          "ihr Wort an den Sohn: Sie haben keinen Wein mehr",
+          "ihre Weisung an die Diener: Was er euch sagt, das tut",
+          "den Gehorsam der Diener, die die Krüge bis zum Rand füllten",
+          "die Stunde, die noch nicht gekommen war und doch vorgezogen wurde",
+          "das Wasser, das zu Wein wurde",
+          "den besseren Wein, der zuletzt gereicht wurde",
+          "das erste Zeichen, durch das er seine Herrlichkeit offenbarte",
+          "den Glauben der Jünger, der daraus erwuchs"] },
+      { frucht:"Umkehr und Verlangen nach dem Reich",
+        punkte:["seine bewundernswerten Predigten",
+          "seine erstaunlichen Wunder",
+          "den Ruf: Kehrt um, denn das Reich Gottes ist nahe",
+          "die Seligpreisungen und die Umkehrung aller Maßstäbe",
+          "die Erwählung der zwölf Apostel und die Vollmacht, die er ihnen gab",
+          "seine Barmherzigkeit gegen die Sünder, die ihm nachfolgten",
+          "die Gleichnisse, in denen er das Verborgene aussprach",
+          "die Vergebung, die er im Namen des Vaters schenkte",
+          "seinen Zorn gegen die Heuchelei und seine Milde gegen die Schwachen",
+          "das Reich, das mitten unter uns ist"] },
+      { frucht:"Verlangen nach Heiligkeit",
+        punkte:["seine wunderbare Verklärung",
+          "den Berg, auf den er die drei mitnahm",
+          "sein Angesicht, das leuchtete wie die Sonne",
+          "Mose und Elija, die mit ihm sprachen",
+          "das Gespräch über seinen bevorstehenden Weg nach Jerusalem",
+          "das Wort des Petrus: Es ist gut, dass wir hier sind",
+          "die Wolke, die sie überschattete",
+          "die Stimme des Vaters: Auf ihn sollt ihr hören",
+          "den Schrecken der Jünger und sein Wort: Fürchtet euch nicht",
+          "den Abstieg vom Berg zurück in den Alltag"] },
+      { frucht:"eucharistische Anbetung",
+        punkte:["die Einsetzung der heiligen Eucharistie",
+          "die Fußwaschung an seinen Aposteln",
+          "den Abend vor seinem Leiden und sein Verlangen, dieses Mahl zu halten",
+          "das Brot, das er nahm, dankte, brach und gab",
+          "die Worte: Das ist mein Leib, für euch hingegeben",
+          "den Kelch, den neuen und ewigen Bund in seinem Blut",
+          "den Auftrag: Tut dies zu meinem Gedächtnis",
+          "seine Gegenwart, die bis heute bleibt",
+          "die Unwürdigkeit, mit der wir oft hinzutreten",
+          "die Speise für den Weg, die uns durch alles trägt"] }
+    ],
+    zalosna: [
+      { frucht:"vollkommene Reue über unsere Sünden und Gleichförmigkeit mit dem Willen Gottes",
+        punkte:["die Zeiten der Zurückgezogenheit, die Jesus in seinem Leben suchte, vor allem die im Ölgarten",
+          "seine demütigen und inständigen Gebete, besonders am Vorabend seines Leidens",
+          "die Geduld und Milde, mit der er seine Apostel ertrug",
+          "die Beklemmung seiner Seele, die bis zum Tod betrübt war",
+          "die Ströme von Blut, in denen der Schmerz ihn ertränkte",
+          "den Trost, den er von einem Engel annehmen wollte",
+          "seine Gleichförmigkeit mit dem Willen des Vaters trotz allem Widerstreben der Natur",
+          "den Mut, mit dem er seinen Häschern entgegenging",
+          "seinen Verrat durch Judas und seine Gefangennahme",
+          "das Verlassenwerden durch seine Apostel"] },
+      { frucht:"vollkommene Beherrschung unserer Sinne",
+        punkte:["die Ketten und Stricke, mit denen Jesus Christus gebunden wurde",
+          "den Schlag ins Gesicht, den er bei Kaiphas empfing",
+          "die dreifache Verleugnung des Petrus",
+          "die Schmach bei Herodes, als man ihm ein weißes Kleid anlegte",
+          "die vollständige Entblößung von seinen Kleidern",
+          "die Verachtung und die Beschimpfungen der Schergen",
+          "die dornigen Ruten und die grausamen Geißeln, unter denen er zerschlagen wurde",
+          "die Säule, an die er gebunden war",
+          "das Blut, das er vergoss, und die Wunden, die er empfing",
+          "sein Zusammenbrechen vor Schwäche in seinem eigenen Blut"] },
+      { frucht:"Freiheit von der Gier nach Ansehen",
+        punkte:["seine dritte Entblößung",
+          "die Dornenkrone",
+          "das Tuch, mit dem man ihm die Augen verband",
+          "die Schläge und das Anspucken, mit denen man sein Antlitz bedeckte",
+          "den alten Mantel, den man ihm um die Schultern legte",
+          "das Rohr, das man ihm in die Hand gab",
+          "den spitzen Stein, auf den man ihn setzte",
+          "die Beleidigungen und den Spott, die man ihm antat",
+          "das Blut, das aus seinem anbetungswürdigen Haupt hervortrat",
+          "die Haare und den Bart, die man ihm ausriss"] },
+      { frucht:"große Geduld, unser Kreuz täglich hinter ihm herzutragen",
+        punkte:["seine Vorführung vor das Volk mit dem Wort: Seht, der Mensch",
+          "dass man Barabbas ihm vorzog",
+          "die falschen Zeugnisse, die man gegen ihn vorbrachte",
+          "seine Verurteilung zum Tod",
+          "die Liebe, mit der er das Kreuz umfing und küsste",
+          "die entsetzlichen Mühen, es zu tragen",
+          "seine Stürze unter der Last",
+          "die schmerzliche Begegnung mit seiner heiligen Mutter",
+          "das Tuch der Veronika, in das sich sein Antlitz prägte",
+          "seine Tränen, die seiner Mutter und die der Frauen, die ihm folgten"] },
+      { frucht:"Abscheu vor der Sünde, Liebe zum Kreuz und ein guter Tod",
+        punkte:["die fünf Wunden Jesu Christi und sein am Kreuz vergossenes Blut",
+          "sein durchbohrtes Herz und das Kreuz, an dem er hing",
+          "die Nägel und die Lanze, den Essig und die Galle",
+          "die Schande, nackt zwischen zwei Räubern gekreuzigt zu werden",
+          "das Mitleiden seiner heiligen Mutter",
+          "seine sieben letzten Worte",
+          "seine Verlassenheit und sein Schweigen",
+          "die Erschütterung der ganzen Schöpfung",
+          "seinen grausamen und schmachvollen Tod",
+          "seine Abnahme vom Kreuz und seine Grablegung"] }
+    ],
+    slavna: [
+      { frucht:"einen lebendigen Glauben",
+        punkte:["den Abstieg seiner Seele in das Reich des Todes",
+          "die Freude und den Auszug der Seelen der Väter",
+          "die Wiedervereinigung seiner Seele mit seinem Leib im Grab",
+          "sein wunderbares Hervorgehen aus dem Grab",
+          "seine Siege über Tod und Sünde, Welt und Widersacher",
+          "die vier Eigenschaften seines verklärten Leibes",
+          "die Macht, die er vom Vater empfing im Himmel und auf Erden",
+          "die Erscheinungen, mit denen er die Jungfrau, seine Apostel und Jünger ehrte",
+          "die Gespräche und das Mahl, das er mit seinen Aposteln hielt",
+          "den Frieden, die Vollmacht und die Sendung, die er ihnen für die ganze Erde gab"] },
+      { frucht:"feste Hoffnung und große Sehnsucht nach dem Himmel",
+        punkte:["die Verheißung, ihnen den Heiligen Geist zu senden",
+          "die Versammlung aller seiner Jünger auf dem Ölberg",
+          "den Segen, den er ihnen gab, als er sich von der Erde erhob",
+          "seine glorreiche Auffahrt aus eigener Kraft",
+          "den Empfang und den Triumph, den er beim Vater und beim ganzen Himmel fand",
+          "die Kraft, mit der er die Tore des Himmels öffnete, die kein Sterblicher durchschritten hatte",
+          "sein Sitzen zur Rechten des Vaters als der geliebte Sohn",
+          "die Macht, die er empfing, Lebende und Tote zu richten",
+          "seine letzte Ankunft, bei der Macht und Majestät im vollen Glanz erscheinen werden",
+          "das Gericht, in dem er die Guten belohnen und die Bösen strafen wird"] },
+      { frucht:"göttliche Weisheit, die Wahrheit zu erkennen, zu schmecken und zu tun",
+        punkte:["den Heiligen Geist, der vom Vater und vom Sohn ausgeht",
+          "seine Sendung durch Vater und Sohn auf die Apostel",
+          "das gewaltige Brausen, mit dem er herabkam",
+          "die Feuerzungen, die den Aposteln das Verständnis der Schriften gaben",
+          "die Fülle der Gnaden, mit der er das Herz Marias auszeichnete",
+          "seine wunderbare Führung über alle Heiligen",
+          "die zwölf Früchte des Heiligen Geistes",
+          "die sieben Gaben des Heiligen Geistes",
+          "die Gabe der Weisheit und das Kommen seiner Herrschaft in den Herzen",
+          "den Sieg über die drei Geister, die ihm widerstehen: Fleisch, Welt und Widersacher"] },
+      { frucht:"wahre Andacht zu Maria, um gut zu leben und gut zu sterben",
+        punkte:["die ewige Vorherbestimmung Marias zum Meisterwerk der Hände Gottes",
+          "ihre unbefleckte Empfängnis und ihre Fülle an Gnade vom Schoß ihrer Mutter Anna an",
+          "ihre Geburt, die den ganzen Erdkreis erfreute",
+          "ihre Darstellung und ihren Aufenthalt im Tempel",
+          "ihr bewundernswertes und von aller Sünde freies Leben",
+          "die Fülle ihrer einzigartigen Tugenden",
+          "ihre fruchtbare Jungfräulichkeit und ihre Geburt ohne Schmerz",
+          "ihre göttliche Mutterschaft und ihren Bund mit der heiligsten Dreifaltigkeit",
+          "ihren kostbaren und liebenden Tod",
+          "ihre Auferweckung und ihre triumphale Aufnahme"] },
+      { frucht:"Beharrlichkeit und Wachstum in der Tugend bis zum Tod",
+        punkte:["die dreifache Krone, mit der die heiligste Dreifaltigkeit Maria gekrönt hat",
+          "die Freude und die neue Herrlichkeit, die der Himmel durch ihren Triumph empfing",
+          "sie als Königin des Himmels und der Erde, der Engel und der Menschen anzuerkennen",
+          "sie als Ausspenderin der Gnaden Gottes und der Gaben des Heiligen Geistes",
+          "sie als Fürsprecherin und Anwältin der Menschen",
+          "sie als Schrecken des Widersachers und der Irrlehren",
+          "sie als sichere Zuflucht der Sünder",
+          "sie als Mutter und Nährerin der Christen",
+          "sie als Freude und Milde der Gerechten",
+          "sie als Zuflucht der Lebenden und Trost der Sterbenden und der Seelen im Fegefeuer"] }
+    ]
+  };
+
+  let kruOffen=null;
   let kruSet=null;   // null = Geheimnis des Tages
   function openKrunica(setId){
     document.querySelectorAll(".ang-overlay").forEach(x=>x.remove());
@@ -4868,10 +5126,37 @@
     // Die fünf Gesätze
     const dec=document.createElement("div"); dec.className="kru-sec";
     dec.innerHTML=`<div class="kru-sec-h">${hr?"Otajstva":"Gesätze"}</div>`;
-    const list=(hr?cur.hr5:cur.de5).map((l,i)=>
-      `<p class="ang-l kru-l"><span class="kru-n">${i+1}</span><span class="kru-t">${esc(l)}</span></p>`).join("");
-    dec.innerHTML+=list;
-    dec.innerHTML+=`<p class="kru-note">${hr?"Uz svako otajstvo: Oče naš · deset Zdravo Marijo · Slava Ocu · O moj Isuse":"Zu jedem Gesätz: Vater unser · zehn Ave Maria · Ehre sei dem Vater · O mein Jesus"}</p>`;
+    const meds=KRU_MED[cur.id]||[];
+    (hr?cur.hr5:cur.de5).forEach((l,i)=>{
+      const z=document.createElement("div"); z.className="kru-z";
+      const kopf=document.createElement("div"); kopf.className="ang-l kru-l";
+      kopf.innerHTML=`<span class="kru-n">${i+1}</span><span class="kru-t">${esc(l)}</span>`;
+      const m=meds[i];
+      if(m){
+        const auf=document.createElement("button"); auf.type="button";
+        auf.className="kru-auf"+(kruOffen===cur.id+i?" on":"");
+        auf.textContent="⌄"; auf.title="Betrachtung";
+        auf.addEventListener("click",()=>{ kruOffen=(kruOffen===cur.id+i?null:cur.id+i); openKrunica(kruSet); });
+        kopf.appendChild(auf);
+      }
+      z.appendChild(kopf);
+      if(m && kruOffen===cur.id+i){
+        // Drei der zehn Punkte, wechselnd nach Kalenderwoche
+        const wn=weekInfo().num, n=m.punkte.length;
+        const gewaehlt=[0,1,2].map(k=>m.punkte[((wn*3)+k)%n]);
+        const b=document.createElement("div"); b.className="kru-med";
+        b.innerHTML=`<div class="km-frucht">Frucht · ${esc(m.frucht)}</div>`+
+          gewaehlt.map(t=>`<div class="km-p">${esc(t)}</div>`).join("")+
+          `<div class="km-q">nach der Methode des hl. Ludwig Maria von Montfort · KW ${wn}</div>`;
+        z.appendChild(b);
+      }
+      dec.appendChild(z);
+    });
+    // Anhängen statt innerHTML neu zu setzen — sonst gingen die Aufklapper verloren
+    const note=document.createElement("p"); note.className="kru-note";
+    note.textContent = hr?"Uz svako otajstvo: Oče naš · deset Zdravo Marijo · Slava Ocu · O moj Isuse"
+                         :"Zu jedem Gesätz: Vater unser · zehn Ave Maria · Ehre sei dem Vater · O mein Jesus";
+    dec.appendChild(note);
     box.appendChild(dec);
 
     // Fatima-Gebet, in Međugorje fest zum Rosenkranz gehörend

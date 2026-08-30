@@ -4024,18 +4024,18 @@
 
       const sc=document.createElement("div"); sc.className="cc-quelle";
       sc.innerHTML=`<div class="cc-q-h">Scan</div>`;
-      sc.appendChild(liFeld(D,"meta","Was liegt auf Herz und Verstand? Roh, ungeordnet …",3,true));
+      sc.appendChild(liFeld(D,"meta",metaPh("scan",0),3,true));
       body.appendChild(sc);
       const e=document.createElement("div"); e.className="li-meta";
       e.innerHTML=`<div class="cc-q-h">Ein Eintrag</div>`;
       const t=document.createElement("div"); t.className="cc-meta-q";
       t.innerHTML=`<div class="cc-mq">Der Punkt mit der größten Ladung</div>`;
-      t.appendChild(liFeld(D,"meta_t","…",2,true));
+      t.appendChild(liFeld(D,"meta_t",metaPh("titel",1),2,true));
       e.appendChild(t);
       META_Q.forEach((q,i)=>{
         const d=document.createElement("div"); d.className="cc-meta-q";
         d.innerHTML=`<div class="cc-mq">${esc(q)}</div>`;
-        d.appendChild(liFeld(D,"meta_q"+i,"…",2,true));
+        d.appendChild(liFeld(D,"meta_q"+i,metaPh("q"+i,i+2),i===2?5:2,true));
         e.appendChild(d);
       });
       body.appendChild(e);
@@ -7970,6 +7970,73 @@
     {id:"msg",   t:"Nachricht an dich",f:"Schreib deinem heutigen Ich aus der Sicht dessen, der diesen Plan mit Freude durchzieht."},
     {id:"vis",   t:"Visualisierung",  f:"Geh die Woche im Geist durch."}
   ];
+  /* ---------- Beispiele in den Metascript-Feldern ----------
+     Nach der Metascript-Methode: Wunsch benennen (auch das Widersprüchliche),
+     Wege abwägen und den stimmigsten markieren, dann aus der Person heraus
+     sprechen, die man werden will. Wechseln täglich. */
+  const META_PH={
+    scan:[
+      "Roh und ungeordnet, alles was zieht. Etwa: Unruhe wegen Freitag · das Gespräch, das ich vermeide · echte Lust, endlich anzufangen",
+      "Was drückt, was zieht. Etwa: drei Tage kein richtiger Fokusblock · Neid auf jemanden, den ich mag · das Gefühl, unter meinem Niveau zu leben",
+      "Ohne zu sortieren aufschreiben. Etwa: Angst vor dem Anruf · zu viel Bildschirm gestern · das Projekt will endlich angepackt werden",
+      "Schmerz und Leidenschaft nebeneinander. Etwa: Ich fühle mich übergangen · ich will der sein, der zuerst spricht",
+      "Was steht zwischen dir und einem klaren Tag? Etwa: unerledigte Zusage · Groll, den ich nicht ausgesprochen habe · Hunger nach Stille",
+      "Was ist heute lebendig in dir? Etwa: Ungeduld mit den Kindern · das Buch drängt · Erschöpfung, die kein Schlaf löst",
+      "Alles, was noch offen im Raum steht. Etwa: keine Bewegung seit vier Tagen · Zweifel, ob der Weg stimmt · Freude über gestern"
+    ],
+    titel:[
+      "Der eine Punkt mit der größten Ladung. Etwa: Ich schiebe das Kapitel seit drei Tagen vor mir her.",
+      "Wo sitzt die meiste Energie? Etwa: Ich weiche dem Gespräch aus, das längst fällig ist.",
+      "Was würdest du am liebsten übergehen? Genau das. Etwa: Ich fülle jede Lücke mit dem Handy.",
+      "Der Punkt, bei dem es innerlich zieht. Etwa: Ich arbeite viel und komme trotzdem nicht voran.",
+      "Ein Satz, der es trifft. Etwa: Ich sage zu allem Ja und bin abends leer.",
+      "Was beschäftigt dich, auch wenn du es wegschiebst? Etwa: Ich lebe gerade nicht wie der, der ich sein will.",
+      "Woran hängt heute am meisten? Etwa: Ich habe Angst, dass ich es doch nicht kann."
+    ],
+    q0:[
+      "Alles nennen, auch das Widersprüchliche. Etwa: Ich will das Kapitel fertig haben · Ich will heute Abend wirklich frei sein · Ich will nicht wieder als der dastehen, der zaudert",
+      "Zwei, drei Wünsche, die sich beißen dürfen. Etwa: Ich will vorankommen · Ich will Ruhe · Ich will niemanden enttäuschen",
+      "Was willst du wirklich, nicht was du solltest. Etwa: Ich will gesehen werden · Ich will meine Zeit zurück · Ich will stolz auf den Tag sein",
+      "Beide Seiten hinschreiben. Etwa: Ich will die Sache abschließen · Ich will nicht wieder alles allein tragen",
+      "Was zieht in welche Richtung? Etwa: Ich will präsent bei den Kindern sein · Ich will heute noch etwas schaffen, das zählt",
+      "Ehrlich, auch das Unbequeme. Etwa: Ich will recht behalten · Ich will Frieden · beides geht nicht zugleich",
+      "Was ist der eigentliche Wunsch darunter? Etwa: Ich will Klarheit · Ich will spüren, dass es vorwärtsgeht"
+    ],
+    q1:[
+      "Mehrere Wege nennen, den stimmigsten markieren. Etwa: Jetzt zwei Stunden durchziehen · Erst 25 Minuten anfangen und neu entscheiden ← das klingt am besten · Heute liegenlassen",
+      "Optionen auflisten, eine wählen. Etwa: Sofort anrufen · Heute Abend anrufen, vorher aufschreiben was ich sagen will ← das trägt · Noch warten",
+      "Welcher Weg gibt Kraft statt zu kosten? Etwa: Alles absagen · Eine Sache absagen und die wichtigste zu Ende bringen ← ja · Weitermachen wie bisher",
+      "Drei Möglichkeiten, dann fühlen welche stimmt. Etwa: Durchhalten · Pause, danach eine Stunde mit voller Kraft ← das ist es · Für heute schließen",
+      "Nicht die beste Lösung, die stimmigste. Etwa: Länger arbeiten · Früher aufhören und morgen früh anfangen ← das fühlt sich frei an",
+      "Wie sähe ein Gewinn heute aus? Etwa: Das Gespräch führen, auch unvollkommen ← das ist es · Es weiter vor mir herschieben",
+      "Welcher Weg macht dich morgen froh? Etwa: Handy in die Schublade und 40 Minuten ← ja · Erst die Kinder, danach ein Block"
+    ],
+    q2:[
+      "Benenne, wer du dabei bist — und lass ihn zu dir sprechen. Etwa: Der, der anfängt, bevor er Lust hat. „Ich weiß, die Sache ist zäh und du bist gerade genervt. Das ist normal. Aber wenn du ehrlich bist, ist das eigentlich ein interessantes Rätsel — und Rätsel machen Spaß, sobald du dich entspannst. Du kriegst das raus, du hast die Richtung schon. Geh kurz an die Luft, komm zurück, und gib dir eine Stunde. Wenn es dann nicht reicht, machen wir Schluss und du hast trotzdem einen guten Tag.“",
+      "Wer wärst du gern gewesen — und was rät dir dieser? Etwa: Der Mann, der Arbeit und Nähe beides Platz gibt. „Du hast monatelang funktioniert wie eine Maschine. Du brauchst Menschen, sonst hältst du das nicht durch. Die Unruhe, die du gerade spürst, kommt nicht von zu wenig Arbeit — sie kommt davon, dass du zu lange allein warst. Geh heute Abend hin. Die eine wichtige Sache machst du vorher fertig, den Rest planst du für morgen.“",
+      "Aus welcher Person heraus willst du handeln? Etwa: Der, der ruhig bleibt, wenn es eng wird. „Das hier ist kein Angriff auf dich, auch wenn es sich so anfühlt. Es ist eine Aufgabe, mehr nicht. Du hast schon Schwereres gelöst und dich hinterher gefragt, warum du dir solche Sorgen gemacht hast. Atme einmal durch, nimm den ersten Schritt, und schau dann weiter.“",
+      "Wer trägt dich da durch — und was sagt er? Etwa: Der, der zuerst spricht. „Du musst niemanden überzeugen und niemandem gefallen. Sag einfach, was wahr ist, ruhig und ohne Rechtfertigung. Wenn es jemandem nicht passt, ist das in Ordnung — deine Würde hängt nicht an seiner Zustimmung. Und du wirst heute Abend froh sein, dass du es gesagt hast.“",
+      "Die Fassung von dir, die das kann — wie redet sie mit dir? Etwa: Der, der seine Zeit achtet. „Niemand nimmt dir den Vormittag weg, außer du gibst ihn her. Du kennst das Muster: erst nur kurz nachsehen, dann ist eine Stunde weg und die Laune auch. Leg das Ding weg, nimm dir vierzig Minuten für die eine Sache. Danach darfst du alles Mögliche tun — aber dann aus freien Stücken, nicht aus Flucht.“",
+      "Sprich zu dir wie zu einem Freund, den du achtest. Etwa: Der, der nicht mehr um Bestätigung wirbt. „Die Nervosität kommt daher, dass du etwas holen willst — Anerkennung, Sympathie, irgendein Zeichen. Dreh es um. Du musst nichts bekommen, du kannst etwas geben: Aufmerksamkeit, Humor, echtes Interesse. Das hast du reichlich. Und wenn jemand damit nichts anfangen kann, ändert das nichts an dir.“",
+      "Wer bist du am Abend gewesen, wenn es gut lief? Etwa: Der, der zu Ende bringt. „Du fängst gern zehn Dinge an und keines wird fertig — deshalb fühlst du dich abends leer, obwohl du den ganzen Tag beschäftigt warst. Heute nur eine Sache, dafür ganz. Alles andere darf warten. Ein abgeschlossenes Ding trägt dich weiter als fünf angefangene.“"
+    ],
+    schnell:[
+      "Was gerade zieht. Roh genügt. Etwa: Ungeduld im Gespräch eben — warum eigentlich?",
+      "Kurz festhalten, ehe es weg ist. Etwa: Diese Erleichterung nach dem Nein. Merken.",
+      "Was ist dir eben aufgefallen? Etwa: Ich weiche aus, sobald es unbequem wird.",
+      "Ein Satz reicht. Etwa: Gerade war ich ganz da. So fühlt sich richtig an.",
+      "Was will bemerkt werden? Etwa: Der Ärger von vorhin sitzt tiefer, als er sollte.",
+      "Notieren, nicht bewerten. Etwa: Zum dritten Mal heute zum Handy gegriffen, ohne Grund.",
+      "Was war das eben? Etwa: Kurze Angst vor dem Anruf — und danach war es leicht."
+    ]
+  };
+  // Tageweise wechseln, zusätzlich nach Feld versetzt
+  function metaPh(art, versatz){
+    const l=META_PH[art]||[]; if(!l.length) return "…";
+    let h=0; for(let i=0;i<today.length;i++) h=(h*31+today.charCodeAt(i))>>>0;
+    return l[(h+(versatz||0))%l.length];
+  }
+
   const META_Q=["Was will ich?","Wie gewinne ich?","Wer werde ich sein?"];
   let ccOn=false, ccStep=0, ccTimer=null, ccRest=0;
   const ccAll=()=>read(WABS,{});
@@ -8380,14 +8447,14 @@
       rec.meta=rec.meta||[];
       const scan=document.createElement("div"); scan.className="cc-scan";
       scan.innerHTML=`<div class="cc-q-h">Scan · Schmerz und Leidenschaft</div>`;
-      const sf=ccFeld(rec,"scan","Alles, was gerade zieht — ungeordnet, roh …",4);
+      const sf=ccFeld(rec,"scan",metaPh("scan",5),4);
       scan.appendChild(sf); body.appendChild(scan);
 
       const l=document.createElement("div"); l.className="cc-metas";
       rec.meta.forEach((m,i)=>{
         const c=document.createElement("div"); c.className="cc-meta";
         const tt=document.createElement("input"); tt.type="text"; tt.className="cc-meta-t";
-        tt.value=m.text||""; tt.placeholder="Der Punkt mit der größten Ladung …";
+        tt.value=m.text||""; tt.placeholder=metaPh("titel",6);
         tt.addEventListener("input",()=>{ m.text=tt.value; ccSave(r=>{ r.meta=rec.meta; }); });
         const del=document.createElement("button"); del.className="row-del"; del.type="button"; del.textContent="×";
         del.addEventListener("click",()=>{ rec.meta.splice(i,1); ccSave(r=>{ r.meta=rec.meta; }); buildVision(); });
@@ -8399,7 +8466,7 @@
           qd.appendChild(ccSicher(
             ()=>(m.a||{})["q"+qi],
             v=>{ m.a=m.a||{}; m.a["q"+qi]=v; ccSave(r=>{ r.meta=rec.meta; }); },
-            "…", 2));
+            metaPh("q"+qi, qi+7), qi===2?5:2));
           c.appendChild(qd);
         });
         // Der Ausgang: daraus wird eine Gewohnheit oder ein Schritt
@@ -9060,7 +9127,7 @@
     box.innerHTML=`<div class="msn-h">Metascript</div>
       <div class="msn-sub">Was gerade zieht. Roh genügt.</div>`;
     const ta=document.createElement("textarea"); ta.className="msn-ta"; ta.rows=4;
-    ta.placeholder="…";
+    ta.placeholder=metaPh("schnell",0);
     const grow=()=>{ ta.style.height="auto"; ta.style.height=Math.max(96,ta.scrollHeight)+"px"; };
     ta.addEventListener("input",grow);
     box.appendChild(ta);

@@ -2,7 +2,7 @@
    Legt die App im Gerät ab: sofortiger Start, läuft ohne Netz.
    Beim Aktualisieren die Zahl in CACHE erhöhen, dann holt sich jedes Gerät die neue Fassung. */
 
-const CACHE = "heute-20260829-4";
+const CACHE = "heute-20260830-6";
 const ASSETS = ["./", "./index.html", "./icon-180.png", "./icon-192.png", "./icon-512.png", "./manifest.webmanifest"];
 
 // Beim Einrichten die App ablegen

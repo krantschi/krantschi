@@ -1066,6 +1066,11 @@
   .li-h.miss .li-h-c{background:var(--rose); box-shadow:none}
   .li-meta{margin-top:14px}
   .li-schluss{padding:4px 0}
+  .li-habitwahl{padding:10px 16px 0; margin-top:8px; border-top:1px solid var(--line)}
+  .li-hw-k{display:block; font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase;
+    color:var(--ink-faint); margin-bottom:5px}
+  .li-hw-s{width:100%; font:inherit; font-size:12.5px; color:var(--ink); background:rgba(var(--sheen),.06);
+    border:none; border-radius:8px; padding:7px 9px; box-shadow:inset 0 0 0 1px var(--line)}
   .li-editliste{padding:12px 16px 0; border-top:1px solid var(--line); margin-top:12px}
   .li-el{display:flex; gap:8px; align-items:center; padding:4px 0}
   .li-el input{flex:1; font:inherit; font-size:13px; color:var(--ink); background:transparent;
@@ -1119,6 +1124,21 @@
     border-radius:999px; padding:5px 12px; white-space:nowrap;
     box-shadow:0 12px 26px -10px rgba(0,0,0,.7)}
   .wp-col.ziel .wp-body{background:rgba(227,178,95,.15); box-shadow:inset 0 0 0 1.5px var(--brass)}
+  .ccw-nav{display:flex; align-items:center; gap:8px; margin:0 20px 12px}
+  .ccw-p{width:26px; height:26px; border:none; border-radius:50%; background:rgba(var(--sheen),.06);
+    color:var(--ink-soft); font-size:15px; line-height:1; cursor:pointer}
+  .ccw-p:hover{background:rgba(var(--sheen),.12)}
+  .ccw-l{flex:1; display:flex; align-items:baseline; justify-content:center; gap:8px; flex-wrap:wrap}
+  .ccw-kw{font-family:var(--serif); font-size:14px; font-weight:650; color:var(--ink)}
+  .ccw-r{font-size:11px; color:var(--ink-faint)}
+  .ccw-ok{font-size:10px; font-weight:800; color:var(--mint); background:rgba(63,207,174,.14);
+    border-radius:999px; padding:1px 8px}
+  .ccw-jetzt{font-size:10.5px; font-weight:700; color:var(--brass); background:transparent; border:none; cursor:pointer}
+  .ccw-nach{display:flex; align-items:center; flex-wrap:wrap; gap:6px; margin:0 20px 12px}
+  .ccw-nk{font-size:10.5px; color:var(--ink-faint)}
+  .ccw-nb{font-size:10.5px; font-weight:700; color:var(--rose); background:rgba(212,115,106,.12);
+    border:none; border-radius:999px; padding:3px 10px; cursor:pointer}
+  .ccw-nb:hover{color:#fff; background:var(--rose)}
   .cc-prog{display:flex; gap:5px; padding:2px 20px 14px}
   .cc-dot{flex:1; height:4px; border:none; border-radius:999px; background:var(--track); cursor:pointer; padding:0; transition:background .2s}
   .cc-dot.done{background:rgba(63,207,174,.55)}
@@ -2464,7 +2484,7 @@
   const ABSICHT="ht_absicht_v1";   // wandert als einziges mit auf das andere Gerät
   const MSNOTIZ="ht_metanotiz_v1";  // spontan Festgehaltenes, strikt lokal   // wandert als einziges mit auf das andere Gerät   // "morgen" = morgens für heute, "abend" = abends für morgen  // Satz der Woche
   const ANGELUS="ht_angelus_v1";
-  const APP_VERSION="2026-08-29";   // wird beim Aktualisieren hochgezählt
+  const APP_VERSION="2026-08-30";   // wird beim Aktualisieren hochgezählt
   const LOCKIN="ht_lockin_v1";
   const LOCKTXT="ht_lockintext_v1", CRYPTO="ht_crypto_v1", CAL="ht_cal_v1", QUOTES="ht_quotes_v1", LOCKCFG="ht_lockin_cfg_v1", SCHATZ="ht_schatz_v1", GOSPELC="ht_gospel_v1";
   const MAX_PRIOS=8;
@@ -3640,6 +3660,20 @@
   function liStop(){ if(liTimer){ clearInterval(liTimer); liTimer=null; } }
   const liSchritte=()=>lockinItems();
   const liGetan=(D,id)=>!!(lockinLog[D]||{})[id];
+  /* Die Gewohnheit, die zum Lock In gehört — entweder ausdrücklich gewählt
+     oder am Namen erkannt. Wird beim Abschließen mit abgehakt. */
+  function liHabit(){
+    const hs=config.habits||[];
+    if(lockinCfg.habit){ const h=hs.find(x=>x.id===lockinCfg.habit); if(h) return h; }
+    return hs.find(x=>/lock\s?-?in/i.test(x.name||"")) || null;
+  }
+  function liHakeHabit(D){
+    const h=liHabit(); if(!h) return false;
+    if(!log[D]) log[D]={};
+    if(log[D][h.id]===true) return false;   // schon abgehakt
+    log[D][h.id]=true; write(LOG,log);
+    return h;
+  }
   const LI_TEXTE=["wins","meta","meta_t","meta_q0","meta_q1","meta_q2"];
   const liFelder=D=>LI_TEXTE.map(id=>({hol:()=>getText(D,id), leg:v=>setText(D,id,v)}));
   const liZu=D=>liFelder(D).filter(f=>isEnc(f.hol())).length;
@@ -3742,8 +3776,10 @@
         if(liStep<items.length-1){ liStep++; buildLockIn(); }
         else {
           state.lockinOpen=false; liStep=0;
+          const gehakt = isToday() ? liHakeHabit(state.viewDate) : false;
           wiederAblegen().then(n=>{
-            buildLockIn();
+            buildLockIn(); renderHeute();
+            if(gehakt) toast(gehakt.name.replace(/^\S+\s+/,"")+" abgehakt");
             if(n) toast(n===1?"Ein Feld wieder abgelegt":n+" Felder wieder abgelegt");
             else if(liRhythmus()!=="abend") toast("Der Tag ist gebaut. Abends wartet der Abschluss.");
           });
@@ -3770,6 +3806,19 @@
         });
         bar.appendChild(rb);
         panel.appendChild(bar);
+        if(state.lockinEdit){
+          const hz=document.createElement("div"); hz.className="li-habitwahl";
+          hz.innerHTML=`<span class="li-hw-k">Gewohnheit, die beim Abschließen mitgeht</span>`;
+          const sel=document.createElement("select"); sel.className="li-hw-s";
+          const o0=document.createElement("option"); o0.value=""; o0.textContent="— keine —"; sel.appendChild(o0);
+          (config.habits||[]).forEach(h=>{
+            const o=document.createElement("option"); o.value=h.id; o.textContent=h.name;
+            if(liHabit() && liHabit().id===h.id) o.selected=true;
+            sel.appendChild(o);
+          });
+          sel.addEventListener("change",()=>{ lockinCfg.habit=sel.value||null; saveLockinCfg(); buildLockIn(); });
+          hz.appendChild(sel); panel.appendChild(hz);
+        }
       }
       if(state.lockinEdit) liEditListe(panel);
 
@@ -4228,13 +4277,13 @@
           l.appendChild(e);
         }
         panel.appendChild(l);
-        const nav=document.createElement("div"); nav.className="cc-nav";
+        const nav1=document.createElement("div"); nav1.className="cc-nav";
         const zu=document.createElement("button"); zu.type="button"; zu.className="cc-link";
         zu.textContent="In den Tagesplan →";
         zu.addEventListener("click",()=>{ state.priosSub="heute"; setTab("prios"); });
-        const w=document.createElement("button"); w.type="button"; w.className="cc-weiter"; w.textContent="weiter zum Rückblick";
-        w.addEventListener("click",()=>{ tagStep=1; buildTagesabschluss(); });
-        nav.append(zu,w); panel.appendChild(nav);
+        const w1=document.createElement("button"); w1.type="button"; w1.className="cc-weiter"; w1.textContent="weiter zum Rückblick";
+        w1.addEventListener("click",()=>{ tagStep=1; buildTagesabschluss(); });
+        nav1.append(zu,w1); panel.appendChild(nav1);
         sec.appendChild(panel); root.appendChild(sec); return;
       }
       if(isToday()){
@@ -7924,8 +7973,24 @@
   const META_Q=["Was will ich?","Wie gewinne ich?","Wer werde ich sein?"];
   let ccOn=false, ccStep=0, ccTimer=null, ccRest=0;
   const ccAll=()=>read(WABS,{});
-  function ccRec(){ const st=ccAll(), k=weekInfo().key; return st[k]||(st[k]={a:{},meta:[],done:false}); }
-  function ccSave(fn){ const st=ccAll(), k=weekInfo().key; const r=st[k]||{a:{},meta:[]}; fn(r); st[k]=r; write(WABS,st); }
+  /* Für welche Woche wird geplant?
+     Ab Freitag ist die kommende gemeint — dann wird sie ja vorbereitet.
+     ccVersatz erlaubt jeden anderen Sprung, auch das Nachholen einer verpassten. */
+  let ccVersatz=null;   // null = automatisch
+  let ccFrei=false;     // vorzeitiges Vorausplanen freigeschaltet
+  function ccStandard(){
+    const wd=new Date().getDay();          // 0 So … 5 Fr, 6 Sa
+    return (wd===5||wd===6||wd===0) ? 1 : 0;
+  }
+  const ccOffset=()=>ccVersatz===null?ccStandard():ccVersatz;
+  const ccKey=()=>addDays(weekInfo().key, ccOffset()*7);
+  function ccWochenNr(k){
+    const t=new Date(k+"T00:00:00"); t.setDate(t.getDate()+3);
+    const j=new Date(t.getFullYear(),0,1);
+    return 1+Math.round(((t-j)/86400000-3+((j.getDay()+6)%7))/7);
+  }
+  function ccRec(){ const st=ccAll(), k=ccKey(); return st[k]||(st[k]={a:{},meta:[],done:false}); }
+  function ccSave(fn){ const st=ccAll(), k=ccKey(); const r=st[k]||{a:{},meta:[]}; fn(r); st[k]=r; write(WABS,st); }
   function ccStop(){ if(ccTimer){ clearInterval(ccTimer); ccTimer=null; } }
 
   // Alle abgelegten Texte eines Command Centers zählen
@@ -8013,16 +8078,74 @@
     view.appendChild(panel);
   }
 
+  // Welche der letzten Wochen wurden nicht abgeschlossen?
+  function ccVerpasst(){
+    const st=ccAll(), heute=weekInfo().key, out=[];
+    for(let i=1;i<=6;i++){
+      const k=addDays(heute,-i*7);
+      const r=st[k];
+      if(!r || !r.done) out.push({k, off:-i});
+    }
+    return out;
+  }
+
   function buildCommand(view){
     ccStop();
     const wi=weekInfo(), rec=ccRec();
     const panel=document.createElement("section"); panel.className="panel cc-panel";
 
+    const k=ccKey(), off=ccOffset();
+    const rel = off===0?"diese Woche" : off===1?"nächste Woche" : off===-1?"letzte Woche"
+              : (off>0?"in "+off+" Wochen":"vor "+(-off)+" Wochen");
     const head=document.createElement("div"); head.className="panel-head";
-    head.innerHTML=`<span class="dot"></span><span class="eyebrow">Command Center</span><span class="vis-hint">KW ${wi.num}</span>`;
+    head.innerHTML=`<span class="dot"></span><span class="eyebrow secret">Command Center</span>`+
+      (ccFrei?`<span class="ccw-frei">frei</span>`:``);
+    // Vor Freitag ist das Vorausplanen zu — die Überschrift gedrückt halten öffnet es
+    armSecret(head.querySelector(".eyebrow"), ()=>{
+      ccFrei=!ccFrei;
+      if(!ccFrei && ccOffset()>ccStandard()){ ccVersatz=null; ccStep=0; }
+      buildVision();
+      toast(ccFrei?"Vorausplanen offen":"Vorausplanen wieder zu");
+    });
     const back=document.createElement("button"); back.type="button"; back.className="vr-edit"; back.textContent="zurück";
-    back.addEventListener("click",()=>{ ccStop(); ccOn=false; buildVision(); });
+    back.addEventListener("click",()=>{ ccStop(); ccOn=false; ccVersatz=null; buildVision(); });
     head.appendChild(back); panel.appendChild(head);
+
+    // Für welche Woche? Blättern in beide Richtungen — auch zum Nachholen
+    const wnav=document.createElement("div"); wnav.className="ccw-nav";
+    // Nach vorn nur bis zur Standardwoche, es sei denn, es ist freigeschaltet
+    const maxVor=ccFrei?99:ccStandard();
+    const pfeil=(txt,d)=>{
+      const b=document.createElement("button"); b.type="button"; b.className="ccw-p"; b.textContent=txt;
+      b.disabled = (d>0 && off>=maxVor);
+      b.title = b.disabled ? "Vorausplanen ab Freitag — oder die Überschrift gedrückt halten" : "";
+      b.addEventListener("click",()=>{ ccStop(); ccVersatz=off+d; ccStep=0; buildVision(); }); return b; };
+    const lbl=document.createElement("div"); lbl.className="ccw-l";
+    const fertig=(ccAll()[k]||{}).done;
+    lbl.innerHTML=`<span class="ccw-kw">KW ${ccWochenNr(k)}</span><span class="ccw-r">${rel}</span>`+
+      (fertig?`<span class="ccw-ok">✓ gemacht</span>`:``);
+    wnav.append(pfeil("‹",-1), lbl, pfeil("›",1));
+    if(ccVersatz!==null && ccVersatz!==ccStandard()){
+      const z=document.createElement("button"); z.type="button"; z.className="ccw-jetzt"; z.textContent="aktuell";
+      z.addEventListener("click",()=>{ ccStop(); ccVersatz=null; ccStep=0; buildVision(); });
+      wnav.appendChild(z);
+    }
+    panel.appendChild(wnav);
+
+    // Verpasste Wochen anbieten
+    const offen=ccVerpasst();
+    if(offen.length && off>=0){
+      const h=document.createElement("div"); h.className="ccw-nach";
+      h.innerHTML=`<span class="ccw-nk">Nicht gemacht:</span>`;
+      offen.slice(0,3).forEach(w=>{
+        const b=document.createElement("button"); b.type="button"; b.className="ccw-nb";
+        b.textContent="KW "+ccWochenNr(w.k);
+        b.title="Nachholen";
+        b.addEventListener("click",()=>{ ccStop(); ccVersatz=w.off; ccStep=0; buildVision(); });
+        h.appendChild(b);
+      });
+      panel.appendChild(h);
+    }
 
     // Fortschritt
     // Wie viele Texte liegen abgelegt? Dann lohnt ein Griff für alle.

@@ -496,11 +496,11 @@
   .kru-auf.on{color:var(--brass); transform:rotate(180deg)}
   .kru-med{margin:2px 0 10px 28px; padding:10px 12px; border-radius:9px; background:rgba(255,255,255,.045);
     box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
-  .km-frucht{font-size:10px; font-weight:800; letter-spacing:.05em; text-transform:uppercase;
-    color:var(--brass); margin-bottom:8px}
-  .km-p{position:relative; padding-left:14px; margin-bottom:6px; font-family:var(--serif); font-size:13.5px;
-    line-height:1.55; color:rgba(237,233,228,.82)}
-  .km-p::before{content:"·"; position:absolute; left:3px; color:var(--brass); opacity:.7}
+  .km-bitte{font-size:10px; font-weight:800; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--brass); margin-bottom:7px}
+  .km-fluss{margin:0; font-family:var(--serif); font-size:13.5px; line-height:1.65;
+    color:rgba(237,233,228,.72)}
+
   .km-q{margin-top:9px; padding-top:7px; border-top:1px solid rgba(255,255,255,.08);
     font-size:9.5px; color:rgba(237,233,228,.35)}
   .kru-note{margin:10px 0 0; font-size:11.5px; line-height:1.5; color:rgba(237,233,228,.42); font-style:italic}
@@ -3674,7 +3674,7 @@
     log[D][h.id]=true; write(LOG,log);
     return h;
   }
-  const LI_TEXTE=["wins","meta","meta_t","meta_q0","meta_q1","meta_q2"];
+  const LI_TEXTE=["meta","meta_t","meta_q0","meta_q1","meta_q2"];
   const liFelder=D=>LI_TEXTE.map(id=>({hol:()=>getText(D,id), leg:v=>setText(D,id,v)}));
   const liZu=D=>liFelder(D).filter(f=>isEnc(f.hol())).length;
 
@@ -5190,13 +5190,11 @@
       }
       z.appendChild(kopf);
       if(m && kruOffen===cur.id+i){
-        // Drei der zehn Punkte, wechselnd nach Kalenderwoche
-        const wn=weekInfo().num, n=m.punkte.length;
-        const gewaehlt=[0,1,2].map(k=>m.punkte[((wn*3)+k)%n]);
+        // Die Bitte oben, darunter alle Punkte als ein ruhiger Fluss zum Durchlesen
         const b=document.createElement("div"); b.className="kru-med";
-        b.innerHTML=`<div class="km-frucht">Frucht · ${esc(m.frucht)}</div>`+
-          gewaehlt.map(t=>`<div class="km-p">${esc(t)}</div>`).join("")+
-          `<div class="km-q">nach der Methode des hl. Ludwig Maria von Montfort · KW ${wn}</div>`;
+        b.innerHTML=`<div class="km-bitte">Bitte um ${esc(m.frucht)}</div>`+
+          `<p class="km-fluss">${m.punkte.map(t=>esc(t)).join(" · ")}</p>`+
+          `<div class="km-q">hl. Ludwig Maria von Montfort</div>`;
         z.appendChild(b);
       }
       dec.appendChild(z);
@@ -8342,16 +8340,24 @@
   function ccBody(step,rec,body,wi){
     if(step.id==="wins"){
       // Die täglichen Wins der letzten Woche als Gedächtnisstütze
-      const gefunden=[];
-      for(let i=7;i>=1;i--){ const k=addDays(today,-i); const v=(lockinText[k]||{}).wins;
-        if(typeof v==="string" && v.trim()) gefunden.push({k, t:v.trim()}); }
+      // Was du an den Abenden festgehalten hast — das ist die Spur der Woche
+      const gefunden=[], zu=[];
+      for(let i=7;i>=1;i--){
+        const k=addDays(today,-i), e=lockinText[k]||{};
+        const v=e.tagesabschluss;
+        if(isEnc(v)){ zu.push(k); continue; }
+        if(typeof v==="string" && v.trim()) gefunden.push({k, t:v.trim(), stand:e.absicht_stand});
+      }
       const box=document.createElement("div"); box.className="cc-quelle";
       if(gefunden.length){
-        box.innerHTML=`<div class="cc-q-h">Deine Notizen der letzten sieben Tage</div>`+
-          gefunden.map(g=>`<div class="cc-q-z"><span class="cc-q-d">${fmtShort(g.k)}</span><span>${esc(g.t.slice(0,180))}</span></div>`).join("");
+        box.innerHTML=`<div class="cc-q-h">Deine Tagesabschlüsse dieser Woche</div>`+
+          gefunden.map(g=>`<div class="cc-q-z"><span class="cc-q-d">${fmtShort(g.k)}</span>`+
+            (g.stand?`<span class="li-stand ${g.stand}">${g.stand==="ja"?"gehalten":"nicht"}</span>`:``)+
+            `<span>${esc(g.t.slice(0,200))}</span></div>`).join("");
       }else{
-        box.innerHTML=`<div class="cc-q-leer">Keine offenen Notizen gefunden. Tägliche Wins im Lock In festzuhalten macht diesen Schritt leicht.</div>`;
+        box.innerHTML=`<div class="cc-q-leer">Noch keine Tagesabschlüsse dieser Woche. Was du abends festhältst, sammelt sich hier von selbst.</div>`;
       }
+      if(zu.length) box.innerHTML+=`<div class="cc-q-leer">${zu.length} ${zu.length===1?"Abend ist":"Abende sind"} abgelegt.</div>`;
       body.appendChild(box);
       body.appendChild(ccFeld(rec,"wins","Fortschritte, Einsichten, kleine Siege …",5));
       return;
@@ -8579,7 +8585,7 @@
     const hw=document.createElement("div"); hw.className="rueck-block";
     hw.innerHTML=`<div class="wabs-sec">Highlights</div>`;
     if(!hi.length){
-      hw.innerHTML+=`<div class="rueck-leer">Hier sammelt sich, was du im Lock In und im Command Center als Win festgehalten hast. Abgelegte Texte bleiben außen vor.</div>`;
+      hw.innerHTML+=`<div class="rueck-leer">Hier sammelt sich, was du in den Tagesabschlüssen und im Command Center festgehalten hast. Abgelegte Texte bleiben außen vor.</div>`;
     }else{
       hw.innerHTML+=hi.slice(0,40).map(h=>`
         <div class="rh2"><span class="rh2-d">${fmtShort(h.d)}</span><span class="rh2-t">${esc(h.t)}</span></div>`).join("");
@@ -8638,7 +8644,7 @@
     const out=[];
     for(const d in (lockinText||{})){
       if(d<von||d>bis) continue;
-      const v=(lockinText[d]||{}).wins;
+      const v=(lockinText[d]||{}).tagesabschluss;
       if(typeof v==="string" && v.trim()) out.push({d, t:v.trim()});
     }
     try{
@@ -9189,7 +9195,7 @@
     const out=[];
     try{ Object.keys(lockinText||{}).forEach(d=>{ const e=lockinText[d]||{};
       Object.keys(e).forEach(id=>{ const v=e[id];
-        if(typeof v==="string" && v.trim()) out.push({d, wo:id==="tagesabschluss"?"Tagesabschluss":"Lock In", t:v}); }); }); }catch(e){}
+        if(typeof v==="string" && v.trim()) out.push({d, wo:id==="tagesabschluss"?"Tagesabschluss":id==="wins"?"Wins (früher)":"Lock In", t:v}); }); }); }catch(e){}
     try{ ensurePrios();
       prios.all.forEach(x=>{ if((x.text||"").trim()) out.push({d:x.day||"", wo:x.prio?"Priorität":x.fixed?"Blocker":"ToDo", t:x.text}); });
       (prios.archive||[]).forEach(a=>{ if((a.text||"").trim()) out.push({d:a.day||"", wo:"Archiv", t:a.text}); }); }catch(e){}

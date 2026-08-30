@@ -412,6 +412,15 @@
   .li-bericht{margin-top:9px; padding:9px 12px; border-radius:9px; background:rgba(var(--sheen),.05);
     font-family:var(--serif); font-size:13.5px; line-height:1.55; color:var(--ink-soft)}
   .tag-prog{padding:2px 0 10px}
+  .tag-staq{display:flex; flex-direction:column; gap:9px; margin-bottom:4px}
+  .ts-z{display:flex; align-items:center; gap:10px; padding:5px 0}
+  .ts-n{flex:1; font-size:13px; color:var(--ink-soft)}
+  .ts-z.offen .ts-n{color:var(--ink)}
+  .ts-w{display:flex; gap:4px}
+  .ts-b{font:inherit; font-size:10.5px; font-weight:700; color:var(--ink-faint); background:transparent;
+    border:none; border-radius:999px; padding:3px 10px; cursor:pointer; box-shadow:inset 0 0 0 1px var(--line)}
+  .ts-b.ja.on{color:var(--mint); box-shadow:inset 0 0 0 1.3px var(--mint)}
+  .ts-b.nein.on{color:var(--rose); box-shadow:inset 0 0 0 1.3px var(--rose)}
   .tag-offen{display:flex; flex-direction:column; gap:5px; margin-bottom:4px}
   .to-z{display:flex; align-items:center; gap:10px; width:100%; text-align:left; font:inherit;
     background:rgba(var(--sheen),.045); border:none; border-radius:9px; padding:9px 12px; cursor:pointer;
@@ -1076,6 +1085,34 @@
   .li-el input{flex:1; font:inherit; font-size:13px; color:var(--ink); background:transparent;
     border:none; border-bottom:1px solid var(--line); padding:4px 2px}
   .li-el input:focus{outline:none; border-bottom-color:var(--brass)}
+  /* ---------- Monatsbericht ---------- */
+  .mb-ov{position:fixed; inset:0; z-index:110; display:flex; align-items:flex-start; justify-content:center;
+    padding:34px 14px 20px; background:rgba(0,0,0,.66); backdrop-filter:blur(5px)}
+  .mb-box{width:100%; max-width:760px; max-height:88vh; overflow-y:auto; padding:20px; border-radius:16px;
+    background:var(--card); box-shadow:0 0 0 1px rgba(var(--sheen),.08), 0 30px 70px -26px rgba(0,0,0,.85)}
+  .mb-kopf{margin-bottom:16px}
+  .mb-titel{font-family:var(--serif); font-size:22px; font-weight:650; color:var(--ink)}
+  .mb-sub{font-size:11px; color:var(--ink-faint); margin-top:2px}
+  .mb-zahlen{display:grid; grid-template-columns:repeat(auto-fit,minmax(88px,1fr)); gap:8px; margin-bottom:16px}
+  .mb-z{padding:8px 10px; border-radius:9px; background:rgba(var(--sheen),.05)}
+  .mb-z strong{display:block; font-size:19px; font-weight:750; color:var(--ink); font-variant-numeric:tabular-nums; line-height:1.1}
+  .mb-z span{font-size:9.5px; color:var(--ink-faint)}
+  .mb-scroll{overflow-x:auto; -webkit-overflow-scrolling:touch; margin:0 -4px}
+  .mb-tab{border-collapse:collapse; font-size:9px}
+  .mb-tab th,.mb-tab td{padding:1px; text-align:center}
+  .mb-h{text-align:left!important; padding-left:4px!important; color:var(--ink-faint); font-size:9px; font-weight:700}
+  .mb-t{color:var(--ink-faint); font-weight:600; font-size:8px; min-width:11px}
+  .mb-n{text-align:left!important; padding:2px 8px 2px 4px!important; font-size:11px; color:var(--ink-soft); white-space:nowrap}
+  .mb-c{width:9px; height:9px; border-radius:2px; background:var(--track)}
+  td.mb-c{padding:0!important}
+  .mb-c.j{background:var(--mint)} .mb-c.n{background:var(--rose)} .mb-c.o{background:rgba(var(--sheen),.09)}
+  .mb-q{font-size:9.5px; color:var(--ink-faint); font-variant-numeric:tabular-nums; padding-left:6px!important}
+  .mb-lz td{text-align:left!important; padding:7px 4px 3px!important; font-size:9px; font-weight:800;
+    letter-spacing:.08em; text-transform:uppercase; color:var(--ink-faint)}
+  .mb-leg{display:flex; align-items:center; gap:4px; margin-top:10px; font-size:10px; color:var(--ink-faint)}
+  .mb-leg .mb-c{display:inline-block; margin-left:8px}
+  .mb-ziele{margin-top:16px; padding-top:12px; border-top:1px solid var(--line)}
+  .mb-acts{display:flex; gap:8px; margin-top:18px; padding-top:14px; border-top:1px solid var(--line)}
   .cc-panel{padding-bottom:18px}
   .cc-offen-hin{margin:0 20px 12px; font-size:11px; color:var(--mint); background:rgba(63,207,174,.1);
     border-radius:8px; padding:6px 11px}
@@ -1887,6 +1924,12 @@
 
   /* Inline-Dropdown am Habit */
   .habit-wrap{display:flex; flex-direction:column}
+  .hspur{position:absolute; left:44px; bottom:5px; display:flex; gap:2px; pointer-events:none}
+  .hp{width:3px; height:3px; border-radius:50%; background:var(--track); opacity:.55}
+  .hp.g{background:var(--mint); opacity:.75}
+  .hp.r{background:var(--rose); opacity:.7}
+  .habit{position:relative}
+  .habit .name{padding-bottom:5px}
   .habit-line{display:flex; gap:6px; align-items:stretch}
   .habit-line .habit{flex:1}
   .chal-chev{flex:0 0 auto; display:flex; align-items:center; gap:7px; border:none; cursor:pointer; border-radius:12px;
@@ -2061,6 +2104,8 @@
   .tages{--c:var(--sky); --c-tint:var(--sky-tint)}
   .tag-icon{font-size:17px; line-height:1}
   .tag-dot{width:7px; height:7px; border-radius:50%; background:var(--sky); flex:0 0 auto}
+  .tages-wins{font-weight:520}
+  .tages-linie{height:1px; background:var(--line); margin:8px 0 6px}
   .tages-text{margin:2px 16px 12px}
 
   :focus-visible{outline:2.5px solid var(--sky); outline-offset:3px; border-radius:10px}
@@ -2705,7 +2750,7 @@
     document.body.classList.toggle("tab-prios", t==="prios");
     document.body.classList.toggle("tab-fokus", t==="fokus");
     // Die Rückseite schließt sich beim Verlassen — sie soll nicht offen liegen bleiben.
-    if(t!=="vizija"){ antiOn=false; prosaOn=false; visEdit=false; ccOn=false; rueckOn=false; verlaufOn=false; ccVerlauf=false; ccStop(); }
+    if(t!=="vizija"){ antiOn=false; prosaOn=false; visEdit=false; ccOn=false; rueckOn=false; verlaufOn=false; ccVerlauf=false; monatOn=false; ccStop(); }
     if(t!=="fokus") lernOn=false;   // versteckte Ansicht bleibt nicht offen liegen
     if(t==="vizija"){ buildVision(); playVizijaIntro(); }
     if(t==="fokus") buildFokus();
@@ -4222,6 +4267,11 @@
   let tagTimer=null, tagRest=0, tagStep=0;
   function tagStop(){ if(tagTimer){ clearInterval(tagTimer); tagTimer=null; } }
   // Was heute noch offen ist — Aufgaben, Prioritäten, Blocker
+  // Gewohnheiten ohne Eintrag für den Tag
+  function tagUnerfasst(){
+    const D=state.viewDate, l=log[D]||{};
+    return (config.habits||[]).filter(h=>l[h.id]===undefined);
+  }
   function tagOffen(){
     try{ ensurePrios();
       return prios.all.filter(x=>x.day===state.viewDate && (x.text||"").trim() && x.status!=="done")
@@ -4243,16 +4293,16 @@
       if(isToday()){
         // Zwei Schritte: erst aufräumen, dann zurückschauen
         const pr=document.createElement("div"); pr.className="cc-prog tag-prog";
-        ["Offene Punkte","Rückblick"].forEach((l,i)=>{
+        ["Offene Punkte","Gewohnheiten","Rückblick"].forEach((l,i)=>{
           const d=document.createElement("button"); d.type="button";
-          d.className="cc-dot"+(i===tagStep?" on":"")+(i===0&&tagOffen().length===0?" done":"");
+          d.className="cc-dot"+(i===tagStep?" on":"")+((i===0&&tagOffen().length===0)||(i===1&&tagUnerfasst().length===0)?" done":"");
           d.title=(i+1)+". "+l;
           d.addEventListener("click",()=>{ tagStep=i; buildTagesabschluss(); });
           pr.appendChild(d);
         });
         panel.appendChild(pr);
         const kp=document.createElement("div"); kp.className="li-kopf";
-        kp.innerHTML=`<span class="cc-n">${tagStep+1}</span><span class="cc-t">${tagStep===0?"Offene Punkte":"Rückblick"}</span>`;
+        kp.innerHTML=`<span class="cc-n">${tagStep+1}</span><span class="cc-t">${["Offene Punkte","Gewohnheiten","Rückblick"][tagStep]}</span>`;
         panel.appendChild(kp);
       }
       if(isToday() && tagStep===0){
@@ -4284,6 +4334,50 @@
         const w1=document.createElement("button"); w1.type="button"; w1.className="cc-weiter"; w1.textContent="weiter zum Rückblick";
         w1.addEventListener("click",()=>{ tagStep=1; buildTagesabschluss(); });
         nav1.append(zu,w1); panel.appendChild(nav1);
+        sec.appendChild(panel); root.appendChild(sec); return;
+      }
+      if(isToday() && tagStep===1){
+        // Schritt 2: jede Gewohnheit bekommt heute eine Antwort
+        const offen=tagUnerfasst();
+        const f=document.createElement("p"); f.className="cc-frage";
+        f.textContent = offen.length
+          ? "Für jede noch offene Gewohnheit: gemacht oder nicht? Beides zählt — nur so wird der Verlauf ehrlich."
+          : "Alle Gewohnheiten sind erfasst.";
+        panel.appendChild(f);
+        const l=document.createElement("div"); l.className="tag-staq";
+        (config.cats||[]).forEach(c=>{
+          const hs=(config.habits||[]).filter(h=>h.cat===c.id);
+          if(!hs.length) return;
+          const g=document.createElement("div"); g.className="li-linie";
+          g.innerHTML=`<div class="cc-l-h" style="--lc:${c.color}">${esc(c.title)}</div>`;
+          hs.forEach(h=>{
+            const v=(log[D]||{})[h.id];
+            const r=document.createElement("div"); r.className="ts-z"+(v===undefined?" offen":"");
+            r.innerHTML=`<span class="ts-n">${esc(h.name)}</span>`;
+            const w=document.createElement("div"); w.className="ts-w";
+            [["ja","gemacht",true],["nein","nicht","miss"]].forEach(([kls,txt,wert])=>{
+              const b=document.createElement("button"); b.type="button";
+              b.className="ts-b "+kls+((v===wert)?" on":"");
+              b.textContent=txt; b.disabled=ro;
+              b.addEventListener("click",()=>{
+                if(!log[D]) log[D]={};
+                if(log[D][h.id]===wert) delete log[D][h.id]; else log[D][h.id]=wert;
+                write(LOG,log); buildTagesabschluss(); renderHeute();
+              });
+              w.appendChild(b);
+            });
+            r.appendChild(w); g.appendChild(r);
+          });
+          l.appendChild(g);
+        });
+        panel.appendChild(l);
+        const nav=document.createElement("div"); nav.className="cc-nav";
+        const zur=document.createElement("button"); zur.type="button"; zur.className="cc-zur"; zur.textContent="zurück";
+        zur.addEventListener("click",()=>{ tagStep=0; buildTagesabschluss(); });
+        const w2=document.createElement("button"); w2.type="button"; w2.className="cc-weiter";
+        w2.textContent = offen.length ? "weiter ("+offen.length+" offen)" : "weiter zum Rückblick";
+        w2.addEventListener("click",()=>{ tagStep=2; buildTagesabschluss(); });
+        nav.append(zur,w2); panel.appendChild(nav);
         sec.appendChild(panel); root.appendChild(sec); return;
       }
       if(isToday()){
@@ -4377,25 +4471,46 @@
       }
       const wrap=document.createElement("div"); wrap.className="lockin-text tages-text";
       wrap.dataset.rolle="bericht";
+
+      // Oben die Wins — bleiben offen, damit sie im Command Center erscheinen
+      const wv=getText(D,"wins");
+      const wta=document.createElement("textarea"); wta.className="lockin-ta tages-wins"; wta.rows=2;
+      wta.placeholder="Wins — was ist gelungen? Auch Kleines zählt.";
+      wta.value=(typeof wv==="string")?wv:"";
+      if(ro){ wta.readOnly=true; } else { wta.addEventListener("input",()=>setText(D,"wins",wta.value)); }
+      wrap.appendChild(wta);
+
+      const linie=document.createElement("div"); linie.className="tages-linie";
+      wrap.appendChild(linie);
+
+      // Darunter der freie Text — nur dieser lässt sich ablegen
       if(isEnc(cur)){
         const mask=document.createElement("div"); mask.className="enc-mask"; mask.textContent="· · · · ·"; mask.title="Antippen zum Öffnen";
         const key=document.createElement("button"); key.className="key-btn open"; key.type="button"; key.textContent="öffnen"; key.title="Text sichtbar machen";
         key.addEventListener("click",()=>unlockField(D,"tagesabschluss"));
-        wrap.append(mask,key);
-        if(!ro) wrap.appendChild(delBtn(D,"tagesabschluss"));
+        const z=document.createElement("div"); z.className="cc-feld-akt"; z.appendChild(key);
+        if(!ro) z.appendChild(delBtn(D,"tagesabschluss"));
+        wrap.append(mask,z);
       }else{
-        const ta=document.createElement("textarea"); ta.className="lockin-ta"; ta.rows=3; ta.placeholder="Wie war dein Tag? Gedanken zum Abschluss …"; ta.value=(typeof cur==="string")?cur:"";
+        const ta=document.createElement("textarea"); ta.className="lockin-ta"; ta.rows=3;
+        ta.placeholder="Wie war der Tag? Was hat gezogen, was getragen …";
+        ta.value=(typeof cur==="string")?cur:"";
         if(ro){ ta.readOnly=true; } else { ta.addEventListener("input",()=>setText(D,"tagesabschluss",ta.value)); }
-        const key=document.createElement("button"); key.className="key-btn"; key.type="button"; key.textContent="ablegen"; key.title="Text geschützt ablegen";
-        key.addEventListener("click",()=>lockField(D,"tagesabschluss"));
-        wrap.append(ta,key);
-        if(!ro && typeof cur==="string" && cur.trim()) wrap.appendChild(delBtn(D,"tagesabschluss"));
+        wrap.appendChild(ta);
+        if(!ro){
+          const key=document.createElement("button"); key.className="key-btn"; key.type="button";
+          key.textContent="ablegen"; key.title="Nur diesen Text geschützt ablegen — die Wins bleiben offen";
+          key.addEventListener("click",()=>lockField(D,"tagesabschluss"));
+          const z=document.createElement("div"); z.className="cc-feld-akt"; z.appendChild(key);
+          if(typeof cur==="string" && cur.trim()) z.appendChild(delBtn(D,"tagesabschluss"));
+          wrap.appendChild(z);
+        }
       }
       panel.appendChild(wrap);
       if(isToday() && !ro){
         const nav=document.createElement("div"); nav.className="tag-nav";
         const zur=document.createElement("button"); zur.type="button"; zur.className="cc-zur"; zur.textContent="zurück";
-        zur.addEventListener("click",()=>{ tagStep=0; buildTagesabschluss(); });
+        zur.addEventListener("click",()=>{ tagStep=1; buildTagesabschluss(); });
         nav.appendChild(zur);
         const fertig=document.createElement("button"); fertig.type="button"; fertig.className="tag-fertig";
         fertig.textContent = liRhythmus()==="abend" ? "Abschließen und morgen planen →" : "Abschließen";
@@ -4460,7 +4575,7 @@
             ? `<span class="streak reset">neu ab morgen</span>`
             : (tier ? `<span class="streak lvl-${streakLevel(s)}" title="${tier.name} · ${s} Tage">${tier.ic} ${s}</span>`
                     : `<span class="streak"></span>`);
-          btn.innerHTML=`${mark}<span class="name">${esc(h.name)}</span>${tail}`;
+          btn.innerHTML=`${mark}<span class="name">${esc(h.name)}</span>${tail}`+habitSpur(h.id);
           if(!ro) btn.addEventListener("click",()=>toggleHabit(h.id));
           if(h.challenge && h.challenge.start && isToday()){
             const st=challengeStats(h);
@@ -4500,6 +4615,19 @@
     document.querySelectorAll(".name-edit").forEach(i=>{const h=config.habits.find(x=>x.id===i.dataset.habit);if(h)h.name=i.value.trim()||h.name;});
     write(CFG,config);
   }
+  /* Vierzehn Tage Verlauf als winzige Punkte — grün erledigt, rot Rückfall,
+     blass wenn nichts eingetragen. Bewusst klein, damit es nicht ablenkt. */
+  function habitSpur(id){
+    let p="";
+    for(let i=13;i>=0;i--){
+      const k=addDays(state.viewDate,-i);
+      const v=(log[k]||{})[id];
+      const c = v===true?"g" : v==="miss"?"r" : "n";
+      p+=`<span class="hp ${c}"></span>`;
+    }
+    return `<span class="hspur">${p}</span>`;
+  }
+
   function toggleHabit(id){
     if(state.editing || !canEdit()) return;
     const k=state.viewDate;
@@ -8075,6 +8203,208 @@
   }
   const ccAlleOeffnen=rec=>alleOeffnen(ccFelder(rec),buildVision);
 
+  /* ---------- Monatsbericht ----------
+     Wird zum Monatsanfang für den Vormonat erzeugt und als Momentaufnahme abgelegt.
+     Nötig, weil die Fokusdaten nach 120 Tagen aufgeräumt werden — später ließe
+     sich der Bericht nicht mehr vollständig rechnen. */
+  const MONAT="ht_monatsbericht_v1";
+  const monAlle=()=>read(MONAT,{});
+  const monSave=o=>write(MONAT,o);
+  const monKey=d=>d.slice(0,7);
+  function monVormonat(){
+    const n=new Date(today+"T00:00:00");
+    const v=new Date(n.getFullYear(), n.getMonth()-1, 1);
+    return ymd(v).slice(0,7);
+  }
+  const MONATE=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+  function monName(k){ const [j,m]=k.split("-"); return MONATE[parseInt(m,10)-1]+" "+j; }
+
+  // Aus Rohdaten einen Bericht rechnen
+  function monRechnen(k){
+    const [j,m]=k.split("-").map(Number);
+    const erster=ymd(new Date(j,m-1,1)), letzter=ymd(new Date(j,m,0));
+    const tage=new Date(j,m,0).getDate();
+    const fx=readFocus(); const byDay={};
+    (fx.archive||[]).forEach(x=>{ if(x&&x.day) byDay[x.day]=x; });
+    if(fx.day) byDay[fx.day]={day:fx.day, blocks:fx.blocks||[]};
+
+    const habits=(config.habits||[]).map(h=>{
+      const cat=(config.cats||[]).find(c=>c.id===h.cat);
+      const reihe=[];
+      for(let t=1;t<=tage;t++){
+        const d=ymd(new Date(j,m-1,t));
+        const v=(log[d]||{})[h.id];
+        reihe.push(v===true?1 : v==="miss"?-1 : 0);
+      }
+      const ja=reihe.filter(x=>x===1).length, nein=reihe.filter(x=>x===-1).length;
+      return {name:h.name, linie:cat?cat.title:"", reihe, ja, nein,
+              quote:Math.round(ja/tage*100)};
+    });
+
+    let mins=0, blocks=0, voll=0, aktiv=0, streak=0, cur=0, li=0, ta=0;
+    for(let t=1;t<=tage;t++){
+      const d=ymd(new Date(j,m-1,t));
+      const f=byDay[d];
+      if(f){ mins+=dayProductive(f.blocks); blocks+=(f.blocks||[]).length; }
+      const l=log[d]||{};
+      if(Object.keys(l).length || (f&&(f.blocks||[]).length)) aktiv++;
+      if(dayComplete(d)){ voll++; cur++; streak=Math.max(streak,cur); } else cur=0;
+      if(lockinAll(d)) li++;
+      const e=lockinText[d]||{};
+      if((typeof e.wins==="string"&&e.wins.trim()) || e.tagesabschluss) ta++;
+    }
+    let erledigt=0;
+    try{ ensurePrios();
+      erledigt=(prios.archive||[]).filter(a=>a.day>=erster&&a.day<=letzter).length
+             + prios.all.filter(x=>x.status==="done"&&x.day>=erster&&x.day<=letzter).length; }catch(e){}
+    let cc=0;
+    try{ const c=read(WABS,{}); for(const w in c) if(w>=erster&&w<=letzter&&(c[w]||{}).done) cc++; }catch(e){}
+    const ziele=[];
+    try{ ["quarter","year"].forEach(kk=>(visPoints(kk)||[]).forEach(p=>{
+      if(p.done && p.doneAt && p.doneAt.slice(0,7)===k && (p.text||"").trim())
+        ziele.push({text:p.text.trim(), ebene:kk==="quarter"?"Quartal":"Jahr"}); })); }catch(e){}
+
+    return {k, tage, habits, mins, blocks, voll, aktiv, streak, erledigt, cc, li, ta, ziele,
+            at:new Date().toISOString()};
+  }
+  function monHolen(k){
+    const st=monAlle();
+    if(st[k] && st[k].daten) return st[k].daten;
+    const d=monRechnen(k);
+    st[k]={daten:d, gesehen:false, at:d.at}; monSave(st);
+    return d;
+  }
+  const monGesehen=k=>!!(monAlle()[k]||{}).gesehen;
+  function monAbhaken(k){ const st=monAlle(); if(st[k]){ st[k].gesehen=true; monSave(st); } }
+
+  // Beim Start prüfen: liegt ein ungesehener Bericht vor?
+  function monPruefen(){
+    const v=monVormonat();
+    // Nur, wenn in dem Monat überhaupt etwas passiert ist
+    const st=monAlle();
+    if(st[v] && st[v].gesehen) return;
+    const d=monHolen(v);
+    if(!d.aktiv){ monAbhaken(v); return; }
+    setTimeout(()=>openMonat(v,true),900);
+  }
+
+  function monTabelle(d){
+    let kopf=`<th class="mb-h">Gewohnheit</th>`;
+    for(let t=1;t<=d.tage;t++) kopf+=`<th class="mb-t">${t}</th>`;
+    kopf+=`<th class="mb-q">%</th>`;
+    let zeilen="";
+    let linie="";
+    d.habits.forEach(h=>{
+      if(h.linie!==linie){ linie=h.linie;
+        zeilen+=`<tr class="mb-lz"><td colspan="${d.tage+2}">${esc(linie)}</td></tr>`; }
+      let z=`<td class="mb-n">${esc(h.name)}</td>`;
+      h.reihe.forEach(v=>{ z+=`<td class="mb-c ${v===1?"j":v===-1?"n":"o"}"></td>`; });
+      z+=`<td class="mb-q">${h.quote}</td>`;
+      zeilen+=`<tr>${z}</tr>`;
+    });
+    return `<table class="mb-tab"><thead><tr>${kopf}</tr></thead><tbody>${zeilen}</tbody></table>`;
+  }
+
+  function openMonat(k, muss){
+    document.querySelectorAll(".mb-ov").forEach(x=>x.remove());
+    const d=monHolen(k);
+    const ov=document.createElement("div"); ov.className="mb-ov open";
+    const box=document.createElement("div"); box.className="mb-box";
+
+    box.innerHTML=`<div class="mb-kopf">
+        <div><div class="mb-titel">${esc(monName(k))}</div>
+        <div class="mb-sub">Monatsbericht${muss?" · bitte einmal ansehen":""}</div></div>
+      </div>
+      <div class="mb-zahlen">
+        <div class="mb-z"><strong>${Math.round(d.mins/60)}</strong><span>Stunden Fokus</span></div>
+        <div class="mb-z"><strong>${d.voll}</strong><span>volle Tage</span></div>
+        <div class="mb-z"><strong>${d.streak}</strong><span>längste Serie</span></div>
+        <div class="mb-z"><strong>${d.aktiv}</strong><span>aktive Tage</span></div>
+        <div class="mb-z"><strong>${d.li}</strong><span>Lock Ins</span></div>
+        <div class="mb-z"><strong>${d.ta}</strong><span>Abschlüsse</span></div>
+        <div class="mb-z"><strong>${d.blocks}</strong><span>Fokusblöcke</span></div>
+        <div class="mb-z"><strong>${d.erledigt}</strong><span>erledigt</span></div>
+        <div class="mb-z"><strong>${d.cc}</strong><span>Command Center</span></div>
+      </div>
+      <div class="mb-scroll">${monTabelle(d)}</div>
+      <div class="mb-leg"><span class="mb-c j"></span>gemacht<span class="mb-c n"></span>nicht<span class="mb-c o"></span>nichts eingetragen</div>`;
+
+    if(d.ziele.length){
+      box.innerHTML+=`<div class="mb-ziele"><div class="cc-q-h">In diesem Monat erreicht</div>`+
+        d.ziele.map(z=>`<div class="rz"><span class="rz-c">✓</span><span class="rz-t">${esc(z.text)}</span><span class="rz-e">${esc(z.ebene)}</span></div>`).join("")+`</div>`;
+    }
+
+    const acts=document.createElement("div"); acts.className="mb-acts";
+    const pdf=document.createElement("button"); pdf.type="button"; pdf.className="ask-btn"; pdf.textContent="als PDF";
+    pdf.addEventListener("click",()=>monDrucken(d));
+    const zu=document.createElement("button"); zu.type="button"; zu.className="ask-btn ok";
+    zu.textContent = muss ? "gesehen" : "schließen";
+    zu.addEventListener("click",()=>{ monAbhaken(k); ov.remove(); });
+    acts.append(pdf,zu); box.appendChild(acts);
+
+    ov.appendChild(box);
+    if(!muss) ov.addEventListener("click",e=>{ if(e.target===ov){ monAbhaken(k); ov.remove(); } });
+    document.body.appendChild(ov);
+  }
+
+  // Über den Druckdialog: dort „Als PDF sichern" wählen
+  function monDrucken(d){
+    const w=window.open("","_blank");
+    if(!w){ alert("Der Druckdialog wurde blockiert."); return; }
+    const stil=`body{font-family:-apple-system,system-ui,sans-serif;color:#111;margin:24px}
+      h1{font-size:20px;margin:0 0 2px} .s{font-size:11px;color:#666;margin-bottom:18px}
+      .z{display:flex;flex-wrap:wrap;gap:18px;margin-bottom:20px}
+      .z div{font-size:11px;color:#666} .z b{display:block;font-size:19px;color:#111}
+      table{border-collapse:collapse;font-size:8px;margin-bottom:12px}
+      th,td{border:.5px solid #ddd;padding:1px 2px;text-align:center}
+      th:first-child,td:first-child{text-align:left;padding-left:5px;font-size:9px;white-space:nowrap}
+      .lz td{background:#f4f4f4;font-weight:700;font-size:9px;text-align:left}
+      .j{background:#1f9d6b} .n{background:#c8564d} .o{background:#f0f0f0}
+      .leg{font-size:9px;color:#666} .leg i{display:inline-block;width:8px;height:8px;margin:0 3px 0 10px;vertical-align:-1px}`;
+    w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Heute — ${monName(d.k)}</title>
+      <style>${stil}</style></head><body>
+      <h1>${monName(d.k)}</h1><div class="s">Monatsbericht · Heute</div>
+      <div class="z">
+        <div><b>${Math.round(d.mins/60)}</b>Stunden Fokus</div><div><b>${d.voll}</b>volle Tage</div>
+        <div><b>${d.streak}</b>längste Serie</div><div><b>${d.aktiv}</b>aktive Tage</div>
+        <div><b>${d.li}</b>Lock Ins</div><div><b>${d.ta}</b>Abschlüsse</div>
+        <div><b>${d.blocks}</b>Blöcke</div><div><b>${d.erledigt}</b>erledigt</div>
+        <div><b>${d.cc}</b>Command Center</div></div>
+      ${monTabelle(d).replace(/class="mb-tab"/,"").replace(/mb-lz/g,"lz").replace(/class="mb-c j"/g,'class="j"').replace(/class="mb-c n"/g,'class="n"').replace(/class="mb-c o"/g,'class="o"').replace(/class="mb-[hnqtc]"/g,"")}
+      <div class="leg"><i class="j"></i>gemacht<i class="n"></i>nicht<i class="o"></i>nichts eingetragen</div>
+      </body></html>`);
+    w.document.close();
+    setTimeout(()=>{ w.focus(); w.print(); },400);
+  }
+
+  // Alle Berichte ansehen
+  function buildMonatsliste(view){
+    const st=monAlle(), ks=Object.keys(st).sort().reverse();
+    const panel=document.createElement("section"); panel.className="panel";
+    const head=document.createElement("div"); head.className="panel-head";
+    head.innerHTML=`<span class="dot"></span><span class="eyebrow">Monatsberichte</span>`;
+    const back=document.createElement("button"); back.type="button"; back.className="vr-edit"; back.textContent="zurück";
+    back.addEventListener("click",()=>{ monatOn=false; buildVision(); });
+    head.appendChild(back); panel.appendChild(head);
+    const l=document.createElement("div"); l.className="ccv-liste";
+    if(!ks.length){
+      const e=document.createElement("div"); e.className="rueck-leer";
+      e.textContent="Noch kein Bericht. Der erste kommt zum nächsten Monatsanfang.";
+      l.appendChild(e);
+    }
+    ks.forEach(k=>{
+      const b=document.createElement("button"); b.type="button"; b.className="ccv-z";
+      const d=(st[k]||{}).daten||{};
+      b.innerHTML=`<span class="ccv-kw">${esc(monName(k))}</span>`+
+        `<span class="ccv-d">${Math.round((d.mins||0)/60)} h · ${d.voll||0} volle Tage</span>`+
+        (st[k].gesehen?`<span class="ccv-ok">✓</span>`:`<span class="ccv-off">neu</span>`);
+      b.addEventListener("click",()=>openMonat(k,false));
+      l.appendChild(b);
+    });
+    panel.appendChild(l); view.appendChild(panel);
+  }
+  let monatOn=false;
+
   /* ---------- Verlauf der Command Center ---------- */
   let ccVerlauf=false, ccWoche=null;
   function buildCCVerlauf(view){
@@ -8344,20 +8674,20 @@
       const gefunden=[], zu=[];
       for(let i=7;i>=1;i--){
         const k=addDays(today,-i), e=lockinText[k]||{};
-        const v=e.tagesabschluss;
-        if(isEnc(v)){ zu.push(k); continue; }
+        const v=e.wins;
         if(typeof v==="string" && v.trim()) gefunden.push({k, t:v.trim(), stand:e.absicht_stand});
+        else if(isEnc(e.tagesabschluss)) zu.push(k);
       }
       const box=document.createElement("div"); box.className="cc-quelle";
       if(gefunden.length){
-        box.innerHTML=`<div class="cc-q-h">Deine Tagesabschlüsse dieser Woche</div>`+
+        box.innerHTML=`<div class="cc-q-h">Deine Wins dieser Woche</div>`+
           gefunden.map(g=>`<div class="cc-q-z"><span class="cc-q-d">${fmtShort(g.k)}</span>`+
             (g.stand?`<span class="li-stand ${g.stand}">${g.stand==="ja"?"gehalten":"nicht"}</span>`:``)+
             `<span>${esc(g.t.slice(0,200))}</span></div>`).join("");
       }else{
-        box.innerHTML=`<div class="cc-q-leer">Noch keine Tagesabschlüsse dieser Woche. Was du abends festhältst, sammelt sich hier von selbst.</div>`;
+        box.innerHTML=`<div class="cc-q-leer">Noch keine Wins dieser Woche. Was du abends über der Linie festhältst, sammelt sich hier von selbst.</div>`;
       }
-      if(zu.length) box.innerHTML+=`<div class="cc-q-leer">${zu.length} ${zu.length===1?"Abend ist":"Abende sind"} abgelegt.</div>`;
+      if(zu.length) box.innerHTML+=`<div class="cc-q-leer">An ${zu.length} ${zu.length===1?"Abend":"Abenden"} ist nur der freie Text abgelegt.</div>`;
       body.appendChild(box);
       body.appendChild(ccFeld(rec,"wins","Fortschritte, Einsichten, kleine Siege …",5));
       return;
@@ -8644,7 +8974,8 @@
     const out=[];
     for(const d in (lockinText||{})){
       if(d<von||d>bis) continue;
-      const v=(lockinText[d]||{}).tagesabschluss;
+      const e=lockinText[d]||{};
+      const v=(typeof e.wins==="string"&&e.wins.trim())?e.wins:e.tagesabschluss;
       if(typeof v==="string" && v.trim()) out.push({d, t:v.trim()});
     }
     try{
@@ -8725,6 +9056,7 @@
     if(prosaOn){ buildProsa(view); return; }
     if(ccOn){ buildCommand(view); return; }
     if(ccVerlauf){ buildCCVerlauf(view); return; }
+    if(monatOn){ buildMonatsliste(view); return; }
     if(rueckOn){ buildRueckblick(view); return; }
     if(verlaufOn){ buildVerlauf(view); return; }
     if(visEdit){ buildVisionEdit(view); return; }
@@ -8840,6 +9172,9 @@
     foot.appendChild(mk("Rückblick",0,()=>{ rueckOn=true; buildVision(); }));
     const ccn=Object.keys(ccAll()).length;
     if(ccn) foot.appendChild(mk("CC-Verlauf",ccn,()=>{ ccVerlauf=true; ccWoche=null; buildVision(); }));
+    const mbn=Object.keys(monAlle()).length;
+    const mbNeu=Object.keys(monAlle()).some(x=>!monAlle()[x].gesehen);
+    foot.appendChild(mk("Monatsberichte",mbn,()=>{ monatOn=true; buildVision(); }, mbNeu?"stark":""));
     foot.appendChild(mk("Verlauf",n,()=>{ verlaufOn=true; buildVision(); }));
     const qn=(read(QUOTES,[])||[]).length;
     if(qn) foot.appendChild(mk("Sätze",qn,()=>{ visEdit=true; buildVision(); }));
@@ -9065,6 +9400,7 @@
   document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="hidden") forgetKeys(); });
   refreshVidBadge().then(adoptSyncedVideo);
   startAngelusWatch();
+  try{ monPruefen(); }catch(e){}
   (function(){
     const b=document.getElementById("bkBtn"); if(!b) return;
     b.addEventListener("click",backupExport);
@@ -9195,7 +9531,7 @@
     const out=[];
     try{ Object.keys(lockinText||{}).forEach(d=>{ const e=lockinText[d]||{};
       Object.keys(e).forEach(id=>{ const v=e[id];
-        if(typeof v==="string" && v.trim()) out.push({d, wo:id==="tagesabschluss"?"Tagesabschluss":id==="wins"?"Wins (früher)":"Lock In", t:v}); }); }); }catch(e){}
+        if(typeof v==="string" && v.trim()) out.push({d, wo:id==="tagesabschluss"?"Tagesabschluss":id==="wins"?"Wins":"Lock In", t:v}); }); }); }catch(e){}
     try{ ensurePrios();
       prios.all.forEach(x=>{ if((x.text||"").trim()) out.push({d:x.day||"", wo:x.prio?"Priorität":x.fixed?"Blocker":"ToDo", t:x.text}); });
       (prios.archive||[]).forEach(a=>{ if((a.text||"").trim()) out.push({d:a.day||"", wo:"Archiv", t:a.text}); }); }catch(e){}

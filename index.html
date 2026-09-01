@@ -1085,6 +1085,16 @@
   .li-el input{flex:1; font:inherit; font-size:13px; color:var(--ink); background:transparent;
     border:none; border-bottom:1px solid var(--line); padding:4px 2px}
   .li-el input:focus{outline:none; border-bottom-color:var(--brass)}
+  /* Nachtragen */
+  .nt-card{margin-bottom:10px; padding:11px 16px 12px; border-radius:12px; background:var(--card);
+    box-shadow:var(--shadow), inset 0 0 0 1px rgba(212,115,106,.28)}
+  .nt-kopf{display:flex; align-items:center; gap:9px; margin-bottom:8px}
+  .nt-p{width:7px; height:7px; border-radius:50%; background:var(--rose)}
+  .nt-t{font-family:var(--serif); font-size:13.5px; font-style:italic; color:var(--ink-soft)}
+  .nt-n{margin-left:auto; font-size:10px; font-weight:800; color:var(--rose);
+    background:rgba(212,115,106,.14); border-radius:999px; padding:1px 8px}
+  .nt-liste{display:flex; flex-direction:column}
+  .nt-weitere{margin-top:8px; font-size:10.5px; color:var(--ink-faint); font-style:italic}
   /* ---------- Monatsbericht ---------- */
   .mb-ov{position:fixed; inset:0; z-index:110; display:flex; align-items:flex-start; justify-content:center;
     padding:34px 14px 20px; background:rgba(0,0,0,.66); backdrop-filter:blur(5px)}
@@ -2434,6 +2444,7 @@
         </div>
         <div class="strip" id="strip"></div>
       </section>
+      <div id="nachtrag"></div>
       <div id="angelus"></div>
       <div id="tagessatz"></div>
       <div id="lockin"></div>
@@ -2529,7 +2540,7 @@
   const ABSICHT="ht_absicht_v1";   // wandert als einziges mit auf das andere Gerät
   const MSNOTIZ="ht_metanotiz_v1";  // spontan Festgehaltenes, strikt lokal   // wandert als einziges mit auf das andere Gerät   // "morgen" = morgens für heute, "abend" = abends für morgen  // Satz der Woche
   const ANGELUS="ht_angelus_v1";
-  const APP_VERSION="2026-08-30";   // wird beim Aktualisieren hochgezählt
+  const APP_VERSION="2026-09-01";   // wird beim Aktualisieren hochgezählt
   const LOCKIN="ht_lockin_v1";
   const LOCKTXT="ht_lockintext_v1", CRYPTO="ht_crypto_v1", CAL="ht_cal_v1", QUOTES="ht_quotes_v1", LOCKCFG="ht_lockin_cfg_v1", SCHATZ="ht_schatz_v1", GOSPELC="ht_gospel_v1";
   const MAX_PRIOS=8;
@@ -2918,7 +2929,7 @@
     const h=await subtle().digest("SHA-256", new TextEncoder().encode("ht|"+pw));
     return b64(h).slice(0,16);
   }
-  function forgetKeys(){ keyCache.clear(); }
+  function forgetKeys(){ keyCache.clear(); sitzungsPw=null; }
   async function encWith(pw, salt, text){
     const iv=window.crypto.getRandomValues(new Uint8Array(12));
     const key=await deriveKey(pw, salt, KDF_IT);
@@ -3662,7 +3673,8 @@
      Ein Passwort öffnet alle Felder eines Ablaufs. Beim Abschließen werden genau die
      wieder abgelegt, die vorher abgelegt waren — ohne erneute Eingabe. */
   let offenGewesen=null;   // {pw, felder:[{hol,leg}]}
-  function merkeOffen(pw){ offenGewesen={pw, felder:[]}; }
+  let sitzungsPw=null;     // nur im Arbeitsspeicher, geht beim Verlassen verloren
+  function merkeOffen(pw){ offenGewesen={pw, felder:[]}; sitzungsPw=pw; }
   function merkeFeld(hol,leg){ if(offenGewesen) offenGewesen.felder.push({hol,leg}); }
   async function wiederAblegen(){
     if(!offenGewesen || !offenGewesen.felder.length){ offenGewesen=null; return 0; }
@@ -3822,12 +3834,13 @@
         else {
           state.lockinOpen=false; liStep=0;
           const gehakt = isToday() ? liHakeHabit(state.viewDate) : false;
-          wiederAblegen().then(n=>{
+          wiederAblegen().then(n=>metaAblegen(D).then(m=>{
             buildLockIn(); renderHeute();
             if(gehakt) toast(gehakt.name.replace(/^\S+\s+/,"")+" abgehakt");
-            if(n) toast(n===1?"Ein Feld wieder abgelegt":n+" Felder wieder abgelegt");
+            const zu=n+m;
+            if(zu) toast(zu===1?"Metascript abgelegt":zu+" Felder abgelegt");
             else if(liRhythmus()!=="abend") toast("Der Tag ist gebaut. Abends wartet der Abschluss.");
-          });
+          }));
         }
       });
       nav.appendChild(w);
@@ -3873,6 +3886,22 @@
   }
 
   // Ein geschütztes Textfeld für einen Lock-In-Schritt
+  /* Beim Abschließen wandert das Metascript von selbst in den Schutz.
+     Ist in dieser Sitzung schon ein Passwort verwendet worden, ohne Rückfrage. */
+  const META_IDS=["meta","meta_t","meta_q0","meta_q1","meta_q2"];
+  async function metaAblegen(D){
+    const offen=META_IDS.filter(id=>{ const v=getText(D,id); return typeof v==="string" && v.trim(); });
+    if(!offen.length) return 0;
+    let pw=sitzungsPw;
+    if(pw==null){ pw=await ensurePassphrase(); if(pw==null) return 0; }
+    try{
+      const salt=unb64(cryptoRec.salt);
+      for(const id of offen) setText(D,id, await encWith(pw,salt,getText(D,id)));
+      sitzungsPw=pw;
+      return offen.length;
+    }catch(e){ return 0; }
+  }
+
   function liFeld(D,id,ph,rows,ohneKnopf){
     const f=ccSicher(()=>getText(D,id), v=>setText(D,id,v), ph, rows, buildLockIn);
     if(ohneKnopf) f.querySelectorAll(".cc-feld-akt").forEach(x=>x.remove());
@@ -5469,8 +5498,62 @@
     else { state.lockinOpen=false; state.tagOpen=false; }
   }
 
+  /* ---------- Nachtragen ----------
+     Was gestern nicht erfasst wurde, bleibt sichtbar, bis es beantwortet ist.
+     Sonst reißt der Verlauf Lücken, die niemand mehr füllt. */
+  function nachtragTage(){
+    const aus=[];
+    for(let i=1;i<=3;i++){
+      const k=addDays(today,-i);
+      const l=log[k]||{};
+      const offen=(config.habits||[]).filter(h=>l[h.id]===undefined);
+      // Nur Tage, an denen überhaupt etwas los war — sonst nervt es nach dem Urlaub
+      const angefangen=Object.keys(l).length>0 || (lockinLog[k]&&Object.keys(lockinLog[k]).length>0);
+      if(offen.length && angefangen) aus.push({k, offen});
+    }
+    return aus;
+  }
+  function renderNachtrag(){
+    const host=document.getElementById("nachtrag"); if(!host) return;
+    host.innerHTML="";
+    const tage=nachtragTage(); if(!tage.length) return;
+    const t=tage[0];
+    const card=document.createElement("section"); card.className="nt-card";
+    const dt=new Date(t.k+"T00:00:00");
+    const kopf=document.createElement("div"); kopf.className="nt-kopf";
+    kopf.innerHTML=`<span class="nt-p"></span>
+      <span class="nt-t">${dt.toLocaleDateString("de-DE",{weekday:"long"})} fehlt noch</span>
+      <span class="nt-n">${t.offen.length}</span>`;
+    card.appendChild(kopf);
+    const l=document.createElement("div"); l.className="nt-liste";
+    t.offen.forEach(h=>{
+      const r=document.createElement("div"); r.className="ts-z offen";
+      r.innerHTML=`<span class="ts-n">${esc(h.name)}</span>`;
+      const w=document.createElement("div"); w.className="ts-w";
+      [["ja","gemacht",true],["nein","nicht","miss"]].forEach(([kls,txt,wert])=>{
+        const b=document.createElement("button"); b.type="button"; b.className="ts-b "+kls;
+        b.textContent=txt;
+        b.addEventListener("click",()=>{
+          if(!log[t.k]) log[t.k]={};
+          log[t.k][h.id]=wert; write(LOG,log);
+          renderHeute();
+        });
+        w.appendChild(b);
+      });
+      r.appendChild(w); l.appendChild(r);
+    });
+    card.appendChild(l);
+    if(tage.length>1){
+      const w=document.createElement("div"); w.className="nt-weitere";
+      w.textContent=(tage.length-1)+(tage.length===2?" weiterer Tag":" weitere Tage")+" danach";
+      card.appendChild(w);
+    }
+    host.appendChild(card);
+  }
+
   function renderHeute(){
     applyPhase();
+    renderNachtrag();
     renderSatz();
     renderAngelus();
     buildRing(); buildStrip(); buildHeader(); buildLockIn(); buildCats(); buildTagesabschluss(); buildSchatzBtn(); renderCalendar();
@@ -7534,12 +7617,22 @@
     const wi=weekInfo();
     if(!id) write(WSATZ,null); else write(WSATZ,{week:wi.key, id});
   }
+  // Alles aus der Sammlung, nicht nur die Zitate aus der Vizija
+  function satzQuelle(){
+    const aus=[];
+    (schatz||[]).forEach(x=>{ const t=(x.text||"").trim();
+      if(t) aus.push({id:x.qid||x.id, text:t, author:x.author||"", imgId:x.imgId}); });
+    // Zitate, die noch nicht in der Sammlung gelandet sind, ergänzen
+    (quotes||[]).forEach(q=>{ const t=(q.text||"").trim();
+      if(t && !aus.some(y=>y.text===t)) aus.push({id:q.id, text:t, author:q.author||"", imgId:q.imgId}); });
+    return aus;
+  }
   function satzDerWoche(){
     const w=wSatz(); if(!w||w.week!==weekInfo().key) return null;
-    return (quotes||[]).find(q=>q.id===w.id)||null;
+    return satzQuelle().find(q=>q.id===w.id)||null;
   }
   function satzDesTages(){
-    const qs=quotes||[]; if(!qs.length) return null;
+    const qs=satzQuelle(); if(!qs.length) return null;
     // Aus dem Datum eine Zahl — dadurch bleibt es den ganzen Tag derselbe Satz
     let h=0; for(let i=0;i<today.length;i++) h=(h*31+today.charCodeAt(i))>>>0;
     return qs[h%qs.length];
@@ -8843,12 +8936,12 @@
       if(z.length) l.innerHTML+=`<div class="cc-vis-z">`+z.map(p=>`<span>${esc(p.text.trim())}</span>`).join("")+`</div>`;
       body.appendChild(l);
       // Ein Satz, der die Woche über bleibt
-      if((quotes||[]).length){
+      if(satzQuelle().length){
         const w=document.createElement("div"); w.className="cc-satz";
         w.innerHTML=`<div class="wabs-sec">Satz für diese Woche</div>`;
         const jetzt=satzDerWoche();
         const liste=document.createElement("div"); liste.className="cc-satz-l";
-        quotes.forEach(q=>{
+        satzQuelle().forEach(q=>{
           const b=document.createElement("button"); b.type="button"; b.className="cc-satz-b"+(jetzt&&jetzt.id===q.id?" on":"");
           b.innerHTML=`<span class="cs-t">${esc(q.text)}</span>`+(q.author?`<span class="cs-by">${esc(q.author)}</span>`:``);
           b.addEventListener("click",()=>{ setWochensatz(jetzt&&jetzt.id===q.id?null:q.id); buildVision(); });
@@ -9176,7 +9269,7 @@
     const mbNeu=Object.keys(monAlle()).some(x=>!monAlle()[x].gesehen);
     foot.appendChild(mk("Monatsberichte",mbn,()=>{ monatOn=true; buildVision(); }, mbNeu?"stark":""));
     foot.appendChild(mk("Verlauf",n,()=>{ verlaufOn=true; buildVision(); }));
-    const qn=(read(QUOTES,[])||[]).length;
+    const qn=satzQuelle().length;
     if(qn) foot.appendChild(mk("Sätze",qn,()=>{ visEdit=true; buildVision(); }));
     panel.appendChild(foot);
 

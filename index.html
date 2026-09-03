@@ -512,6 +512,13 @@
 
   .km-q{margin-top:9px; padding-top:7px; border-top:1px solid rgba(255,255,255,.08);
     font-size:9.5px; color:rgba(237,233,228,.35)}
+  .weihe-voll{margin-top:14px; padding-top:12px; border-top:1px solid rgba(255,255,255,.1)}
+  .weihe-b{padding:9px 0 0}
+  .weihe-ta{width:100%; box-sizing:border-box; font-family:var(--serif); font-size:14px; line-height:1.6;
+    color:rgba(237,233,228,.9); background:rgba(255,255,255,.05); border:none; border-radius:10px;
+    padding:12px 14px; resize:none; overflow:hidden; box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
+  .weihe-ta:focus{outline:none; box-shadow:inset 0 0 0 1.3px var(--brass)}
+  .weihe-text .ang-l{margin-bottom:10px}
   .kru-note{margin:10px 0 0; font-size:11.5px; line-height:1.5; color:rgba(237,233,228,.42); font-style:italic}
   .kru-fat{font-size:14px; line-height:1.55; color:rgba(237,233,228,.85)}
   /* Gebetstext */
@@ -2540,7 +2547,7 @@
   const ABSICHT="ht_absicht_v1";   // wandert als einziges mit auf das andere Gerät
   const MSNOTIZ="ht_metanotiz_v1";  // spontan Festgehaltenes, strikt lokal   // wandert als einziges mit auf das andere Gerät   // "morgen" = morgens für heute, "abend" = abends für morgen  // Satz der Woche
   const ANGELUS="ht_angelus_v1";
-  const APP_VERSION="2026-09-01";   // wird beim Aktualisieren hochgezählt
+  const APP_VERSION="2026-09-03";   // wird beim Aktualisieren hochgezählt
   const LOCKIN="ht_lockin_v1";
   const LOCKTXT="ht_lockintext_v1", CRYPTO="ht_crypto_v1", CAL="ht_cal_v1", QUOTES="ht_quotes_v1", LOCKCFG="ht_lockin_cfg_v1", SCHATZ="ht_schatz_v1", GOSPELC="ht_gospel_v1";
   const MAX_PRIOS=8;
@@ -4962,6 +4969,104 @@
     Object.keys(ang.lit).forEach(k=>{ if(k<cut) delete ang.lit[k]; });
     saveAng(); renderHeute();
   }
+  /* ---------- Weihe an Jesus durch Maria ----------
+     Die tägliche Erneuerungsformel nach Montfort — kurz, alt, frei.
+     Der volle Weiheakt wird einmal jährlich gesprochen; dafür gibt es
+     ein eigenes Feld, das du selbst füllst. */
+  const WEIHE="ht_weihetext_v1";
+  const WEIHE_KURZ={
+    la:[["","Totus tuus ego sum, et omnia mea tua sunt."],
+        ["","Accipio te in mea omnia."],
+        ["","O Maria, da mihi cor tuum."]],
+    de:[["","Ganz dein bin ich, und alles, was mein ist, ist dein."],
+        ["","Ich nehme dich in alles Meine auf."],
+        ["","O Maria, gib mir dein Herz."]],
+    hr:[["","Sav sam tvoj, i sve moje tvoje je."],
+        ["","Primam te u sve svoje."],
+        ["","O Marijo, daj mi svoje srce."]]
+  };
+  // Eigener Zweig, wie bei Litanei und Krunica — ang.log gehört dem Angelus
+  const weihePrayed=()=>((loadAng().weihe||{})[today]===true);
+  function weiheMark(){
+    loadAng(); ang.weihe=ang.weihe||{};
+    if(ang.weihe[today]) delete ang.weihe[today]; else ang.weihe[today]=true;
+    saveAng();
+  }
+  function openWeihe(){
+    document.querySelectorAll(".ang-overlay").forEach(x=>x.remove());
+    loadAng();
+    const l=ang.lang==="hr"?"hr":ang.lang==="la"?"la":"de";
+    const ov=document.createElement("div"); ov.className="ang-overlay open";
+    const box=document.createElement("div"); box.className="ang-box";
+
+    const h=document.createElement("div"); h.className="ang-h";
+    h.innerHTML=`<span class="ang-k secret">${l==="hr"?"Posveta":l==="la"?"Consecratio":"Weihe"}</span>`+
+      (l!=="de"?`<span class="ang-lang">${l==="hr"?"hrvatski":"latine"}</span>`:``);
+    armSecret(h.querySelector(".ang-k"), ()=>{ ang.lang=nextLang(ang.lang); saveAng(); openWeihe(); });
+    box.appendChild(h);
+
+    const hin=document.createElement("p"); hin.className="kru-note";
+    hin.textContent = l==="hr"
+      ? "Svakodnevna obnova posvete — sv. Ljudevit Montfortski."
+      : "Tägliche Erneuerung der Weihe — nach dem hl. Ludwig Maria von Montfort.";
+    box.appendChild(hin);
+    box.insertAdjacentHTML("beforeend", angLines(WEIHE_KURZ[l]));
+
+    // Der volle Weiheakt — Text trägst du selbst ein
+    const eig=read(WEIHE,"");
+    const wrap=document.createElement("div"); wrap.className="weihe-voll";
+    const kopf=document.createElement("button"); kopf.type="button"; kopf.className="tli-h"+(weiheOffen?" on":"");
+    kopf.innerHTML=`<span>${l==="hr"?"Cijeli čin posvete":"Voller Weiheakt"}</span><span class="tli-c">⌄</span>`;
+    kopf.addEventListener("click",()=>{ weiheOffen=!weiheOffen; openWeihe(); });
+    wrap.appendChild(kopf);
+    if(weiheOffen){
+      const b=document.createElement("div"); b.className="weihe-b";
+      if(weiheEdit || !String(eig).trim()){
+        const ta=document.createElement("textarea"); ta.className="weihe-ta"; ta.rows=8;
+        ta.placeholder="Deinen Weihetext hier einsetzen. Er wird einmal jährlich gesprochen, meist an einem Marienfest nach 33 Tagen Vorbereitung.";
+        ta.value=String(eig||"");
+        const grow=()=>{ ta.style.height="auto"; ta.style.height=Math.max(160,ta.scrollHeight)+"px"; };
+        ta.addEventListener("input",()=>{ write(WEIHE,ta.value); grow(); });
+        requestAnimationFrame(grow);
+        b.appendChild(ta);
+        const f=document.createElement("button"); f.type="button"; f.className="key-btn"; f.textContent="fertig";
+        f.hidden=!String(eig).trim();
+        ta.addEventListener("input",()=>{ f.hidden=!ta.value.trim(); });
+        f.addEventListener("click",()=>{ weiheEdit=false; openWeihe(); });
+        const z=document.createElement("div"); z.className="cc-feld-akt"; z.appendChild(f);
+        b.appendChild(z);
+      }else{
+        const t=document.createElement("div"); t.className="weihe-text";
+        String(eig).split(/\n\s*\n/).forEach(abs=>{
+          if(!abs.trim()) return;
+          const p2=document.createElement("p"); p2.className="ang-l"; p2.textContent=abs.trim();
+          t.appendChild(p2);
+        });
+        b.appendChild(t);
+        const e=document.createElement("button"); e.type="button"; e.className="key-btn"; e.textContent="bearbeiten";
+        e.addEventListener("click",()=>{ weiheEdit=true; openWeihe(); });
+        const z=document.createElement("div"); z.className="cc-feld-akt"; z.appendChild(e);
+        b.appendChild(z);
+      }
+      wrap.appendChild(b);
+    }
+    box.appendChild(wrap);
+
+    const acts=document.createElement("div"); acts.className="ang-acts";
+    const done=document.createElement("button"); done.type="button"; done.className="ang-done"+(weihePrayed()?" on":"");
+    done.textContent=weihePrayed()?(l==="hr"?"pomoljeno":"gebetet"):(l==="hr"?"označi":"gebetet");
+    done.addEventListener("click",()=>{ weiheMark(); openWeihe(); renderHeute(); });
+    const zu=document.createElement("button"); zu.type="button"; zu.className="ang-close";
+    zu.textContent=l==="hr"?"zatvori":"schließen";
+    zu.addEventListener("click",()=>ov.remove());
+    acts.append(done,zu); box.appendChild(acts);
+
+    ov.appendChild(box);
+    ov.addEventListener("click",e=>{ if(e.target===ov) ov.remove(); });
+    document.body.appendChild(ov);
+  }
+  let weiheOffen=false, weiheEdit=false;
+
   function openLitanei(){
     document.querySelectorAll(".ang-overlay").forEach(x=>x.remove());
     loadAng();
@@ -5444,6 +5549,12 @@
       (litPrayed()?`<span class="geb-ck">✓</span>`:``);
     l.addEventListener("click",()=>{ ov.remove(); openLitanei(); });
     box.appendChild(l);
+
+    const wz=document.createElement("button"); wz.type="button"; wz.className="geb-card row"+(weihePrayed()?" done":"");
+    wz.innerHTML=`<span class="geb-c-t">${hr?"Posveta Isusu po Mariji":"Weihe an Jesus durch Maria"}</span>`+
+      (weihePrayed()?`<span class="geb-ck">✓</span>`:``);
+    wz.addEventListener("click",()=>{ ov.remove(); openWeihe(); });
+    box.appendChild(wz);
 
     // Sieben Tage
     const strip=document.createElement("div"); strip.className="geb-strip";

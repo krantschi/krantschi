@@ -519,6 +519,15 @@
     padding:12px 14px; resize:none; overflow:hidden; box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
   .weihe-ta:focus{outline:none; box-shadow:inset 0 0 0 1.3px var(--brass)}
   .weihe-text .ang-l{margin-bottom:10px}
+  .ps-stufen{display:flex; flex-wrap:wrap; gap:5px; margin-bottom:14px}
+  .ps-s{font:inherit; font-size:10.5px; font-weight:700; color:rgba(237,233,228,.5); background:transparent;
+    border:none; border-radius:999px; padding:4px 11px; cursor:pointer; box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
+  .ps-s.on{color:var(--on-accent); background:var(--brass); box-shadow:none}
+  .ps-v{display:flex; gap:10px; cursor:pointer; align-items:baseline}
+  .ps-n{flex:0 0 14px; font-size:10px; font-weight:700; color:var(--brass); opacity:.7}
+  .ps-t{flex:1}
+  .ps-w{white-space:nowrap}
+  .ps-l{color:rgba(237,233,228,.22); letter-spacing:.06em}
   .kru-note{margin:10px 0 0; font-size:11.5px; line-height:1.5; color:rgba(237,233,228,.42); font-style:italic}
   .kru-fat{font-size:14px; line-height:1.55; color:rgba(237,233,228,.85)}
   /* Gebetstext */
@@ -2547,7 +2556,7 @@
   const ABSICHT="ht_absicht_v1";   // wandert als einziges mit auf das andere Gerät
   const MSNOTIZ="ht_metanotiz_v1";  // spontan Festgehaltenes, strikt lokal   // wandert als einziges mit auf das andere Gerät   // "morgen" = morgens für heute, "abend" = abends für morgen  // Satz der Woche
   const ANGELUS="ht_angelus_v1";
-  const APP_VERSION="2026-09-03";   // wird beim Aktualisieren hochgezählt
+  const APP_VERSION="2026-09-06";   // wird beim Aktualisieren hochgezählt
   const LOCKIN="ht_lockin_v1";
   const LOCKTXT="ht_lockintext_v1", CRYPTO="ht_crypto_v1", CAL="ht_cal_v1", QUOTES="ht_quotes_v1", LOCKCFG="ht_lockin_cfg_v1", SCHATZ="ht_schatz_v1", GOSPELC="ht_gospel_v1";
   const MAX_PRIOS=8;
@@ -5067,6 +5076,108 @@
   }
   let weiheOffen=false, weiheEdit=false;
 
+  /* ---------- Psalm 23 (Vulgata 22) ----------
+     Deutsch nach Allioli (1851), lateinisch nach der Vulgata — beide gemeinfrei.
+     Die Einheitsübersetzung ist geschützt und daher nicht verwendet. */
+  const PSALM23={
+    de:[["1","Ein Psalm Davids. Der Herr ist mein Hirt, mir wird nichts mangeln;"],
+        ["2","auf einem Weideplatze lässt er mich lagern, an Wasser der Erquickung leitet er mich;"],
+        ["3","er erquickt meine Seele, führt mich auf Pfaden der Gerechtigkeit, um seines Namens willen."],
+        ["4","Denn ob ich auch mitten durch Todesschatten wandelte, fürchte ich doch kein Unglück; bist du doch bei mir. Dein Stecken und dein Stab trösten mich."],
+        ["5","Du deckst vor meinem Angesichte einen Tisch im Angesichte meiner Bedränger, salbst mein Haupt mit Öl, und mein überströmender Becher, wie herrlich ist er!"],
+        ["6","Deine Gnade geleitet mich alle Tage meines Lebens und ich darf wohnen im Hause des Herrn immerdar."]],
+    la:[["1","Psalmus David. Dominus regit me, et nihil mihi deerit:"],
+        ["2","In loco pascuæ ibi me collocavit. Super aquam refectionis educavit me:"],
+        ["3","Animam meam convertit. Deduxit me super semitas justitiæ, propter nomen suum."],
+        ["4","Nam et si ambulavero in medio umbræ mortis, non timebo mala: quoniam tu mecum es. Virga tua, et baculus tuus: ipsa me consolata sunt."],
+        ["5","Parasti in conspectu meo mensam, adversus eos, qui tribulant me. Impinguasti in oleo caput meum: et calix meus inebrians quam præclarus est!"],
+        ["6","Et misericordia tua subsequetur me omnibus diebus vitæ meæ: Et ut inhabitem in domo Domini, in longitudinem dierum."]],
+    hr:[["1","Psalam Davidov. Gospodin je pastir moj, ni u čem ja ne oskudijevam;"],
+        ["2","na poljanama zelenim on mi daje odmora. Na vrutke me tihane vodi"],
+        ["3","i krijepi dušu moju. Stazama pravim on me upravlja radi imena svojega."],
+        ["4","Pa da mi je i dolinom smrti proći, zla se ne bojim, jer si ti sa mnom. Tvoj štap i palica tvoja utjeha su meni."],
+        ["5","Trpezu preda mnom prostireš na oči dušmanima mojim. Uljem mi glavu mažeš, čaša se moja prelijeva."],
+        ["6","Dobrota i milost pratit će mene sve dane života moga. U Gospodnjem ću domu prebivati kroz dane mnoge."]]
+  };
+  const PS_STUFEN=["ganz","halb","anfänge","zu"];
+  let psStufe=0, psSprache=null;
+  const psPrayed=()=>((loadAng().psalm||{})[today]===true);
+  function psMark(){
+    loadAng(); ang.psalm=ang.psalm||{};
+    if(ang.psalm[today]) delete ang.psalm[today]; else ang.psalm[today]=true;
+    saveAng();
+  }
+  // Zum Auswendiglernen: erst alles, dann jedes zweite Wort, dann nur Anfänge, dann nichts
+  function psVerdecken(text, stufe){
+    if(stufe===0) return esc(text);
+    return text.split(/(\s+)/).map(w=>{
+      if(/^\s+$/.test(w)) return w;
+      const rein=w.replace(/[^\wÄÖÜäöüßæ]/g,"");
+      if(!rein) return esc(w);
+      if(stufe===1 && Math.abs(hashWort(rein))%2===0) return esc(w);
+      if(stufe===2) return `<span class="ps-w">${esc(w.slice(0,1))}<span class="ps-l">${"·".repeat(Math.max(1,rein.length-1))}</span></span>`;
+      if(stufe===3) return `<span class="ps-w"><span class="ps-l">${"·".repeat(rein.length)}</span></span>`;
+      return `<span class="ps-w"><span class="ps-l">${"·".repeat(rein.length)}</span></span>`;
+    }).join("");
+  }
+  function hashWort(w){ let h=0; for(let i=0;i<w.length;i++) h=(h*31+w.charCodeAt(i))|0; return h; }
+
+  function openPsalm(){
+    document.querySelectorAll(".ang-overlay").forEach(x=>x.remove());
+    loadAng();
+    const l = psSprache || (ang.lang==="hr"?"hr":ang.lang==="la"?"la":"de");
+    const ov=document.createElement("div"); ov.className="ang-overlay open";
+    const box=document.createElement("div"); box.className="ang-box";
+
+    const h=document.createElement("div"); h.className="ang-h";
+    h.innerHTML=`<span class="ang-k secret">${l==="hr"?"Psalam 23":l==="la"?"Psalmus XXII":"Psalm 23"}</span>`+
+      (l!=="de"?`<span class="ang-lang">${l==="hr"?"hrvatski":"Vulgata"}</span>`:``);
+    armSecret(h.querySelector(".ang-k"), ()=>{ psSprache = l==="de"?"hr" : l==="hr"?"la" : "de"; openPsalm(); });
+    box.appendChild(h);
+
+    // Lernstufen
+    const st=document.createElement("div"); st.className="ps-stufen";
+    ["ganzer Text","halb verdeckt","nur Anfänge","aus dem Kopf"].forEach((t,i)=>{
+      const b=document.createElement("button"); b.type="button"; b.className="ps-s"+(psStufe===i?" on":"");
+      b.textContent=t;
+      b.addEventListener("click",()=>{ psStufe=i; openPsalm(); });
+      st.appendChild(b);
+    });
+    box.appendChild(st);
+
+    const t=document.createElement("div"); t.className="ps-text";
+    PSALM23[l].forEach(([n,v])=>{
+      const z=document.createElement("p"); z.className="ang-l ps-v";
+      z.innerHTML=`<span class="ps-n">${n}</span><span class="ps-t">${psVerdecken(v,psStufe)}</span>`;
+      // Antippen deckt einen Vers ganz auf
+      z.addEventListener("click",()=>{
+        const sp=z.querySelector(".ps-t");
+        sp.innerHTML = sp.dataset.auf==="1" ? psVerdecken(v,psStufe) : esc(v);
+        sp.dataset.auf = sp.dataset.auf==="1" ? "" : "1";
+      });
+      t.appendChild(z);
+    });
+    box.appendChild(t);
+
+    const q=document.createElement("p"); q.className="kru-note";
+    q.textContent = l==="la" ? "Vulgata · Psalmus 22"
+      : l==="hr" ? "Psalam 23 · antipanjem se otkriva redak"
+      : "Allioli-Übersetzung · Vers antippen deckt ihn auf";
+    box.appendChild(q);
+
+    const acts=document.createElement("div"); acts.className="ang-acts";
+    const done=document.createElement("button"); done.type="button"; done.className="ang-done"+(psPrayed()?" on":"");
+    done.textContent=psPrayed()?"gebetet ✓":"gebetet";
+    done.addEventListener("click",()=>{ psMark(); openPsalm(); renderHeute(); });
+    const zu=document.createElement("button"); zu.type="button"; zu.className="ang-close"; zu.textContent="schließen";
+    zu.addEventListener("click",()=>ov.remove());
+    acts.append(done,zu); box.appendChild(acts);
+
+    ov.appendChild(box);
+    ov.addEventListener("click",e=>{ if(e.target===ov) ov.remove(); });
+    document.body.appendChild(ov);
+  }
+
   function openLitanei(){
     document.querySelectorAll(".ang-overlay").forEach(x=>x.remove());
     loadAng();
@@ -5549,6 +5660,12 @@
       (litPrayed()?`<span class="geb-ck">✓</span>`:``);
     l.addEventListener("click",()=>{ ov.remove(); openLitanei(); });
     box.appendChild(l);
+
+    const pz=document.createElement("button"); pz.type="button"; pz.className="geb-card row"+(psPrayed()?" done":"");
+    pz.innerHTML=`<span class="geb-c-t">${hr?"Psalam 23":"Psalm 23"}</span>`+
+      (psPrayed()?`<span class="geb-ck">✓</span>`:``);
+    pz.addEventListener("click",()=>{ ov.remove(); openPsalm(); });
+    box.appendChild(pz);
 
     const wz=document.createElement("button"); wz.type="button"; wz.className="geb-card row"+(weihePrayed()?" done":"");
     wz.innerHTML=`<span class="geb-c-t">${hr?"Posveta Isusu po Mariji":"Weihe an Jesus durch Maria"}</span>`+

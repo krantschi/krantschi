@@ -2556,7 +2556,7 @@
   const ABSICHT="ht_absicht_v1";   // wandert als einziges mit auf das andere Gerät
   const MSNOTIZ="ht_metanotiz_v1";  // spontan Festgehaltenes, strikt lokal   // wandert als einziges mit auf das andere Gerät   // "morgen" = morgens für heute, "abend" = abends für morgen  // Satz der Woche
   const ANGELUS="ht_angelus_v1";
-  const APP_VERSION="2026-09-06";   // wird beim Aktualisieren hochgezählt
+  const APP_VERSION="2026-09-07";   // wird beim Aktualisieren hochgezählt
   const LOCKIN="ht_lockin_v1";
   const LOCKTXT="ht_lockintext_v1", CRYPTO="ht_crypto_v1", CAL="ht_cal_v1", QUOTES="ht_quotes_v1", LOCKCFG="ht_lockin_cfg_v1", SCHATZ="ht_schatz_v1", GOSPELC="ht_gospel_v1";
   const MAX_PRIOS=8;
@@ -4978,6 +4978,66 @@
     Object.keys(ang.lit).forEach(k=>{ if(k<cut) delete ang.lit[k]; });
     saveAng(); renderHeute();
   }
+  /* ---------- Gebet zum hl. Erzengel Michael ----------
+     Leo XIII., 1886. Überlieferter Wortlaut, gemeinfrei. */
+  const MICHAEL={
+    de:[["","Heiliger Erzengel Michael, verteidige uns im Kampfe;"],
+        ["","gegen die Bosheit und die Nachstellungen des Teufels sei unser Schutz."],
+        ["","Gott gebiete ihm, so bitten wir flehentlich;"],
+        ["","du aber, Fürst der himmlischen Heerscharen,"],
+        ["","stoße den Satan und die anderen bösen Geister,"],
+        ["","die in der Welt umherziehen, um die Seelen zu verderben,"],
+        ["","durch die Kraft Gottes in die Hölle. Amen."]],
+    hr:[["","Sveti Mihaele Arkanđele, brani nas u boju;"],
+        ["","protiv zloće i zasjeda đavolskih budi nam zaštita."],
+        ["","Neka mu zapovjedi Bog, ponizno molimo;"],
+        ["","a ti, Kneže vojske nebeske,"],
+        ["","Sotonu i druge zle duhove,"],
+        ["","koji svijetom lutaju na propast duša,"],
+        ["","božanskom snagom u pakao strovali. Amen."]],
+    la:[["","Sancte Michaël Archangele, defende nos in proelio;"],
+        ["","contra nequitiam et insidias diaboli esto praesidium."],
+        ["","Imperet illi Deus, supplices deprecamur:"],
+        ["","tuque, Princeps militiae caelestis,"],
+        ["","Satanam aliosque spiritus malignos,"],
+        ["","qui ad perditionem animarum pervagantur in mundo,"],
+        ["","divina virtute in infernum detrude. Amen."]]
+  };
+  const michPrayed=()=>((loadAng().michael||{})[today]===true);
+  function michMark(){
+    loadAng(); ang.michael=ang.michael||{};
+    if(ang.michael[today]) delete ang.michael[today]; else ang.michael[today]=true;
+    saveAng();
+  }
+  function openMichael(){
+    document.querySelectorAll(".ang-overlay").forEach(x=>x.remove());
+    loadAng();
+    const l=ang.lang==="hr"?"hr":ang.lang==="la"?"la":"de";
+    const ov=document.createElement("div"); ov.className="ang-overlay open";
+    const box=document.createElement("div"); box.className="ang-box";
+    const h=document.createElement("div"); h.className="ang-h";
+    const titel = l==="hr"?"Sveti Mihael" : l==="la"?"Sancte Michaël" : "Erzengel Michael";
+    h.innerHTML=`<span class="ang-k secret">${titel}</span>`+
+      (l!=="de"?`<span class="ang-lang">${l==="hr"?"hrvatski":"latine"}</span>`:``);
+    armSecret(h.querySelector(".ang-k"), ()=>{ ang.lang=nextLang(ang.lang); saveAng(); openMichael(); });
+    box.appendChild(h);
+    box.insertAdjacentHTML("beforeend", angLines(MICHAEL[l]));
+    const n=document.createElement("p"); n.className="kru-note";
+    n.textContent = l==="hr" ? "Papa Lav XIII., 1886." : "Papst Leo XIII., 1886.";
+    box.appendChild(n);
+    const acts=document.createElement("div"); acts.className="ang-acts";
+    const done=document.createElement("button"); done.type="button"; done.className="ang-done"+(michPrayed()?" on":"");
+    done.textContent=michPrayed()?(l==="hr"?"pomoljeno ✓":"gebetet ✓"):(l==="hr"?"pomoli":"gebetet");
+    done.addEventListener("click",()=>{ michMark(); openMichael(); renderHeute(); });
+    const zu=document.createElement("button"); zu.type="button"; zu.className="ang-close";
+    zu.textContent=l==="hr"?"zatvori":"schließen";
+    zu.addEventListener("click",()=>ov.remove());
+    acts.append(done,zu); box.appendChild(acts);
+    ov.appendChild(box);
+    ov.addEventListener("click",e=>{ if(e.target===ov) ov.remove(); });
+    document.body.appendChild(ov);
+  }
+
   /* ---------- Weihe an Jesus durch Maria ----------
      Die tägliche Erneuerungsformel nach Montfort — kurz, alt, frei.
      Der volle Weiheakt wird einmal jährlich gesprochen; dafür gibt es
@@ -5666,6 +5726,12 @@
       (psPrayed()?`<span class="geb-ck">✓</span>`:``);
     pz.addEventListener("click",()=>{ ov.remove(); openPsalm(); });
     box.appendChild(pz);
+
+    const mi=document.createElement("button"); mi.type="button"; mi.className="geb-card row"+(michPrayed()?" done":"");
+    mi.innerHTML=`<span class="geb-c-t">${hr?"Sveti Mihael Arkanđeo":"Erzengel Michael"}</span>`+
+      (michPrayed()?`<span class="geb-ck">✓</span>`:``);
+    mi.addEventListener("click",()=>{ ov.remove(); openMichael(); });
+    box.appendChild(mi);
 
     const wz=document.createElement("button"); wz.type="button"; wz.className="geb-card row"+(weihePrayed()?" done":"");
     wz.innerHTML=`<span class="geb-c-t">${hr?"Posveta Isusu po Mariji":"Weihe an Jesus durch Maria"}</span>`+

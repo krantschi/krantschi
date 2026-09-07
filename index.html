@@ -512,6 +512,11 @@
 
   .km-q{margin-top:9px; padding-top:7px; border-top:1px solid rgba(255,255,255,.08);
     font-size:9.5px; color:rgba(237,233,228,.35)}
+  .ps-eigen{margin-top:14px; padding-top:11px; border-top:1px solid rgba(255,255,255,.1)}
+  .ps-edit{font:inherit; font-size:11px; font-weight:650; color:rgba(237,233,228,.45);
+    background:transparent; border:none; cursor:pointer; padding:2px 0}
+  .ps-edit:hover{color:var(--brass)}
+  .key-btn.del{color:var(--rose)}
   .weihe-voll{margin-top:14px; padding-top:12px; border-top:1px solid rgba(255,255,255,.1)}
   .weihe-b{padding:9px 0 0}
   .weihe-ta{width:100%; box-sizing:border-box; font-family:var(--serif); font-size:14px; line-height:1.6;
@@ -5139,6 +5144,17 @@
   /* ---------- Psalm 23 (Vulgata 22) ----------
      Deutsch nach Allioli (1851), lateinisch nach der Vulgata — beide gemeinfrei.
      Die Einheitsübersetzung ist geschützt und daher nicht verwendet. */
+  const PSTEXT="ht_psalmtext_v1";   // eigener Wortlaut je Sprache
+  // Der Wortlaut, der gerade gilt: eigener, sonst der mitgelieferte
+  function psVerse(l){
+    const eig=(read(PSTEXT,{})||{})[l];
+    if(typeof eig==="string" && eig.trim()){
+      return eig.split(/\n\s*\n/).map((abs,i)=>[String(i+1), abs.replace(/\s*\n\s*/g," ").trim()])
+                .filter(x=>x[1]);
+    }
+    return PSALM23[l];
+  }
+  const psEigen=l=>{ const e=(read(PSTEXT,{})||{})[l]; return typeof e==="string" && e.trim(); };
   const PSALM23={
     de:[["1","Ein Psalm Davids. Der Herr ist mein Hirt, mir wird nichts mangeln;"],
         ["2","auf einem Weideplatze lässt er mich lagern, an Wasser der Erquickung leitet er mich;"],
@@ -5160,7 +5176,7 @@
         ["6","Dobrota i milost pratit će mene sve dane života moga. U Gospodnjem ću domu prebivati kroz dane mnoge."]]
   };
   const PS_STUFEN=["ganz","halb","anfänge","zu"];
-  let psStufe=0, psSprache=null;
+  let psStufe=0, psSprache=null, psEdit=false;
   const psPrayed=()=>((loadAng().psalm||{})[today]===true);
   function psMark(){
     loadAng(); ang.psalm=ang.psalm||{};
@@ -5206,7 +5222,7 @@
     box.appendChild(st);
 
     const t=document.createElement("div"); t.className="ps-text";
-    PSALM23[l].forEach(([n,v])=>{
+    psVerse(l).forEach(([n,v])=>{
       const z=document.createElement("p"); z.className="ang-l ps-v";
       z.innerHTML=`<span class="ps-n">${n}</span><span class="ps-t">${psVerdecken(v,psStufe)}</span>`;
       // Antippen deckt einen Vers ganz auf
@@ -5218,6 +5234,34 @@
       t.appendChild(z);
     });
     box.appendChild(t);
+
+    // Eigenen Wortlaut einsetzen — Absätze werden zu Versen
+    const eb=document.createElement("div"); eb.className="ps-eigen";
+    if(psEdit){
+      const ta=document.createElement("textarea"); ta.className="weihe-ta"; ta.rows=10;
+      ta.placeholder="Wortlaut einsetzen. Eine Leerzeile trennt die Verse.";
+      ta.value=((read(PSTEXT,{})||{})[l])||PSALM23[l].map(x=>x[1]).join("\n\n");
+      const grow=()=>{ ta.style.height="auto"; ta.style.height=Math.max(200,ta.scrollHeight)+"px"; };
+      ta.addEventListener("input",()=>{ const o=read(PSTEXT,{})||{}; o[l]=ta.value; write(PSTEXT,o); grow(); });
+      requestAnimationFrame(grow);
+      eb.appendChild(ta);
+      const z2=document.createElement("div"); z2.className="cc-feld-akt";
+      const f=document.createElement("button"); f.type="button"; f.className="key-btn"; f.textContent="fertig";
+      f.addEventListener("click",()=>{ psEdit=false; openPsalm(); });
+      z2.appendChild(f);
+      if(psEigen(l)){
+        const zk=document.createElement("button"); zk.type="button"; zk.className="key-btn del"; zk.textContent="zurücksetzen";
+        zk.addEventListener("click",()=>{ const o=read(PSTEXT,{})||{}; delete o[l]; write(PSTEXT,o); psEdit=false; openPsalm(); });
+        z2.appendChild(zk);
+      }
+      eb.appendChild(z2);
+    }else{
+      const e=document.createElement("button"); e.type="button"; e.className="ps-edit";
+      e.textContent = psEigen(l) ? "eigener Wortlaut · ändern" : "eigenen Wortlaut einsetzen";
+      e.addEventListener("click",()=>{ psEdit=true; openPsalm(); });
+      eb.appendChild(e);
+    }
+    box.appendChild(eb);
 
     const q=document.createElement("p"); q.className="kru-note";
     q.textContent = l==="la" ? "Vulgata · Psalmus 22"

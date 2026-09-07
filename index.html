@@ -5238,6 +5238,133 @@
     document.body.appendChild(ov);
   }
 
+  /* ---------- Litanei der Großherzigkeit ----------
+     Neueren Datums; ein lateinischer Text existiert dafür nicht.
+     Als dritte Sprache steht deshalb das englische Original. */
+  const GROSS={
+    de:{ titel:"Litanei der Großherzigkeit",
+      head:"Herr Jesus Christus, Priester, Prophet und König, erhöre mich.",
+      rB:"befreie mich, Jesus.",
+      rG:"Jesus, schenke mir die Gnade, es zu ersehnen.",
+      sep:"Um die Gnade, zu ersehnen…",
+      b:["Von dem Verlangen nach einem bequemen Leben,",
+         "von dem Verlangen nach vergänglichen Vergnügen,",
+         "von dem Verlangen, ein Kind zu bleiben,",
+         "von dem Verlangen nach Reichtum ohne Arbeit,",
+         "von dem Verlangen nach billiger Gnade,",
+         "von dem Verlangen, in unbeschwerten Zeiten zu leben,",
+         "von dem Verlangen zu warten, bis ich bereit bin,",
+         "von dem Verlangen nach Sicherheit in dieser Welt,",
+         "von der Furcht, herausgefordert zu werden,",
+         "von der Furcht vor berechtigten Erwartungen,",
+         "von der Furcht vor harter Arbeit,",
+         "von der Furcht vor Veränderung,",
+         "von der Furcht, aus meiner Bequemlichkeit gerissen zu werden,",
+         "von der Furcht, dass man sich auf mich verlässt,",
+         "von der Furcht, Verantwortung zu tragen,",
+         "von der Furcht, auf die Probe gestellt zu werden,"],
+      g:["Dass der Wille des Vaters geschehe und nicht mein eigener,",
+         "dass Großes von mir verlangt werde zur Ehre Gottes und zum Wohl meines Nächsten,",
+         "dass ich um des Evangeliums willen leide,",
+         "dass mein Leben aus Kreuzen bestehe, damit ich meinem Erlöser gleiche,",
+         "dass ich die Leiden, die mich treffen, mutig aufopfere für das Heil der Seelen,",
+         "dass alle falsche Demut aus meiner Seele getilgt werde,",
+         "dass mein Licht vor den Menschen leuchte, damit sie meine guten Werke sehen und meinen Vater im Himmel preisen,"] },
+    hr:{ titel:"Litanije velikodušnosti",
+      head:"Gospodine Isuse Kriste, svećeniče, proroče i kralju, usliši me.",
+      rB:"oslobodi me, Isuse.",
+      rG:"Isuse, daj mi milost da to želim.",
+      sep:"Za milost da želim…",
+      b:["Od želje za udobnim životom,",
+         "od želje za prolaznim užicima,",
+         "od želje da ostanem dijete,",
+         "od želje za bogatstvom bez rada,",
+         "od želje za jeftinom milošću,",
+         "od želje da živim u bezbrižnim vremenima,",
+         "od želje da čekam dok ne budem spreman,",
+         "od želje za sigurnošću ovoga svijeta,",
+         "od straha da budem izazvan,",
+         "od straha od opravdanih očekivanja,",
+         "od straha od teškoga rada,",
+         "od straha od promjene,",
+         "od straha da budem istrgnut iz svoje udobnosti,",
+         "od straha da se drugi oslone na mene,",
+         "od straha da preuzmem odgovornost,",
+         "od straha da budem stavljen na kušnju,"],
+      g:["Da se vrši volja Očeva, a ne moja,",
+         "da se od mene traže velika djela na slavu Božju i na dobro bližnjega,",
+         "da trpim radi evanđelja,",
+         "da se moj život sastoji od križeva, kako bih nalikovao svome Spasitelju,",
+         "da patnje koje me snađu hrabro prikazujem za spasenje duša,",
+         "da se svaka lažna poniznost iskorijeni iz moje duše,",
+         "da svijetli svjetlo moje pred ljudima, da vide moja dobra djela i slave Oca mojega koji je na nebesima,"] },
+    en:{ titel:"Litany of Magnanimity",
+      head:"Lord Jesus Christ, priest, prophet, and king, hear me.",
+      rB:"deliver me, Jesus.",
+      rG:"Jesus, grant me the grace to desire it.",
+      sep:"Grant me the grace to desire…",
+      b:["From the desire for a comfortable life,",
+         "from the desire for passing pleasures,",
+         "from the desire to remain as a child,",
+         "from the desire for wealth without work,",
+         "from the desire for cheap grace,",
+         "from the desire to live in unchallenging times,",
+         "from the desire to wait until I am ready,",
+         "from the desire for this-worldly security,",
+         "from the fear of being challenged,",
+         "from the fear of just expectations,",
+         "from the fear of hard work,",
+         "from the fear of change,",
+         "from the fear of being pushed from my comfort zone,",
+         "from the fear of being depended upon,",
+         "from the fear of shouldering responsibility,",
+         "from the fear of being subject to the test,"],
+      g:["That the Father's will be done, rather than my own,",
+         "that great deeds may be asked of me for God's glory and my neighbours' good,",
+         "that I may suffer for the sake of the Gospel,",
+         "that my life may consist of crosses in order that I may imitate my Saviour,",
+         "that I might offer up the sufferings that befall me with courage for the salvation of souls,",
+         "that all false humility might be expunged from my soul,",
+         "that my light may shine before others, that they may see my good deeds and glorify my Father in heaven,"] }
+  };
+  const grossPrayed=()=>((loadAng().gross||{})[today]===true);
+  function grossMark(){
+    loadAng(); ang.gross=ang.gross||{};
+    if(ang.gross[today]) delete ang.gross[today]; else ang.gross[today]=true;
+    saveAng();
+  }
+  function openGross(){
+    document.querySelectorAll(".ang-overlay").forEach(x=>x.remove());
+    loadAng();
+    // Statt Latein steht hier das englische Original
+    const l = ang.lang==="hr" ? "hr" : ang.lang==="la" ? "en" : "de";
+    const t=GROSS[l];
+    const ov=document.createElement("div"); ov.className="ang-overlay open";
+    const box=document.createElement("div"); box.className="ang-box lit-box";
+    const h=document.createElement("div"); h.className="ang-h";
+    h.innerHTML=`<span class="ang-k secret">${esc(t.titel)}</span>`+
+      (l!=="de"?`<span class="ang-lang">${l==="hr"?"hrvatski":"english"}</span>`:``);
+    armSecret(h.querySelector(".ang-k"), ()=>{ ang.lang=nextLang(ang.lang); saveAng(); openGross(); });
+    box.appendChild(h);
+    let html=`<p class="lit-head">${esc(t.head)}</p>`;
+    html+=t.b.map(x=>`<p class="ang-l lit-l">${esc(x)}<span class="lit-r">${esc(t.rB)}</span></p>`).join("");
+    html+=`<p class="lit-sep">${esc(t.sep)}</p>`;
+    html+=t.g.map(x=>`<p class="ang-l lit-l">${esc(x)}<span class="lit-r">${esc(t.rG)}</span></p>`).join("");
+    html+=`<p class="lit-head" style="margin-top:14px">Amen.</p>`;
+    const body=document.createElement("div"); body.innerHTML=html; box.appendChild(body);
+    const acts=document.createElement("div"); acts.className="ang-acts";
+    const done=document.createElement("button"); done.type="button"; done.className="ang-btn ok";
+    done.textContent=grossPrayed()?(l==="hr"?"pomoljeno ✓":l==="en"?"prayed ✓":"gebetet ✓")
+                                  :(l==="hr"?"pomoli":l==="en"?"pray":"gebetet");
+    done.addEventListener("click",()=>{ grossMark(); ov.remove(); renderHeute(); });
+    const close=document.createElement("button"); close.type="button"; close.className="ang-btn";
+    close.textContent=l==="hr"?"zatvori":l==="en"?"close":"schließen";
+    close.addEventListener("click",()=>ov.remove());
+    acts.append(done,close); box.appendChild(acts); ov.appendChild(box);
+    ov.addEventListener("click",e=>{ if(e.target===ov) ov.remove(); });
+    document.body.appendChild(ov);
+  }
+
   function openLitanei(){
     document.querySelectorAll(".ang-overlay").forEach(x=>x.remove());
     loadAng();
@@ -5720,6 +5847,12 @@
       (litPrayed()?`<span class="geb-ck">✓</span>`:``);
     l.addEventListener("click",()=>{ ov.remove(); openLitanei(); });
     box.appendChild(l);
+
+    const gz=document.createElement("button"); gz.type="button"; gz.className="geb-card row"+(grossPrayed()?" done":"");
+    gz.innerHTML=`<span class="geb-c-t">${hr?"Litanije velikodušnosti":"Litanei der Großherzigkeit"}</span>`+
+      (grossPrayed()?`<span class="geb-ck">✓</span>`:``);
+    gz.addEventListener("click",()=>{ ov.remove(); openGross(); });
+    box.appendChild(gz);
 
     const pz=document.createElement("button"); pz.type="button"; pz.className="geb-card row"+(psPrayed()?" done":"");
     pz.innerHTML=`<span class="geb-c-t">${hr?"Psalam 23":"Psalm 23"}</span>`+

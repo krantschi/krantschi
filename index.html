@@ -2007,6 +2007,8 @@
 
   /* ---------- Sichern / Laden ---------- */
   .sync-bar{display:flex; gap:8px; margin-top:-4px}
+  .sync-btn.gefahr{color:var(--rose); opacity:.62}
+  .sync-btn.gefahr:hover{opacity:1; box-shadow:inset 0 0 0 1px var(--rose)}
   .sync-btn{flex:1; display:flex; align-items:center; justify-content:center; gap:6px; font:inherit; font-size:12.5px; font-weight:700;
     color:var(--ink-soft); background:var(--card); border:none; border-radius:11px; padding:9px 10px; cursor:pointer; box-shadow:var(--shadow)}
   .sync-btn:hover{color:var(--ink)}
@@ -2480,6 +2482,7 @@
         <button class="sync-btn" id="loadBtn" type="button">↓ Laden</button>
         <button class="sync-btn" id="saveBtn" type="button">↑ Sichern</button>
         <button class="sync-btn" id="bkBtn" type="button" title="Alles als Datei sichern">⤓ Datei</button>
+        <button class="sync-btn gefahr" id="wipeBtn" type="button" title="Alle abgelegten Texte endgültig löschen">Abgelegtes löschen</button>
       </div>
       <div class="wipe-bar" id="wipeBar" hidden>
         <div class="wipe-title">Aufräumen</div>
@@ -9968,6 +9971,7 @@
   (function(){
     const b=document.getElementById("bkBtn"); if(!b) return;
     b.addEventListener("click",backupExport);
+    const wb=document.getElementById("wipeBtn"); if(wb) wb.addEventListener("click",wipeEncrypted);
     let t=null;
     const st=()=>{ t=setTimeout(()=>{ t=null; backupImport(); },700); };
     const cl=()=>{ if(t){ clearTimeout(t); t=null; } };
@@ -10139,6 +10143,65 @@
     };
     inp.addEventListener("input",lauf);
     document.body.appendChild(ov); setTimeout(()=>inp.focus(),40); lauf();
+  }
+
+  /* ---------- Alle abgelegten Texte löschen ----------
+     Endgültig und über alle Orte hinweg. Nur mit Passwort und getippter Bestätigung. */
+  function encOrte(){
+    const o=[];
+    for(const d in (lockinText||{})){ const e=lockinText[d]||{};
+      for(const id in e) if(isEnc(e[id])) o.push({wo:"Lock In / Tagesabschluss", loesch:()=>{ delete lockinText[d][id]; write(LOCKTXT,lockinText); }}); }
+    try{ const cc=read(WABS,{});
+      for(const k in cc){ const r=cc[k]||{};
+        for(const id in (r.a||{})) if(isEnc(r.a[id])) o.push({wo:"Command Center", loesch:()=>{ const c2=read(WABS,{}); delete c2[k].a[id]; write(WABS,c2); }});
+        (r.meta||[]).forEach((m,mi)=>{ for(const q in (m.a||{})) if(isEnc(m.a[q]))
+          o.push({wo:"Command Center", loesch:()=>{ const c2=read(WABS,{}); delete c2[k].meta[mi].a[q]; write(WABS,c2); }}); });
+      } }catch(e){}
+    try{ (read(MSNOTIZ,[])||[]).forEach(n=>{ if(isEnc(n.t))
+      o.push({wo:"Metascript-Notizen", loesch:()=>{ msSave(msAlle().filter(x=>x.id!==n.id)); }}); }); }catch(e){}
+    try{ if(isEnc(vision.prosa)) o.push({wo:"Prosa-Vizija", loesch:()=>{ vision.prosa=""; saveVision(); }});
+      (vision.anti.points||[]).forEach(pt=>{ if(isEnc(pt.text))
+        o.push({wo:"Anti-Vizija", loesch:()=>{ pt.text=""; saveVision(); }}); }); }catch(e){}
+    try{ const fx=readFocus(); (fx.thoughts||[]).forEach(g=>{ if(isEnc(g.text))
+      o.push({wo:"Gedanken", loesch:()=>{ const f2=readFocus(); const h=(f2.thoughts||[]).find(x=>x.id===g.id);
+        if(h){ f2.thoughts=f2.thoughts.filter(x=>x.id!==g.id); writeFocus(f2); } }}); }); }catch(e){}
+    return o;
+  }
+  // Irgendein abgelegter Wert, um das Passwort zu prüfen
+  function ersterEnc(){
+    for(const d in (lockinText||{})){ const e=lockinText[d]||{}; for(const id in e) if(isEnc(e[id])) return e[id]; }
+    try{ const cc=read(WABS,{}); for(const k in cc){ const r=cc[k]||{};
+      for(const id in (r.a||{})) if(isEnc(r.a[id])) return r.a[id];
+      for(const m of (r.meta||[])) for(const q in (m.a||{})) if(isEnc(m.a[q])) return m.a[q]; } }catch(e){}
+    try{ for(const n of (read(MSNOTIZ,[])||[])) if(isEnc(n.t)) return n.t; }catch(e){}
+    try{ if(isEnc(vision.prosa)) return vision.prosa;
+      for(const pt of (vision.anti.points||[])) if(isEnc(pt.text)) return pt.text; }catch(e){}
+    try{ const fx=readFocus(); for(const g of (fx.thoughts||[])) if(isEnc(g.text)) return g.text; }catch(e){}
+    return null;
+  }
+  async function wipeEncrypted(){
+    const orte=encOrte();
+    if(!orte.length){ alert("Es liegt nichts Abgelegtes vor."); return; }
+    const zaehl={}; orte.forEach(x=>zaehl[x.wo]=(zaehl[x.wo]||0)+1);
+    const liste=Object.keys(zaehl).map(k=>"· "+k+": "+zaehl[k]).join("\n");
+    if(!confirm("Es werden "+orte.length+" abgelegte Texte ENDGÜLTIG gelöscht:\n\n"+liste+
+      "\n\nSie sind danach nicht wiederherstellbar — auch nicht mit dem Passwort.\n\nHast du vorher eine Sicherung gemacht?")) return;
+
+    // Passwort verlangen, damit das nicht versehentlich oder von fremder Hand geschieht
+    const pw=await ensurePassphrase();
+    if(pw==null) return;
+    const probe=ersterEnc();
+    let passt=false;
+    if(probe){ try{ await decWith(pw, unb64(cryptoRec.salt), probe); passt=true; }catch(e){} }
+    if(!passt && !confirm("Das Passwort passt nicht zu den abgelegten Texten.\n\nSie wären damit ohnehin nicht mehr zu öffnen. Trotzdem endgültig löschen?")) return;
+
+    const wort=prompt("Zum Bestätigen bitte LÖSCHEN eintippen:");
+    if((wort||"").trim().toUpperCase()!=="LÖSCHEN"){ toast("Abgebrochen"); return; }
+
+    orte.forEach(x=>{ try{ x.loesch(); }catch(e){} });
+    forgetKeys();
+    toast(orte.length+" abgelegte Texte gelöscht");
+    setTimeout(()=>location.reload(),700);
   }
 
   /* ---------- Sicherung: alles in eine Datei ---------- */

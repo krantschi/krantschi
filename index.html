@@ -6065,12 +6065,25 @@
 
   /* ---------- iCloud-Kalender (öffentlicher Link, lokal via Server geholt) ---------- */
   let calCfg=read(CAL,{url:""}), calEvents={}, calStatus="";
+  // Der Link kommt oft mit Leerzeichen, in Klammern oder ohne Vorsatz
+  function calNorm(u){
+    let x=String(u||"").trim().replace(/^<|>$/g,"").replace(/\s+/g,"");
+    x=x.replace(/^webcal:/i,"https:");
+    if(/^[\w.-]+\.\w+\//.test(x) && !/^https?:\/\//i.test(x)) x="https://"+x;
+    return x;
+  }
   function setupCalendar(){
     const cur=calCfg.url||"";
-    const v=prompt("Öffentlichen iCloud-Kalender-Link einfügen (webcal:// oder https://…ics).\nLeer lassen = Kalender entfernen.", cur);
+    const v=prompt("Öffentlichen iCloud-Kalender-Link einfügen.\n\nIn der Kalender-App: Kalender freigeben → Öffentlicher Kalender → Link kopieren.\nEr beginnt mit webcal:// oder https://\n\nLeer lassen = Kalender entfernen.", cur);
     if(v===null) return;
-    calCfg.url=v.trim(); write(CAL,calCfg); calEvents={}; calStatus="";
-    if(calCfg.url) loadCalendar(); else buildPrios();
+    const u=calNorm(v);
+    if(!u){ calCfg.url=""; write(CAL,calCfg); calEvents={}; calStatus=""; buildPrios(); return; }
+    if(!/^https?:\/\//i.test(u)){
+      alert("Das sieht nicht nach einem Link aus:\n\n"+v.trim().slice(0,80)+"\n\nEr muss mit webcal:// oder https:// beginnen. In der Kalender-App findest du ihn unter „Kalender freigeben“ → „Öffentlicher Kalender“.");
+      return;
+    }
+    calCfg.url=u; write(CAL,calCfg); calEvents={}; calStatus="";
+    loadCalendar();
   }
   function icsUnfold(txt){ return txt.replace(/\r\n/g,"\n").replace(/\n[ \t]/g,""); }
   function icsDate(val){
@@ -6105,14 +6118,29 @@
   async function loadCalendar(){
     if(!calCfg.url) return;
     calStatus="Kalender wird geladen …"; buildPrios();
+    // Der Kalender läuft über den Server auf dem Mac; ohne ihn geht es nicht
+    if(location.protocol!=="http:" || !/^(localhost|127\.|0\.0\.0\.0|192\.168\.|10\.)/.test(location.hostname)){
+      calStatus="Kalender braucht den Mac-Server";
+      buildPrios(); return;
+    }
     try{
       const r=await fetch("/kalender?url="+encodeURIComponent(calCfg.url));
+      if(!r.ok) throw new Error("http");
       const j=await r.json();
-      if(j.error) throw new Error("fetch");
+      if(j.error){
+        calStatus = j.grund==="kein_link"      ? "Link nicht gültig"
+                  : j.grund==="nicht_erreicht" ? "Server nicht erreicht — Link prüfen"
+                  : j.grund==="status"         ? "Abgelehnt (Fehler "+(j.code||"?")+") — ist der Kalender öffentlich?"
+                  : j.grund==="kein_kalender"  ? "Antwort ist kein Kalender — ist es der Freigabe-Link?"
+                  : "Kalender nicht erreichbar";
+        buildPrios(); return;
+      }
       calEvents=parseICS(j.ics||"");
+      const gesamt=Object.keys(calEvents).reduce((n,k)=>n+calEvents[k].length,0);
+      if(!gesamt){ calStatus="Kalender gelesen, aber ohne Termine"; buildPrios(); return; }
       const n=(calEvents[state.viewDate]||[]).length;
       calStatus = n ? `${n} Termin${n>1?"e":""} heute` : "Keine Termine heute";
-    }catch(e){ calStatus="Kalender nicht erreichbar"; }
+    }catch(e){ calStatus="Server antwortet nicht — läuft server.rb?"; }
     buildPrios();
   }
 

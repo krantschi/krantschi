@@ -2482,14 +2482,13 @@
         <button class="sync-btn" id="loadBtn" type="button">↓ Laden</button>
         <button class="sync-btn" id="saveBtn" type="button">↑ Sichern</button>
         <button class="sync-btn" id="bkBtn" type="button" title="Alles als Datei sichern">⤓ Datei</button>
-        <button class="sync-btn gefahr" id="wipeBtn" type="button" title="Alle geschriebenen Texte endgültig löschen">Texte löschen</button>
       </div>
       <div class="wipe-bar" id="wipeBar" hidden>
         <div class="wipe-title">Aufräumen</div>
-        <div class="wipe-desc">Löscht Texte in Lock-In und Tagesabschluss. Bewahrte Worte und Vizija bleiben erhalten. Kann nicht rückgängig gemacht werden.</div>
+        <div class="wipe-desc">Löscht alles Geschriebene — Wins, Tagesabschlüsse, Absichten, Metascripts, Command Center, Prosa- und Anti-Vizija, Gedanken. Aufgaben, Ziele, Gewohnheiten und Zitate bleiben. Kann nicht rückgängig gemacht werden.</div>
         <div class="wipe-btns">
-          <button class="wipe-btn soft" id="wipePlain" type="button">Offene Texte löschen<small>Abgelegte bleiben</small></button>
-          <button class="wipe-btn hard" id="wipeAll" type="button">Alles löschen<small>Auch Abgelegtes</small></button>
+          <button class="wipe-btn soft" id="wipePlain" type="button">Nur offene Texte<small>Abgelegte bleiben</small></button>
+          <button class="wipe-btn hard" id="wipeAll" type="button">Alle Texte<small>Auch Abgelegtes</small></button>
         </div>
       </div>
     </section>
@@ -5180,6 +5179,7 @@
   };
   const PS_STUFEN=["ganz","halb","anfänge","zu"];
   let psStufe=0, psSprache=null, psEdit=false;
+  let wipeOffen=false;   // der versteckte Aufräum-Bereich
   const psPrayed=()=>((loadAng().psalm||{})[today]===true);
   function psMark(){
     loadAng(); ang.psalm=ang.psalm||{};
@@ -6028,6 +6028,7 @@
   function renderHeute(){
     applyPhase();
     renderNachtrag();
+    const wb=document.getElementById("wipeBar"); if(wb) wb.hidden=!wipeOffen;
     renderSatz();
     renderAngelus();
     buildRing(); buildStrip(); buildHeader(); buildLockIn(); buildCats(); buildTagesabschluss(); buildSchatzBtn(); renderCalendar();
@@ -6053,34 +6054,7 @@
     document.body.classList.toggle("editing",state.editing);
     const b=document.getElementById("editBtn");
     b.textContent=state.editing?"Fertig":"Bearbeiten"; b.classList.toggle("primary",state.editing);
-    const wb=document.getElementById("wipeBar"); if(wb) wb.hidden=!state.editing;
     buildCats(); buildRing();
-  }
-  function wipeTexts(hard){
-    // Nur Lock-In + Tagesabschluss (Struktur: {tag:{feld:wert}})
-    // Schatzkammer und Vizija bleiben bewusst unangetastet.
-    let removed=0, keptEnc=0;
-    let lt={}; try{ lt=JSON.parse(localStorage.getItem(LOCKTXT)||"{}"); }catch(e){}
-    for(const day in lt){
-      for(const id in lt[day]){
-        const v=lt[day][id];
-        const enc = v && typeof v==="object" && v.iv && v.ct;
-        if(hard || !enc){ delete lt[day][id]; removed++; } else { keptEnc++; }
-      }
-      if(!Object.keys(lt[day]).length) delete lt[day];
-    }
-    write(LOCKTXT,lt); lockinText=lt;
-    return {removed, keptEnc};
-  }
-  function confirmWipe(hard){
-    const msg = hard
-      ? "WIRKLICH ALLES löschen?\n\nAlle Texte in Lock-In und Tagesabschluss — auch die verschlüsselten — werden entfernt. Bewahrte Worte und Vizija bleiben erhalten. Das lässt sich nicht rückgängig machen."
-      : "Alle unverschlüsselten Texte löschen?\n\nKlartext in Lock-In und Tagesabschluss wird entfernt. Verschlüsselte Einträge, Schatzkammer und Vizija bleiben erhalten. Das lässt sich nicht rückgängig machen.";
-    if(!confirm(msg)) return;
-    const r=wipeTexts(hard);
-    renderHeute();
-    const extra = r.keptEnc ? ` ${r.keptEnc} verschlüsselte Einträge blieben erhalten.` : "";
-    alert(`Aufgeräumt: ${r.removed} Feld-Texte in Lock-In/Tagesabschluss gelöscht.${extra}`);
   }
   function resetToday(){
     if(state.editing) return;
@@ -8099,17 +8073,21 @@
     // Zitate, die noch nicht in der Sammlung gelandet sind, ergänzen
     (quotes||[]).forEach(q=>{ const t=(q.text||"").trim();
       if(t && !aus.some(y=>y.text===t)) aus.push({id:q.id, text:t, author:q.author||"", imgId:q.imgId}); });
+    // Feste Reihenfolge, damit der Umlauf nicht springt, wenn du etwas hinzufügst
+    aus.sort((a,b)=>String(a.id).localeCompare(String(b.id)));
     return aus;
   }
   function satzDerWoche(){
     const w=wSatz(); if(!w||w.week!==weekInfo().key) return null;
     return satzQuelle().find(q=>q.id===w.id)||null;
   }
+  const SATZ_EPOCHE=Date.UTC(2020,0,1);
   function satzDesTages(){
     const qs=satzQuelle(); if(!qs.length) return null;
-    // Aus dem Datum eine Zahl — dadurch bleibt es den ganzen Tag derselbe Satz
-    let h=0; for(let i=0;i<today.length;i++) h=(h*31+today.charCodeAt(i))>>>0;
-    return qs[h%qs.length];
+    // Reihum, ein Zitat je Tag. Nach der Länge der Sammlung beginnt der Umlauf neu,
+    // sodass jedes Zitat gleich oft an die Reihe kommt.
+    const tag=Math.floor((Date.parse(today+"T00:00:00Z")-SATZ_EPOCHE)/86400000);
+    return qs[((tag%qs.length)+qs.length)%qs.length];
   }
   const heutigerSatz=()=>satzDerWoche()||satzDesTages();
 
@@ -9971,7 +9949,6 @@
   (function(){
     const b=document.getElementById("bkBtn"); if(!b) return;
     b.addEventListener("click",backupExport);
-    const wb=document.getElementById("wipeBtn"); if(wb) wb.addEventListener("click",wipeEncrypted);
     let t=null;
     const st=()=>{ t=setTimeout(()=>{ t=null; backupImport(); },700); };
     const cl=()=>{ if(t){ clearTimeout(t); t=null; } };
@@ -9984,8 +9961,14 @@
   applyTheme();
   document.getElementById("editBtn").addEventListener("click",toggleEdit);
   document.getElementById("resetBtn").addEventListener("click",resetToday);
-  document.getElementById("wipePlain").addEventListener("click",()=>confirmWipe(false));
-  document.getElementById("wipeAll").addEventListener("click",()=>confirmWipe(true));
+  document.getElementById("wipePlain").addEventListener("click",()=>wipeTexte(false));
+  document.getElementById("wipeAll").addEventListener("click",()=>wipeTexte(true));
+  // Versteckter Zugang: „Heute zurücksetzen" gedrückt halten
+  armSecret(document.getElementById("resetBtn"), ()=>{
+    wipeOffen=!wipeOffen; renderHeute();
+    if(wipeOffen) setTimeout(()=>{ const w=document.getElementById("wipeBar");
+      if(w&&w.scrollIntoView) w.scrollIntoView({behavior:"smooth",block:"center"}); },80);
+  });
   document.getElementById("saveBtn").addEventListener("click",doBackup);
   document.getElementById("loadBtn").addEventListener("click",doRestore);
   document.getElementById("syncBtn").addEventListener("click",async()=>{
@@ -10197,9 +10180,9 @@
     try{ const fx=readFocus(); for(const g of (fx.thoughts||[])) if(isEnc(g.text)) return g.text; }catch(e){}
     return null;
   }
-  async function wipeEncrypted(){
-    const orte=alleTexte();
-    if(!orte.length){ alert("Es sind keine Texte vorhanden."); return; }
+  async function wipeTexte(auchAbgelegte){
+    const orte=alleTexte().filter(x=>auchAbgelegte || !x.enc);
+    if(!orte.length){ alert(auchAbgelegte?"Es sind keine Texte vorhanden.":"Es sind keine offenen Texte vorhanden."); return; }
     const zaehl={}; orte.forEach(x=>zaehl[x.wo]=(zaehl[x.wo]||0)+1);
     const liste=Object.keys(zaehl).sort().map(k=>"· "+k+": "+zaehl[k]).join("\n");
     const zu=orte.filter(x=>x.enc).length;
@@ -10220,7 +10203,7 @@
     if((wort||"").trim().toUpperCase()!=="LÖSCHEN"){ toast("Abgebrochen"); return; }
 
     orte.forEach(x=>{ try{ x.loesch(); }catch(e){} });
-    forgetKeys();
+    forgetKeys(); wipeOffen=false;
     toast(orte.length+" Texte gelöscht");
     setTimeout(()=>location.reload(),700);
   }

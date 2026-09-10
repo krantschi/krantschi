@@ -1453,6 +1453,8 @@
   .tl-b-res::after{content:""; position:absolute; left:50%; bottom:2px; transform:translateX(-50%); width:22px; height:2px; border-radius:2px; background:var(--track)}
   .todo-check.sm{width:17px; height:17px; border-width:2px; flex:0 0 auto; margin-top:1px}
   .tl-foot{display:flex; align-items:center; gap:10px; padding:10px 16px 14px; border-top:1px solid var(--line)}
+  .tl-cal-btn.leise{opacity:.5; font-size:10.5px}
+  .tl-cal-btn.leise:hover{opacity:1}
   .tl-cal-btn{font:inherit; font-size:12px; font-weight:680; color:var(--sky); background:var(--sky-tint); border:none; border-radius:7px; padding:6px 11px; cursor:pointer}
   .tl-cal-status{font-size:11px; color:var(--ink-faint)}
 
@@ -2563,7 +2565,7 @@
   const ABSICHT="ht_absicht_v1";   // wandert als einziges mit auf das andere Gerät
   const MSNOTIZ="ht_metanotiz_v1";  // spontan Festgehaltenes, strikt lokal   // wandert als einziges mit auf das andere Gerät   // "morgen" = morgens für heute, "abend" = abends für morgen  // Satz der Woche
   const ANGELUS="ht_angelus_v1";
-  const APP_VERSION="2026-09-08";   // wird beim Aktualisieren hochgezählt
+  const APP_VERSION="2026-09-10";   // wird beim Aktualisieren hochgezählt
   const LOCKIN="ht_lockin_v1";
   const LOCKTXT="ht_lockintext_v1", CRYPTO="ht_crypto_v1", CAL="ht_cal_v1", QUOTES="ht_quotes_v1", LOCKCFG="ht_lockin_cfg_v1", SCHATZ="ht_schatz_v1", GOSPELC="ht_gospel_v1";
   const MAX_PRIOS=8;
@@ -6064,7 +6066,7 @@
   }
 
   /* ---------- iCloud-Kalender (öffentlicher Link, lokal via Server geholt) ---------- */
-  let calCfg=read(CAL,{url:""}), calEvents={}, calStatus="";
+  let calCfg=read(CAL,{url:"",bote:""}), calEvents={}, calStatus="";
   // Der Link kommt oft mit Leerzeichen, in Klammern oder ohne Vorsatz
   function calNorm(u){
     let x=String(u||"").trim().replace(/^<|>$/g,"").replace(/\s+/g,"");
@@ -6084,6 +6086,16 @@
     }
     calCfg.url=u; write(CAL,calCfg); calEvents={}; calStatus="";
     loadCalendar();
+  }
+  // Ohne Boten geht es nur am Mac; mit ihm auf beiden Geräten
+  function setupBote(){
+    const cur=calCfg.bote||"";
+    const v=prompt("Adresse des Kalender-Boten (Cloudflare Worker).\n\nSie sieht so aus:\nhttps://heute-kal.deinname.workers.dev\n\nOhne Boten wird der Kalender nur am Mac geladen.\nLeer lassen = wieder nur am Mac.", cur);
+    if(v===null) return;
+    let b=String(v).trim().replace(/\/+$/,"");
+    if(b && !/^https:\/\//i.test(b)) b="https://"+b.replace(/^https?:\/\//i,"");
+    calCfg.bote=b; write(CAL,calCfg); calEvents={}; calStatus="";
+    if(calCfg.url) loadCalendar(); else buildPrios();
   }
   function icsUnfold(txt){ return txt.replace(/\r\n/g,"\n").replace(/\n[ \t]/g,""); }
   function icsDate(val){
@@ -6118,17 +6130,22 @@
   async function loadCalendar(){
     if(!calCfg.url) return;
     calStatus="Kalender wird geladen …"; buildPrios();
-    // Der Kalender läuft über den Server auf dem Mac; ohne ihn geht es nicht
-    if(location.protocol!=="http:" || !/^(localhost|127\.|0\.0\.0\.0|192\.168\.|10\.)/.test(location.hostname)){
-      calStatus="Kalender braucht den Mac-Server";
+    const amMac = location.protocol==="http:" && /^(localhost|127\.|0\.0\.0\.0|192\.168\.|10\.)/.test(location.hostname);
+    // Der Bote läuft im Netz und ist von beiden Geräten erreichbar
+    const quelle = calCfg.bote ? calCfg.bote+"?url="
+                 : amMac       ? "/kalender?url="
+                 : null;
+    if(!quelle){
+      calStatus="Kalender braucht den Boten oder den Mac";
       buildPrios(); return;
     }
     try{
-      const r=await fetch("/kalender?url="+encodeURIComponent(calCfg.url));
+      const r=await fetch(quelle+encodeURIComponent(calCfg.url));
       if(!r.ok) throw new Error("http");
       const j=await r.json();
       if(j.error){
-        calStatus = j.grund==="kein_link"      ? "Link nicht gültig"
+        calStatus = j.grund==="anbieter"       ? "Anbieter nicht freigegeben ("+(j.host||"?")+")"
+                  : j.grund==="kein_link"      ? "Link nicht gültig"
                   : j.grund==="nicht_erreicht" ? "Server nicht erreicht — Link prüfen"
                   : j.grund==="status"         ? "Abgelehnt (Fehler "+(j.code||"?")+") — ist der Kalender öffentlich?"
                   : j.grund==="kein_kalender"  ? "Antwort ist kein Kalender — ist es der Freigabe-Link?"
@@ -6140,7 +6157,7 @@
       if(!gesamt){ calStatus="Kalender gelesen, aber ohne Termine"; buildPrios(); return; }
       const n=(calEvents[state.viewDate]||[]).length;
       calStatus = n ? `${n} Termin${n>1?"e":""} heute` : "Keine Termine heute";
-    }catch(e){ calStatus="Server antwortet nicht — läuft server.rb?"; }
+    }catch(e){ calStatus = calCfg.bote ? "Bote antwortet nicht — Adresse prüfen" : "Server antwortet nicht — läuft server.rb?"; }
     buildPrios();
   }
 
@@ -7847,7 +7864,16 @@
     const cfgBtn=document.createElement("button"); cfgBtn.className="tl-cal-btn"; cfgBtn.type="button";
     cfgBtn.textContent = calCfg.url ? "Kalender-Link ändern" : "iCloud-Kalender verbinden";
     cfgBtn.addEventListener("click",setupCalendar);
+    // Langdruck führt zum Boten — das braucht man einmal, dann nie wieder
+    armSecret(cfgBtn, setupBote);
     foot.appendChild(cfgBtn);
+    if(calCfg.url){
+      const bb=document.createElement("button"); bb.className="tl-cal-btn leise"; bb.type="button";
+      bb.textContent = calCfg.bote ? "Bote ✓" : "Bote einrichten";
+      bb.title = calCfg.bote ? calCfg.bote : "Damit der Kalender auch am iPhone geladen wird";
+      bb.addEventListener("click",setupBote);
+      foot.appendChild(bb);
+    }
     if(calCfg.url){ const st=document.createElement("span"); st.className="tl-cal-status"; st.textContent=calStatus||""; foot.appendChild(st); }
     panel.appendChild(foot);
     view.appendChild(panel);

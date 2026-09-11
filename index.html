@@ -2577,7 +2577,7 @@
   const ABSICHT="ht_absicht_v1";   // wandert als einziges mit auf das andere Gerät
   const MSNOTIZ="ht_metanotiz_v1";  // spontan Festgehaltenes, strikt lokal   // wandert als einziges mit auf das andere Gerät   // "morgen" = morgens für heute, "abend" = abends für morgen  // Satz der Woche
   const ANGELUS="ht_angelus_v1";
-  const APP_VERSION="2026-09-10";   // wird beim Aktualisieren hochgezählt
+  const APP_VERSION="2026-09-11";   // wird beim Aktualisieren hochgezählt
   const LOCKIN="ht_lockin_v1";
   const LOCKTXT="ht_lockintext_v1", CRYPTO="ht_crypto_v1", CAL="ht_cal_v1", QUOTES="ht_quotes_v1", LOCKCFG="ht_lockin_cfg_v1", SCHATZ="ht_schatz_v1", GOSPELC="ht_gospel_v1";
   const MAX_PRIOS=8;
@@ -6132,8 +6132,107 @@
     const d = z ? new Date(Date.UTC(+Y,+M-1,+D,+h,+mi,+s)) : new Date(+Y,+M-1,+D,+h,+mi,+s);
     return {date:ymd(d), allDay:false, hour:d.getHours(), min:d.getMinutes()};
   }
+  /* ---------- Wiederkehrende Termine ----------
+     Deckt ab, was in Kalendern üblich ist: täglich, wöchentlich (auch mit
+     mehreren Wochentagen), monatlich nach Datum oder nach Wochentag, jährlich.
+     Dazu INTERVAL, COUNT, UNTIL und gestrichene Einzeltermine (EXDATE). */
+  const WT=["SU","MO","TU","WE","TH","FR","SA"];
+  function rruleLesen(txt){
+    const r={};
+    txt.split(";").forEach(teil=>{
+      const [k,v]=teil.split("=");
+      if(k&&v) r[k.trim().toUpperCase()]=v.trim();
+    });
+    return r;
+  }
+  // Alle Termine einer Regel im sichtbaren Zeitraum
+  function serienTage(start, rr, exdates, vonKey, bisKey){
+    const aus=[];
+    const f=rr.FREQ, iv=Math.max(1,parseInt(rr.INTERVAL||"1",10));
+    if(!f) return aus;
+    const bis = rr.UNTIL ? rr.UNTIL.slice(0,8).replace(/(\d{4})(\d{2})(\d{2})/,"$1-$2-$3") : null;
+    const max = rr.COUNT ? parseInt(rr.COUNT,10) : null;
+    const tage = rr.BYDAY ? rr.BYDAY.split(",").map(x=>x.trim()) : [];
+
+    const d0=new Date(start+"T00:00:00");
+    let zaehler=0, schutz=0;
+    // Vom ersten Termin an vorwärts, bis der sichtbare Zeitraum durchlaufen ist
+    let cur=new Date(d0);
+    while(schutz++ < 4000){
+      const k=ymd(cur);
+      if(bisKey && k>bisKey) break;
+      if(bis && k>bis) break;
+      if(max!==null && zaehler>=max) break;
+
+      let treffer=[];
+      if(f==="DAILY") treffer=[k];
+      else if(f==="WEEKLY"){
+        if(tage.length){
+          // Die Woche von cur aus durchgehen
+          const wochenStart=new Date(cur); wochenStart.setDate(cur.getDate()-((cur.getDay()+6)%7));
+          treffer=tage.map(t=>{
+            const idx=WT.indexOf(t.replace(/^[-+]?\d+/,""));
+            if(idx<0) return null;
+            const x=new Date(wochenStart); x.setDate(wochenStart.getDate()+((idx+6)%7));
+            return ymd(x);
+          }).filter(Boolean);
+        } else treffer=[k];
+      }
+      else if(f==="MONTHLY"){
+        if(rr.BYDAY){
+          // etwa "-1SU" = letzter Sonntag, "2TU" = zweiter Dienstag
+          const m=/^([-+]?\d+)?([A-Z]{2})$/.exec(rr.BYDAY.split(",")[0].trim());
+          if(m){
+            const nth=m[1]?parseInt(m[1],10):1, wd=WT.indexOf(m[2]);
+            const j=cur.getFullYear(), mo=cur.getMonth();
+            if(nth>0){
+              const erster=new Date(j,mo,1);
+              let off=(wd-erster.getDay()+7)%7;
+              const x=new Date(j,mo,1+off+(nth-1)*7);
+              if(x.getMonth()===mo) treffer=[ymd(x)];
+            }else{
+              const letzter=new Date(j,mo+1,0);
+              let off=(letzter.getDay()-wd+7)%7;
+              const x=new Date(j,mo+1,0-off+(nth+1)*7);
+              if(x.getMonth()===mo) treffer=[ymd(x)];
+            }
+          }
+        } else {
+          const tag=rr.BYMONTHDAY?parseInt(rr.BYMONTHDAY,10):d0.getDate();
+          const x=new Date(cur.getFullYear(),cur.getMonth(),tag);
+          if(x.getDate()===tag) treffer=[ymd(x)];
+        }
+      }
+      else if(f==="YEARLY"){
+        const x=new Date(cur.getFullYear(), d0.getMonth(), d0.getDate());
+        if(x.getMonth()===d0.getMonth()) treffer=[ymd(x)];
+      }
+
+      treffer.forEach(t=>{
+        if(t<start) return;
+        if(bis && t>bis) return;
+        if(max!==null && zaehler>=max) return;
+        // Gestrichene Termine zählen mit — so sieht es die Norm vor
+        zaehler++;
+        if(exdates.indexOf(t)>=0) return;
+        if(vonKey && t<vonKey) return;
+        if(bisKey && t>bisKey) return;
+        aus.push(t);
+      });
+
+      if(f==="DAILY") cur.setDate(cur.getDate()+iv);
+      else if(f==="WEEKLY") cur.setDate(cur.getDate()+7*iv);
+      else if(f==="MONTHLY") cur.setMonth(cur.getMonth()+iv);
+      else if(f==="YEARLY") cur.setFullYear(cur.getFullYear()+iv);
+      else break;
+    }
+    return aus;
+  }
+
   function parseICS(txt){
     const out={};
+    // Nur ein Fenster berechnen, sonst läuft eine tägliche Serie ins Endlose
+    const CAL_VON=addDays(today,-35), CAL_BIS=addDays(today,120);
     icsUnfold(txt).split("BEGIN:VEVENT").slice(1).forEach(block=>{
       const body=block.split("END:VEVENT")[0];
       const sum=/(?:^|\n)SUMMARY[^:\n]*:(.*)/.exec(body);
@@ -6153,7 +6252,20 @@
       if(start>=24*60) return;
       // Ohne UID aus Tag, Zeit und Titel eine Kennung bilden
       const kern=(uid?uid[1].trim():"")|| (d.date+"|"+start+"|"+title);
-      (out[d.date]=out[d.date]||[]).push({start, dur, title, allDay:d.allDay, uid:kern});
+      const setzen=tag=>{
+        // Je Wiederholung eine eigene Kennung, damit Haken einzeln sitzen
+        const k = tag===d.date ? kern : kern+"#"+tag;
+        (out[tag]=out[tag]||[]).push({start, dur, title, allDay:d.allDay, uid:k});
+      };
+      const rr=/(?:^|\n)RRULE[^:\n]*:(.*)/.exec(body);
+      if(rr){
+        const ex=[];
+        (body.match(/(?:^|\n)EXDATE[^:\n]*:([^\n]*)/g)||[]).forEach(z=>{
+          z.split(":")[1].split(",").forEach(w=>{ const q=icsDate(w.trim()); if(q) ex.push(q.date); });
+        });
+        const tage=serienTage(d.date, rruleLesen(rr[1].trim()), ex, CAL_VON, CAL_BIS);
+        if(tage.length) tage.forEach(setzen); else setzen(d.date);
+      } else setzen(d.date);
     });
     return out;
   }

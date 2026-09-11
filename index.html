@@ -1436,6 +1436,18 @@
   .tl-now{position:absolute; left:-4px; right:0; height:2px; background:var(--rose); border-radius:2px; z-index:4}
   .tl-now::before{content:""; position:absolute; left:-4px; top:-3px; width:8px; height:8px; border-radius:50%; background:var(--rose)}
   .tl-event{position:absolute; left:4px; right:6px; padding:4px 8px; border-radius:6px; background:var(--sky-tint); border-left:2.5px solid var(--sky); overflow:hidden; z-index:1}
+  .tl-event{cursor:pointer; text-align:left; border:none; font:inherit}
+  .tl-ev-ck{position:absolute; right:6px; top:5px; width:11px; height:11px; border-radius:3px;
+    box-shadow:inset 0 0 0 1.4px currentColor; opacity:.4}
+  .tl-event.done .tl-ev-ck{background:currentColor; opacity:.85}
+  .tl-event.done .tl-ev-ck::after{content:"\2713"; display:block; color:var(--card); font-size:8px;
+    font-weight:800; line-height:11px; text-align:center}
+  .tl-event.done{opacity:.5}
+  .tl-event.done .tl-ev-title{text-decoration:line-through}
+  .wp-ev{cursor:pointer; border:none; font:inherit; text-align:left}
+  .wp-ev.done{opacity:.45; text-decoration:line-through}
+  .li-fest.ok{opacity:.5}
+  .li-fest.ok span:last-child{text-decoration:line-through}
   .tl-ev-time{display:block; font-size:9.5px; font-weight:800; color:var(--sky); font-variant-numeric:tabular-nums; letter-spacing:.03em}
   .tl-ev-title{display:block; font-size:12px; font-weight:600; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
   .tl-block{position:absolute; left:4px; right:6px; display:flex; align-items:flex-start; gap:8px; padding:6px 8px;
@@ -4008,12 +4020,13 @@
       // Was heute ohnehin feststeht
       const fest=[];
       blockersFor(D).forEach(b=>fest.push({t:b.text||"Blocker", z:fMinToClock(b.start)}));
-      (calEvents[D]||[]).forEach(ev=>{ if(typeof ev.start==="number") fest.push({t:ev.text||"Termin", z:fMinToClock(ev.start), k:true}); });
+      (calEvents[D]||[]).forEach(ev=>{ if(typeof ev.start==="number")
+        fest.push({t:ev.title||ev.text||"Termin", z:fMinToClock(ev.start), k:true, ok:calIstDone(D,ev)}); });
       fest.sort((a,b)=>a.z.localeCompare(b.z));
       if(fest.length){
         const f=document.createElement("div"); f.className="li-quelle";
         f.innerHTML=`<div class="cc-q-h">Steht fest</div>`+
-          fest.map(x=>`<div class="li-fest${x.k?" kal":""}"><span class="li-fz">${esc(x.z)}</span><span>${esc(x.t)}</span></div>`).join("");
+          fest.map(x=>`<div class="li-fest${x.k?" kal":""}${x.ok?" ok":""}"><span class="li-fz">${esc(x.z)}</span><span>${esc(x.t)}</span></div>`).join("");
         body.appendChild(f);
       }
       // Der Tag selbst
@@ -6067,6 +6080,20 @@
 
   /* ---------- iCloud-Kalender (öffentlicher Link, lokal via Server geholt) ---------- */
   let calCfg=read(CAL,{url:"",bote:""}), calEvents={}, calStatus="";
+  /* Erledigte Termine — nur die Kennung, nicht der Termin selbst.
+     Wird mit abgeglichen und nach acht Wochen aufgeräumt. */
+  const CALDONE="ht_caldone_v1";
+  const calKey=(tag,ev)=>tag+"~"+(ev.uid||ev.title);
+  const calDoneAll=()=>read(CALDONE,{});
+  const calIstDone=(tag,ev)=>!!calDoneAll()[calKey(tag,ev)];
+  function calToggle(tag,ev){
+    const o=calDoneAll(), k=calKey(tag,ev);
+    if(o[k]) delete o[k]; else o[k]=Date.now();
+    // Alte Haken verfallen, damit der Abgleich nicht zuwächst
+    const grenze=Date.now()-56*864e5;
+    for(const x in o) if(o[x]<grenze) delete o[x];
+    write(CALDONE,o);
+  }
   // Der Link kommt oft mit Leerzeichen, in Klammern oder ohne Vorsatz
   function calNorm(u){
     let x=String(u||"").trim().replace(/^<|>$/g,"").replace(/\s+/g,"");
@@ -6110,6 +6137,7 @@
     icsUnfold(txt).split("BEGIN:VEVENT").slice(1).forEach(block=>{
       const body=block.split("END:VEVENT")[0];
       const sum=/(?:^|\n)SUMMARY[^:\n]*:(.*)/.exec(body);
+      const uid=/(?:^|\n)UID[^:\n]*:(.*)/.exec(body);
       const dt=/(?:^|\n)DTSTART[^:\n]*:(.*)/.exec(body);
       const de=/(?:^|\n)DTEND[^:\n]*:(.*)/.exec(body);
       if(!dt) return;
@@ -6123,7 +6151,9 @@
         dur = (e && !e.allDay && e.date===d.date) ? Math.max(15,(e.hour*60+e.min)-start) : 60;
       }
       if(start>=24*60) return;
-      (out[d.date]=out[d.date]||[]).push({start, dur, title, allDay:d.allDay});
+      // Ohne UID aus Tag, Zeit und Titel eine Kennung bilden
+      const kern=(uid?uid[1].trim():"")|| (d.date+"|"+start+"|"+title);
+      (out[d.date]=out[d.date]||[]).push({start, dur, title, allDay:d.allDay, uid:kern});
     });
     return out;
   }
@@ -7461,11 +7491,14 @@
       // Kalendereinträge dieses Tages
       (calEvents[k]||[]).forEach(ev=>{
         if(typeof ev.start!=="number") return;
-        const e=document.createElement("div"); e.className="wp-ev";
+        const t=ev.title||ev.text||"Termin";
+        const fertig=calIstDone(k,ev);
+        const e=document.createElement("button"); e.type="button"; e.className="wp-ev"+(fertig?" done":"");
         e.style.top=((ev.start-TL_START)*WP_PXMIN)+"px";
         e.style.height=Math.max(11,(ev.dur||60)*WP_PXMIN-1)+"px";
-        e.title=(ev.text||"Termin")+" · "+fMinToClock(ev.start);
-        e.textContent=ev.text||"Termin";
+        e.title=t+" · "+fMinToClock(ev.start)+(fertig?" · erledigt":"");
+        e.textContent=t;
+        e.addEventListener("click",ev2=>{ ev2.stopPropagation(); calToggle(k,ev); buildPrios(); });
         body.appendChild(e);
       });
       // Fokuszeiten vergangener Tage — was tatsächlich lief
@@ -7771,12 +7804,16 @@
     }
     // Kalender-Termine
     (calEvents[state.viewDate]||[]).forEach(ev=>{
-      const el=document.createElement("div"); el.className="tl-event";
+      const fertig=calIstDone(state.viewDate,ev);
+      const el=document.createElement("button"); el.type="button";
+      el.className="tl-event"+(fertig?" done":"");
       el.style.top=min2y(Math.max(TL_START,ev.start))+"px";
       el.style.height=Math.max(22,(Math.min(ev.start+ev.dur,TL_END)-Math.max(TL_START,ev.start))*TL_PXMIN-2)+"px";
-      el.innerHTML=`<span class="tl-ev-time"></span><span class="tl-ev-title"></span>`;
+      el.innerHTML=`<span class="tl-ev-ck"></span><span class="tl-ev-time"></span><span class="tl-ev-title"></span>`;
       el.querySelector(".tl-ev-time").textContent=ev.allDay?"ganztägig":fmtMin(ev.start);
       el.querySelector(".tl-ev-title").textContent=ev.title;
+      el.title=fertig?"erledigt — antippen zum Zurücknehmen":"als erledigt abhaken";
+      el.addEventListener("click",()=>{ calToggle(state.viewDate,ev); buildPrios(); });
       track.appendChild(el);
     });
     // Aufgabenblöcke

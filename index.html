@@ -10013,8 +10013,11 @@
   let gospelLoaded=false;
   function cleanText(t){ return String(t||"").replace(/<br\s*\/?>/gi,"\n").replace(/<\/p>/gi,"\n\n").replace(/<[^>]+>/g,"").replace(/&nbsp;/g," ").replace(/\n{3,}/g,"\n\n").trim(); }
   async function fetchGospel(date){
-    // 1) lokaler Server (Mac)   2) taeglich erzeugte Datei neben der App (iPhone/Web)
-    const urls=["/evangelium?date="+date, "evangelium/"+date+".json"];
+    // 1) der Bote im Netz — von beiden Geräten erreichbar
+    // 2) lokaler Server (Mac)   3) Datei neben der App
+    const urls=[];
+    if(calCfg.bote) urls.push(calCfg.bote.replace(/\/+$/,"")+"/evangelium?date="+date);
+    urls.push("/evangelium?date="+date, "evangelium/"+date+".json");
     for(const u of urls){
       try{
         const r=await fetch(u,{cache:"no-store"});
@@ -10026,7 +10029,11 @@
         const stelle=g.stelle||"";
         const title=g.title||"";
         const text=cleanText(g.text||"");
-        if(text||ref) return {ref,stelle,title,text,source:j.source||g.source||"Evangelizo", papst:(j.papst||g.papst||null)};
+        // Die einzelnen Lesungen mitnehmen, sonst fehlen die Reiter
+        const teile=Array.isArray(j.teile)?j.teile:Array.isArray(g.teile)?g.teile:null;
+        const sauber=teile?teile.map(t=>({code:t.code,label:t.label,stelle:t.stelle||"",text:cleanText(t.text||"")}))
+                                 .filter(t=>t.text):null;
+        if(text||ref) return {ref,stelle,title,text,teile:sauber,source:j.source||g.source||"Evangelizo", papst:(j.papst||g.papst||null)};
       }catch(e){ /* naechste Quelle */ }
     }
     return {error:true};

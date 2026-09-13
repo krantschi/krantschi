@@ -1148,7 +1148,7 @@
   .cc-offen-hin{margin:0 20px 12px; font-size:11px; color:var(--mint); background:rgba(63,207,174,.1);
     border-radius:8px; padding:6px 11px}
   .li-sync{margin-top:5px; font-size:10.5px; color:var(--ink-faint); font-style:italic}
-  /* Zur Ruhe kommen */
+  /* Lockerer Fokus */
   .li-ruhe{margin-bottom:12px}
   .atem{padding:12px 0 2px}
   .atem-wahl{display:flex; gap:5px; margin-bottom:14px}
@@ -1177,20 +1177,47 @@
   .zf{margin-top:9px}
   .zf-kopf{display:flex; align-items:center; gap:7px; flex-wrap:wrap; margin-bottom:8px}
   .zf-stifte{display:flex; gap:5px}
-  .zf-f{width:20px; height:20px; border:none; border-radius:50%; cursor:pointer; padding:0;
-    background:var(--zf-c); box-shadow:0 0 0 1px rgba(var(--sheen),.18)}
-  .zf-f.on{box-shadow:0 0 0 2px var(--card), 0 0 0 3.5px var(--zf-c)}
-  .zf-d{width:26px; height:22px; display:grid; place-items:center; border:none; border-radius:6px;
-    background:rgba(var(--sheen),.07); cursor:pointer}
+
+
+
+
+
+
+
+
+
+
+  /* ---------- Zeichenfläche ---------- */
+  .zf{margin-top:10px}
+  .zf-feld{position:relative; border-radius:14px; overflow:hidden;
+    box-shadow:inset 0 0 0 1px var(--line), 0 1px 3px rgba(0,0,0,.06)}
+  .zf-cv{display:block; width:100%; touch-action:none; cursor:crosshair;
+    background-color:#FCFBF6;
+    /* Punktraster wie auf Notizpapier */
+    background-image:radial-gradient(circle, rgba(0,0,0,.11) 1.1px, transparent 1.2px);
+    background-size:26px 26px; background-position:13px 13px;
+    border-radius:10px}
+  body.dark .zf-cv{background-color:#16171B;
+    background-image:radial-gradient(circle, rgba(255,255,255,.1) 1.1px, transparent 1.2px)}
+  .zf-leer{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    pointer-events:none; font-family:var(--serif); font-style:italic; font-size:14px; color:rgba(0,0,0,.22)}
+  body.dark .zf-leer{color:rgba(255,255,255,.2)}
+  .zf-bar{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:9px}
+  .zf-farben{display:flex; gap:5px}
+  .zf-f{width:22px; height:22px; border:none; border-radius:50%; cursor:pointer; padding:0;
+    background:var(--c); box-shadow:0 0 0 1px rgba(0,0,0,.12); transition:transform .13s}
+  .zf-f.on{transform:scale(1.22); box-shadow:0 0 0 2px var(--card), 0 0 0 3.5px var(--c)}
+  .zf-dicken{display:flex; gap:3px; align-items:center}
+  .zf-d{width:24px; height:24px; border:none; border-radius:7px; background:transparent; cursor:pointer;
+    display:grid; place-items:center; padding:0}
+  .zf-d.on{background:rgba(var(--sheen),.1)}
   .zf-d>span{display:block; width:14px; background:var(--ink-soft); border-radius:99px}
   .zf-rad,.zf-btn{font:inherit; font-size:10.5px; font-weight:650; color:var(--ink-faint); background:transparent;
-    border:none; border-radius:999px; padding:4px 10px; cursor:pointer; box-shadow:inset 0 0 0 1px var(--line)}
-  .zf-rad.on{color:var(--rose); box-shadow:inset 0 0 0 1.3px var(--rose)}
+    border:none; border-radius:999px; padding:5px 11px; cursor:pointer; box-shadow:inset 0 0 0 1px var(--line)}
+  .zf-rad.on{color:var(--rose); box-shadow:inset 0 0 0 1.4px var(--rose)}
   .zf-btn{margin-left:auto}
   .zf-btn+.zf-btn{margin-left:0}
-  .zf-cv{display:block; width:100%; height:340px; border-radius:12px; background:var(--paper,#FCFBF6);
-    box-shadow:inset 0 0 0 1px var(--line); touch-action:none; cursor:crosshair}
-  .zf-hint{margin-top:6px; font-size:10.5px; color:var(--ink-faint); font-style:italic}
+  .zf-btn:disabled,.zf-d:disabled{opacity:.3; cursor:default}
   .zf-zu{display:flex; align-items:center; gap:10px; height:120px; justify-content:center;
     border-radius:12px; background:rgba(var(--sheen),.05); box-shadow:inset 0 0 0 1px var(--line)}
   .zf-zu-t{font-size:12px; color:var(--ink-faint)}
@@ -4012,7 +4039,7 @@
     }catch(e){ return 0; }
   }
 
-  /* ---------- Zur Ruhe kommen ----------
+  /* ---------- Lockerer Fokus ----------
      Kohärentes Atmen mit 5,5 Atemzügen je Minute — ein- und ausatmen gleich lang,
      ohne Halten. Dafür spricht die belastbarste Datenlage; die Wirkung auf die
      Herzratenvariabilität zeigt sich meist schon in den ersten zwei Minuten.
@@ -4176,91 +4203,128 @@
      die Striche als Text — dadurch greift derselbe Schutz wie bei allen Feldern. */
   const ZEICHEN_H = 260;
 
+  /* ---------- Zeichenfläche ----------
+     Für Apple Pencil gebaut. Drei Dinge machen den Unterschied zu billig wirkenden
+     Flächen: es wird nur das neue Stück gezeichnet statt alles neu, die Strichbreite
+     folgt Druck UND Geschwindigkeit (schnell = dünn, wie echte Tinte), und beides
+     wird geglättet, damit die Linie nicht zappelt. */
+  const ZF_H = 620;        // Grundhöhe
+  const ZF_MEHR = 420;     // was ein Druck auf „mehr Platz“ hinzufügt
+  const ZF_FARBEN = [
+    ["tinte",  "#1C1C1E"],
+    ["blau",   "#2C6BED"],
+    ["rot",    "#D0342C"],
+    ["gruen",  "#1F8A4C"],
+    ["messing","#B8873A"]
+  ];
+  let zfFarbe = 0, zfRadiert = false, zfDicke = 1;
+
   function zeichenFlaeche(hol, leg, neu, ro){
     const box = document.createElement("div"); box.className = "zf";
-
+    const feld = document.createElement("div"); feld.className = "zf-feld";
     const cv = document.createElement("canvas"); cv.className = "zf-cv";
-    box.appendChild(cv);
+    feld.appendChild(cv); box.appendChild(feld);
 
-    // Striche: [[x,y,druck], …] je Zug, auf ganze Zahlen gerundet
-    let striche = [];
+    // Ein Zug: {f:Farbindex, d:Dicke, p:[[x,y,breite], …]}
+    let zuege = [];
     try {
       const roh = hol();
-      if (typeof roh === "string" && roh.trim()) striche = JSON.parse(roh);
-      if (!Array.isArray(striche)) striche = [];
-    } catch (e) { striche = []; }
+      if (typeof roh === "string" && roh.trim()) {
+        const j = JSON.parse(roh);
+        zuege = Array.isArray(j) ? j.map(z => Array.isArray(z) ? {f:0,d:1,p:z} : z) : [];
+      }
+    } catch (e) { zuege = []; }
 
-    let stiftGesehen = false;   // sobald ein Stift da war, ignorieren wir Finger
-    let aktuell = null;
-    let ctx = null, breite = 0, hoehe = 0;
+    let stiftGesehen = false, aktuell = null, ctx = null;
+    let breite = 0, hoehe = ZF_H, dpr = 1;
+    let extra = 0;   // wie oft „mehr Platz“ gedrückt wurde
+    let letzterPunkt = null, letzteBreite = null, letzteZeit = 0;
 
     const messen = () => {
       const r = cv.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
+      dpr = Math.min(3, window.devicePixelRatio || 1);
       breite = Math.max(1, Math.round(r.width));
-      hoehe  = ZEICHEN_H;
+      hoehe = ZF_H + extra * ZF_MEHR;
       cv.width  = Math.round(breite * dpr);
       cv.height = Math.round(hoehe * dpr);
       cv.style.height = hoehe + "px";
-      ctx = cv.getContext("2d");
+      ctx = cv.getContext("2d", { desynchronized: true });
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
     };
 
-    const farbe = () => getComputedStyle(document.body).getPropertyValue("--ink").trim() || "#1b1b1b";
+    const farbeVon = i => ZF_FARBEN[Math.max(0, Math.min(ZF_FARBEN.length-1, i|0))][1];
 
-    // Ein Zug, geglättet über Mittelpunkte — dadurch keine Ecken
-    const zugMalen = (zug) => {
-      if (!zug || zug.length < 2) {
-        if (zug && zug.length === 1) {
-          const [x, y, d] = zug[0];
-          ctx.beginPath();
-          ctx.arc(x, y, Math.max(.6, d * 2.2), 0, Math.PI * 2);
-          ctx.fill();
-        }
-        return;
+    // Ein einzelnes Segment — das ist der Kern: es wird nur das gezeichnet,
+    // was neu dazugekommen ist, nie die ganze Fläche.
+    const segment = (a, b, hex, radiert) => {
+      ctx.save();
+      if (radiert) { ctx.globalCompositeOperation = "destination-out"; ctx.strokeStyle = "rgba(0,0,0,1)"; }
+      else ctx.strokeStyle = hex;
+      ctx.lineWidth = (a[2] + b[2]) / 2;
+      ctx.beginPath();
+      ctx.moveTo(a[0], a[1]);
+      ctx.lineTo(b[0], b[1]);
+      ctx.stroke();
+      ctx.restore();
+    };
+
+    const zugMalen = (z) => {
+      const hex = farbeVon(z.f), rad = z.f === -1;
+      const p = z.p || [];
+      if (p.length === 1) {
+        ctx.save();
+        if (rad) ctx.globalCompositeOperation = "destination-out";
+        ctx.fillStyle = rad ? "rgba(0,0,0,1)" : hex;
+        ctx.beginPath(); ctx.arc(p[0][0], p[0][1], p[0][2]/2, 0, Math.PI*2); ctx.fill();
+        ctx.restore(); return;
       }
-      for (let i = 1; i < zug.length; i++) {
-        const a = zug[i - 1], b = zug[i];
-        const mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2;
-        ctx.beginPath();
-        ctx.lineWidth = Math.max(.7, ((a[2] + b[2]) / 2) * 4.4);
-        if (i === 1) ctx.moveTo(a[0], a[1]); else {
-          const v = zug[i - 2];
-          ctx.moveTo((v[0] + a[0]) / 2, (v[1] + a[1]) / 2);
-        }
-        ctx.quadraticCurveTo(a[0], a[1], mx, my);
-        ctx.stroke();
-      }
+      for (let i = 1; i < p.length; i++) segment(p[i-1], p[i], hex, rad);
     };
 
     const alles = () => {
       if (!ctx) return;
       ctx.clearRect(0, 0, breite, hoehe);
-      ctx.strokeStyle = farbe();
-      ctx.fillStyle = farbe();
-      striche.forEach(zugMalen);
+      zuege.forEach(zugMalen);
       if (aktuell) zugMalen(aktuell);
-      leer.hidden = striche.length > 0 || !!aktuell;
+      leer.hidden = zuege.length > 0 || !!aktuell;
     };
 
-    const sichern = () => leg(striche.length ? JSON.stringify(striche) : "");
+    const sichern = () => leg((zuege.length || extra) ? JSON.stringify({z:zuege, e:extra}) : "");
 
-    const punkt = (e) => {
+    const roh = (e) => {
       const r = cv.getBoundingClientRect();
-      let d = (typeof e.pressure === "number" && e.pressure > 0) ? e.pressure : .5;
-      if (e.pointerType === "mouse") d = .5;
-      return [ Math.round((e.clientX - r.left) * 10) / 10,
-               Math.round((e.clientY - r.top)  * 10) / 10,
-               Math.round(d * 100) / 100 ];
+      return { x: e.clientX - r.left, y: e.clientY - r.top,
+               dr: (typeof e.pressure === "number" && e.pressure > 0) ? e.pressure : .5,
+               stift: e.pointerType === "pen" };
+    };
+
+    /* Strichbreite: Grundbreite mal Druck, verjüngt durch Geschwindigkeit.
+       Danach geglättet, sonst springt die Linie bei jedem Messwert. */
+    const breiteFuer = (p, jetzt) => {
+      const basis = (zfRadiert ? 20 : 4.6) * zfDicke;
+      let w;
+      if (zfRadiert) w = basis;
+      else {
+        const druck = p.stift ? (.5 + p.dr * 1.1) : 1;
+        let tempo = 0;
+        if (letzterPunkt && jetzt > letzteZeit) {
+          const dx = p.x - letzterPunkt.x, dy = p.y - letzterPunkt.y;
+          tempo = Math.hypot(dx, dy) / Math.max(1, jetzt - letzteZeit);  // px je ms
+        }
+        const duenner = 1 / (1 + Math.min(1.4, tempo * .55));
+        w = basis * druck * (.74 + .26 * duenner);
+      }
+      if (letzteBreite == null) letzteBreite = w;
+      letzteBreite = letzteBreite * .72 + w * .28;     // Glättung
+      return Math.max(1.5, letzteBreite);
     };
 
     const nimmt = (e) => {
       if (ro) return false;
       if (e.pointerType === "pen") { stiftGesehen = true; return true; }
-      // Handballen und Finger abweisen, sobald der Stift im Spiel ist
-      if (stiftGesehen && e.pointerType === "touch") return false;
+      if (stiftGesehen && e.pointerType === "touch") return false;   // Handballen
       return true;
     };
 
@@ -4268,58 +4332,118 @@
       if (!nimmt(e)) return;
       e.preventDefault();
       cv.setPointerCapture && cv.setPointerCapture(e.pointerId);
-      aktuell = [punkt(e)];
-      alles();
+      const jetzt = performance.now();
+      letzterPunkt = null; letzteBreite = null; letzteZeit = jetzt;
+      const p = roh(e);
+      const w = breiteFuer(p, jetzt);
+      aktuell = { f: zfRadiert ? -1 : zfFarbe, d: zfDicke, p: [[r1(p.x), r1(p.y), r1(w)]] };
+      letzterPunkt = p; letzteZeit = jetzt;
+      zugMalen(aktuell);
+      leer.hidden = true;
     };
+
     const zieht = (e) => {
       if (!aktuell || !nimmt(e)) return;
       e.preventDefault();
-      // Zwischenschritte mitnehmen, sonst wirkt der Strich eckig
-      const roh = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
-      roh.forEach(x => aktuell.push(punkt(x)));
-      alles();
+      const folge = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+      folge.forEach(x => {
+        const jetzt = performance.now();
+        const p = roh(x);
+        const w = breiteFuer(p, jetzt);
+        const neuP = [r1(p.x), r1(p.y), r1(w)];
+        const vor = aktuell.p[aktuell.p.length - 1];
+        // Winzige Bewegungen überspringen, das glättet zusätzlich
+        if (Math.hypot(neuP[0]-vor[0], neuP[1]-vor[1]) < .45) return;
+        aktuell.p.push(neuP);
+        segment(vor, neuP, farbeVon(aktuell.f), aktuell.f === -1);
+        letzterPunkt = p; letzteZeit = jetzt;
+      });
     };
+
     const hoch = () => {
       if (!aktuell) return;
-      if (aktuell.length) striche.push(aktuell);
-      aktuell = null;
-      alles(); sichern(); knoepfe();
+      if (aktuell.p.length) zuege.push(aktuell);
+      aktuell = null; letzterPunkt = null; letzteBreite = null;
+      sichern(); knoepfe(); leer.hidden = zuege.length > 0;
     };
+    const r1 = n => Math.round(n * 10) / 10;
 
     cv.addEventListener("pointerdown", runter);
     cv.addEventListener("pointermove", zieht);
     ["pointerup", "pointercancel", "pointerleave"].forEach(t => cv.addEventListener(t, hoch));
 
     const leer = document.createElement("div"); leer.className = "zf-leer";
-    leer.textContent = "Hier zeichnen";
-    box.appendChild(leer);
+    leer.textContent = "Hier schreiben oder zeichnen";
+    feld.appendChild(leer);
 
+    /* ---- Werkzeugleiste ---- */
     const bar = document.createElement("div"); bar.className = "zf-bar";
-    const zurueck = document.createElement("button"); zurueck.type = "button"; zurueck.className = "zf-b";
+
+    const farben = document.createElement("div"); farben.className = "zf-farben";
+    ZF_FARBEN.forEach(([name, hex], i) => {
+      const b = document.createElement("button"); b.type = "button";
+      b.className = "zf-f" + (!zfRadiert && zfFarbe === i ? " on" : "");
+      b.style.setProperty("--c", hex);
+      b.title = name;
+      b.addEventListener("click", () => { zfFarbe = i; zfRadiert = false; leisteAuf(); });
+      farben.appendChild(b);
+    });
+    bar.appendChild(farben);
+
+    const rad = document.createElement("button"); rad.type = "button";
+    rad.className = "zf-rad" + (zfRadiert ? " on" : "");
+    rad.textContent = "Radierer";
+    rad.addEventListener("click", () => { zfRadiert = !zfRadiert; leisteAuf(); });
+    bar.appendChild(rad);
+
+    const dicken = document.createElement("div"); dicken.className = "zf-dicken";
+    [[.6,"fein"],[1,"mittel"],[1.8,"breit"]].forEach(([v, t]) => {
+      const b = document.createElement("button"); b.type = "button";
+      b.className = "zf-d" + (zfDicke === v ? " on" : "");
+      b.title = t;
+      b.innerHTML = `<span style="height:${Math.round(v*4+1)}px"></span>`;
+      b.addEventListener("click", () => { zfDicke = v; leisteAuf(); });
+      dicken.appendChild(b);
+    });
+    bar.appendChild(dicken);
+
+    const zurueck = document.createElement("button"); zurueck.type = "button"; zurueck.className = "zf-btn";
     zurueck.textContent = "zurück";
-    zurueck.addEventListener("click", () => { striche.pop(); alles(); sichern(); knoepfe(); });
-    const weg = document.createElement("button"); weg.type = "button"; weg.className = "zf-b del";
+    zurueck.addEventListener("click", () => { zuege.pop(); alles(); sichern(); knoepfe(); });
+    const mehr = document.createElement("button"); mehr.type = "button"; mehr.className = "zf-btn";
+    mehr.textContent = "mehr Platz";
+    mehr.title = "Die Seite wird länger";
+    mehr.addEventListener("click", () => { extra++; messen(); alles(); sichern(); });
+    const weg = document.createElement("button"); weg.type = "button"; weg.className = "zf-btn";
     weg.textContent = "leeren";
     weg.addEventListener("click", () => {
-      if (!striche.length) return;
+      if (!zuege.length) return;
       if (!confirm("Zeichnung löschen?")) return;
-      striche = []; alles(); sichern(); knoepfe();
+      zuege = []; alles(); sichern(); knoepfe();
     });
-    bar.append(zurueck, weg);
+    bar.append(zurueck, mehr, weg);
     if (!ro) box.appendChild(bar);
 
-    function knoepfe() {
-      zurueck.disabled = !striche.length;
-      weg.disabled = !striche.length;
+    function leisteAuf(){
+      farben.querySelectorAll(".zf-f").forEach((b, i) =>
+        b.classList.toggle("on", !zfRadiert && zfFarbe === i));
+      rad.classList.toggle("on", zfRadiert);
+      dicken.querySelectorAll(".zf-d").forEach((b, i) =>
+        b.classList.toggle("on", zfDicke === [.6,1,1.8][i]));
+    }
+    function knoepfe(){
+      zurueck.disabled = !zuege.length;
+      weg.disabled = !zuege.length;
     }
 
-    requestAnimationFrame(() => { messen(); alles(); knoepfe(); });
-    // Bei Drehung oder Größenänderung neu zeichnen
-    if(typeof ResizeObserver==="function"){
-      const beobachter = new ResizeObserver(() => { messen(); alles(); });
-      beobachter.observe(cv);
+    requestAnimationFrame(() => { messen(); alles(); knoepfe(); leisteAuf(); });
+    if (typeof ResizeObserver === "function") {
+      let vor = 0;
+      new ResizeObserver(() => {
+        const b = Math.round(cv.getBoundingClientRect().width);
+        if (b && b !== vor) { vor = b; messen(); alles(); }
+      }).observe(cv);
     }
-
     return box;
   }
 
@@ -4355,18 +4479,10 @@
       else if(!ab && !(typeof wins==="string"&&wins.trim())) h+=`<div class="cc-q-leer">Noch kein Tagesabschluss vorhanden. Was du abends festhältst, steht am nächsten Morgen hier.</div>`;
       q.innerHTML=h; body.appendChild(q);
 
-      // Zur Ruhe kommen, bevor der Tag gebaut wird
-      const at=document.createElement("div"); at.className="li-atem";
-      const ah=document.createElement("button"); ah.type="button"; ah.className="li-ref-h"+(atemOffen?" on":"");
-      ah.innerHTML=`<span>Zur Ruhe kommen</span><span class="tli-c">⌄</span>`;
-      ah.addEventListener("click",()=>{ atemOffen=!atemOffen; if(!atemOffen) atemStop(); buildLockIn(); });
-      at.appendChild(ah);
-      if(atemOffen) at.appendChild(atemBauen());
-      body.appendChild(at);
-      // Erst ankommen, dann zurückschauen
+      // Lockerer Fokus: erst ankommen, dann zurückschauen
       const ruhe=document.createElement("div"); ruhe.className="li-ruhe";
       const rk=document.createElement("button"); rk.type="button"; rk.className="tli-h"+(ruheOffen?" on":"");
-      rk.innerHTML=`<span>Zur Ruhe kommen</span><span class="tli-c">⌄</span>`;
+      rk.innerHTML=`<span>Lockerer Fokus</span><span class="tli-c">⌄</span>`;
       rk.addEventListener("click",()=>{ atemStop(); ruheOffen=!ruheOffen; buildLockIn(); });
       ruhe.appendChild(rk);
       if(ruheOffen) ruhe.appendChild(atemBauen());

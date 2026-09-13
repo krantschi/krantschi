@@ -4208,6 +4208,7 @@
      Flächen: es wird nur das neue Stück gezeichnet statt alles neu, die Strichbreite
      folgt Druck UND Geschwindigkeit (schnell = dünn, wie echte Tinte), und beides
      wird geglättet, damit die Linie nicht zappelt. */
+  const ZF_STIFT = "ht_stift_v1";   // merkt sich, dass dieses Gerät einen Stift hat
   const ZF_H = 620;        // Grundhöhe
   const ZF_MEHR = 420;     // was ein Druck auf „mehr Platz“ hinzufügt
   const ZF_FARBEN = [
@@ -4235,7 +4236,8 @@
       }
     } catch (e) { zuege = []; }
 
-    let stiftGesehen = false, aktuell = null, ctx = null;
+    let stiftGesehen = (()=>{ try{ return localStorage.getItem(ZF_STIFT)==="1"; }catch(e){ return false; } })();
+    let aktuellTyp = null, aktuell = null, ctx = null;
     let breite = 0, hoehe = ZF_H, dpr = 1;
     let extra = 0;   // wie oft „mehr Platz“ gedrückt wurde
     let letzterPunkt = null, letzteBreite = null, letzteZeit = 0;
@@ -4258,15 +4260,30 @@
 
     // Ein einzelnes Segment — das ist der Kern: es wird nur das gezeichnet,
     // was neu dazugekommen ist, nie die ganze Fläche.
+    /* Ein Segment wird als gefülltes Band gezeichnet, das an beiden Enden
+       unterschiedlich breit sein darf. Dadurch läuft die Breite stufenlos mit
+       und es entstehen keine Absätze zwischen den Teilstücken. */
     const segment = (a, b, hex, radiert) => {
+      const dx = b[0]-a[0], dy = b[1]-a[1];
+      const len = Math.hypot(dx, dy);
       ctx.save();
-      if (radiert) { ctx.globalCompositeOperation = "destination-out"; ctx.strokeStyle = "rgba(0,0,0,1)"; }
-      else ctx.strokeStyle = hex;
-      ctx.lineWidth = (a[2] + b[2]) / 2;
+      if (radiert) { ctx.globalCompositeOperation = "destination-out"; ctx.fillStyle = "rgba(0,0,0,1)"; }
+      else ctx.fillStyle = hex;
+      const ha = Math.max(.35, a[2]/2), hb = Math.max(.35, b[2]/2);
+      if (len < .01) {
+        ctx.beginPath(); ctx.arc(b[0], b[1], hb, 0, Math.PI*2); ctx.fill();
+        ctx.restore(); return;
+      }
+      const nx = -dy/len, ny = dx/len;          // Senkrechte zur Richtung
+      const w1 = Math.atan2(ny, nx), w2 = Math.atan2(-ny, -nx);
       ctx.beginPath();
-      ctx.moveTo(a[0], a[1]);
-      ctx.lineTo(b[0], b[1]);
-      ctx.stroke();
+      ctx.moveTo(a[0]+nx*ha, a[1]+ny*ha);
+      ctx.lineTo(b[0]+nx*hb, b[1]+ny*hb);
+      ctx.arc(b[0], b[1], hb, w1, w2, false);   // runde Kuppe vorn
+      ctx.lineTo(a[0]-nx*ha, a[1]-ny*ha);
+      ctx.arc(a[0], a[1], ha, w2, w1, false);   // runde Kuppe hinten
+      ctx.closePath();
+      ctx.fill();
       ctx.restore();
     };
 
@@ -4292,6 +4309,14 @@
     };
 
     const sichern = () => leg((zuege.length || extra) ? JSON.stringify({z:zuege, e:extra}) : "");
+
+    // Ein nachlaufender Punkt: die Linie folgt dem Zeiger gedämpft statt roh
+    let glattX = null, glattY = null;
+    const glaetten = (x, y, neu) => {
+      if (neu || glattX == null) { glattX = x; glattY = y; }
+      else { glattX = glattX + (x - glattX) * .42; glattY = glattY + (y - glattY) * .42; }
+      return [glattX, glattY];
+    };
 
     const roh = (e) => {
       const r = cv.getBoundingClientRect();
@@ -4321,10 +4346,18 @@
       return Math.max(1.5, letzteBreite);
     };
 
+    /* Der Handballen liegt fast immer VOR der Spitze auf. Deshalb genügt es nicht,
+       den Stift erst beim Aufsetzen zu erkennen — wir merken uns über Sitzungen
+       hinweg, dass dieses Gerät einen Stift hat, und nehmen dann nur noch ihn. */
     const nimmt = (e) => {
       if (ro) return false;
-      if (e.pointerType === "pen") { stiftGesehen = true; return true; }
-      if (stiftGesehen && e.pointerType === "touch") return false;   // Handballen
+      if (e.pointerType === "pen") {
+        if (!stiftGesehen) { stiftGesehen = true; try{ localStorage.setItem(ZF_STIFT,"1"); }catch(x){} }
+        // Ein Finger-Zug, der gerade läuft, war der Handballen — verwerfen
+        if (aktuell && aktuellTyp !== "pen") { aktuell = null; alles(); }
+        return true;
+      }
+      if (stiftGesehen) return false;      // Finger und Handballen bleiben draußen
       return true;
     };
 
@@ -4335,7 +4368,9 @@
       const jetzt = performance.now();
       letzterPunkt = null; letzteBreite = null; letzteZeit = jetzt;
       const p = roh(e);
+      const g0 = glaetten(p.x, p.y, true); p.x = g0[0]; p.y = g0[1];
       const w = breiteFuer(p, jetzt);
+      aktuellTyp = e.pointerType;
       aktuell = { f: zfRadiert ? -1 : zfFarbe, d: zfDicke, p: [[r1(p.x), r1(p.y), r1(w)]] };
       letzterPunkt = p; letzteZeit = jetzt;
       zugMalen(aktuell);
@@ -4349,13 +4384,25 @@
       folge.forEach(x => {
         const jetzt = performance.now();
         const p = roh(x);
+        const g = glaetten(p.x, p.y, false); p.x = g[0]; p.y = g[1];
         const w = breiteFuer(p, jetzt);
         const neuP = [r1(p.x), r1(p.y), r1(w)];
         const vor = aktuell.p[aktuell.p.length - 1];
-        // Winzige Bewegungen überspringen, das glättet zusätzlich
-        if (Math.hypot(neuP[0]-vor[0], neuP[1]-vor[1]) < .45) return;
-        aktuell.p.push(neuP);
-        segment(vor, neuP, farbeVon(aktuell.f), aktuell.f === -1);
+        const weg = Math.hypot(neuP[0]-vor[0], neuP[1]-vor[1]);
+        if (weg < .28) return;              // Zittern an Ort und Stelle überspringen
+        const hex = farbeVon(aktuell.f), rad = aktuell.f === -1;
+        // Bei großen Sprüngen Zwischenpunkte setzen, damit die Kurve rund bleibt
+        const stufen = weg > 9 ? Math.min(8, Math.ceil(weg/4.5)) : 1;
+        let letzt = vor;
+        for (let k = 1; k <= stufen; k++) {
+          const t = k/stufen;
+          const zw = [ r1(vor[0] + (neuP[0]-vor[0])*t),
+                       r1(vor[1] + (neuP[1]-vor[1])*t),
+                       r1(vor[2] + (neuP[2]-vor[2])*t) ];
+          segment(letzt, zw, hex, rad);
+          aktuell.p.push(zw);
+          letzt = zw;
+        }
         letzterPunkt = p; letzteZeit = jetzt;
       });
     };

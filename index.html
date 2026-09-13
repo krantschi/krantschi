@@ -1148,6 +1148,73 @@
   .cc-offen-hin{margin:0 20px 12px; font-size:11px; color:var(--mint); background:rgba(63,207,174,.1);
     border-radius:8px; padding:6px 11px}
   .li-sync{margin-top:5px; font-size:10.5px; color:var(--ink-faint); font-style:italic}
+  /* Zur Ruhe kommen */
+  .li-ruhe{margin-bottom:12px}
+  .atem{padding:12px 0 2px}
+  .atem-wahl{display:flex; gap:5px; margin-bottom:14px}
+  .atem-w{font:inherit; font-size:10.5px; font-weight:650; color:var(--ink-faint); background:transparent;
+    border:none; border-radius:999px; padding:4px 11px; cursor:pointer; box-shadow:inset 0 0 0 1px var(--line)}
+  .atem-w.on{color:var(--on-accent); background:var(--brass); box-shadow:none}
+  .atem-buehne{position:relative; height:190px; display:grid; place-items:center; margin-bottom:10px}
+  .atem-kreis{position:absolute; width:88px; height:88px; border-radius:50%;
+    background:radial-gradient(circle at 38% 34%, rgba(227,178,95,.30), rgba(227,178,95,.07) 62%, transparent 72%);
+    box-shadow:0 0 0 1px rgba(227,178,95,.28), 0 0 46px -10px rgba(227,178,95,.42);
+    transform:scale(1); will-change:transform}
+  .atem-wort{position:relative; z-index:2; text-align:center}
+  .aw-p{display:block; font-family:var(--serif); font-size:16px; color:var(--ink)}
+  .aw-t{display:block; margin-top:3px; font-size:11px; color:var(--ink-faint); font-variant-numeric:tabular-nums}
+  .atem-hinweis{margin:0 0 12px; font-size:11.5px; line-height:1.5; color:var(--ink-faint); font-style:italic}
+  .atem-leiste{display:flex; align-items:center; gap:5px}
+  .atem-d{font:inherit; font-size:10.5px; font-weight:650; color:var(--ink-faint); background:transparent;
+    border:none; border-radius:999px; padding:4px 10px; cursor:pointer; box-shadow:inset 0 0 0 1px var(--line)}
+  .atem-d.on{color:var(--brass); box-shadow:inset 0 0 0 1.3px var(--brass)}
+  .atem-start{margin-left:auto; font:inherit; font-size:12px; font-weight:700; color:var(--on-accent);
+    background:var(--brass); border:none; border-radius:999px; padding:7px 18px; cursor:pointer}
+  @media (prefers-reduced-motion:reduce){ .atem-kreis{transition:none} }
+  /* Zeichenfläche */
+  .li-zeichnen{margin-top:14px}
+  .zf-marke{margin-left:auto; margin-right:6px; color:var(--brass); font-size:11px}
+  .zf{margin-top:9px}
+  .zf-kopf{display:flex; align-items:center; gap:7px; flex-wrap:wrap; margin-bottom:8px}
+  .zf-stifte{display:flex; gap:5px}
+  .zf-f{width:20px; height:20px; border:none; border-radius:50%; cursor:pointer; padding:0;
+    background:var(--zf-c); box-shadow:0 0 0 1px rgba(var(--sheen),.18)}
+  .zf-f.on{box-shadow:0 0 0 2px var(--card), 0 0 0 3.5px var(--zf-c)}
+  .zf-d{width:26px; height:22px; display:grid; place-items:center; border:none; border-radius:6px;
+    background:rgba(var(--sheen),.07); cursor:pointer}
+  .zf-d>span{display:block; width:14px; background:var(--ink-soft); border-radius:99px}
+  .zf-rad,.zf-btn{font:inherit; font-size:10.5px; font-weight:650; color:var(--ink-faint); background:transparent;
+    border:none; border-radius:999px; padding:4px 10px; cursor:pointer; box-shadow:inset 0 0 0 1px var(--line)}
+  .zf-rad.on{color:var(--rose); box-shadow:inset 0 0 0 1.3px var(--rose)}
+  .zf-btn{margin-left:auto}
+  .zf-btn+.zf-btn{margin-left:0}
+  .zf-cv{display:block; width:100%; height:340px; border-radius:12px; background:var(--paper,#FCFBF6);
+    box-shadow:inset 0 0 0 1px var(--line); touch-action:none; cursor:crosshair}
+  .zf-hint{margin-top:6px; font-size:10.5px; color:var(--ink-faint); font-style:italic}
+  .zf-zu{display:flex; align-items:center; gap:10px; height:120px; justify-content:center;
+    border-radius:12px; background:rgba(var(--sheen),.05); box-shadow:inset 0 0 0 1px var(--line)}
+  .zf-zu-t{font-size:12px; color:var(--ink-faint)}
+  /* Box Breathing */
+  .li-atem{margin:12px 0}
+  .atem-box{display:flex; flex-direction:column; align-items:center; gap:14px; padding:16px 0 6px}
+  .atem{position:relative; width:168px; height:168px}
+  .atem-svg{width:100%; height:100%; display:block}
+  .atem-bahn{fill:none; stroke:var(--line); stroke-width:1.5}
+  .atem-p{fill:var(--brass); filter:drop-shadow(0 0 7px var(--brass))}
+  .atem-mitte{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center;
+    justify-content:center; pointer-events:none; transform:scale(var(--dehn,.9)); transition:transform .12s linear}
+  .atem-phase{font-family:var(--serif); font-size:15px; color:var(--ink-soft); letter-spacing:.02em}
+  .atem-zahl{font-size:26px; font-weight:250; color:var(--ink); font-variant-numeric:tabular-nums; line-height:1.2}
+  .atem-leiste{display:flex; align-items:center; gap:6px}
+  .atem-m{font:inherit; font-size:10.5px; font-weight:700; color:var(--ink-faint); background:transparent;
+    border:none; border-radius:999px; padding:4px 10px; cursor:pointer; box-shadow:inset 0 0 0 1px var(--line)}
+  .atem-m.on{color:var(--brass); box-shadow:inset 0 0 0 1.3px var(--brass)}
+  .atem-start{font:inherit; font-size:12px; font-weight:700; color:var(--on-accent); background:var(--brass);
+    border:none; border-radius:999px; padding:6px 18px; cursor:pointer; margin-left:6px}
+  .li-wins{margin-top:8px; padding:9px 12px; border-radius:9px; background:rgba(63,207,174,.1)}
+  .li-wins-k{display:block; font-size:9px; font-weight:800; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--mint); margin-bottom:3px}
+  @media (prefers-reduced-motion:reduce){ .atem-mitte{transition:none} }
   .li-ref{margin-bottom:12px}
   .li-ref-h{width:100%; display:flex; align-items:center; gap:8px; font:inherit; font-size:11px; font-weight:700;
     color:var(--ink-faint); background:rgba(var(--sheen),.045); border:none; border-radius:8px; padding:7px 11px; cursor:pointer}
@@ -1428,6 +1495,11 @@
   .ask-btn.ok{color:var(--on-ink); background:var(--brass)}
   .ask-btn.del{flex:0 0 auto; color:var(--rose); background:var(--rose-tint)}
   .tl-wrap{padding:10px 14px 14px}
+  .tl-track{touch-action:pan-y}
+  .tl-ghost{position:absolute; left:4px; right:10px; border-radius:6px; pointer-events:none; z-index:4;
+    background:rgba(227,178,95,.3); box-shadow:inset 0 0 0 1.5px var(--brass);
+    font-size:10px; font-weight:750; color:var(--on-accent); padding:2px 8px;
+    overflow:hidden; font-variant-numeric:tabular-nums}
   .tl-track{position:relative; margin-left:46px; border-left:1px solid var(--hair); border-radius:2px}
   .tl-track.over{background:linear-gradient(var(--sky-tint),var(--sky-tint))}
   .tl-line{position:absolute; left:0; right:0; height:0; border-top:1px solid var(--line)}
@@ -2577,7 +2649,7 @@
   const ABSICHT="ht_absicht_v1";   // wandert als einziges mit auf das andere Gerät
   const MSNOTIZ="ht_metanotiz_v1";  // spontan Festgehaltenes, strikt lokal   // wandert als einziges mit auf das andere Gerät   // "morgen" = morgens für heute, "abend" = abends für morgen  // Satz der Woche
   const ANGELUS="ht_angelus_v1";
-  const APP_VERSION="2026-09-11";   // wird beim Aktualisieren hochgezählt
+  const APP_VERSION="2026-09-13";   // wird beim Aktualisieren hochgezählt
   const LOCKIN="ht_lockin_v1";
   const LOCKTXT="ht_lockintext_v1", CRYPTO="ht_crypto_v1", CAL="ht_cal_v1", QUOTES="ht_quotes_v1", LOCKCFG="ht_lockin_cfg_v1", SCHATZ="ht_schatz_v1", GOSPELC="ht_gospel_v1";
   const MAX_PRIOS=8;
@@ -2799,6 +2871,7 @@
     document.body.classList.toggle("tab-fokus", t==="fokus");
     // Die Rückseite schließt sich beim Verlassen — sie soll nicht offen liegen bleiben.
     if(t!=="vizija"){ antiOn=false; prosaOn=false; visEdit=false; ccOn=false; rueckOn=false; verlaufOn=false; ccVerlauf=false; monatOn=false; ccStop(); }
+    if(t!=="heute") atemStop();
     if(t!=="fokus") lernOn=false;   // versteckte Ansicht bleibt nicht offen liegen
     if(t==="vizija"){ buildVision(); playVizijaIntro(); }
     if(t==="fokus") buildFokus();
@@ -3743,7 +3816,7 @@
     toast(fehl ? (auf+" geöffnet, "+fehl+" nicht") : (auf===1?"Ein Feld geöffnet":auf+" Felder geöffnet"));
   }
 
-  let liStep=0, liTimer=null, liRest=0;
+  let liStep=0, liTimer=null, liRest=0, ruheOffen=false;
   const liRhythmus=()=>read(LIRHY,"morgen");
   // Für welchen Tag der Lock-In gilt: morgens für heute, abends für morgen
   function liTag(){
@@ -3751,7 +3824,7 @@
     return liRhythmus()==="abend" ? addDays(today,1) : today;
   }
   const liVortag=()=>addDays(liTag(),-1);
-  function liStop(){ if(liTimer){ clearInterval(liTimer); liTimer=null; } }
+  function liStop(){ if(liTimer){ clearInterval(liTimer); liTimer=null; } atemStop(); }
   const liSchritte=()=>lockinItems();
   const liGetan=(D,id)=>!!(lockinLog[D]||{})[id];
   /* Die Gewohnheit, die zum Lock In gehört — entweder ausdrücklich gewählt
@@ -3783,7 +3856,7 @@
     const head=document.createElement("button");
     head.className="lockin-head"; head.type="button"; head.setAttribute("aria-expanded", state.lockinOpen?"true":"false");
     head.innerHTML=`<span class="lockin-check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
-      <span class="lockin-title">Lock In</span>
+      <span class="lockin-title">Mein Morgen</span>
       ${fuerMorgen?`<span class="li-fuer">für morgen</span>`:``}
       ${s>0?`<span class="lockin-streak">🔥 ${s}</span>`:""}
       <span class="lockin-meter">${done}/${items.length}</span>
@@ -3863,7 +3936,7 @@
       hk.addEventListener("click",()=>toggleLockin(st.id));
       nav.appendChild(hk);
       const w=document.createElement("button"); w.type="button"; w.className="cc-weiter";
-      w.textContent = liStep<items.length-1 ? "weiter" : "Lock In abschließen";
+      w.textContent = liStep<items.length-1 ? "weiter" : "Morgen abschließen";
       w.addEventListener("click",()=>{
         liStop(); liRest=0;
         if(!liGetan(D,st.id) && !ro) toggleLockin(st.id, true);
@@ -3925,7 +3998,7 @@
   // Ein geschütztes Textfeld für einen Lock-In-Schritt
   /* Beim Abschließen wandert das Metascript von selbst in den Schutz.
      Ist in dieser Sitzung schon ein Passwort verwendet worden, ohne Rückfrage. */
-  const META_IDS=["meta","meta_t","meta_q0","meta_q1","meta_q2"];
+  const META_IDS=["meta","meta_t","meta_q0","meta_q1","meta_q2","meta_draw"];
   async function metaAblegen(D){
     const offen=META_IDS.filter(id=>{ const v=getText(D,id); return typeof v==="string" && v.trim(); });
     if(!offen.length) return 0;
@@ -3939,10 +4012,322 @@
     }catch(e){ return 0; }
   }
 
+  /* ---------- Zur Ruhe kommen ----------
+     Kohärentes Atmen mit 5,5 Atemzügen je Minute — ein- und ausatmen gleich lang,
+     ohne Halten. Dafür spricht die belastbarste Datenlage; die Wirkung auf die
+     Herzratenvariabilität zeigt sich meist schon in den ersten zwei Minuten.
+     Der Seufzer ist für akute Anspannung gedacht: zweimal einatmen, lang aus. */
+  const ATEM={
+    kohaerent:{ name:"Ruhig werden", takt:[["ein",5.5],["aus",5.5]],
+      hinweis:"Durch die Nase, klein und leise. Bequem schlägt tief." },
+    seufzer:{ name:"Seufzer", takt:[["ein",1.5],["nach",1.0],["aus",6.0]],
+      hinweis:"Zweimal kurz durch die Nase ein, dann lang durch den Mund aus." },
+    lang:{ name:"Langer Ausatem", takt:[["ein",4],["aus",8]],
+      hinweis:"Ohne Halten. Der Ausatem trägt die Beruhigung." }
+  };
+  let atemArt="kohaerent", atemLauf=null, atemEnde=0, atemDauer=180;
+  function atemStop(){ if(atemLauf){ cancelAnimationFrame(atemLauf); atemLauf=null; } }
+
+  function atemBauen(){
+    const box=document.createElement("div"); box.className="atem";
+    const wahl=document.createElement("div"); wahl.className="atem-wahl";
+    Object.keys(ATEM).forEach(k=>{
+      const b=document.createElement("button"); b.type="button";
+      b.className="atem-w"+(atemArt===k?" on":""); b.textContent=ATEM[k].name;
+      b.addEventListener("click",()=>{ atemStop(); atemArt=k; buildLockIn(); });
+      wahl.appendChild(b);
+    });
+    box.appendChild(wahl);
+
+    const buehne=document.createElement("div"); buehne.className="atem-buehne";
+    const kreis=document.createElement("div"); kreis.className="atem-kreis";
+    const wort=document.createElement("div"); wort.className="atem-wort";
+    wort.textContent="bereit";
+    buehne.append(kreis,wort); box.appendChild(buehne);
+
+    const hin=document.createElement("p"); hin.className="atem-hinweis";
+    hin.textContent=ATEM[atemArt].hinweis;
+    box.appendChild(hin);
+
+    const leiste=document.createElement("div"); leiste.className="atem-leiste";
+    [[120,"2 min"],[180,"3 min"],[300,"5 min"]].forEach(([sek,l])=>{
+      const b=document.createElement("button"); b.type="button";
+      b.className="atem-d"+(atemDauer===sek?" on":""); b.textContent=l;
+      b.addEventListener("click",()=>{ atemStop(); atemDauer=sek; buildLockIn(); });
+      leiste.appendChild(b);
+    });
+    const start=document.createElement("button"); start.type="button"; start.className="atem-start";
+    start.textContent="beginnen";
+    leiste.appendChild(start); box.appendChild(leiste);
+
+    const takt=ATEM[atemArt].takt;
+    const zyklus=takt.reduce((n,x)=>n+x[1],0);
+    let laeuft=false;
+    start.addEventListener("click",()=>{
+      if(laeuft){ atemStop(); laeuft=false; start.textContent="beginnen";
+        wort.textContent="bereit"; kreis.style.transform="scale(1)"; return; }
+      laeuft=true; start.textContent="anhalten";
+      atemEnde=Date.now()+atemDauer*1000;
+      const schritt=()=>{
+        const rest=atemEnde-Date.now();
+        if(rest<=0){ atemStop(); laeuft=false; start.textContent="beginnen";
+          wort.textContent="fertig"; kreis.style.transform="scale(1)";
+          try{ playGong(); }catch(e){} return; }
+        const t=((atemDauer*1000-rest)/1000)%zyklus;
+        let acc=0, phase=takt[0], anteil=0;
+        for(const p2 of takt){
+          if(t<acc+p2[1]){ phase=p2; anteil=(t-acc)/p2[1]; break; }
+          acc+=p2[1];
+        }
+        // Der Kreis wächst beim Einatmen, hält beim zweiten Zug, fällt beim Ausatmen
+        let gr;
+        if(phase[0]==="ein")       gr=1+0.55*weich(anteil);
+        else if(phase[0]==="nach") gr=1.55+0.12*weich(anteil);
+        else                        gr=(atemArt==="seufzer"?1.67:1.55)-((atemArt==="seufzer"?0.67:0.55))*weich(anteil);
+        kreis.style.transform="scale("+gr.toFixed(3)+")";
+        const sek=Math.ceil(rest/1000);
+        wort.innerHTML=`<span class="aw-p">${phase[0]==="ein"?"einatmen":phase[0]==="nach"?"noch einmal":"ausatmen"}</span>`+
+          `<span class="aw-t">${Math.floor(sek/60)}:${String(sek%60).padStart(2,"0")}</span>`;
+        atemLauf=requestAnimationFrame(schritt);
+      };
+      schritt();
+    });
+    return box;
+  }
+  // Sanfter Verlauf statt gleichförmigem Wachsen
+  const weich=x=>0.5-0.5*Math.cos(Math.PI*Math.max(0,Math.min(1,x)));
+
   function liFeld(D,id,ph,rows,ohneKnopf){
     const f=ccSicher(()=>getText(D,id), v=>setText(D,id,v), ph, rows, buildLockIn);
     if(ohneKnopf) f.querySelectorAll(".cc-feld-akt").forEach(x=>x.remove());
     return f;
+  }
+
+  /* ---------- Box Breathing ----------
+     Vier gleiche Phasen zu je vier Sekunden: ein, halten, aus, halten.
+     Ein Quadrat, an dem ein Punkt entlangläuft — man folgt ihm mit dem Atem. */
+  let atemOffen=false, zeichenOffen=false;
+  // iPad erkennen: Mehrfachberührung plus Tablet-Größe. Der Mac hat keine Berührung.
+  const istTablet = (()=>{ try{
+    return (navigator.maxTouchPoints||0) > 1 && Math.min(screen.width,screen.height) >= 700;
+  }catch(e){ return false; } })();
+  let atemAn=false, atemTimer=null, atemStart=0, atemMin=3;
+  function atemStop(){ if(atemTimer){ clearInterval(atemTimer); atemTimer=null; } atemAn=false; }
+  function atemBauen(){
+    const wrap=document.createElement("div"); wrap.className="atem";
+    const S=168, R=14, L=S-2*R;
+    wrap.innerHTML=`
+      <svg class="atem-svg" viewBox="0 0 ${S} ${S}" aria-hidden="true">
+        <rect class="atem-bahn" x="${R}" y="${R}" width="${L}" height="${L}" rx="10"/>
+        <circle class="atem-p" cx="${R}" cy="${R}" r="6"/>
+      </svg>
+      <div class="atem-mitte"><div class="atem-phase">bereit</div><div class="atem-zahl"></div></div>`;
+    const p=wrap.querySelector(".atem-p");
+    const phase=wrap.querySelector(".atem-phase");
+    const zahl=wrap.querySelector(".atem-zahl");
+    const NAMEN=["einatmen","halten","ausatmen","halten"];
+
+    const tick=()=>{
+      const ms=Date.now()-atemStart;
+      const rest=atemMin*60000-ms;
+      if(rest<=0){ atemStop(); phase.textContent="fertig"; zahl.textContent="";
+        p.setAttribute("cx",R); p.setAttribute("cy",R);
+        try{ playGong(); }catch(e){} buildLockIn(); return; }
+      const t=(ms/4000)%4;              // vier Sekunden je Seite
+      const i=Math.floor(t), f=t-i;
+      phase.textContent=NAMEN[i];
+      zahl.textContent=(4-Math.floor(f*4))+"";
+      // Der Punkt wandert im Uhrzeigersinn am Quadrat entlang
+      let x=R, y=R;
+      if(i===0){ x=R;         y=R+f*L; }
+      else if(i===1){ x=R+f*L; y=R+L; }
+      else if(i===2){ x=R+L;   y=R+L-f*L; }
+      else { x=R+L-f*L;        y=R; }
+      p.setAttribute("cx",x.toFixed(1)); p.setAttribute("cy",y.toFixed(1));
+      wrap.style.setProperty("--dehn", (i===0? .85+f*.15 : i===1? 1 : i===2? 1-f*.15 : .85).toFixed(3));
+    };
+
+    const leiste=document.createElement("div"); leiste.className="atem-leiste";
+    [2,3,5].forEach(m=>{
+      const b=document.createElement("button"); b.type="button";
+      b.className="atem-m"+(atemMin===m?" on":""); b.textContent=m+" min";
+      b.addEventListener("click",()=>{ atemMin=m; atemStop(); buildLockIn(); });
+      leiste.appendChild(b);
+    });
+    const start=document.createElement("button"); start.type="button"; start.className="atem-start";
+    start.textContent=atemAn?"anhalten":"beginnen";
+    start.addEventListener("click",()=>{
+      if(atemAn){ atemStop(); buildLockIn(); return; }
+      atemAn=true; atemStart=Date.now(); tick();
+      atemTimer=setInterval(tick,100);
+      start.textContent="anhalten";
+    });
+    leiste.appendChild(start);
+
+    const box=document.createElement("div"); box.className="atem-box";
+    box.appendChild(wrap); box.appendChild(leiste);
+    if(atemAn){ atemStart=atemStart||Date.now(); tick(); atemTimer=setInterval(tick,100); }
+    return box;
+  }
+
+  /* ---------- Zeichenfläche ----------
+     Für Apple Pencil gebaut: Druckstärke bestimmt die Strichbreite, die Handballen-
+     auflage wird abgewiesen, sobald ein Stift erkannt wurde. Gespeichert werden
+     die Striche als Text — dadurch greift derselbe Schutz wie bei allen Feldern. */
+  const ZEICHEN_H = 260;
+
+  function zeichenFlaeche(hol, leg, neu, ro){
+    const box = document.createElement("div"); box.className = "zf";
+
+    const cv = document.createElement("canvas"); cv.className = "zf-cv";
+    box.appendChild(cv);
+
+    // Striche: [[x,y,druck], …] je Zug, auf ganze Zahlen gerundet
+    let striche = [];
+    try {
+      const roh = hol();
+      if (typeof roh === "string" && roh.trim()) striche = JSON.parse(roh);
+      if (!Array.isArray(striche)) striche = [];
+    } catch (e) { striche = []; }
+
+    let stiftGesehen = false;   // sobald ein Stift da war, ignorieren wir Finger
+    let aktuell = null;
+    let ctx = null, breite = 0, hoehe = 0;
+
+    const messen = () => {
+      const r = cv.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      breite = Math.max(1, Math.round(r.width));
+      hoehe  = ZEICHEN_H;
+      cv.width  = Math.round(breite * dpr);
+      cv.height = Math.round(hoehe * dpr);
+      cv.style.height = hoehe + "px";
+      ctx = cv.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+    };
+
+    const farbe = () => getComputedStyle(document.body).getPropertyValue("--ink").trim() || "#1b1b1b";
+
+    // Ein Zug, geglättet über Mittelpunkte — dadurch keine Ecken
+    const zugMalen = (zug) => {
+      if (!zug || zug.length < 2) {
+        if (zug && zug.length === 1) {
+          const [x, y, d] = zug[0];
+          ctx.beginPath();
+          ctx.arc(x, y, Math.max(.6, d * 2.2), 0, Math.PI * 2);
+          ctx.fill();
+        }
+        return;
+      }
+      for (let i = 1; i < zug.length; i++) {
+        const a = zug[i - 1], b = zug[i];
+        const mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2;
+        ctx.beginPath();
+        ctx.lineWidth = Math.max(.7, ((a[2] + b[2]) / 2) * 4.4);
+        if (i === 1) ctx.moveTo(a[0], a[1]); else {
+          const v = zug[i - 2];
+          ctx.moveTo((v[0] + a[0]) / 2, (v[1] + a[1]) / 2);
+        }
+        ctx.quadraticCurveTo(a[0], a[1], mx, my);
+        ctx.stroke();
+      }
+    };
+
+    const alles = () => {
+      if (!ctx) return;
+      ctx.clearRect(0, 0, breite, hoehe);
+      ctx.strokeStyle = farbe();
+      ctx.fillStyle = farbe();
+      striche.forEach(zugMalen);
+      if (aktuell) zugMalen(aktuell);
+      leer.hidden = striche.length > 0 || !!aktuell;
+    };
+
+    const sichern = () => leg(striche.length ? JSON.stringify(striche) : "");
+
+    const punkt = (e) => {
+      const r = cv.getBoundingClientRect();
+      let d = (typeof e.pressure === "number" && e.pressure > 0) ? e.pressure : .5;
+      if (e.pointerType === "mouse") d = .5;
+      return [ Math.round((e.clientX - r.left) * 10) / 10,
+               Math.round((e.clientY - r.top)  * 10) / 10,
+               Math.round(d * 100) / 100 ];
+    };
+
+    const nimmt = (e) => {
+      if (ro) return false;
+      if (e.pointerType === "pen") { stiftGesehen = true; return true; }
+      // Handballen und Finger abweisen, sobald der Stift im Spiel ist
+      if (stiftGesehen && e.pointerType === "touch") return false;
+      return true;
+    };
+
+    const runter = (e) => {
+      if (!nimmt(e)) return;
+      e.preventDefault();
+      cv.setPointerCapture && cv.setPointerCapture(e.pointerId);
+      aktuell = [punkt(e)];
+      alles();
+    };
+    const zieht = (e) => {
+      if (!aktuell || !nimmt(e)) return;
+      e.preventDefault();
+      // Zwischenschritte mitnehmen, sonst wirkt der Strich eckig
+      const roh = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+      roh.forEach(x => aktuell.push(punkt(x)));
+      alles();
+    };
+    const hoch = () => {
+      if (!aktuell) return;
+      if (aktuell.length) striche.push(aktuell);
+      aktuell = null;
+      alles(); sichern(); knoepfe();
+    };
+
+    cv.addEventListener("pointerdown", runter);
+    cv.addEventListener("pointermove", zieht);
+    ["pointerup", "pointercancel", "pointerleave"].forEach(t => cv.addEventListener(t, hoch));
+
+    const leer = document.createElement("div"); leer.className = "zf-leer";
+    leer.textContent = "Hier zeichnen";
+    box.appendChild(leer);
+
+    const bar = document.createElement("div"); bar.className = "zf-bar";
+    const zurueck = document.createElement("button"); zurueck.type = "button"; zurueck.className = "zf-b";
+    zurueck.textContent = "zurück";
+    zurueck.addEventListener("click", () => { striche.pop(); alles(); sichern(); knoepfe(); });
+    const weg = document.createElement("button"); weg.type = "button"; weg.className = "zf-b del";
+    weg.textContent = "leeren";
+    weg.addEventListener("click", () => {
+      if (!striche.length) return;
+      if (!confirm("Zeichnung löschen?")) return;
+      striche = []; alles(); sichern(); knoepfe();
+    });
+    bar.append(zurueck, weg);
+    if (!ro) box.appendChild(bar);
+
+    function knoepfe() {
+      zurueck.disabled = !striche.length;
+      weg.disabled = !striche.length;
+    }
+
+    requestAnimationFrame(() => { messen(); alles(); knoepfe(); });
+    // Bei Drehung oder Größenänderung neu zeichnen
+    if(typeof ResizeObserver==="function"){
+      const beobachter = new ResizeObserver(() => { messen(); alles(); });
+      beobachter.observe(cv);
+    }
+
+    return box;
+  }
+
+  // Eine abgelegte Zeichnung sichtbar machen, ohne sie zu öffnen
+  function zeichenMaske(){
+    const d = document.createElement("div"); d.className = "zf-zu";
+    d.innerHTML = `<span class="tli-zu">· · · · ·</span>`;
+    return d;
   }
 
   function liBody(st,D,body,ro,fuerMorgen){
@@ -3953,6 +4338,7 @@
       const av=getText(g,"absicht");
       const ab=(typeof av==="string" && av.trim())?av.trim():null;
       const stand=vt.absicht_stand, komm=vt.absicht_komm;
+      const wins=vt.wins;
       const ber=vt.tagesabschluss;
       const q=document.createElement("div"); q.className="cc-quelle";
       let h="";
@@ -3962,10 +4348,30 @@
             ${stand?`<span class="li-stand ${stand}">${stand==="ja"?"gehalten":"nicht gehalten"}</span>`:``}</div>`;
         if(typeof komm==="string" && komm.trim()) h+=`<div class="li-komm">${esc(komm.trim())}</div>`;
       }
+      if(typeof wins==="string" && wins.trim())
+        h+=`<div class="li-wins"><span class="li-wins-k">Wins</span>${esc(wins.trim())}</div>`;
       if(isEnc(ber)) h+=`<div class="cc-q-leer">Der Bericht ist abgelegt.</div>`;
       else if(typeof ber==="string" && ber.trim()) h+=`<div class="li-bericht">${esc(ber.trim())}</div>`;
-      else if(!ab) h+=`<div class="cc-q-leer">Noch kein Tagesabschluss vorhanden. Was du abends festhältst, steht am nächsten Morgen hier.</div>`;
+      else if(!ab && !(typeof wins==="string"&&wins.trim())) h+=`<div class="cc-q-leer">Noch kein Tagesabschluss vorhanden. Was du abends festhältst, steht am nächsten Morgen hier.</div>`;
       q.innerHTML=h; body.appendChild(q);
+
+      // Zur Ruhe kommen, bevor der Tag gebaut wird
+      const at=document.createElement("div"); at.className="li-atem";
+      const ah=document.createElement("button"); ah.type="button"; ah.className="li-ref-h"+(atemOffen?" on":"");
+      ah.innerHTML=`<span>Zur Ruhe kommen</span><span class="tli-c">⌄</span>`;
+      ah.addEventListener("click",()=>{ atemOffen=!atemOffen; if(!atemOffen) atemStop(); buildLockIn(); });
+      at.appendChild(ah);
+      if(atemOffen) at.appendChild(atemBauen());
+      body.appendChild(at);
+      // Erst ankommen, dann zurückschauen
+      const ruhe=document.createElement("div"); ruhe.className="li-ruhe";
+      const rk=document.createElement("button"); rk.type="button"; rk.className="tli-h"+(ruheOffen?" on":"");
+      rk.innerHTML=`<span>Zur Ruhe kommen</span><span class="tli-c">⌄</span>`;
+      rk.addEventListener("click",()=>{ atemStop(); ruheOffen=!ruheOffen; buildLockIn(); });
+      ruhe.appendChild(rk);
+      if(ruheOffen) ruhe.appendChild(atemBauen());
+      body.appendChild(ruhe);
+
       const b=document.createElement("button"); b.type="button"; b.className="cc-link";
       b.textContent=(typeof ber==="string"&&ber.trim())||isEnc(ber) ? "Tagesabschluss ansehen →" : "Tagesabschluss nachholen →";
       b.addEventListener("click",()=>{ state.viewDate=g; state.tagOpen=true; renderHeute();
@@ -4081,7 +4487,7 @@
     }
     /* --- Metascript --- */
     if(st.id==="meta"){
-      const IDS=["meta","meta_t","meta_q0","meta_q1","meta_q2"];
+      const IDS=["meta","meta_t","meta_q0","meta_q1","meta_q2","meta_draw"];
       const felder=IDS.map(id=>({id, hol:()=>getText(D,id), leg:v=>setText(D,id,v)}));
       const zu=felder.filter(f=>isEnc(f.hol())).length;
 
@@ -4153,6 +4559,30 @@
       body.appendChild(e);
 
       // Ein Knopf legt das ganze Metascript ab
+      // Zeichenfläche — nur auf dem iPad
+      if(istTablet){
+        const zw=document.createElement("div"); zw.className="li-zeichnen";
+        const zh=document.createElement("button"); zh.type="button"; zh.className="li-ref-h"+(zeichenOffen?" on":"");
+        const hatBild=(()=>{ const v=getText(D,"meta_draw"); return isEnc(v)||(typeof v==="string"&&v.trim().length>2); })();
+        zh.innerHTML=`<span>Skizze</span>${hatBild?`<span class="zf-marke">✎</span>`:``}<span class="tli-c">⌄</span>`;
+        zh.addEventListener("click",()=>{ zeichenOffen=!zeichenOffen; buildLockIn(); });
+        zw.appendChild(zh);
+        if(zeichenOffen){
+          const v=getText(D,"meta_draw");
+          if(isEnc(v)){
+            const zu=document.createElement("div"); zu.className="zf-zu";
+            zu.innerHTML=`<span class="tli-zu">· · · · ·</span><span class="zf-zu-t">Skizze abgelegt</span>`;
+            zw.appendChild(zu);
+          }else{
+            zw.appendChild(zeichenFlaeche(
+              ()=>getText(D,"meta_draw"),
+              t=>setText(D,"meta_draw",t),
+              buildLockIn, ro));
+          }
+        }
+        body.appendChild(zw);
+      }
+
       const bar=document.createElement("div"); bar.className="li-meta-bar";
       if(zu>0){
         const auf=document.createElement("button"); auf.type="button"; auf.className="key-btn open";
@@ -4352,13 +4782,13 @@
     const has = isEnc(cur) ? true : (typeof cur==="string" && cur.trim().length>0);
     const sec=document.createElement("section"); sec.className="cat tages";
     const head=document.createElement("button"); head.className="lockin-head"; head.type="button"; head.setAttribute("aria-expanded", state.tagOpen?"true":"false");
-    head.innerHTML=`<span class="tag-icon" aria-hidden="true">🌙</span><span class="lockin-title">Tagesabschluss</span>${has?'<span class="tag-dot"></span>':''}<span class="chev" aria-hidden="true">⌄</span>`;
+    head.innerHTML=`<span class="tag-icon" aria-hidden="true">🌙</span><span class="lockin-title">Mein Tagesabschluss</span>${has?'<span class="tag-dot"></span>':''}<span class="chev" aria-hidden="true">⌄</span>`;
     head.addEventListener("click",()=>{ state.tagOpen=!state.tagOpen; if(!state.tagOpen){ tagStop(); tagRest=0; tagStep=0; } buildTagesabschluss(); });
     sec.appendChild(head);
     if(state.tagOpen){
       const panel=document.createElement("div"); panel.className="lockin-panel";
-      if(isToday()){
-        // Zwei Schritte: erst aufräumen, dann zurückschauen
+      if(canEdit()){
+        // Drei Schritte: erst aufräumen, dann erfassen, dann zurückschauen
         const pr=document.createElement("div"); pr.className="cc-prog tag-prog";
         ["Offene Punkte","Gewohnheiten","Rückblick"].forEach((l,i)=>{
           const d=document.createElement("button"); d.type="button";
@@ -4372,7 +4802,7 @@
         kp.innerHTML=`<span class="cc-n">${tagStep+1}</span><span class="cc-t">${["Offene Punkte","Gewohnheiten","Rückblick"][tagStep]}</span>`;
         panel.appendChild(kp);
       }
-      if(isToday() && tagStep===0){
+      if(canEdit() && tagStep===0){
         // Schritt 1: was noch offen ist, hier abhaken
         const offen=tagOffen();
         const f=document.createElement("p"); f.className="cc-frage";
@@ -4403,7 +4833,7 @@
         nav1.append(zu,w1); panel.appendChild(nav1);
         sec.appendChild(panel); root.appendChild(sec); return;
       }
-      if(isToday() && tagStep===1){
+      if(canEdit() && tagStep===1){
         // Schritt 2: jede Gewohnheit bekommt heute eine Antwort
         const offen=tagUnerfasst();
         const f=document.createElement("p"); f.className="cc-frage";
@@ -4447,7 +4877,7 @@
         nav.append(zur,w2); panel.appendChild(nav);
         sec.appendChild(panel); root.appendChild(sec); return;
       }
-      if(isToday()){
+      if(canEdit()){
         // Zeitfenster für den Abschluss — rau statt perfekt
         const uz=document.createElement("div"); uz.className="tag-uhrzeile";
         const uhr=document.createElement("button"); uhr.type="button"; uhr.className="cc-uhr";
@@ -4461,7 +4891,7 @@
         });
         uz.appendChild(uhr); panel.appendChild(uz);
       }
-      if(isToday()){
+      if(canEdit()){
         // Die Absicht des Morgens — und ob sie gehalten hat
         const ab=getText(D,"absicht");
         if(typeof ab==="string" && ab.trim()){
@@ -4508,7 +4938,7 @@
           const v=getText(D,it.id);
           return lockinOn(it.id,D) || isEnc(v) || (typeof v==="string" && v.trim());
         }).length;
-        kopf.innerHTML=`<span>Dein Lock In</span><span class="tli-n">${gesetzt}/${lockinItems().length}</span><span class="tli-c">⌄</span>`;
+        kopf.innerHTML=`<span>Mein Morgen</span><span class="tli-n">${gesetzt}/${lockinItems().length}</span><span class="tli-c">⌄</span>`;
         kopf.addEventListener("click",()=>{ state.tagLiOpen=!state.tagLiOpen; buildTagesabschluss(); });
         li.appendChild(kopf);
         if(state.tagLiOpen){
@@ -4524,7 +4954,7 @@
             b.appendChild(z);
           });
           const auf=document.createElement("button"); auf.type="button"; auf.className="cc-link";
-          auf.textContent="Lock In öffnen und durchgehen →";
+          auf.textContent="Morgen öffnen und durchgehen →";
           auf.addEventListener("click",()=>{ state.lockinOpen=true; liStep=0; renderHeute();
             setTimeout(()=>{ const el=document.getElementById("lockin"); if(el&&el.scrollIntoView) el.scrollIntoView({behavior:"smooth",block:"start"}); },80); });
           b.appendChild(auf);
@@ -4574,7 +5004,7 @@
         }
       }
       panel.appendChild(wrap);
-      if(isToday() && !ro){
+      if(canEdit() && !ro){
         const nav=document.createElement("div"); nav.className="tag-nav";
         const zur=document.createElement("button"); zur.type="button"; zur.className="cc-zur"; zur.textContent="zurück";
         zur.addEventListener("click",()=>{ tagStep=1; buildTagesabschluss(); });
@@ -7702,13 +8132,14 @@
     });
   }
   // Neue ToDo direkt aus der Tagesansicht — sie erscheint zugleich in der ToDo-Liste
-  async function newTaskAt(start){
+  async function newTaskAt(start, dauer){
+    const d0=dauer||60;
     const r=await askText({title:"Aufgabe um "+fMinToClock(start), placeholder:"Was steht an?", times:true,
-      from:fMinToClock(start), dur:60});
+      from:fMinToClock(start), dur:d0});
     if(!r||r.deleted||!r.text) return;
     ensurePrios();
     addItem({text:r.text,
-      start:clampMin(r.start!=null?r.start:start), dur:Math.max(TL_MINDUR,r.dur||60), fromTimeline:true});
+      start:clampMin(r.start!=null?r.start:start), dur:Math.max(TL_MINDUR,r.dur||d0), fromTimeline:true});
     savePrios(); buildPrios();
     toast("Aufgabe eingeplant");
   }
@@ -7979,23 +8410,56 @@
         track.appendChild(fb);
       });
     }
-    // Langdruck auf eine freie Stelle legt direkt eine ToDo mit Uhrzeit an
+    // Aufziehen legt einen Zeitraum an — wie im Kalender
     (function(){
-      let t=null, sy=0;
-      const startAt=e=>{
-        // auf bestehenden Einträgen soll der Langdruck nichts Neues anlegen
-        if(e.target.closest(".tl-block,.tl-event,.tl-blk,.tl-focus-blk,.tl-now")) return;
+      let von=null, ghost=null, gezogen=false, halten=null;
+      const anlegen=e=>{
         const pt=e.touches?e.touches[0]:e;
-        sy=pt.clientY;
         const r=track.getBoundingClientRect();
-        const raw=TL_START+Math.round(((pt.clientY-r.top)/TL_PXMIN)/TL_SNAP)*TL_SNAP;
-        t=setTimeout(()=>{ t=null; if(navigator.vibrate) try{navigator.vibrate(16);}catch(e2){} newTaskAt(clampMin(raw)); },520);
+        von=clampMin(TL_START+Math.round(((pt.clientY-r.top)/TL_PXMIN)/TL_SNAP)*TL_SNAP);
+        ghost=document.createElement("div"); ghost.className="tl-ghost";
+        ghost.style.top=min2y(von)+"px"; ghost.style.height=Math.max(9,TL_SNAP*TL_PXMIN)+"px";
+        ghost.dataset.von=von; ghost.dataset.bis=von+TL_SNAP;
+        ghost.textContent=fMinToClock(von)+"–"+fMinToClock(von+TL_SNAP);
+        track.appendChild(ghost);
       };
-      const move=e=>{ const pt=e.touches?e.touches[0]:e; if(t && Math.abs(pt.clientY-sy)>10){ clearTimeout(t); t=null; } };
-      const cancel=()=>{ if(t){ clearTimeout(t); t=null; } };
+      const startAt=e=>{
+        if(e.target.closest(".tl-block,.tl-event,.tl-blk,.tl-focus-blk,.tl-now")) return;
+        gezogen=false;
+        const pt=e.touches?e.touches[0]:e;
+        const sy=pt.clientY;
+        if(!e.touches){ anlegen(e); }
+        else halten=setTimeout(()=>{ halten=null;
+          if(navigator.vibrate) try{navigator.vibrate(16);}catch(e2){}
+          anlegen({touches:[{clientY:sy}]}); },300);
+      };
+      const move=e=>{
+        const pt=e.touches?e.touches[0]:e;
+        if(halten){ clearTimeout(halten); halten=null; }
+        if(von==null||!ghost) return;
+        if(e.cancelable) e.preventDefault();
+        const r=track.getBoundingClientRect();
+        const jetzt=clampMin(TL_START+Math.round(((pt.clientY-r.top)/TL_PXMIN)/TL_SNAP)*TL_SNAP);
+        const a=Math.min(von,jetzt), b=Math.max(von,jetzt)+TL_SNAP;
+        if(Math.abs(jetzt-von)>=TL_SNAP) gezogen=true;
+        ghost.style.top=min2y(a)+"px";
+        ghost.style.height=Math.max(9,(b-a)*TL_PXMIN)+"px";
+        ghost.dataset.von=a; ghost.dataset.bis=b;
+        ghost.textContent=fMinToClock(a)+"–"+fMinToClock(b);
+      };
+      const ende=()=>{
+        if(halten){ clearTimeout(halten); halten=null; }
+        if(von==null) return;
+        const g=ghost, v=von; von=null; ghost=null;
+        if(!g) return;
+        const a=parseInt(g.dataset.von,10), b=parseInt(g.dataset.bis,10);
+        g.remove();
+        if(gezogen && !isNaN(a) && !isNaN(b)) newTaskAt(a, b-a);
+        else newTaskAt(v);
+      };
       track.addEventListener("mousedown",startAt); track.addEventListener("touchstart",startAt,{passive:true});
-      track.addEventListener("mousemove",move); track.addEventListener("touchmove",move,{passive:true});
-      ["mouseup","mouseleave","touchend","touchcancel"].forEach(ev=>track.addEventListener(ev,cancel));
+      track.addEventListener("mousemove",move);    track.addEventListener("touchmove",move,{passive:false});
+      ["mouseup","mouseleave","touchend","touchcancel"].forEach(ev=>track.addEventListener(ev,ende));
     })();
 
     // Blocker dieses Tages

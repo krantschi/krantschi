@@ -170,6 +170,8 @@
     transition:all .16s}
   .gt-b:hover{color:var(--ink-soft)}
   .gt-b.on{color:var(--on-accent); background:var(--brass); box-shadow:none}
+  .gr-was{font-weight:750; color:var(--ink-soft)}
+  .gr-wo{margin-left:9px; font-weight:650; color:var(--brass); font-variant-numeric:tabular-nums}
   .gospel-ref{font-size:11.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--sky)}
   .gospel-title{font-size:14.5px; font-weight:680; margin-top:4px; color:var(--ink); line-height:1.3}
   .gospel-text{margin-top:9px; font-size:14px; line-height:1.62; color:var(--ink-soft); white-space:pre-line}
@@ -1168,6 +1170,8 @@
   .atem-d{font:inherit; font-size:10.5px; font-weight:650; color:var(--ink-faint); background:transparent;
     border:none; border-radius:999px; padding:4px 10px; cursor:pointer; box-shadow:inset 0 0 0 1px var(--line)}
   .atem-d.on{color:var(--brass); box-shadow:inset 0 0 0 1.3px var(--brass)}
+  .atem-m.ton{margin-left:8px}
+  .atem-m.ton.on{color:var(--mint); box-shadow:inset 0 0 0 1.3px var(--mint)}
   .atem-start{margin-left:auto; font:inherit; font-size:12px; font-weight:700; color:var(--on-accent);
     background:var(--brass); border:none; border-radius:999px; padding:7px 18px; cursor:pointer}
   @media (prefers-reduced-motion:reduce){ .atem-kreis{transition:none} }
@@ -2676,7 +2680,7 @@
   const ABSICHT="ht_absicht_v1";   // wandert als einziges mit auf das andere Gerät
   const MSNOTIZ="ht_metanotiz_v1";  // spontan Festgehaltenes, strikt lokal   // wandert als einziges mit auf das andere Gerät   // "morgen" = morgens für heute, "abend" = abends für morgen  // Satz der Woche
   const ANGELUS="ht_angelus_v1";
-  const APP_VERSION="2026-09-13";   // wird beim Aktualisieren hochgezählt
+  const APP_VERSION="2026-09-14";   // wird beim Aktualisieren hochgezählt
   const LOCKIN="ht_lockin_v1";
   const LOCKTXT="ht_lockintext_v1", CRYPTO="ht_crypto_v1", CAL="ht_cal_v1", QUOTES="ht_quotes_v1", LOCKCFG="ht_lockin_cfg_v1", SCHATZ="ht_schatz_v1", GOSPELC="ht_gospel_v1";
   const MAX_PRIOS=8;
@@ -3844,6 +3848,10 @@
   }
 
   let liStep=0, liTimer=null, liRest=0, ruheOffen=false;
+  /* Lockerer Fokus: Box Breathing, sechs Sekunden je Phase */
+  let atemAn=false, atemTimer=null, atemStart=0, atemMin=3;
+  let atemTonAn=true;   // Klang bei jedem Wechsel, damit es ohne Bildschirm geht
+  function atemStop(){ if(atemTimer){ clearInterval(atemTimer); atemTimer=null; } atemAn=false; }
   const liRhythmus=()=>read(LIRHY,"morgen");
   // Für welchen Tag der Lock-In gilt: morgens für heute, abends für morgen
   function liTag(){
@@ -4052,94 +4060,7 @@
     lang:{ name:"Langer Ausatem", takt:[["ein",4],["aus",8]],
       hinweis:"Ohne Halten. Der Ausatem trägt die Beruhigung." }
   };
-  let atemArt="kohaerent", atemLauf=null, atemEnde=0, atemDauer=180;
-  function atemStop(){ if(atemLauf){ cancelAnimationFrame(atemLauf); atemLauf=null; } }
 
-  function atemBauen(){
-    const box=document.createElement("div"); box.className="atem";
-    const wahl=document.createElement("div"); wahl.className="atem-wahl";
-    Object.keys(ATEM).forEach(k=>{
-      const b=document.createElement("button"); b.type="button";
-      b.className="atem-w"+(atemArt===k?" on":""); b.textContent=ATEM[k].name;
-      b.addEventListener("click",()=>{ atemStop(); atemArt=k; buildLockIn(); });
-      wahl.appendChild(b);
-    });
-    box.appendChild(wahl);
-
-    const buehne=document.createElement("div"); buehne.className="atem-buehne";
-    const kreis=document.createElement("div"); kreis.className="atem-kreis";
-    const wort=document.createElement("div"); wort.className="atem-wort";
-    wort.textContent="bereit";
-    buehne.append(kreis,wort); box.appendChild(buehne);
-
-    const hin=document.createElement("p"); hin.className="atem-hinweis";
-    hin.textContent=ATEM[atemArt].hinweis;
-    box.appendChild(hin);
-
-    const leiste=document.createElement("div"); leiste.className="atem-leiste";
-    [[120,"2 min"],[180,"3 min"],[300,"5 min"]].forEach(([sek,l])=>{
-      const b=document.createElement("button"); b.type="button";
-      b.className="atem-d"+(atemDauer===sek?" on":""); b.textContent=l;
-      b.addEventListener("click",()=>{ atemStop(); atemDauer=sek; buildLockIn(); });
-      leiste.appendChild(b);
-    });
-    const start=document.createElement("button"); start.type="button"; start.className="atem-start";
-    start.textContent="beginnen";
-    leiste.appendChild(start); box.appendChild(leiste);
-
-    const takt=ATEM[atemArt].takt;
-    const zyklus=takt.reduce((n,x)=>n+x[1],0);
-    let laeuft=false;
-    start.addEventListener("click",()=>{
-      if(laeuft){ atemStop(); laeuft=false; start.textContent="beginnen";
-        wort.textContent="bereit"; kreis.style.transform="scale(1)"; return; }
-      laeuft=true; start.textContent="anhalten";
-      atemEnde=Date.now()+atemDauer*1000;
-      const schritt=()=>{
-        const rest=atemEnde-Date.now();
-        if(rest<=0){ atemStop(); laeuft=false; start.textContent="beginnen";
-          wort.textContent="fertig"; kreis.style.transform="scale(1)";
-          try{ playGong(); }catch(e){} return; }
-        const t=((atemDauer*1000-rest)/1000)%zyklus;
-        let acc=0, phase=takt[0], anteil=0;
-        for(const p2 of takt){
-          if(t<acc+p2[1]){ phase=p2; anteil=(t-acc)/p2[1]; break; }
-          acc+=p2[1];
-        }
-        // Der Kreis wächst beim Einatmen, hält beim zweiten Zug, fällt beim Ausatmen
-        let gr;
-        if(phase[0]==="ein")       gr=1+0.55*weich(anteil);
-        else if(phase[0]==="nach") gr=1.55+0.12*weich(anteil);
-        else                        gr=(atemArt==="seufzer"?1.67:1.55)-((atemArt==="seufzer"?0.67:0.55))*weich(anteil);
-        kreis.style.transform="scale("+gr.toFixed(3)+")";
-        const sek=Math.ceil(rest/1000);
-        wort.innerHTML=`<span class="aw-p">${phase[0]==="ein"?"einatmen":phase[0]==="nach"?"noch einmal":"ausatmen"}</span>`+
-          `<span class="aw-t">${Math.floor(sek/60)}:${String(sek%60).padStart(2,"0")}</span>`;
-        atemLauf=requestAnimationFrame(schritt);
-      };
-      schritt();
-    });
-    return box;
-  }
-  // Sanfter Verlauf statt gleichförmigem Wachsen
-  const weich=x=>0.5-0.5*Math.cos(Math.PI*Math.max(0,Math.min(1,x)));
-
-  function liFeld(D,id,ph,rows,ohneKnopf){
-    const f=ccSicher(()=>getText(D,id), v=>setText(D,id,v), ph, rows, buildLockIn);
-    if(ohneKnopf) f.querySelectorAll(".cc-feld-akt").forEach(x=>x.remove());
-    return f;
-  }
-
-  /* ---------- Box Breathing ----------
-     Vier gleiche Phasen zu je vier Sekunden: ein, halten, aus, halten.
-     Ein Quadrat, an dem ein Punkt entlangläuft — man folgt ihm mit dem Atem. */
-  let atemOffen=false, zeichenOffen=false;
-  // iPad erkennen: Mehrfachberührung plus Tablet-Größe. Der Mac hat keine Berührung.
-  const istTablet = (()=>{ try{
-    return (navigator.maxTouchPoints||0) > 1 && Math.min(screen.width,screen.height) >= 700;
-  }catch(e){ return false; } })();
-  let atemAn=false, atemTimer=null, atemStart=0, atemMin=3;
-  function atemStop(){ if(atemTimer){ clearInterval(atemTimer); atemTimer=null; } atemAn=false; }
   function atemBauen(){
     const wrap=document.createElement("div"); wrap.className="atem";
     const S=168, R=14, L=S-2*R;
@@ -4153,6 +4074,7 @@
     const phase=wrap.querySelector(".atem-phase");
     const zahl=wrap.querySelector(".atem-zahl");
     const NAMEN=["einatmen","halten","ausatmen","halten"];
+    let letztePhase=-1;
 
     const tick=()=>{
       const ms=Date.now()-atemStart;
@@ -4160,10 +4082,14 @@
       if(rest<=0){ atemStop(); phase.textContent="fertig"; zahl.textContent="";
         p.setAttribute("cx",R); p.setAttribute("cy",R);
         try{ playGong(); }catch(e){} buildLockIn(); return; }
-      const t=(ms/4000)%4;              // vier Sekunden je Seite
+      const t=(ms/6000)%4;              // sechs Sekunden je Seite
       const i=Math.floor(t), f=t-i;
+      if(i!==letztePhase){
+        letztePhase=i;
+        if(atemTonAn) atemTon(i===0?"ein":i===2?"aus":"halt");
+      }
       phase.textContent=NAMEN[i];
-      zahl.textContent=(4-Math.floor(f*4))+"";
+      zahl.textContent=(6-Math.floor(f*6))+"";
       // Der Punkt wandert im Uhrzeigersinn am Quadrat entlang
       let x=R, y=R;
       if(i===0){ x=R;         y=R+f*L; }
@@ -4181,11 +4107,23 @@
       b.addEventListener("click",()=>{ atemMin=m; atemStop(); buildLockIn(); });
       leiste.appendChild(b);
     });
+    const ton=document.createElement("button"); ton.type="button";
+    ton.className="atem-m ton"+(atemTonAn?" on":"");
+    ton.textContent=atemTonAn?"♪ Ton":"Ton aus";
+    ton.title="Klang bei jedem Phasenwechsel — dann geht es auch ohne Bildschirm";
+    ton.addEventListener("click",()=>{
+      atemTonAn=!atemTonAn;
+      ton.className="atem-m ton"+(atemTonAn?" on":"");
+      ton.textContent=atemTonAn?"♪ Ton":"Ton aus";
+      if(atemTonAn) atemTon("ein");
+    });
+    leiste.appendChild(ton);
+
     const start=document.createElement("button"); start.type="button"; start.className="atem-start";
     start.textContent=atemAn?"anhalten":"beginnen";
     start.addEventListener("click",()=>{
       if(atemAn){ atemStop(); buildLockIn(); return; }
-      atemAn=true; atemStart=Date.now(); tick();
+      atemAn=true; atemStart=Date.now(); letztePhase=-1; tick();
       atemTimer=setInterval(tick,100);
       start.textContent="anhalten";
     });
@@ -7044,6 +6982,40 @@
   let ftick=null, audioCtx=null;
   function loadTimerCfg(){ const t=read(TIMER,null); if(t){ ftimer.flowMin=t.flowMin||50; ftimer.breakMin=t.breakMin||10; } }
   function saveTimerCfg(){ write(TIMER,{flowMin:ftimer.flowMin, breakMin:ftimer.breakMin}); }
+  /* Ein kurzer, weicher Ton für die Atemphasen. Die Tonhöhe sagt,
+     was dran ist: aufsteigend beim Einatmen, absteigend beim Ausatmen,
+     ein leiser Anschlag beim Halten. So geht es auch ohne Bildschirm. */
+  function atemTon(art){
+    try{
+      const Ctx=window.AudioContext||window.webkitAudioContext; if(!Ctx) return;
+      if(!audioCtx) audioCtx=new Ctx();
+      if(audioCtx.state==="suspended") audioCtx.resume();
+      const t0=audioCtx.currentTime;
+      const hz = art==="ein" ? [392,523] : art==="aus" ? [523,392] : [440,440];
+      const laut = art==="halt" ? .09 : .16;
+      const dauer = art==="halt" ? .18 : .42;
+
+      const osc=audioCtx.createOscillator(); osc.type="sine";
+      osc.frequency.setValueAtTime(hz[0],t0);
+      if(hz[0]!==hz[1]) osc.frequency.exponentialRampToValueAtTime(hz[1], t0+dauer*.8);
+
+      // Ein zweiter Ton eine Oktave höher, sehr leise — das macht ihn weich
+      const ober=audioCtx.createOscillator(); ober.type="sine";
+      ober.frequency.setValueAtTime(hz[0]*2,t0);
+      const og=audioCtx.createGain(); og.gain.setValueAtTime(laut*.22,t0);
+
+      const g=audioCtx.createGain();
+      g.gain.setValueAtTime(0,t0);
+      g.gain.linearRampToValueAtTime(laut, t0+.05);        // weich einblenden
+      g.gain.exponentialRampToValueAtTime(.0001, t0+dauer);
+
+      const filt=audioCtx.createBiquadFilter(); filt.type="lowpass"; filt.frequency.value=1800;
+      osc.connect(g); ober.connect(og); og.connect(g); g.connect(filt); filt.connect(audioCtx.destination);
+      osc.start(t0); ober.start(t0);
+      osc.stop(t0+dauer+.05); ober.stop(t0+dauer+.05);
+    }catch(e){}
+  }
+
   function playGong(){
     try{
       const Ctx=window.AudioContext||window.webkitAudioContext; if(!Ctx) return;
@@ -10690,8 +10662,18 @@
       }
     }
     const akt = teile.find(t=>t.code===(leseTeil||"GSP")) || null;
-    document.getElementById("gospelRef").textContent = akt ? (akt.stelle||akt.label) : (stelle||(d.ref||""));
-    document.getElementById("gospelTitle").textContent = akt && leseTeil && leseTeil!=="GSP" ? akt.label : (d.title||"");
+    // Immer beides zeigen: was du liest und wo es steht
+    const ref=document.getElementById("gospelRef");
+    if(akt){
+      const wo = (akt.stelle||"").trim() || extractStelle(akt.text) || "";
+      ref.innerHTML = `<span class="gr-was">${esc(akt.label)}</span>`+
+                      (wo?`<span class="gr-wo">${esc(wo)}</span>`:``);
+    }else{
+      const wo = stelle || "";
+      ref.innerHTML = `<span class="gr-was">${esc(d.ref||"Tagesevangelium")}</span>`+
+                      (wo?`<span class="gr-wo">${esc(wo)}</span>`:``);
+    }
+    document.getElementById("gospelTitle").textContent = d.title||"";
     document.getElementById("gospelText").textContent = akt ? (akt.text||"") : (d.text||"");
     document.getElementById("gospelSrc").innerHTML = d.source
       ? ("Quelle: "+esc(d.source)+" · <a href=\""+GOSPEL_PAGE+"\" target=\"_blank\" rel=\"noopener noreferrer\">Vatican News</a>")

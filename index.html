@@ -2680,7 +2680,7 @@
   const ABSICHT="ht_absicht_v1";   // wandert als einziges mit auf das andere Gerät
   const MSNOTIZ="ht_metanotiz_v1";  // spontan Festgehaltenes, strikt lokal   // wandert als einziges mit auf das andere Gerät   // "morgen" = morgens für heute, "abend" = abends für morgen  // Satz der Woche
   const ANGELUS="ht_angelus_v1";
-  const APP_VERSION="2026-09-14";   // wird beim Aktualisieren hochgezählt
+  const APP_VERSION="2026-09-15";   // wird beim Aktualisieren hochgezählt
   const LOCKIN="ht_lockin_v1";
   const LOCKTXT="ht_lockintext_v1", CRYPTO="ht_crypto_v1", CAL="ht_cal_v1", QUOTES="ht_quotes_v1", LOCKCFG="ht_lockin_cfg_v1", SCHATZ="ht_schatz_v1", GOSPELC="ht_gospel_v1";
   const MAX_PRIOS=8;
@@ -3851,6 +3851,7 @@
   /* Lockerer Fokus: Box Breathing, sechs Sekunden je Phase */
   let atemAn=false, atemTimer=null, atemStart=0, atemMin=3;
   let atemTonAn=true;   // Klang bei jedem Wechsel, damit es ohne Bildschirm geht
+  let zeichenOffen=false;   // Skizzenfläche im Metascript (nur iPad)
   function atemStop(){ if(atemTimer){ clearInterval(atemTimer); atemTimer=null; } atemAn=false; }
   const liRhythmus=()=>read(LIRHY,"morgen");
   // Für welchen Tag der Lock-In gilt: morgens für heute, abends für morgen
@@ -4082,14 +4083,14 @@
       if(rest<=0){ atemStop(); phase.textContent="fertig"; zahl.textContent="";
         p.setAttribute("cx",R); p.setAttribute("cy",R);
         try{ playGong(); }catch(e){} buildLockIn(); return; }
-      const t=(ms/6000)%4;              // sechs Sekunden je Seite
+      const t=(ms/9000)%4;              // neun Sekunden je Seite
       const i=Math.floor(t), f=t-i;
       if(i!==letztePhase){
         letztePhase=i;
         if(atemTonAn) atemTon(i===0?"ein":i===2?"aus":"halt");
       }
       phase.textContent=NAMEN[i];
-      zahl.textContent=(6-Math.floor(f*6))+"";
+      zahl.textContent=(9-Math.floor(f*9))+"";
       // Der Punkt wandert im Uhrzeigersinn am Quadrat entlang
       let x=R, y=R;
       if(i===0){ x=R;         y=R+f*L; }
@@ -4188,7 +4189,8 @@
       cv.width  = Math.round(breite * dpr);
       cv.height = Math.round(hoehe * dpr);
       cv.style.height = hoehe + "px";
-      ctx = cv.getContext("2d", { desynchronized: true });
+      ctx = cv.getContext("2d", { desynchronized: true }) || cv.getContext("2d");
+      if(!ctx) return;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
@@ -4252,14 +4254,24 @@
     let glattX = null, glattY = null;
     const glaetten = (x, y, neu) => {
       if (neu || glattX == null) { glattX = x; glattY = y; }
-      else { glattX = glattX + (x - glattX) * .42; glattY = glattY + (y - glattY) * .42; }
+      else { glattX = glattX + (x - glattX) * .62; glattY = glattY + (y - glattY) * .62; }
       return [glattX, glattY];
+    };
+
+    // Neigung: 0 = senkrecht, 1 = flach. Safari liefert altitudeAngle, sonst tiltX/Y
+    const neigung = (e) => {
+      if (typeof e.altitudeAngle === "number")
+        return Math.max(0, Math.min(1, 1 - e.altitudeAngle / (Math.PI/2)));
+      const tx = e.tiltX||0, ty = e.tiltY||0;
+      const t = Math.min(90, Math.hypot(tx, ty));
+      return t/90;
     };
 
     const roh = (e) => {
       const r = cv.getBoundingClientRect();
       return { x: e.clientX - r.left, y: e.clientY - r.top,
                dr: (typeof e.pressure === "number" && e.pressure > 0) ? e.pressure : .5,
+               neig: e.pointerType === "pen" ? neigung(e) : 0,
                stift: e.pointerType === "pen" };
     };
 
@@ -4270,7 +4282,9 @@
       let w;
       if (zfRadiert) w = basis;
       else {
-        const druck = p.stift ? (.5 + p.dr * 1.1) : 1;
+        let druck = p.stift ? (.5 + p.dr * 1.1) : 1;
+        // Flach gehaltener Stift zieht breiter, wie eine echte Mine
+        if (p.stift && p.neig > 0) druck *= 1 + Math.min(.7, p.neig * .9);
         let tempo = 0;
         if (letzterPunkt && jetzt > letzteZeit) {
           const dx = p.x - letzterPunkt.x, dy = p.y - letzterPunkt.y;
@@ -4439,6 +4453,14 @@
     return d;
   }
 
+  const istTablet = (()=>{ try{
+    return (navigator.maxTouchPoints||0) > 1 && Math.min(screen.width,screen.height) >= 700;
+  }catch(e){ return false; } })();
+  function liFeld(D,id,ph,rows,ohneKnopf){
+    const f=ccSicher(()=>getText(D,id), v=>setText(D,id,v), ph, rows, buildLockIn);
+    if(ohneKnopf) f.querySelectorAll(".cc-feld-akt").forEach(x=>x.remove());
+    return f;
+  }
   function liBody(st,D,body,ro,fuerMorgen){
     /* --- Wins von gestern --- */
     if(st.id==="wins"){
@@ -10724,7 +10746,8 @@
     if(papstLoaded) return;
     if(supplied && supplied.text){ renderPapst(supplied); papstLoaded=true; return; }
     try{
-      const r=await fetch("/papst?date="+encodeURIComponent(today));
+      const basis = calCfg.bote ? calCfg.bote.replace(/\/+$/,"") : "";
+      const r=await fetch(basis+"/papst?date="+encodeURIComponent(today));
       const d=await r.json();
       if(d && !d.error && d.text){
         renderPapst(d); papstLoaded=true;

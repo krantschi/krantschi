@@ -1,7 +1,7 @@
 /* Heute — App-Hülle / Offline-Speicher. Kein Backup für persönliche Daten.
    Die lokale Datenhaltung und Kalender-/GitHub-Verbindungen bleiben unberührt. */
 const PREFIX = "heute-atelier-" + encodeURIComponent(self.registration.scope) + "-";
-const CACHE = PREFIX + "v2";
+const CACHE = PREFIX + "v4";
 const LEGACY_CACHE = "heute-20260915-36";
 const CORE = ["./", "./index.html"];
 const OPTIONAL = ["./habit-tracker.html", "./icon-180.png", "./icon-192.png", "./icon-512.png", "./manifest.webmanifest"];

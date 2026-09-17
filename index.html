@@ -3074,7 +3074,7 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
   const ABSICHT="ht_absicht_v1";   // wandert als einziges mit auf das andere Gerät
   const MSNOTIZ="ht_metanotiz_v1";  // spontan Festgehaltenes, strikt lokal   // wandert als einziges mit auf das andere Gerät   // "morgen" = morgens für heute, "abend" = abends für morgen  // Satz der Woche
   const ANGELUS="ht_angelus_v1";
-  const APP_VERSION="2026-09-16-centrala2";   // wird beim Aktualisieren hochgezählt
+  const APP_VERSION="2026-09-17-schlicht";   // wird beim Aktualisieren hochgezählt
   const LOCKIN="ht_lockin_v1";
   const LOCKTXT="ht_lockintext_v1", CRYPTO="ht_crypto_v1", CAL="ht_cal_v1", QUOTES="ht_quotes_v1", LOCKCFG="ht_lockin_cfg_v1", SCHATZ="ht_schatz_v1", GOSPELC="ht_gospel_v1";
   const MAX_PRIOS=8;
@@ -11109,7 +11109,18 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
                       (wo?`<span class="gr-wo">${esc(wo)}</span>`:``);
     }
     document.getElementById("gospelTitle").textContent = d.title||"";
-    document.getElementById("gospelText").textContent = akt ? (akt.text||"") : (d.text||"");
+    // Die Stelle steht oft nochmal als erste Zeile im Text — dann nur einmal zeigen
+    const ohneKopf = (txt, wo) => {
+      const zeilen = String(txt||"").split("\n");
+      const erste = (zeilen[0]||"").trim();
+      const knapp = x => x.replace(/[\s.,;:]+/g,"").toLowerCase();
+      if (erste && wo && (knapp(erste)===knapp(wo) || (erste.length<70 && knapp(erste).startsWith(knapp(wo)))))
+        return zeilen.slice(1).join("\n").replace(/^\n+/,"");
+      return txt||"";
+    };
+    const woJetzt = akt ? ((akt.stelle||"").trim() || extractStelle(akt.text) || "") : (stelle||"");
+    document.getElementById("gospelText").textContent =
+      ohneKopf(akt ? (akt.text||"") : (d.text||""), woJetzt);
     document.getElementById("gospelSrc").innerHTML = d.source
       ? ("Quelle: "+esc(d.source)+" · <a href=\""+GOSPEL_PAGE+"\" target=\"_blank\" rel=\"noopener noreferrer\">Vatican News</a>")
       : "";
@@ -11591,7 +11602,7 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
     const h=document.getElementById('uiPageHeading');
     if(h){
       h.hidden=state.tab==='heute';
-      const labels={fokus:['Ein Moment. Ein Fokus.','Raum für das, was jetzt zählt.'],prios:['Dein Tag, mit Richtung.','Prioritäten setzen. Freiraum schaffen.'],vizija:['Das große Ganze.','Dein Nordstern. Schritt für Schritt.']};
+      const labels={fokus:['Fokus',''],prios:['Plan',''],vizija:['Vizija','']};
       const pair=labels[state.tab];
       if(pair){ h.querySelector('h1').textContent=pair[0]; h.querySelector('p').textContent=pair[1]; }
     }
@@ -11609,11 +11620,7 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
   function uiUpdateDay(){
     const note=document.getElementById('uiDayNote'); if(!note) return;
     const total=coreHabits().length,done=coreDone(state.viewDate);
-    note.textContent = !isToday() ? 'Dein Rückblick · '+done+' von '+total+' Kerngewohnheiten.' :
-      total===0 ? 'Dein Tag beginnt mit einer kleinen Entscheidung.' :
-      done===total ? 'Deine Basis steht. Alles Weitere ist ein Bonus.' :
-      done===0 ? 'Ein kleiner Schritt ist ein guter Anfang.' :
-      done+' von '+total+' Kerngewohnheiten. Schritt für Schritt.';
+    note.textContent = total===0 ? '' : done+' von '+total+' Kerngewohnheiten';
     const sub=document.getElementById('uiHabitCount');
     if(sub) sub.textContent=doneCount(state.viewDate)+' / '+config.habits.length+' erledigt';
   }
@@ -11625,7 +11632,7 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
     const nav=document.getElementById('tabs'); nav.setAttribute('aria-label','Hauptnavigation');
     const main=document.querySelector('main.app');
     const mast=document.createElement('header'); mast.className='ui-masthead';
-    mast.innerHTML='<div class="ui-brand"><span class="ui-brand-mark">'+uiIcon('sun')+'</span><div><span class="ui-wordmark">heute.</span><small>DEIN TAG. DEINE RICHTUNG.</small></div></div><div class="ui-utilities"></div>';
+    mast.innerHTML='<div class="ui-brand"><span class="ui-brand-mark">'+uiIcon('sun')+'</span><div><span class="ui-wordmark">heute.</span></div></div><div class="ui-utilities"></div>';
     const utilities=mast.querySelector('.ui-utilities');
     ['msMini','findMini','themeMini'].forEach(id=>utilities.appendChild(document.getElementById(id)));
     main.prepend(mast);
@@ -11640,33 +11647,32 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
     live.addEventListener('click',()=>{ fclock.open=true; setTab('fokus'); window.scrollTo({top:0,behavior:'auto'}); }); page.after(live);
     // Leave all original nodes and listeners intact; only rearrange the Today surface.
     const todayView=document.getElementById('view-heute'),hero=todayView.querySelector('.head');
-    const kicker=document.createElement('span'); kicker.className='ui-kicker'; kicker.textContent='Ein Tag mit Richtung'; hero.prepend(kicker);
-    const note=document.createElement('p'); note.id='uiDayNote'; note.className='ui-day-note'; hero.querySelector('.head-top').after(note);
+        const note=document.createElement('p'); note.id='uiDayNote'; note.className='ui-day-note'; hero.querySelector('.head-top').after(note);
     document.getElementById('calBtn').innerHTML=uiIcon('plan');
     todayView.prepend(hero);
     const shortcuts=document.createElement('div'); shortcuts.className='ui-shortcuts';
-    shortcuts.innerHTML='<button class="ui-shortcut" id="uiFocusShortcut" type="button">'+uiIcon('focus')+'<span><strong>Zeit für Fokus</strong><small>Eine Sache. Ganz da.</small></span></button><button class="ui-shortcut" id="uiPrayerShortcut" type="button">'+uiIcon('prayer')+'<span><strong>Innehalten</strong><small>Dein Raum für Gebet</small></span></button>';
+    shortcuts.innerHTML='<button class="ui-shortcut" id="uiFocusShortcut" type="button">'+uiIcon('focus')+'<span><strong>Fokus</strong></span></button><button class="ui-shortcut" id="uiPrayerShortcut" type="button">'+uiIcon('prayer')+'<span><strong>Gebet</strong></span></button>';
     hero.after(shortcuts);
     shortcuts.querySelector('#uiFocusShortcut').addEventListener('click',()=>{ fclock.open=true; setTab('fokus'); window.scrollTo({top:0,behavior:'auto'}); });
     shortcuts.querySelector('#uiPrayerShortcut').addEventListener('click',openGebet);
     // Rituals remain ahead of habits; the words collection becomes the quiet closing card.
-    const heading=document.createElement('div'); heading.className='ui-section-heading'; heading.innerHTML='<h2>Deine Gewohnheiten</h2><span id="uiHabitCount"></span>';
+    const heading=document.createElement('div'); heading.className='ui-section-heading'; heading.innerHTML='<h2>Gewohnheiten</h2><span id="uiHabitCount"></span>';
     document.getElementById('cats').before(heading);
     document.getElementById('tagesabschluss').after(document.getElementById('schatzBtn'));
     const tools=document.createElement('dialog'); tools.id='uiTools'; tools.className='ui-tools'; tools.setAttribute('aria-labelledby','uiToolsTitle');
-    tools.innerHTML='<div class="ui-tools-head"><h2 id="uiToolsTitle">Dein Werkzeugkasten</h2><button type="button" class="ui-tools-close" aria-label="Werkzeuge schließen">'+uiIcon('close')+'</button></div>';
+    tools.innerHTML='<div class="ui-tools-head"><h2 id="uiToolsTitle">Werkzeuge</h2><button type="button" class="ui-tools-close" aria-label="Werkzeuge schließen">'+uiIcon('close')+'</button></div>';
     tools.querySelector('.ui-tools-close').addEventListener('click',()=>tools.close());
     const group=label=>{ const h=document.createElement('p'); h.className='ui-kicker ui-tools-group'; h.textContent=label; tools.appendChild(h); };
     const action=(icon,title,sub,fn)=>{ const b=document.createElement('button'); b.type='button'; b.className='ui-tools-action'; b.innerHTML=uiIcon(icon)+'<span><strong>'+title+'</strong><small>'+sub+'</small></span>'; b.addEventListener('click',()=>{ tools.close(); fn(); }); tools.appendChild(b); };
     group('Raum für deinen Tag');
     action('prayer','Gebetsort','Angelus, Rosenkranz und deine Gebete',openGebet);
     action('book','Lernplan','Fächer, Prüfungstage und Wochenplanung',()=>{setTab('fokus'); lernOn=true; buildFokus();});
-    action('star','Bewahrte Worte','Deine Sammlung von Sätzen und Zitaten',openSchatz);
+    action('star','Bewahrte Worte','Sätze und Zitate',openSchatz);
     group('Kalender & Abgleich');
     action('plan','Apple-Kalender','Bestehenden Kalender-Link ansehen oder ändern',setupCalendar);
     action('sync','Kalender-Bote','Cloudflare-Verbindung für Kalender & Evangelium',setupBote);
     action('sync','Geräteabgleich','Bestehenden GitHub-Abgleich verwalten',setupSync);
-    group('Deine Daten');
+    group('Daten');
     action('download','Sicherung exportieren','Alle Textbereiche · auf Wunsch verschlüsselt',backupExport);
     action('upload','Sicherung importieren','Eine Heute-Sicherungsdatei wiederherstellen',backupImport);
     action('backup','Klassische Datei laden','Das bisherige Format mit app: heute-tracker',doRestore);
@@ -11791,14 +11797,14 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
     if(!cReady)return;
     const ret=document.getElementById('cReturn');if(ret){ret.hidden=!cReturn;ret.textContent=cReturn?.type==='cc'?'← Zum Command Center · Schritt '+(cReturn.step+1)+' / 8':'← Zum Morgenablauf';}
     const box=document.getElementById('cNext');if(!box)return;box.replaceChildren();
-    const k=document.createElement('span');k.className='ui-kicker';k.textContent='Dein nächster Schritt';box.append(k);
+    const k=document.createElement('span');k.className='ui-kicker';k.textContent='Als Nächstes';box.append(k);
     const h=document.createElement('h2'),p=document.createElement('p'),b=document.createElement('button');b.type='button';b.className='c-action';
     const resume=cRuntime.ritual;
-    if(!isToday()){h.textContent='Ein Blick zurück';p.textContent='Du siehst den '+fmtShort(state.viewDate)+'.';b.textContent='Zum heutigen Tag';b.onclick=()=>{state.viewDate=today;renderHeute();};}
-    else if(resume?.type==='cc'&&!ccAll()[resume.week]?.done){h.textContent='Deine Woche weiterdenken';p.textContent='Command Center · KW '+ccWochenNr(resume.week)+' · Schritt '+(resume.step+1)+' von 8';b.textContent='Fortsetzen';b.onclick=()=>cResume(resume);}
-    else if(dayPhase()==='abend'){h.textContent='Den Tag gut abschließen';p.textContent='Offene Punkte, Gewohnheiten und dein Rückblick.';b.textContent='Tagesabschluss öffnen';b.onclick=()=>{state.tagOpen=true;buildTagesabschluss();document.getElementById('tagesabschluss').scrollIntoView({block:'start'});};}
-    else if(dayPhase()==='morgen'){h.textContent='Mit Klarheit beginnen';p.textContent='Dein Morgenablauf wartet dort, wo du weitermachst.';b.textContent='Morgenablauf öffnen';b.onclick=()=>{state.lockinOpen=true;buildLockIn();document.getElementById('lockin').scrollIntoView({block:'start'});};}
-    else {const task=prios.all?.find(t=>t.day===today&&t.prio&&t.status!=='done'&&t.text?.trim());h.textContent=task?.text||'Raum für das Wesentliche';p.textContent=task?'Deine nächste offene Priorität.':'Wähle bewusst, worauf du deine Aufmerksamkeit richtest.';b.textContent=task?'Dafür Fokus öffnen':'Tag planen';b.onclick=()=>{if(task){task.focus=true;savePrios();cRuntime.taskId=task.id;cSave();fclock.open=true;setTab('fokus');}else setTab('prios');};}
+    if(!isToday()){h.textContent=fmtShort(state.viewDate);p.textContent='Vergangener Tag';b.textContent='Zum heutigen Tag';b.onclick=()=>{state.viewDate=today;renderHeute();};}
+    else if(resume?.type==='cc'&&!ccAll()[resume.week]?.done){h.textContent='Command Center fortsetzen';p.textContent='Command Center · KW '+ccWochenNr(resume.week)+' · Schritt '+(resume.step+1)+' von 8';b.textContent='Fortsetzen';b.onclick=()=>cResume(resume);}
+    else if(dayPhase()==='abend'){h.textContent='Tagesabschluss';p.textContent='Offene Punkte, Gewohnheiten, Rückblick';b.textContent='Tagesabschluss öffnen';b.onclick=()=>{state.tagOpen=true;buildTagesabschluss();document.getElementById('tagesabschluss').scrollIntoView({block:'start'});};}
+    else if(dayPhase()==='morgen'){h.textContent='Mein Morgen';p.textContent='Noch nicht abgeschlossen';b.textContent='Morgenablauf öffnen';b.onclick=()=>{state.lockinOpen=true;buildLockIn();document.getElementById('lockin').scrollIntoView({block:'start'});};}
+    else {const task=prios.all?.find(t=>t.day===today&&t.prio&&t.status!=='done'&&t.text?.trim());h.textContent=task?.text||'Keine Priorität gesetzt';p.textContent=task?'Offene Priorität':'Im Plan festlegen';b.textContent=task?'Dafür Fokus öffnen':'Tag planen';b.onclick=()=>{if(task){task.focus=true;savePrios();cRuntime.taskId=task.id;cSave();fclock.open=true;setTab('fokus');}else setTab('prios');};}
     box.append(h,p,b);
     if(isToday()){
       const upcoming=(calEvents[today]||[]).filter(e=>e.allDay||e.start>=nowMin()).sort((a,b)=>a.start-b.start)[0];

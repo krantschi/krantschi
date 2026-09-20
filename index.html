@@ -3110,7 +3110,7 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
   const ABSICHT="ht_absicht_v1";   // wandert als einziges mit auf das andere Gerät
   const MSNOTIZ="ht_metanotiz_v1";  // spontan Festgehaltenes, strikt lokal   // wandert als einziges mit auf das andere Gerät   // "morgen" = morgens für heute, "abend" = abends für morgen  // Satz der Woche
   const ANGELUS="ht_angelus_v1";
-  const APP_VERSION="2026-09-20-stift3";   // wird beim Aktualisieren hochgezählt
+  const APP_VERSION="2026-09-20-stift4";   // wird beim Aktualisieren hochgezählt
   const LOCKIN="ht_lockin_v1";
   const LOCKTXT="ht_lockintext_v1", CRYPTO="ht_crypto_v1", CAL="ht_cal_v1", QUOTES="ht_quotes_v1", LOCKCFG="ht_lockin_cfg_v1", SCHATZ="ht_schatz_v1", GOSPELC="ht_gospel_v1";
   const MAX_PRIOS=8;
@@ -4925,14 +4925,16 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
        Berührung, die so groß ist wie ein Handballen, auf der ganzen Seite
        verschluckt. Ein Finger bleibt schmal und darf weiter scrollen. */
     const seiteHalten = an => { document.body.classList.toggle("zf-aktiv", an); };
-    // Finger ≈ 8–13 px, Ballen ≈ 20–45 px. Ein Finger soll weiterhin tippen und scrollen können.
-    const istBallen = t => Math.max(t.radiusX||0, t.radiusY||0) >= 20;
+    // iPadOS meldet einen Finger mit etwa 20–25 px Radius, einen Ballen mit 40 und mehr.
+    const istBallen = t => Math.max(t.radiusX||0, t.radiusY||0) >= 32;
     const ballenWache = e => {
       if (ro || !stiftGesehen) return;
       if (!box.isConnected) { document.removeEventListener("touchstart", ballenWache); document.removeEventListener("touchmove", ballenWache); return; }
       const stiftUnten = !!aktuell && aktuellTyp === "pen";
       const r = feld.getBoundingClientRect();
-      for (const t of e.touches) {
+      // Nur die NEU aufgesetzten Berührungen prüfen — ein ruhender Ballen darf
+      // einen gleichzeitigen Fingertipp auf einen Knopf nicht mit verwerfen
+      for (const t of (e.changedTouches || e.touches)) {
         if (!istBallen(t)) continue;                       // ein Finger — durchlassen
         const imFeld = t.clientX>=r.left && t.clientX<=r.right && t.clientY>=r.top && t.clientY<=r.bottom;
         if (stiftUnten || imFeld) { e.preventDefault(); return; }

@@ -3110,7 +3110,7 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
   const ABSICHT="ht_absicht_v1";   // wandert als einziges mit auf das andere Gerät
   const MSNOTIZ="ht_metanotiz_v1";  // spontan Festgehaltenes, strikt lokal   // wandert als einziges mit auf das andere Gerät   // "morgen" = morgens für heute, "abend" = abends für morgen  // Satz der Woche
   const ANGELUS="ht_angelus_v1";
-  const APP_VERSION="2026-09-20-stift2";   // wird beim Aktualisieren hochgezählt
+  const APP_VERSION="2026-09-20-stift3";   // wird beim Aktualisieren hochgezählt
   const LOCKIN="ht_lockin_v1";
   const LOCKTXT="ht_lockintext_v1", CRYPTO="ht_crypto_v1", CAL="ht_cal_v1", QUOTES="ht_quotes_v1", LOCKCFG="ht_lockin_cfg_v1", SCHATZ="ht_schatz_v1", GOSPELC="ht_gospel_v1";
   const MAX_PRIOS=8;
@@ -4741,17 +4741,35 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
         c.beginPath(); c.arc(p[0][0], p[0][1], Math.max(.5, p[0][2]/2), 0, Math.PI*2); c.fill();
         c.restore(); return;
       }
-      const start = Math.max(1, ab|0);
-      let vor = p[start-1];
-      for (let i = start; i < p.length; i++) {
+      /* Der ganze Zug als EINE geschlossene Fläche: linke Kante vorwärts, runde
+         Kuppe, rechte Kante rückwärts, runde Kuppe. Einmal füllen — dadurch gibt
+         es keine Nahtstellen zwischen Teilstücken und keine Haarrisse. */
+      const pts = [p[0]];
+      for (let i = 1; i < p.length; i++) {
         const p0 = p[Math.max(0, i-2)], p1 = p[i-1], p2 = p[i], p3 = p[Math.min(p.length-1, i+1)];
         const len = Math.hypot(p2[0]-p1[0], p2[1]-p1[1]);
         const stufen = Math.max(1, Math.min(10, Math.ceil(len/2.5)));
-        for (let s = 1; s <= stufen; s++) {
-          const q = kurvenPunkt(p0, p1, p2, p3, s/stufen);
-          band(c, vor, q); vor = q;
-        }
+        for (let s = 1; s <= stufen; s++) pts.push(kurvenPunkt(p0, p1, p2, p3, s/stufen));
       }
+      const n = pts.length;
+      const normale = (i) => {
+        const a = pts[Math.max(0, i-1)], b = pts[Math.min(n-1, i+1)];
+        let dx = b[0]-a[0], dy = b[1]-a[1];
+        let l = Math.hypot(dx, dy);
+        if (l < 1e-6) { dx = 1; dy = 0; l = 1; }
+        return [-dy/l, dx/l];
+      };
+      const halb = i => Math.max(.35, pts[i][2]/2);
+      c.beginPath();
+      let n0 = normale(0), h0 = halb(0);
+      c.moveTo(pts[0][0] + n0[0]*h0, pts[0][1] + n0[1]*h0);
+      for (let i = 1; i < n; i++) { const nn = normale(i), h = halb(i); c.lineTo(pts[i][0] + nn[0]*h, pts[i][1] + nn[1]*h); }
+      const ne = normale(n-1), he = halb(n-1);
+      c.arc(pts[n-1][0], pts[n-1][1], he, Math.atan2(ne[1], ne[0]), Math.atan2(-ne[1], -ne[0]), false);
+      for (let i = n-2; i >= 0; i--) { const nn = normale(i), h = halb(i); c.lineTo(pts[i][0] - nn[0]*h, pts[i][1] - nn[1]*h); }
+      c.arc(pts[0][0], pts[0][1], h0, Math.atan2(-n0[1], -n0[0]), Math.atan2(n0[1], n0[0]), false);
+      c.closePath();
+      c.fill();
       c.restore();
     };
 
@@ -4822,10 +4840,11 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
     /* Der Handballen liegt fast immer VOR der Spitze auf. Deshalb merken wir uns
        über Sitzungen hinweg, dass dieses Gerät einen Stift hat, und nehmen dann
        nur noch ihn. */
+    const fingerScrollt = () => { ov.style.touchAction = stiftGesehen ? "pan-y" : "none"; };
     const nimmt = (e) => {
       if (ro) return false;
       if (e.pointerType === "pen") {
-        if (!stiftGesehen) { stiftGesehen = true; try{ localStorage.setItem(ZF_STIFT,"1"); }catch(x){} }
+        if (!stiftGesehen) { stiftGesehen = true; try{ localStorage.setItem(ZF_STIFT,"1"); }catch(x){} fingerScrollt(); }
         if (aktuell && aktuellTyp !== "pen") { aktuell = null; vorher = []; ebeneBald(); alles(); }
         return true;
       }
@@ -4906,11 +4925,18 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
        Berührung, die so groß ist wie ein Handballen, auf der ganzen Seite
        verschluckt. Ein Finger bleibt schmal und darf weiter scrollen. */
     const seiteHalten = an => { document.body.classList.toggle("zf-aktiv", an); };
-    const istBallen = t => Math.max(t.radiusX||0, t.radiusY||0) >= 16;   // Finger ≈ 8–13, Ballen ≈ 20–45
+    // Finger ≈ 8–13 px, Ballen ≈ 20–45 px. Ein Finger soll weiterhin tippen und scrollen können.
+    const istBallen = t => Math.max(t.radiusX||0, t.radiusY||0) >= 20;
     const ballenWache = e => {
       if (ro || !stiftGesehen) return;
       if (!box.isConnected) { document.removeEventListener("touchstart", ballenWache); document.removeEventListener("touchmove", ballenWache); return; }
-      for (const t of e.touches) if (istBallen(t)) { e.preventDefault(); return; }
+      const stiftUnten = !!aktuell && aktuellTyp === "pen";
+      const r = feld.getBoundingClientRect();
+      for (const t of e.touches) {
+        if (!istBallen(t)) continue;                       // ein Finger — durchlassen
+        const imFeld = t.clientX>=r.left && t.clientX<=r.right && t.clientY>=r.top && t.clientY<=r.bottom;
+        if (stiftUnten || imFeld) { e.preventDefault(); return; }
+      }
     };
     document.addEventListener("touchstart", ballenWache, { passive:false });
     document.addEventListener("touchmove",  ballenWache, { passive:false });
@@ -5005,6 +5031,7 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
       weg.disabled = !zuege.length;
     }
 
+    fingerScrollt();
     requestAnimationFrame(() => { messen(); alles(); knoepfe(); leisteAuf(); });
 
     if (typeof ResizeObserver === "function") {

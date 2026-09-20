@@ -1195,7 +1195,9 @@
   .zf{margin-top:10px}
   .zf-feld{position:relative; border-radius:14px; overflow:hidden;
     box-shadow:inset 0 0 0 1px var(--line), 0 1px 3px rgba(0,0,0,.06)}
-  .zf-cv{display:block; width:100%; touch-action:none; cursor:crosshair;
+  .zf-feld{position:relative}
+  .zf-ov{position:absolute; inset:0; width:100%; touch-action:none; cursor:crosshair; background:transparent}
+  .zf-cv{display:block; width:100%; pointer-events:none;
     background-color:#FCFBF6;
     /* Punktraster wie auf Notizpapier */
     background-image:radial-gradient(circle, rgba(0,0,0,.11) 1.1px, transparent 1.2px);
@@ -1420,6 +1422,13 @@
     background:var(--card); box-shadow:0 0 0 1px rgba(var(--sheen),.08), 0 30px 70px -26px rgba(0,0,0,.8)}
   .msn-h{font-family:var(--serif); font-size:17px; font-weight:650; color:var(--ink)}
   .msn-sub{font-size:12px; color:var(--ink-faint); margin:2px 0 12px}
+  .msn-um{display:flex; gap:4px; margin-bottom:10px}
+  .msn-um-b{font:inherit; font-size:11px; font-weight:700; color:var(--ink-faint); background:transparent;
+    border:none; border-radius:999px; padding:4px 12px; cursor:pointer; box-shadow:inset 0 0 0 1px var(--line)}
+  .msn-um-b.on{color:var(--brass); box-shadow:inset 0 0 0 1.3px var(--brass)}
+  .msn-zf{margin:0 -4px}
+  .msn-sk{display:block}
+  .msn-skc{display:block; border-radius:6px; background:rgba(var(--sheen),.04)}
   .msn-ta{width:100%; box-sizing:border-box; font-family:var(--serif); font-size:15.5px; line-height:1.6;
     color:var(--ink); background:rgba(var(--sheen),.05); border:none; border-radius:11px; padding:12px 14px;
     resize:none; overflow:hidden; box-shadow:inset 0 0 0 1px var(--line)}
@@ -3074,7 +3083,7 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
   const ABSICHT="ht_absicht_v1";   // wandert als einziges mit auf das andere Gerät
   const MSNOTIZ="ht_metanotiz_v1";  // spontan Festgehaltenes, strikt lokal   // wandert als einziges mit auf das andere Gerät   // "morgen" = morgens für heute, "abend" = abends für morgen  // Satz der Woche
   const ANGELUS="ht_angelus_v1";
-  const APP_VERSION="2026-09-17-schlicht";   // wird beim Aktualisieren hochgezählt
+  const APP_VERSION="2026-09-20-stift";   // wird beim Aktualisieren hochgezählt
   const LOCKIN="ht_lockin_v1";
   const LOCKTXT="ht_lockintext_v1", CRYPTO="ht_crypto_v1", CAL="ht_cal_v1", QUOTES="ht_quotes_v1", LOCKCFG="ht_lockin_cfg_v1", SCHATZ="ht_schatz_v1", GOSPELC="ht_gospel_v1";
   const MAX_PRIOS=8;
@@ -4591,77 +4600,111 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
+      if (typeof messenOv === "function") messenOv();
     };
 
     const farbeVon = i => ZF_FARBEN[Math.max(0, Math.min(ZF_FARBEN.length-1, i|0))][1];
 
-    // Ein einzelnes Segment — das ist der Kern: es wird nur das gezeichnet,
-    // was neu dazugekommen ist, nie die ganze Fläche.
-    /* Ein Segment wird als gefülltes Band gezeichnet, das an beiden Enden
-       unterschiedlich breit sein darf. Dadurch läuft die Breite stufenlos mit
-       und es entstehen keine Absätze zwischen den Teilstücken. */
-    const segment = (a, b, hex, radiert) => {
+    /* ---- Zwei Ebenen, wie bei Apple ----
+       Die Hauptfläche trägt alle fertigen Züge. Der laufende Zug wird auf einer
+       durchsichtigen Ebene darüber gezeichnet und mit jedem Bildaufbau neu
+       aufgebaut — dadurch kann die Spitze vorauslaufen (Vorhersage) und sich
+       korrigieren, ohne dass Reste auf der Fläche bleiben. */
+    const ov = document.createElement("canvas"); ov.className = "zf-ov";
+    feld.appendChild(ov);
+    let octx = null;
+
+    const messenOv = () => {
+      ov.width = cv.width; ov.height = cv.height; ov.style.height = cv.style.height;
+      octx = ov.getContext("2d", { desynchronized: true }) || ov.getContext("2d");
+      if (octx) octx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+
+    /* Ein Band zwischen zwei Punkten, vorn und hinten unterschiedlich breit,
+       mit runden Kuppen — so bleibt die Breite stufenlos. */
+    const band = (c, a, b) => {
       const dx = b[0]-a[0], dy = b[1]-a[1];
       const len = Math.hypot(dx, dy);
-      ctx.save();
-      if (radiert) { ctx.globalCompositeOperation = "destination-out"; ctx.fillStyle = "rgba(0,0,0,1)"; }
-      else ctx.fillStyle = hex;
       const ha = Math.max(.35, a[2]/2), hb = Math.max(.35, b[2]/2);
-      if (len < .01) {
-        ctx.beginPath(); ctx.arc(b[0], b[1], hb, 0, Math.PI*2); ctx.fill();
-        ctx.restore(); return;
-      }
-      const nx = -dy/len, ny = dx/len;          // Senkrechte zur Richtung
+      if (len < .01) { c.beginPath(); c.arc(b[0], b[1], hb, 0, Math.PI*2); c.fill(); return; }
+      const nx = -dy/len, ny = dx/len;
       const w1 = Math.atan2(ny, nx), w2 = Math.atan2(-ny, -nx);
-      ctx.beginPath();
-      ctx.moveTo(a[0]+nx*ha, a[1]+ny*ha);
-      ctx.lineTo(b[0]+nx*hb, b[1]+ny*hb);
-      ctx.arc(b[0], b[1], hb, w1, w2, false);   // runde Kuppe vorn
-      ctx.lineTo(a[0]-nx*ha, a[1]-ny*ha);
-      ctx.arc(a[0], a[1], ha, w2, w1, false);   // runde Kuppe hinten
-      ctx.closePath();
-      ctx.fill();
-      ctx.restore();
+      c.beginPath();
+      c.moveTo(a[0]+nx*ha, a[1]+ny*ha);
+      c.lineTo(b[0]+nx*hb, b[1]+ny*hb);
+      c.arc(b[0], b[1], hb, w1, w2, false);
+      c.lineTo(a[0]-nx*ha, a[1]-ny*ha);
+      c.arc(a[0], a[1], ha, w2, w1, false);
+      c.closePath();
+      c.fill();
     };
 
-    const zugMalen = (z) => {
-      const hex = farbeVon(z.f), rad = z.f === -1;
+    /* Catmull-Rom: eine weiche Kurve DURCH die Messpunkte, nicht nur an ihnen
+       vorbei. Genau das lässt Handschrift rund statt eckig aussehen. */
+    const kurvenPunkt = (p0, p1, p2, p3, t) => {
+      const t2 = t*t, t3 = t2*t;
+      return [
+        .5*((2*p1[0]) + (-p0[0]+p2[0])*t + (2*p0[0]-5*p1[0]+4*p2[0]-p3[0])*t2 + (-p0[0]+3*p1[0]-3*p2[0]+p3[0])*t3),
+        .5*((2*p1[1]) + (-p0[1]+p2[1])*t + (2*p0[1]-5*p1[1]+4*p2[1]-p3[1])*t2 + (-p0[1]+3*p1[1]-3*p2[1]+p3[1])*t3),
+        p1[2] + (p2[2]-p1[2])*t
+      ];
+    };
+
+    // Einen ganzen Zug malen: Punkte → Kurve → Bänder
+    const zugMalenAuf = (c, z, ab) => {
       const p = z.p || [];
+      if (!p.length) return;
+      c.save();
+      if (z.f === -1) { c.globalCompositeOperation = "destination-out"; c.fillStyle = "rgba(0,0,0,1)"; }
+      else c.fillStyle = farbeVon(z.f);
       if (p.length === 1) {
-        ctx.save();
-        if (rad) ctx.globalCompositeOperation = "destination-out";
-        ctx.fillStyle = rad ? "rgba(0,0,0,1)" : hex;
-        ctx.beginPath(); ctx.arc(p[0][0], p[0][1], p[0][2]/2, 0, Math.PI*2); ctx.fill();
-        ctx.restore(); return;
+        c.beginPath(); c.arc(p[0][0], p[0][1], Math.max(.5, p[0][2]/2), 0, Math.PI*2); c.fill();
+        c.restore(); return;
       }
-      for (let i = 1; i < p.length; i++) segment(p[i-1], p[i], hex, rad);
+      const start = Math.max(1, ab|0);
+      let vor = p[start-1];
+      for (let i = start; i < p.length; i++) {
+        const p0 = p[Math.max(0, i-2)], p1 = p[i-1], p2 = p[i], p3 = p[Math.min(p.length-1, i+1)];
+        const len = Math.hypot(p2[0]-p1[0], p2[1]-p1[1]);
+        const stufen = Math.max(1, Math.min(10, Math.ceil(len/2.5)));
+        for (let s = 1; s <= stufen; s++) {
+          const q = kurvenPunkt(p0, p1, p2, p3, s/stufen);
+          band(c, vor, q); vor = q;
+        }
+      }
+      c.restore();
     };
 
+    // Die Hauptfläche komplett neu aufbauen (nach Rückgängig, Leeren, Größenänderung)
     const alles = () => {
       if (!ctx) return;
       ctx.clearRect(0, 0, breite, hoehe);
-      zuege.forEach(zugMalen);
-      if (aktuell) zugMalen(aktuell);
+      zuege.forEach(z => zugMalenAuf(ctx, z, 1));
       leer.hidden = zuege.length > 0 || !!aktuell;
     };
 
-    const sichern = () => leg((zuege.length || extra) ? JSON.stringify({z:zuege, e:extra}) : "");
-
-    // Ein nachlaufender Punkt: die Linie folgt dem Zeiger gedämpft statt roh
-    let glattX = null, glattY = null;
-    const glaetten = (x, y, neu) => {
-      if (neu || glattX == null) { glattX = x; glattY = y; }
-      else { glattX = glattX + (x - glattX) * .62; glattY = glattY + (y - glattY) * .62; }
-      return [glattX, glattY];
+    // Die Ebene darüber: laufender Zug plus vorhergesagte Spitze
+    let vorher = [];      // vorhergesagte Punkte, nur zum Anzeigen
+    let bild = null;      // ausstehender Bildaufbau
+    const ebeneMalen = () => {
+      bild = null;
+      if (!octx) return;
+      octx.clearRect(0, 0, breite, hoehe);
+      if (!aktuell) return;
+      if (aktuell.f === -1) return;           // der Radierer wirkt direkt auf der Fläche
+      const z = { f: aktuell.f, p: vorher.length ? aktuell.p.concat(vorher) : aktuell.p };
+      zugMalenAuf(octx, z, 1);
     };
+    const ebeneBald = () => { if (!bild) bild = requestAnimationFrame(ebeneMalen); };
+
+    const sichern = () => leg((zuege.length || extra) ? JSON.stringify({z:zuege, e:extra}) : "");
 
     // Neigung: 0 = senkrecht, 1 = flach. Safari liefert altitudeAngle, sonst tiltX/Y
     const neigung = (e) => {
       if (typeof e.altitudeAngle === "number")
         return Math.max(0, Math.min(1, 1 - e.altitudeAngle / (Math.PI/2)));
       const tx = e.tiltX||0, ty = e.tiltY||0;
-      const t = Math.min(90, Math.hypot(tx, ty));
-      return t/90;
+      return Math.min(90, Math.hypot(tx, ty))/90;
     };
 
     const roh = (e) => {
@@ -4672,101 +4715,110 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
                stift: e.pointerType === "pen" };
     };
 
-    /* Strichbreite: Grundbreite mal Druck, verjüngt durch Geschwindigkeit.
-       Danach geglättet, sonst springt die Linie bei jedem Messwert. */
+    /* Strichbreite: Grundbreite mal Druck, leicht verjüngt durch Geschwindigkeit,
+       breiter bei flach gehaltenem Stift. Danach geglättet. */
     const breiteFuer = (p, jetzt) => {
       const basis = (zfRadiert ? 20 : 4.6) * zfDicke;
       let w;
       if (zfRadiert) w = basis;
       else {
         let druck = p.stift ? (.5 + p.dr * 1.1) : 1;
-        // Flach gehaltener Stift zieht breiter, wie eine echte Mine
         if (p.stift && p.neig > 0) druck *= 1 + Math.min(.7, p.neig * .9);
         let tempo = 0;
         if (letzterPunkt && jetzt > letzteZeit) {
-          const dx = p.x - letzterPunkt.x, dy = p.y - letzterPunkt.y;
-          tempo = Math.hypot(dx, dy) / Math.max(1, jetzt - letzteZeit);  // px je ms
+          tempo = Math.hypot(p.x - letzterPunkt.x, p.y - letzterPunkt.y) / Math.max(1, jetzt - letzteZeit);
         }
         const duenner = 1 / (1 + Math.min(1.4, tempo * .55));
         w = basis * druck * (.74 + .26 * duenner);
       }
       if (letzteBreite == null) letzteBreite = w;
-      letzteBreite = letzteBreite * .72 + w * .28;     // Glättung
+      letzteBreite = letzteBreite * .72 + w * .28;
       return Math.max(1.5, letzteBreite);
     };
 
-    /* Der Handballen liegt fast immer VOR der Spitze auf. Deshalb genügt es nicht,
-       den Stift erst beim Aufsetzen zu erkennen — wir merken uns über Sitzungen
-       hinweg, dass dieses Gerät einen Stift hat, und nehmen dann nur noch ihn. */
+    /* Der Handballen liegt fast immer VOR der Spitze auf. Deshalb merken wir uns
+       über Sitzungen hinweg, dass dieses Gerät einen Stift hat, und nehmen dann
+       nur noch ihn. */
     const nimmt = (e) => {
       if (ro) return false;
       if (e.pointerType === "pen") {
         if (!stiftGesehen) { stiftGesehen = true; try{ localStorage.setItem(ZF_STIFT,"1"); }catch(x){} }
-        // Ein Finger-Zug, der gerade läuft, war der Handballen — verwerfen
-        if (aktuell && aktuellTyp !== "pen") { aktuell = null; alles(); }
+        if (aktuell && aktuellTyp !== "pen") { aktuell = null; vorher = []; ebeneBald(); alles(); }
         return true;
       }
-      if (stiftGesehen) return false;      // Finger und Handballen bleiben draußen
+      if (stiftGesehen) return false;
       return true;
+    };
+
+    const r1 = n => Math.round(n * 10) / 10;
+
+    const punktAus = (x, jetzt) => {
+      const p = roh(x);
+      const w = breiteFuer(p, jetzt);
+      letzterPunkt = p; letzteZeit = jetzt;
+      return [r1(p.x), r1(p.y), r1(w)];
     };
 
     const runter = (e) => {
       if (!nimmt(e)) return;
       e.preventDefault();
-      cv.setPointerCapture && cv.setPointerCapture(e.pointerId);
+      ov.setPointerCapture && ov.setPointerCapture(e.pointerId);
       const jetzt = performance.now();
       letzterPunkt = null; letzteBreite = null; letzteZeit = jetzt;
-      const p = roh(e);
-      const g0 = glaetten(p.x, p.y, true); p.x = g0[0]; p.y = g0[1];
-      const w = breiteFuer(p, jetzt);
       aktuellTyp = e.pointerType;
-      aktuell = { f: zfRadiert ? -1 : zfFarbe, d: zfDicke, p: [[r1(p.x), r1(p.y), r1(w)]] };
-      letzterPunkt = p; letzteZeit = jetzt;
-      zugMalen(aktuell);
+      aktuell = { f: zfRadiert ? -1 : zfFarbe, d: zfDicke, p: [punktAus(e, jetzt)] };
+      vorher = [];
       leer.hidden = true;
+      if (aktuell.f === -1) zugMalenAuf(ctx, aktuell, 1); else ebeneBald();
     };
 
     const zieht = (e) => {
       if (!aktuell || !nimmt(e)) return;
       e.preventDefault();
+      // Alle Zwischenmessungen seit dem letzten Ereignis (bis zu 240 je Sekunde)
       const folge = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+      const jetzt = performance.now();
+      let neu = 0;
       folge.forEach(x => {
-        const jetzt = performance.now();
-        const p = roh(x);
-        const g = glaetten(p.x, p.y, false); p.x = g[0]; p.y = g[1];
-        const w = breiteFuer(p, jetzt);
-        const neuP = [r1(p.x), r1(p.y), r1(w)];
-        const vor = aktuell.p[aktuell.p.length - 1];
-        const weg = Math.hypot(neuP[0]-vor[0], neuP[1]-vor[1]);
-        if (weg < .28) return;              // Zittern an Ort und Stelle überspringen
-        const hex = farbeVon(aktuell.f), rad = aktuell.f === -1;
-        // Bei großen Sprüngen Zwischenpunkte setzen, damit die Kurve rund bleibt
-        const stufen = weg > 9 ? Math.min(8, Math.ceil(weg/4.5)) : 1;
-        let letzt = vor;
-        for (let k = 1; k <= stufen; k++) {
-          const t = k/stufen;
-          const zw = [ r1(vor[0] + (neuP[0]-vor[0])*t),
-                       r1(vor[1] + (neuP[1]-vor[1])*t),
-                       r1(vor[2] + (neuP[2]-vor[2])*t) ];
-          segment(letzt, zw, hex, rad);
-          aktuell.p.push(zw);
-          letzt = zw;
-        }
-        letzterPunkt = p; letzteZeit = jetzt;
+        const q = punktAus(x, jetzt);
+        const vor = aktuell.p[aktuell.p.length-1];
+        if (Math.hypot(q[0]-vor[0], q[1]-vor[1]) < .28) return;
+        aktuell.p.push(q); neu++;
       });
+      if (aktuell.f === -1) {
+        // Radierer: sofort auf der Fläche, keine Vorhersage
+        if (neu) zugMalenAuf(ctx, aktuell, aktuell.p.length - neu);
+        return;
+      }
+      // Vorhersage: wohin die Spitze gleich läuft — nur angezeigt, nie gespeichert
+      vorher = [];
+      if (e.getPredictedEvents) {
+        const vs = e.getPredictedEvents();
+        const wBasis = aktuell.p[aktuell.p.length-1][2];
+        vs.slice(0, 3).forEach(x => {
+          const p = roh(x);
+          vorher.push([r1(p.x), r1(p.y), wBasis]);
+        });
+      }
+      ebeneBald();
     };
 
     const hoch = () => {
       if (!aktuell) return;
-      if (aktuell.p.length) zuege.push(aktuell);
+      vorher = [];
+      if (aktuell.p.length) {
+        zuege.push(aktuell);
+        if (aktuell.f !== -1) zugMalenAuf(ctx, aktuell, 1);   // jetzt endgültig auf die Fläche
+      }
       aktuell = null; letzterPunkt = null; letzteBreite = null;
+      ebeneBald();
       sichern(); knoepfe(); leer.hidden = zuege.length > 0;
     };
-    const r1 = n => Math.round(n * 10) / 10;
 
-    cv.addEventListener("pointerdown", runter);
-    cv.addEventListener("pointermove", zieht);
-    ["pointerup", "pointercancel", "pointerleave"].forEach(t => cv.addEventListener(t, hoch));
+
+    ov.addEventListener("pointerdown", runter);
+    ov.addEventListener("pointermove", zieht);
+    ["pointerup", "pointercancel", "pointerleave"].forEach(t => ov.addEventListener(t, hoch));
 
     const leer = document.createElement("div"); leer.className = "zf-leer";
     leer.textContent = "Hier schreiben oder zeichnen";
@@ -5044,12 +5096,16 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
       const notiz=msAlle().filter(n=>n.d===D);
       if(notiz.length){
         const nz=document.createElement("div"); nz.className="li-notiz";
-        nz.innerHTML=`<div class="cc-q-h">Unterwegs festgehalten · ${notiz.length}</div>`+
-          notiz.map(n=>{
-            const zeit=new Date(n.at).toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});
-            return `<div class="li-nz"><span class="msn-zt">${zeit}</span>`+
-              (isEnc(n.t)?`<span class="tli-zu">· · · · ·</span>`:`<span class="li-nzt">${esc(String(n.t))}</span>`)+`</div>`;
-          }).join("");
+        nz.innerHTML=`<div class="cc-q-h">Unterwegs festgehalten · ${notiz.length}</div>`;
+        notiz.forEach(n=>{
+          const zeit=new Date(n.at).toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});
+          const z=document.createElement("div"); z.className="li-nz";
+          z.innerHTML=`<span class="msn-zt">${zeit}</span>`;
+          if(isEnc(n.t)) z.insertAdjacentHTML("beforeend",`<span class="tli-zu">· · · · ·${n.art==="skizze"?" ✎":""}</span>`);
+          else if(n.art==="skizze"){ const sp=document.createElement("span"); sp.className="li-nzt"; sp.appendChild(skizzeVorschau(n.t,260,90)); z.appendChild(sp); }
+          else z.insertAdjacentHTML("beforeend",`<span class="li-nzt">${esc(String(n.t))}</span>`);
+          nz.appendChild(z);
+        });
         if(notiz.some(n=>isEnc(n.t))){
           const ob=document.createElement("button"); ob.type="button"; ob.className="cc-link"; ob.textContent="Abgelegtes öffnen →";
           ob.addEventListener("click",()=>alleOeffnen(notiz.map(n=>({
@@ -11280,6 +11336,29 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
   const msAlle=()=>read(MSNOTIZ,[]);
   const msSave=l=>write(MSNOTIZ,l);
   const msHeute=()=>msAlle().filter(n=>n.d===today);
+  let msSkizze=false;
+  /* Eine Skizze verkleinert wiedergeben — Striche nachmalen, sonst nichts */
+  function skizzeVorschau(rohText, w, h){
+    const c=document.createElement("canvas"); c.className="msn-skc";
+    const dpr=Math.min(2, window.devicePixelRatio||1);
+    c.width=w*dpr; c.height=h*dpr; c.style.width=w+"px"; c.style.height=h+"px";
+    try{
+      const j=JSON.parse(rohText); const zuege=Array.isArray(j)?j:(j.z||[]);
+      const ctx=c.getContext("2d"); if(!ctx) return c;
+      // Ausschnitt: alles, was gezeichnet wurde, eingepasst
+      let minx=1e9,miny=1e9,maxx=-1e9,maxy=-1e9;
+      zuege.forEach(z=>(z.p||[]).forEach(p=>{ minx=Math.min(minx,p[0]); miny=Math.min(miny,p[1]); maxx=Math.max(maxx,p[0]); maxy=Math.max(maxy,p[1]); }));
+      if(minx>maxx) return c;
+      const sx=(w-8)/Math.max(1,maxx-minx), sy=(h-8)/Math.max(1,maxy-miny), sk=Math.min(sx,sy,1.2);
+      ctx.setTransform(dpr*sk,0,0,dpr*sk, dpr*(4-minx*sk), dpr*(4-miny*sk));
+      ctx.lineCap="round"; ctx.lineJoin="round";
+      zuege.forEach(z=>{ if(z.f===-1) return; const p=z.p||[]; if(!p.length) return;
+        ctx.strokeStyle=ZF_FARBEN[Math.max(0,Math.min(ZF_FARBEN.length-1,z.f|0))][1];
+        ctx.lineWidth=Math.max(1.2/sk, (p[0][2]||3)); ctx.beginPath(); ctx.moveTo(p[0][0],p[0][1]);
+        for(let i=1;i<p.length;i++) ctx.lineTo(p[i][0],p[i][1]); ctx.stroke(); });
+    }catch(e){}
+    return c;
+  }
   function openMetaNotiz(){
     document.querySelectorAll(".msn-ov").forEach(x=>x.remove());
     const ov=document.createElement("div"); ov.className="msn-ov open";
@@ -11290,7 +11369,27 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
     ta.placeholder=metaPh("schnell",0);
     const grow=()=>{ ta.style.height="auto"; ta.style.height=Math.max(96,ta.scrollHeight)+"px"; };
     ta.addEventListener("input",grow);
-    box.appendChild(ta);
+
+    // Auf dem iPad: schreiben oder zeichnen
+    let skizze=null;      // die Striche der Skizze als Text, solange der Dialog offen ist
+    let zfBox=null;
+    if(istTablet){
+      const um=document.createElement("div"); um.className="msn-um";
+      const bt=document.createElement("button"); bt.type="button"; bt.className="msn-um-b"+(msSkizze?"":" on"); bt.textContent="Text";
+      const bz=document.createElement("button"); bz.type="button"; bz.className="msn-um-b"+(msSkizze?" on":""); bz.textContent="Skizze";
+      const wechsel=z=>{ msSkizze=z; bt.classList.toggle("on",!z); bz.classList.toggle("on",z);
+        ta.hidden=z; if(zfBox) zfBox.hidden=!z; if(!z) setTimeout(()=>ta.focus(),20); };
+      bt.addEventListener("click",()=>wechsel(false));
+      bz.addEventListener("click",()=>wechsel(true));
+      um.append(bt,bz); box.appendChild(um);
+      box.appendChild(ta);
+      zfBox=zeichenFlaeche(()=>skizze||"", v=>{ skizze=v; }, true, false);
+      zfBox.classList.add("msn-zf");
+      box.appendChild(zfBox);
+      ta.hidden=msSkizze; zfBox.hidden=!msSkizze;
+    }else{
+      box.appendChild(ta);
+    }
 
     const acts=document.createElement("div"); acts.className="msn-acts";
     const zu=document.createElement("button"); zu.type="button"; zu.className="ask-btn"; zu.textContent="Abbrechen";
@@ -11299,7 +11398,9 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
     abl.title="Geschützt sichern";
     const ok=document.createElement("button"); ok.type="button"; ok.className="ask-btn ok"; ok.textContent="sichern";
     const sichern=async(schuetzen)=>{
-      const t=ta.value.trim(); if(!t){ ov.remove(); return; }
+      const istSkizze = istTablet && msSkizze;
+      const t = istSkizze ? String(skizze||"").trim() : ta.value.trim();
+      if(!t){ ov.remove(); return; }
       let wert=t;
       if(schuetzen){
         const pw=await ensurePassphrase(); if(pw==null) return;
@@ -11307,7 +11408,9 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
         catch(e){ alert("Ablegen fehlgeschlagen."); return; }
       }
       const l=msAlle();
-      l.unshift({id:uid(), d:today, at:new Date().toISOString(), t:wert});
+      const eintrag={id:uid(), d:today, at:new Date().toISOString(), t:wert};
+      if(istSkizze) eintrag.art="skizze";
+      l.unshift(eintrag);
       // Nur die letzten Wochen behalten
       const cut=addDays(today,-60);
       msSave(l.filter(n=>n.d>=cut).slice(0,300));
@@ -11329,7 +11432,10 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
         const z=document.createElement("div"); z.className="msn-z";
         const zeit=new Date(n.at).toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});
         z.innerHTML=`<span class="msn-zt">${zeit}</span>`+
-          (isEnc(n.t)?`<span class="tli-zu">· · · · ·</span>`:`<span class="msn-tx">${esc(String(n.t))}</span>`);
+          (isEnc(n.t)?`<span class="tli-zu">· · · · ·${n.art==="skizze"?" ✎":""}</span>`
+           : n.art==="skizze" ? `<span class="msn-tx msn-sk"></span>`
+           : `<span class="msn-tx">${esc(String(n.t))}</span>`);
+        if(n.art==="skizze" && !isEnc(n.t)) z.querySelector(".msn-sk").appendChild(skizzeVorschau(n.t, 220, 70));
         const del=document.createElement("button"); del.className="row-del"; del.type="button"; del.textContent="×";
         del.addEventListener("click",()=>{ msSave(msAlle().filter(x=>x.id!==n.id)); ov.remove(); openMetaNotiz(); });
         z.appendChild(del);

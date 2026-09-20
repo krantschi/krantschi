@@ -1193,6 +1193,14 @@
 
   /* ---------- Zeichenfläche ---------- */
   .zf{margin-top:10px}
+  /* Während ein Stift auf der Fläche ist: die ganze Seite reglos */
+  body.zf-aktiv, body.zf-aktiv *{-webkit-user-select:none!important; user-select:none!important;
+    -webkit-touch-callout:none!important}
+  body.zf-aktiv{overflow:hidden; overscroll-behavior:none; touch-action:none}
+  body.zf-kein-markieren, body.zf-kein-markieren *{-webkit-user-select:none!important; user-select:none!important;
+    -webkit-touch-callout:none!important}
+  body.zf-kein-markieren input, body.zf-kein-markieren textarea{-webkit-user-select:text!important; user-select:text!important}
+  .zf{-webkit-user-select:none; user-select:none; -webkit-touch-callout:none; touch-action:none}
   .zf-feld{position:relative; border-radius:14px; overflow:hidden;
     box-shadow:inset 0 0 0 1px var(--line), 0 1px 3px rgba(0,0,0,.06)}
   .zf-feld{position:relative}
@@ -1209,6 +1217,20 @@
     pointer-events:none; font-family:var(--serif); font-style:italic; font-size:14px; color:rgba(0,0,0,.22)}
   body.dark .zf-leer{color:rgba(255,255,255,.2)}
   .zf-bar{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:9px}
+  /* Die Stifte — kleine Sinnbilder, wie in Notizen */
+  .zf-stifte{display:flex; gap:2px; align-items:flex-end}
+  .zf-st{display:flex; flex-direction:column; align-items:center; gap:3px; font:inherit;
+    background:transparent; border:none; padding:4px 6px 2px; border-radius:9px; cursor:pointer; opacity:.55}
+  .zf-st.on{opacity:1; background:rgba(var(--sheen),.08)}
+  .zf-st-i{display:block; width:22px; height:22px; border-radius:3px; background:currentColor; color:var(--ink-soft);
+    transform:translateY(4px); transition:transform .15s ease}
+  .zf-st.on .zf-st-i{transform:translateY(0)}
+  .zf-st-n{font-size:8.5px; font-weight:700; color:var(--ink-faint); letter-spacing:.02em}
+  .zf-st.stift  .zf-st-i{clip-path:polygon(44% 0,56% 0,60% 62%,50% 100%,40% 62%)}
+  .zf-st.filz   .zf-st-i{clip-path:polygon(36% 0,64% 0,66% 66%,54% 100%,46% 100%,34% 66%)}
+  .zf-st.blei   .zf-st-i{clip-path:polygon(40% 0,60% 0,60% 55%,50% 100%,40% 55%); color:#8a8a8e}
+  .zf-st.marker .zf-st-i{clip-path:polygon(28% 0,72% 0,72% 70%,64% 100%,36% 100%,28% 70%); color:#f2c14e}
+  .zf-st.rad    .zf-st-i{clip-path:polygon(0 30%,55% 0,100% 45%,45% 100%,0 70%); color:#d47b76}
   .zf-farben{display:flex; gap:5px}
   .zf-f{width:22px; height:22px; border:none; border-radius:50%; cursor:pointer; padding:0;
     background:var(--c); box-shadow:0 0 0 1px rgba(0,0,0,.12); transition:transform .13s}
@@ -1327,6 +1349,11 @@
   .cc-ta:focus{outline:none; box-shadow:inset 0 0 0 1.4px var(--brass)}
   .cc-ta.klein{font-size:13.5px; padding:8px 11px}
   .cc-feld{margin-bottom:2px}
+  .cc-sk-t{display:inline-flex; align-items:center; gap:6px; margin:6px 0 2px; font:inherit; font-size:10.5px;
+    font-weight:700; color:var(--ink-faint); background:transparent; border:none; cursor:pointer; padding:2px 0}
+  .cc-sk-t.on{color:var(--brass)}
+  .cc-sk-m{width:6px; height:6px; border-radius:50%; background:var(--brass)}
+  .cc-sk{margin-top:6px}
   .cc-feld-akt{display:flex; gap:6px; margin-top:4px}
   .cc-quelle{margin-bottom:12px}
   .cc-q-h{font-size:9.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:7px}
@@ -3083,7 +3110,7 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
   const ABSICHT="ht_absicht_v1";   // wandert als einziges mit auf das andere Gerät
   const MSNOTIZ="ht_metanotiz_v1";  // spontan Festgehaltenes, strikt lokal   // wandert als einziges mit auf das andere Gerät   // "morgen" = morgens für heute, "abend" = abends für morgen  // Satz der Woche
   const ANGELUS="ht_angelus_v1";
-  const APP_VERSION="2026-09-20-stift";   // wird beim Aktualisieren hochgezählt
+  const APP_VERSION="2026-09-20-stift2";   // wird beim Aktualisieren hochgezählt
   const LOCKIN="ht_lockin_v1";
   const LOCKTXT="ht_lockintext_v1", CRYPTO="ht_crypto_v1", CAL="ht_cal_v1", QUOTES="ht_quotes_v1", LOCKCFG="ht_lockin_cfg_v1", SCHATZ="ht_schatz_v1", GOSPELC="ht_gospel_v1";
   const MAX_PRIOS=8;
@@ -4564,6 +4591,17 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
     ["messing","#B8873A"]
   ];
   let zfFarbe = 0, zfRadiert = false, zfDicke = 1;
+  /* Die Stifte aus Notizen. Jeder hat eigene Breite, Deckkraft und Reaktion
+     auf Druck, Tempo und Neigung. */
+  const ZF_STIFTE = [
+    { id:"stift",  name:"Stift",      basis:4.6,  deck:1,   druck:1,   tempo:1,   neig:.9,  mischen:"source-over" },
+    { id:"filz",   name:"Filzstift",  basis:9.5,  deck:.96, druck:.25, tempo:0,   neig:.3,  mischen:"source-over" },
+    { id:"blei",   name:"Bleistift",  basis:3.2,  deck:.72, druck:.8,  tempo:.6,  neig:2.2, mischen:"source-over", koernig:true },
+    { id:"marker", name:"Textmarker", basis:24,   deck:.34, druck:0,   tempo:0,   neig:0,   mischen:"multiply" },
+    { id:"fueller",name:"Füller",     basis:4.2,  deck:1,   druck:1.4, tempo:2.2, neig:.4,  mischen:"source-over" },
+    { id:"mono",   name:"Monolinie",  basis:3.4,  deck:1,   druck:0,   tempo:0,   neig:0,   mischen:"source-over" }
+  ];
+  let zfStift = 0;
 
   function zeichenFlaeche(hol, leg, neu, ro){
     const box = document.createElement("div"); box.className = "zf";
@@ -4604,6 +4642,25 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
     };
 
     const farbeVon = i => ZF_FARBEN[Math.max(0, Math.min(ZF_FARBEN.length-1, i|0))][1];
+    /* Graphit auf Papier: ein kleines Rauschmuster, je Farbe einmal erzeugt.
+       Manche Stellen decken voll, andere weniger — das gibt die Körnung. */
+    const koernungen = {};
+    const koernung = (c, hex) => {
+      if (koernungen[hex]) return koernungen[hex];
+      const k = document.createElement("canvas"); k.width = k.height = 32;
+      const kc = k.getContext("2d"); if (!kc) return hex;
+      kc.fillStyle = hex;
+      let seed = 11;
+      for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) {
+        seed = (seed * 9301 + 49297) % 233280;
+        const r = seed / 233280;
+        kc.globalAlpha = r < .22 ? .3 : r < .55 ? .7 : 1;
+        kc.fillRect(x, y, 1, 1);
+      }
+      const m = c.createPattern ? c.createPattern(k, "repeat") : null;
+      if (m) koernungen[hex] = m;
+      return m || hex;
+    };
 
     /* ---- Zwei Ebenen, wie bei Apple ----
        Die Hauptfläche trägt alle fertigen Züge. Der laufende Zug wird auf einer
@@ -4651,12 +4708,35 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
     };
 
     // Einen ganzen Zug malen: Punkte → Kurve → Bänder
+    let hilf = null, hctx = null;
+    const hilfHolen = () => {
+      if (!hilf) hilf = document.createElement("canvas");
+      if (hilf.width !== cv.width || hilf.height !== cv.height) {
+        hilf.width = cv.width; hilf.height = cv.height;
+        hctx = hilf.getContext("2d");
+      }
+      if (hctx) hctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      return hctx;
+    };
     const zugMalenAuf = (c, z, ab) => {
       const p = z.p || [];
       if (!p.length) return;
+      const st = ZF_STIFTE[z.w|0] || ZF_STIFTE[0];
+      /* Halbdeckend (Bleistift, Textmarker): Bänder überlappen sich, und bei
+         Deckkraft unter 1 würde jede Überlappung dunkler. Deshalb den Zug
+         deckend auf eine Hilfsfläche malen und dann als Ganzes einblenden. */
+      if (z.f !== -1 && st.deck < 1 && c !== hctx) {
+        const h = hilfHolen(); if (!h) return;
+        h.clearRect(0, 0, breite, hoehe);
+        zugMalenAuf(h, z, 1);
+        c.save(); c.globalAlpha = st.deck; c.globalCompositeOperation = st.mischen;
+        c.setTransform(1, 0, 0, 1, 0, 0); c.drawImage(hilf, 0, 0);
+        c.restore(); c.setTransform(dpr, 0, 0, dpr, 0, 0);
+        return;
+      }
       c.save();
       if (z.f === -1) { c.globalCompositeOperation = "destination-out"; c.fillStyle = "rgba(0,0,0,1)"; }
-      else c.fillStyle = farbeVon(z.f);
+      else { c.fillStyle = st.koernig ? koernung(c, farbeVon(z.f)) : farbeVon(z.f); }
       if (p.length === 1) {
         c.beginPath(); c.arc(p[0][0], p[0][1], Math.max(.5, p[0][2]/2), 0, Math.PI*2); c.fill();
         c.restore(); return;
@@ -4692,7 +4772,7 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
       octx.clearRect(0, 0, breite, hoehe);
       if (!aktuell) return;
       if (aktuell.f === -1) return;           // der Radierer wirkt direkt auf der Fläche
-      const z = { f: aktuell.f, p: vorher.length ? aktuell.p.concat(vorher) : aktuell.p };
+      const z = { f: aktuell.f, w: aktuell.w, p: vorher.length ? aktuell.p.concat(vorher) : aktuell.p };
       zugMalenAuf(octx, z, 1);
     };
     const ebeneBald = () => { if (!bild) bild = requestAnimationFrame(ebeneMalen); };
@@ -4718,18 +4798,21 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
     /* Strichbreite: Grundbreite mal Druck, leicht verjüngt durch Geschwindigkeit,
        breiter bei flach gehaltenem Stift. Danach geglättet. */
     const breiteFuer = (p, jetzt) => {
-      const basis = (zfRadiert ? 20 : 4.6) * zfDicke;
+      const st = ZF_STIFTE[zfStift] || ZF_STIFTE[0];
+      const basis = (zfRadiert ? 20 : st.basis) * zfDicke;
       let w;
       if (zfRadiert) w = basis;
       else {
-        let druck = p.stift ? (.5 + p.dr * 1.1) : 1;
-        if (p.stift && p.neig > 0) druck *= 1 + Math.min(.7, p.neig * .9);
+        // Druck: wie stark er die Breite bestimmt, hängt am Werkzeug
+        let druck = p.stift ? (1 - st.druck*.5) + p.dr * st.druck * 1.1 : 1;
+        if (p.stift && p.neig > 0 && st.neig > 0) druck *= 1 + Math.min(st.neig, p.neig * st.neig);
         let tempo = 0;
         if (letzterPunkt && jetzt > letzteZeit) {
           tempo = Math.hypot(p.x - letzterPunkt.x, p.y - letzterPunkt.y) / Math.max(1, jetzt - letzteZeit);
         }
-        const duenner = 1 / (1 + Math.min(1.4, tempo * .55));
-        w = basis * druck * (.74 + .26 * duenner);
+        const duenner = 1 / (1 + Math.min(1.6, tempo * .55 * Math.max(.5, st.tempo)));
+        const bereich = Math.min(.7, .26 * st.tempo);      // wie stark das Tempo die Breite verändert
+        w = basis * druck * ((1 - bereich) + bereich * duenner);
       }
       if (letzteBreite == null) letzteBreite = w;
       letzteBreite = letzteBreite * .72 + w * .28;
@@ -4766,7 +4849,7 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
       const jetzt = performance.now();
       letzterPunkt = null; letzteBreite = null; letzteZeit = jetzt;
       aktuellTyp = e.pointerType;
-      aktuell = { f: zfRadiert ? -1 : zfFarbe, d: zfDicke, p: [punktAus(e, jetzt)] };
+      aktuell = { f: zfRadiert ? -1 : zfFarbe, d: zfDicke, w: zfStift, p: [punktAus(e, jetzt)] };
       vorher = [];
       leer.hidden = true;
       if (aktuell.f === -1) zugMalenAuf(ctx, aktuell, 1); else ebeneBald();
@@ -4804,6 +4887,7 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
     };
 
     const hoch = () => {
+      seiteHalten(false);
       if (!aktuell) return;
       vorher = [];
       if (aktuell.p.length) {
@@ -4816,8 +4900,32 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
     };
 
 
-    ov.addEventListener("pointerdown", runter);
+    /* ---- Handballen ----
+       Der Ballen liegt auf, bevor der Stift aufsetzt, und oft NEBEN der Fläche.
+       Solange die Fläche offen ist und dieses Gerät einen Stift kennt, wird jede
+       Berührung, die so groß ist wie ein Handballen, auf der ganzen Seite
+       verschluckt. Ein Finger bleibt schmal und darf weiter scrollen. */
+    const seiteHalten = an => { document.body.classList.toggle("zf-aktiv", an); };
+    const istBallen = t => Math.max(t.radiusX||0, t.radiusY||0) >= 16;   // Finger ≈ 8–13, Ballen ≈ 20–45
+    const ballenWache = e => {
+      if (ro || !stiftGesehen) return;
+      if (!box.isConnected) { document.removeEventListener("touchstart", ballenWache); document.removeEventListener("touchmove", ballenWache); return; }
+      for (const t of e.touches) if (istBallen(t)) { e.preventDefault(); return; }
+    };
+    document.addEventListener("touchstart", ballenWache, { passive:false });
+    document.addEventListener("touchmove",  ballenWache, { passive:false });
+    if (stiftGesehen && !ro) document.body.classList.add("zf-kein-markieren");
+    const aufraeumen = new MutationObserver(() => {
+      if (!box.isConnected) { document.body.classList.remove("zf-kein-markieren"); seiteHalten(false); aufraeumen.disconnect(); }
+    });
+    aufraeumen.observe(document.body, { childList:true, subtree:true });
+
+    ov.addEventListener("pointerdown", e => { if (nimmt(e)) seiteHalten(true); runter(e); });
     ov.addEventListener("pointermove", zieht);
+    ["touchstart","touchmove"].forEach(t => box.addEventListener(t, e => {
+      if (stiftGesehen && !ro) e.preventDefault();
+    }, { passive:false }));
+    box.addEventListener("contextmenu", e => e.preventDefault());
     ["pointerup", "pointercancel", "pointerleave"].forEach(t => ov.addEventListener(t, hoch));
 
     const leer = document.createElement("div"); leer.className = "zf-leer";
@@ -4838,11 +4946,22 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
     });
     bar.appendChild(farben);
 
+    const stifte = document.createElement("div"); stifte.className = "zf-stifte";
+    ZF_STIFTE.forEach((st, i) => {
+      const b = document.createElement("button"); b.type = "button";
+      b.className = "zf-st " + st.id + (!zfRadiert && zfStift === i ? " on" : "");
+      b.title = st.name;
+      b.innerHTML = `<span class="zf-st-i"></span><span class="zf-st-n">${st.name}</span>`;
+      b.addEventListener("click", () => { zfStift = i; zfRadiert = false; leisteAuf(); });
+      stifte.appendChild(b);
+    });
     const rad = document.createElement("button"); rad.type = "button";
-    rad.className = "zf-rad" + (zfRadiert ? " on" : "");
-    rad.textContent = "Radierer";
+    rad.className = "zf-st rad" + (zfRadiert ? " on" : "");
+    rad.title = "Radierer";
+    rad.innerHTML = `<span class="zf-st-i"></span><span class="zf-st-n">Radierer</span>`;
     rad.addEventListener("click", () => { zfRadiert = !zfRadiert; leisteAuf(); });
-    bar.appendChild(rad);
+    stifte.appendChild(rad);
+    bar.appendChild(stifte);
 
     const dicken = document.createElement("div"); dicken.className = "zf-dicken";
     [[.6,"fein"],[1,"mittel"],[1.8,"breit"]].forEach(([v, t]) => {
@@ -4876,6 +4995,8 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
       farben.querySelectorAll(".zf-f").forEach((b, i) =>
         b.classList.toggle("on", !zfRadiert && zfFarbe === i));
       rad.classList.toggle("on", zfRadiert);
+      stifte.querySelectorAll(".zf-st:not(.rad)").forEach((b, i) =>
+        b.classList.toggle("on", !zfRadiert && zfStift === i));
       dicken.querySelectorAll(".zf-d").forEach((b, i) =>
         b.classList.toggle("on", zfDicke === [.6,1,1.8][i]));
     }
@@ -4885,6 +5006,7 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
     }
 
     requestAnimationFrame(() => { messen(); alles(); knoepfe(); leisteAuf(); });
+
     if (typeof ResizeObserver === "function") {
       let vor = 0;
       new ResizeObserver(() => {
@@ -4906,7 +5028,8 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
     return (navigator.maxTouchPoints||0) > 1 && Math.min(screen.width,screen.height) >= 700;
   }catch(e){ return false; } })();
   function liFeld(D,id,ph,rows,ohneKnopf){
-    const f=ccSicher(()=>getText(D,id), v=>setText(D,id,v), ph, rows, buildLockIn);
+    const sk = { hol:()=>getText(D,id+"_draw"), leg:v=>setText(D,id+"_draw",v), key:"li:"+id };
+    const f=ccSicher(()=>getText(D,id), v=>setText(D,id,v), ph, rows, buildLockIn, sk);
     if(ohneKnopf) f.querySelectorAll(".cc-feld-akt").forEach(x=>x.remove());
     return f;
   }
@@ -5556,28 +5679,18 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
       const linie=document.createElement("div"); linie.className="tages-linie";
       wrap.appendChild(linie);
 
-      // Darunter der freie Text — nur dieser lässt sich ablegen
-      if(isEnc(cur)){
-        const mask=document.createElement("div"); mask.className="enc-mask"; mask.textContent="· · · · ·"; mask.title="Antippen zum Öffnen";
-        const key=document.createElement("button"); key.className="key-btn open"; key.type="button"; key.textContent="öffnen"; key.title="Text sichtbar machen";
-        key.addEventListener("click",()=>unlockField(D,"tagesabschluss"));
-        const z=document.createElement("div"); z.className="cc-feld-akt"; z.appendChild(key);
-        if(!ro) z.appendChild(delBtn(D,"tagesabschluss"));
-        wrap.append(mask,z);
-      }else{
-        const ta=document.createElement("textarea"); ta.className="lockin-ta"; ta.rows=3;
-        ta.placeholder="Wie war der Tag? Was hat gezogen, was getragen …";
-        ta.value=(typeof cur==="string")?cur:"";
-        if(ro){ ta.readOnly=true; } else { ta.addEventListener("input",()=>setText(D,"tagesabschluss",ta.value)); }
+      // Darunter der freie Text — nur dieser lässt sich ablegen, samt Skizze
+      if(ro){
+        const ta=document.createElement("textarea"); ta.className="lockin-ta"; ta.rows=3; ta.readOnly=true;
+        ta.value=isEnc(cur)?"· · · · ·":(typeof cur==="string"?cur:"");
         wrap.appendChild(ta);
-        if(!ro){
-          const key=document.createElement("button"); key.className="key-btn"; key.type="button";
-          key.textContent="ablegen"; key.title="Nur diesen Text geschützt ablegen — die Wins bleiben offen";
-          key.addEventListener("click",()=>lockField(D,"tagesabschluss"));
-          const z=document.createElement("div"); z.className="cc-feld-akt"; z.appendChild(key);
-          if(typeof cur==="string" && cur.trim()) z.appendChild(delBtn(D,"tagesabschluss"));
-          wrap.appendChild(z);
-        }
+      }else{
+        const f=ccSicher(()=>getText(D,"tagesabschluss"), v=>setText(D,"tagesabschluss",v),
+          "Wie war der Tag? Was hat gezogen, was getragen …", 3, buildTagesabschluss,
+          { hol:()=>getText(D,"tagesabschluss_draw"), leg:v=>setText(D,"tagesabschluss_draw",v), key:"ta:bericht" });
+        f.querySelectorAll(".cc-ta").forEach(t=>t.classList.add("lockin-ta"));
+        const k=f.querySelector(".key-btn:not(.open):not(.del)"); if(k) k.title="Nur diesen Text geschützt ablegen — die Wins bleiben offen";
+        wrap.appendChild(f);
       }
       panel.appendChild(wrap);
       if(canEdit() && !ro){
@@ -10453,32 +10566,42 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
   function ccFeld(rec,id,ph,rows){ return ccSicher(
     ()=>((rec.a||{})[id]),
     v=>ccSave(r=>{ r.a=r.a||{}; r.a[id]=v; }),
-    ph, rows); }
+    ph, rows, undefined,
+    { hol:()=>((rec.a||{})[id+"_draw"]), leg:v=>ccSave(r=>{ r.a=r.a||{}; r.a[id+"_draw"]=v; }), key:"cc:"+id }); }
 
-  function ccSicher(hol,leg,ph,rows,neu){
+  /* sk = { hol, leg, key } — die Skizze zum Feld. Text und Skizze teilen sich
+     das Schloss: „ablegen“ schließt beide, „öffnen“ öffnet beide. */
+  const skOffen = new Set();      // welche Skizzen gerade aufgeklappt sind
+  function ccSicher(hol,leg,ph,rows,neu,sk){
     const NEU = neu || buildVision;
     const wrap=document.createElement("div"); wrap.className="cc-feld";
     const cur=hol();
-    if(isEnc(cur)){
+    const skCur = sk ? sk.hol() : "";
+    const skHat = sk && (isEnc(skCur) || (typeof skCur==="string" && skCur.trim().length>2));
+    if(isEnc(cur) || (sk && isEnc(skCur))){
       const mask=document.createElement("div"); mask.className="enc-mask"; mask.textContent="· · · · ·";
       mask.title="Antippen zum Öffnen";
       const key=document.createElement("button"); key.className="key-btn open"; key.type="button";
       key.textContent="öffnen"; key.title="Text sichtbar machen";
       const oeffne=async()=>{
         const pw=await ensurePassphrase(); if(pw==null) return;
-        try{ const t=await decWith(pw, unb64(cryptoRec.salt), cur); leg(t); NEU(); }
-        catch(e){ alert("Konnte nicht öffnen (falsches Passwort?)."); }
+        try{
+          if(isEnc(cur)) leg(await decWith(pw, unb64(cryptoRec.salt), cur));
+          if(sk && isEnc(skCur)) sk.leg(await decWith(pw, unb64(cryptoRec.salt), skCur));
+          NEU();
+        }catch(e){ alert("Konnte nicht öffnen (falsches Passwort?)."); }
       };
       key.addEventListener("click",oeffne);
       mask.addEventListener("click",oeffne);
       const del=document.createElement("button"); del.className="key-btn del"; del.type="button"; del.textContent="löschen";
       del.addEventListener("click",async()=>{
         const pw=await ensurePassphrase(); if(pw==null) return;
-        try{ await decWith(pw, unb64(cryptoRec.salt), cur); }
+        try{ await decWith(pw, unb64(cryptoRec.salt), isEnc(cur)?cur:skCur); }
         catch(e){ alert("Falsches Passwort — es wurde nichts gelöscht."); return; }
         if(!confirm("Diesen Text endgültig löschen? Das lässt sich nicht rückgängig machen.")) return;
-        leg(""); NEU(); toast("Text gelöscht");
+        leg(""); if(sk) sk.leg(""); NEU(); toast("Text gelöscht");
       });
+      if(sk && isEnc(skCur)) mask.textContent="· · · · · ✎";
       const zeile=document.createElement("div"); zeile.className="cc-feld-akt"; zeile.append(key,del);
       wrap.append(mask,zeile);
       return wrap;
@@ -10489,16 +10612,37 @@ body.ph-morgen .cat.tages:not(:hover),body.ph-tag .cat.lockin:not(:hover),body.p
     ta.addEventListener("input",()=>{ leg(ta.value); grow(); });
     requestAnimationFrame(grow);
     wrap.appendChild(ta);
+
+    // Auf dem iPad: eine Skizze zum Feld, aufklappbar
+    let skZf=null;
+    if(sk && istTablet){
+      const kk = sk.key || ph || "";
+      // Mit Inhalt ist die Skizze von selbst auf; ein Eintrag im Set kehrt das um
+      const zeigen = skOffen.has(kk) ? !skHat : skHat;
+      const st=document.createElement("button"); st.type="button"; st.className="cc-sk-t"+(zeigen?" on":"");
+      st.innerHTML=`<span>✎ Skizze</span>${skHat?`<span class="cc-sk-m"></span>`:``}`;
+      st.addEventListener("click",()=>{ if(skOffen.has(kk)) skOffen.delete(kk); else skOffen.add(kk); NEU(); });
+      wrap.appendChild(st);
+      if(zeigen){ skZf=zeichenFlaeche(sk.hol, sk.leg, true, false); skZf.classList.add("cc-sk"); wrap.appendChild(skZf); }
+    }
+
     // Der Knopf ist immer da, tritt aber erst hervor, wenn etwas dasteht
     const key=document.createElement("button"); key.className="key-btn"; key.type="button";
-    key.textContent="ablegen"; key.title="Text geschützt ablegen";
-    key.hidden=!(ta.value||"").trim();
-    ta.addEventListener("input",()=>{ key.hidden=!(ta.value||"").trim(); });
+    key.textContent="ablegen"; key.title=sk?"Text und Skizze geschützt ablegen":"Text geschützt ablegen";
+    const hatWas=()=> (ta.value||"").trim() || (sk && typeof sk.hol()==="string" && sk.hol().trim().length>2);
+    key.hidden=!hatWas();
+    ta.addEventListener("input",()=>{ key.hidden=!hatWas(); });
+    if(sk) wrap.addEventListener("pointerup",()=>{ setTimeout(()=>{ key.hidden=!hatWas(); },30); });
     key.addEventListener("click",async()=>{
-      const t=ta.value; if(!t.trim()){ alert("Hier steht noch nichts."); return; }
+      const t=ta.value; const z = sk ? sk.hol() : "";
+      const zHat = typeof z==="string" && z.trim().length>2;
+      if(!t.trim() && !zHat){ alert("Hier steht noch nichts."); return; }
       const pw=await ensurePassphrase(); if(pw==null) return;
-      try{ const payload=await encWith(pw, unb64(cryptoRec.salt), t); leg(payload); NEU(); }
-      catch(e){ alert("Ablegen fehlgeschlagen."); }
+      try{
+        if(t.trim()) leg(await encWith(pw, unb64(cryptoRec.salt), t));
+        if(zHat)     sk.leg(await encWith(pw, unb64(cryptoRec.salt), z));
+        NEU();
+      }catch(e){ alert("Ablegen fehlgeschlagen."); }
     });
     const zeile=document.createElement("div"); zeile.className="cc-feld-akt"; zeile.appendChild(key);
     wrap.appendChild(zeile);

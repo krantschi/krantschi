@@ -535,6 +535,14 @@
   .ps-t{flex:1}
   .ps-w{white-space:nowrap}
   .ps-l{color:rgba(237,233,228,.22); letter-spacing:.06em}
+  /* Botschaft aus Medjugorje */
+  .medj-datum{font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--brass); margin:2px 0 10px}
+  .medj-text{font-family:var(--serif); font-size:16px; line-height:1.75; white-space:pre-wrap}
+  .geb-card.medj.neu .geb-c-t{color:var(--brass)}
+  .geb-neu{margin-left:auto; font-size:9.5px; font-weight:800; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--on-accent); background:var(--brass); border-radius:999px; padding:2px 7px}
+  .al-medj{font-size:9.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--brass);
+    box-shadow:inset 0 0 0 1px var(--brass); border-radius:999px; padding:2px 7px}
   .kru-note{margin:10px 0 0; font-size:11.5px; line-height:1.5; color:rgba(237,233,228,.42); font-style:italic}
   .kru-fat{font-size:14px; line-height:1.55; color:rgba(237,233,228,.85)}
   /* Gebetstext */
@@ -1069,6 +1077,9 @@
     padding:9px 12px; border-radius:9px; background:rgba(227,178,95,.1)}
   .li-absicht.gross{margin-top:14px; font-size:16px; font-style:normal}
   .li-viz{padding:12px 14px; border-radius:11px; background:rgba(var(--sheen),.05)}
+  .li-viz-klein{margin-top:12px; padding-top:10px; border-top:1px solid var(--line)}
+  .li-viz-klein .li-viz-t{font-size:15px; color:var(--ink-soft)}
+  .cc-nordstern{margin-bottom:12px}
   .li-viz-t{margin:0 0 6px; font-family:var(--serif); font-size:16px; line-height:1.45; color:var(--ink)}
   .li-viz-q{margin-top:10px; padding-top:9px; border-top:1px solid var(--line);
     font-family:var(--serif); font-style:italic; font-size:13px; color:var(--ink-soft)}
@@ -3039,6 +3050,21 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
 .v-chain-status{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}.q-plan button:focus-visible,.vread button:focus-visible{outline:2px solid var(--violet);outline-offset:2px}.u-quick{min-width:36px;min-height:36px;padding:4px 8px}
 @media(max-width:540px){.q-tabs{padding-inline:16px}.q-composer,.q-section{margin-inline:16px}.q-task-when{max-width:88px;min-height:40px}.q-task-title{min-height:40px}.q-week-nav{padding-inline:16px}.q-tab{font-size:11px}.q-chip{min-height:36px}}
 
+/* Keep the v6 palette. Fix overflow, small touch targets and hidden-state conflicts. */
+.u-sheet{overscroll-behavior:contain;max-height:85vh;max-height:85dvh;scroll-padding:18px}.u-sheet h2{font-size:21px;overflow-wrap:anywhere}
+.u-sheet [hidden],.prosa-panel [hidden]{display:none!important}
+.q-task-main,.q-subtasks,.q-plan{min-width:0}.q-task-when{overflow-wrap:anywhere;text-align:center;min-height:40px}.q-task .todo-check{min-width:32px;min-height:32px;width:32px;height:32px}.q-subtasks{margin-left:40px}
+.q-edit-more{margin-top:10px;border-top:1px solid var(--line)}.q-edit-more>summary{min-height:44px;align-content:center;font-size:13px;color:var(--ink-soft);cursor:pointer}.q-edit-more .q-edit-settings{padding:6px 0}.q-error:empty{display:none}
+.q-section:empty,.v-cc-next:empty,.wp-hint:empty,.tag-hint:empty{display:none}
+.cc-prog:not(.tag-prog){display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.cc-prog:not(.tag-prog) .cc-dot{min-width:0;min-height:44px;font-size:11px;line-height:1.35;letter-spacing:0}
+.tag-prog .cc-dot{font-size:11px;min-height:40px;padding:6px;line-height:1.35}.cc-nav{flex-wrap:wrap}.cc-nav .cc-weiter{min-width:0;overflow-wrap:anywhere}
+.e-evening{padding:0 20px 10px}.e-prayer-link,.e-plan{min-height:44px;padding:7px 0;border:0;background:transparent;color:var(--brass);text-align:left;font:500 13px var(--ui-font);cursor:pointer}
+.e-examen{width:min(520px,calc(100% - 24px));padding:24px}.e-examen h2{font-size:21px;line-height:1.4;padding-right:32px;margin-bottom:16px;outline:none}.e-close{float:right;width:40px;height:40px;min-height:40px;margin:-8px -8px 0 0;border:0;border-radius:8px;background:transparent;color:var(--ink-soft);font-size:24px;cursor:pointer}
+.e-body{clear:both}.e-body p{font-size:16px;line-height:1.7;margin:14px 0;color:var(--ink)}.e-body .e-meta{font-size:12px;color:var(--ink-soft);margin:10px 0}.e-body .e-prayer{white-space:pre-line;font-size:16px}.e-progress{display:flex;gap:8px;margin:6px 0 16px}.e-step{flex:1;min-width:0;min-height:44px;border:1px solid var(--line);border-radius:8px;color:var(--ink-soft);background:transparent;font:500 13px var(--ui-font);cursor:pointer}.e-step[aria-current=step]{background:var(--brass-tint);border-color:var(--brass);color:var(--brass)}
+.e-questions,.e-source{border-top:1px solid var(--line);margin-top:18px}.e-questions>summary,.e-source>summary{cursor:pointer;min-height:44px;align-content:center;color:var(--ink-soft);font-size:13px}.e-source a{display:inline-block;color:var(--ink-soft);font-size:12px;padding:4px 0 12px}.e-nav{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:24px}.e-nav .u-primary{margin-left:auto;min-height:44px}.e-examen button:focus-visible,.e-prayer-link:focus-visible{outline:2px solid var(--brass);outline-offset:3px}
+@media(max-width:540px){.cc-prog:not(.tag-prog){grid-template-columns:repeat(2,minmax(0,1fr))}.e-examen{padding:20px}.e-evening{padding-inline:16px}.tag-prog{gap:4px}.tag-prog .cc-dot{font-size:10px}}
+@media(prefers-reduced-motion:reduce){.e-examen *{animation:none!important;transition:none!important}}
+
 </style>
 </head>
 <body>
@@ -3109,12 +3135,6 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
       <div class="foot">
         <button id="editBtn" type="button">Bearbeiten</button>
         <button id="resetBtn" type="button">Heute zurücksetzen</button>
-      </div>
-      <div class="sync-bar">
-        <button class="sync-btn wide" id="syncBtn" type="button"><span class="sync-ic">⟳</span> <span id="syncLabel">Abgleich einrichten</span></button>
-        <button class="sync-btn" id="loadBtn" type="button">↓ Laden</button>
-        <button class="sync-btn" id="saveBtn" type="button">↑ Sichern</button>
-        <button class="sync-btn" id="bkBtn" type="button" title="Alles als Datei sichern">⤓ Datei</button>
       </div>
       <div class="wipe-bar" id="wipeBar" hidden>
         <div class="wipe-title">Aufräumen</div>
@@ -3196,25 +3216,21 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
   const ABSICHT="ht_absicht_v1";   // wandert als einziges mit auf das andere Gerät
   const MSNOTIZ="ht_metanotiz_v1";  // spontan Festgehaltenes, strikt lokal   // wandert als einziges mit auf das andere Gerät   // "morgen" = morgens für heute, "abend" = abends für morgen  // Satz der Woche
   const ANGELUS="ht_angelus_v1";
-  const APP_VERSION="2026-10-01-centrala6";   // wird beim Aktualisieren hochgezählt
+  const APP_VERSION="2026-10-13-schlank";   // wird beim Aktualisieren hochgezählt
   const LOCKIN="ht_lockin_v1";
   const LOCKTXT="ht_lockintext_v1", CRYPTO="ht_crypto_v1", CAL="ht_cal_v1", QUOTES="ht_quotes_v1", LOCKCFG="ht_lockin_cfg_v1", SCHATZ="ht_schatz_v1", GOSPELC="ht_gospel_v1";
   const MAX_PRIOS=8;
   const LOCKIN_DEFAULT=[
-    {id:"wins",    label:"Rückblick",               frage:"Was war — und was daraus wurde. Der Fortschritt wird hier verankert.", date:true},
+    {id:"wins",    label:"Rückblick",               frage:"Was war — und was daraus wurde. Dann einen Moment beim Nordstern bleiben.", date:true},
     {id:"absicht", label:"Absicht für heute",       frage:"Eine klare Absicht. Worauf soll dein Tag zeigen? Woran erkennst du am Abend, dass er gelungen ist?", text:true},
-    {id:"vizija",  label:"In Vizija eintauchen",    frage:"Einen Moment beim Nordstern bleiben."},
     {id:"tag",     label:"Den Tag bauen",           frage:"Zieh aus der Woche, was heute dran ist. Sieben Dinge in der Reihenfolge, wie sie kommen."},
     {id:"staq",    label:"STAQ",                    frage:"Hardline gehalten? Und trägt die Aufstellung heute noch?"},
-    {id:"meta",    label:"Metascript",              frage:"Kurzer Scan — was liegt an? Dann ein Eintrag dazu.", text:true},
-    {id:"visual",  label:"Komm Heiliger Geist",     frage:"Zum Schluss: der Tag wird übergeben."}
+    {id:"meta",    label:"Metascript",              frage:"Kurzer Scan — was liegt an? Ein Eintrag. Dann wird der Tag übergeben.", text:true}
   ];
   const LOCKIN_ALT=[
     {id:"wins", label:"", date:true},
-    {id:"vizija", label:"In Vizija eintauchen"},
     {id:"prios", label:"Top 3 Prioritäten für heute"},
-    {id:"staq", label:"STAQ eintauchen"},
-    {id:"visual", label:"Komm Heiliger Geist"}
+    {id:"staq", label:"STAQ eintauchen"}
   ];
 
   const DEFAULTS={
@@ -3325,6 +3341,13 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
     const alt=lockinCfg.items.find(x=>x.id==="prios");
     if(alt && !lockinCfg.items.some(x=>x.id==="tag")){ alt.id="tag"; if(!alt.label) alt.label="Den Tag bauen"; neu=true; }
     else if(alt){ lockinCfg.items=lockinCfg.items.filter(x=>x.id!=="prios"); neu=true; }
+    // „In Vizija eintauchen“ lebt jetzt im Rückblick, „Komm Heiliger Geist“ schließt das Metascript
+    if(lockinCfg.items.some(x=>x.id==="vizija"||x.id==="visual")){
+      lockinCfg.items=lockinCfg.items.filter(x=>x.id!=="vizija"&&x.id!=="visual"); neu=true;
+      const w=lockinCfg.items.find(x=>x.id==="wins"), m=lockinCfg.items.find(x=>x.id==="meta");
+      if(w) w.frage=LOCKIN_DEFAULT.find(d=>d.id==="wins").frage;
+      if(m) m.frage=LOCKIN_DEFAULT.find(d=>d.id==="meta").frage;
+    }
     LOCKIN_DEFAULT.forEach((d,i)=>{
       const da=lockinCfg.items.find(x=>x.id===d.id);
       if(!da){ lockinCfg.items.splice(Math.min(i,lockinCfg.items.length),0,{...d}); neu=true; }
@@ -4307,10 +4330,6 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
     document.body.appendChild(ov);
   }
 
-  function itemLabel(it,D){
-    if(it.date) return new Date(D+"T00:00:00").toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
-    return it.label;
-  }
   const lockinDay=k=>lockinLog[k]||{};
   const lockinOn=(id,k)=>!!lockinDay(k)[id];
   const lockinDone=k=>lockinItems().reduce((n,it)=>n+(lockinOn(it.id,k)?1:0),0);
@@ -4320,13 +4339,6 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
     let n=0; while(lockinAll(ymd(d))){ n++; d.setDate(d.getDate()-1); } return n;
   }
   function saveLockinCfg(){ write(LOCKCFG,lockinCfg); }
-  function commitLockinEdits(){
-    document.querySelectorAll(".li-name-edit").forEach(i=>{
-      const it=lockinCfg.items.find(x=>x.id===i.dataset.li);
-      if(it && !it.date) it.label=i.value.trim()||it.label;
-    });
-    saveLockinCfg();
-  }
   /* ---------- Lock In: der tägliche Reset als geführter Ablauf ----------
      Absicht setzen, den Tag bauen, STAQ, Metascript. Rau statt perfekt, 5 bis 15 Minuten. */
   /* ---------- Vorübergehend geöffnet ----------
@@ -4378,7 +4390,6 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
     if(!isToday()) return state.viewDate;
     return liRhythmus()==="abend" ? addDays(today,1) : today;
   }
-  const liVortag=()=>addDays(liTag(),-1);
   function liStop(){ if(liTimer){ clearInterval(liTimer); liTimer=null; } atemStop(); }
   const liSchritte=()=>lockinItems();
   const liGetan=(D,id)=>!!(lockinLog[D]||{})[id];
@@ -4965,12 +4976,6 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
     return box;
   }
 
-  // Eine abgelegte Zeichnung sichtbar machen, ohne sie zu öffnen
-  function zeichenMaske(){
-    const d = document.createElement("div"); d.className = "zf-zu";
-    d.innerHTML = `<span class="tli-zu">· · · · ·</span>`;
-    return d;
-  }
 
   const istTablet = (()=>{ try{
     return (navigator.maxTouchPoints||0) > 1 && Math.min(screen.width,screen.height) >= 700;
@@ -5005,6 +5010,20 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
       else if(!ab && !(typeof wins==="string"&&wins.trim())) h+=`<div class="cc-q-leer">Noch kein Tagesabschluss vorhanden. Was du abends festhältst, steht am nächsten Morgen hier.</div>`;
       q.innerHTML=h; body.appendChild(q);
 
+      // Einen Moment beim Nordstern bleiben — war einmal ein eigener Schritt
+      {
+        const stern=(vision.points||[]).filter(p=>(p.text||"").trim());
+        const q=heutigerSatz();
+        if(stern.length || q){
+          const vz=document.createElement("div"); vz.className="li-viz li-viz-klein";
+          vz.innerHTML=stern.map(p=>`<p class="li-viz-t">${esc(p.text.trim())}</p>`).join("")+
+            (q?`<div class="li-viz-q">“ ${esc(q.text)}${q.author?` <span>— ${esc(q.author)}</span>`:``}</div>`:``);
+          const sb=document.createElement("button"); sb.type="button"; sb.className="cc-link"; sb.textContent="Schau öffnen →";
+          sb.addEventListener("click",openSchau);
+          vz.appendChild(sb);
+          body.appendChild(vz);
+        }
+      }
       // Lockerer Fokus: erst ankommen, dann zurückschauen
       const ruhe=document.createElement("div"); ruhe.className="li-ruhe";
       const rk=document.createElement("button"); rk.type="button"; rk.className="tli-h"+(ruheOffen?" on":"");
@@ -5035,20 +5054,6 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
       return;
     }
     /* --- In Vizija eintauchen --- */
-    if(st.id==="vizija"){
-      const stern=(vision.points||[]).filter(p=>(p.text||"").trim());
-      const box=document.createElement("div"); box.className="li-viz";
-      box.innerHTML=stern.length
-        ? stern.map(p=>`<p class="li-viz-t">${esc(p.text.trim())}</p>`).join("")
-        : `<p class="cc-q-leer">Noch kein Nordstern gesetzt.</p>`;
-      const q=heutigerSatz();
-      if(q) box.innerHTML+=`<div class="li-viz-q">“ ${esc(q.text)}${q.author?` <span>— ${esc(q.author)}</span>`:``}</div>`;
-      body.appendChild(box);
-      const b=document.createElement("button"); b.type="button"; b.className="cc-link"; b.textContent="Schau öffnen →";
-      b.addEventListener("click",openSchau);
-      body.appendChild(b);
-      return;
-    }
     /* --- Den Tag bauen --- */
     if(st.id==="tag"){
       // Was die Woche vorgibt
@@ -5251,19 +5256,17 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
         bar.appendChild(ab);
       }
       body.appendChild(bar);
-      return;
-    }
-    /* --- Komm Heiliger Geist --- */
-    if(st.id==="visual"){
+      // Zum Schluss wird der Tag übergeben — leise, in der grauen Schrift
       const l=document.createElement("div"); l.className="li-schluss";
-      l.innerHTML=`<p class="cc-vis-t">Der Tag ist gebaut. Übergib ihn.</p>
-        <p class="cc-vis-t dim">Komm, Heiliger Geist, erfülle die Herzen deiner Gläubigen und entzünde in ihnen das Feuer deiner Liebe.</p>`;
+      l.innerHTML=`<p class="cc-vis-t dim">Komm, Heiliger Geist, erfülle die Herzen deiner Gläubigen und entzünde in ihnen das Feuer deiner Liebe.</p>`;
       const ab=getText(D,"absicht");
       if(typeof ab==="string" && ab.trim())
         l.innerHTML+=`<div class="li-absicht gross">${esc(ab.trim())}</div>`;
       body.appendChild(l);
       return;
     }
+    // Alte Kennungen aus gespeicherten Listen: leer lassen statt abzustürzen
+    if(st.id==="vizija"||st.id==="visual") return;
   }
 
   // Die Schritte selbst bearbeiten
@@ -5449,8 +5452,8 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
         const offen=tagOffen();
         const f=document.createElement("p"); f.className="cc-frage";
         f.textContent = offen.length
-          ? "Was ist heute doch noch gelaufen? Hak ab, was erledigt ist."
-          : "Nichts mehr offen. Weiter zum Rückblick.";
+          ? "Offene Aufgaben"
+          : "Alles erledigt.";
         panel.appendChild(f);
         const l=document.createElement("div"); l.className="tag-offen";
         offen.forEach(x=>{
@@ -5470,17 +5473,17 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
         const zu=document.createElement("button"); zu.type="button"; zu.className="cc-link";
         zu.textContent="In den Tagesplan →";
         zu.addEventListener("click",()=>{ state.priosSub="heute"; setTab("prios"); });
-        const w1=document.createElement("button"); w1.type="button"; w1.className="cc-weiter"; w1.textContent="weiter zum Rückblick";
+        const w1=document.createElement("button"); w1.type="button"; w1.className="cc-weiter"; w1.textContent="Weiter zu Gewohnheiten";
         w1.addEventListener("click",()=>{ tagStep=1; buildTagesabschluss(); });
         nav1.append(zu,w1); panel.appendChild(nav1);
-        sec.appendChild(panel); root.appendChild(sec); return;
+        sec.appendChild(panel); root.appendChild(sec);eTagesabschluss(root); return;
       }
       if(canEdit() && tagStep===1){
         // Schritt 2: jede Gewohnheit bekommt heute eine Antwort
         const offen=tagUnerfasst();
         const f=document.createElement("p"); f.className="cc-frage";
         f.textContent = offen.length
-          ? "Für jede noch offene Gewohnheit: gemacht oder nicht? Beides zählt — nur so wird der Verlauf ehrlich."
+          ? "Gemacht oder ausgelassen?"
           : "Alle Gewohnheiten sind erfasst.";
         panel.appendChild(f);
         const l=document.createElement("div"); l.className="tag-staq";
@@ -5517,7 +5520,7 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
         w2.textContent = offen.length ? "weiter ("+offen.length+" offen)" : "weiter zum Rückblick";
         w2.addEventListener("click",()=>{ tagStep=2; buildTagesabschluss(); });
         nav.append(zur,w2); panel.appendChild(nav);
-        sec.appendChild(panel); root.appendChild(sec); return;
+        sec.appendChild(panel); root.appendChild(sec);eTagesabschluss(root); return;
       }
       if(canEdit()){
         // Zeitfenster für den Abschluss — rau statt perfekt
@@ -5605,7 +5608,7 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
         panel.appendChild(li);
 
         const h=document.createElement("div"); h.className="tag-hint";
-        h.textContent="Wie ist es gelaufen? Auch wenn es wackelig war — das Festhalten ist der Punkt, nicht die Perfektion.";
+        h.textContent="";
         panel.appendChild(h);
       }
       const wrap=document.createElement("div"); wrap.className="lockin-text tages-text";
@@ -5666,7 +5669,7 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
       }
       sec.appendChild(panel);
     }
-    root.appendChild(sec);
+    root.appendChild(sec);eTagesabschluss(root);
   }
 
   function buildCats(){
@@ -6130,6 +6133,87 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
     ov.appendChild(box);
     ov.addEventListener("click",e=>{ if(e.target===ov) ov.remove(); });
     document.body.appendChild(ov);
+  }
+
+  /* ---------- Botschaft aus Medjugorje ----------
+     Die Pfarrei veröffentlicht am 25. jedes Monats die Botschaft der Gospa.
+     Der Bote liest sie von medjugorje.hr, deutsch und kroatisch. Gespeichert wird
+     nur der Text samt Datum; der Abgleich bringt ihn auf alle Geräte. */
+  const MEDJ="ht_medjugorje_v1";
+  const medjLesen=()=>read(MEDJ,{})||{};
+  const medjAktuell=()=>{ const m=medjLesen(); return m.de||m.hr||null; };
+  // Neu = eine Botschaft liegt vor, die du noch nicht geöffnet hast
+  const medjNeu=()=>{ const m=medjLesen(); const d=(m.de||m.hr||{}).date; return !!d && m.gesehen!==d; };
+  function medjGesehen(){ const m=medjLesen(); const d=(m.de||m.hr||{}).date; if(d && m.gesehen!==d){ m.gesehen=d; write(MEDJ,m); } }
+
+  let medjLaeuft=false;
+  async function medjLaden(force){
+    if(!calCfg.bote || medjLaeuft) return false;
+    const m=medjLesen();
+    // Höchstens alle zwölf Stunden fragen — die Botschaft ändert sich einmal im Monat
+    if(!force && m.geholt && (Date.now()-Date.parse(m.geholt)) < 12*3600e3) return false;
+    medjLaeuft=true;
+    try{
+      const basis=calCfg.bote.replace(/\/+$/,"");
+      const hol=async l=>{ try{ const r=await fetch(basis+"/medjugorje?lang="+l,{cache:"no-store"}); if(!r.ok) return null;
+        const j=await r.json(); return (j && !j.error && j.text) ? {date:j.date||"", datumText:j.datumText||"", text:j.text, url:j.url||""} : null; }catch(e){ return null; } };
+      const [de,hr]=await Promise.all([hol("de"),hol("hr")]);
+      let geaendert=false;
+      if(de){ m.de=de; geaendert=true; }
+      if(hr){ m.hr=hr; geaendert=true; }
+      m.geholt=new Date().toISOString();
+      write(MEDJ,m);
+      if(geaendert) renderHeute();
+      return geaendert;
+    } finally { medjLaeuft=false; }
+  }
+
+  function openMedjugorje(){
+    document.querySelectorAll(".ang-overlay").forEach(x=>x.remove());
+    loadAng();
+    const hrSprache=(ang.lang==="hr");
+    const m=medjLesen();
+    const b = hrSprache ? (m.hr||m.de) : (m.de||m.hr);
+    const istHr = b && b===m.hr && m.hr!==m.de;
+    const ov=document.createElement("div"); ov.className="ang-overlay open";
+    const box=document.createElement("div"); box.className="ang-box";
+    const h=document.createElement("div"); h.className="ang-h";
+    h.innerHTML=`<span class="ang-k secret">${hrSprache?"Međugorje":"Medjugorje"}</span>`+
+      (hrSprache?`<span class="ang-lang">hrvatski</span>`:``);
+    armSecret(h.querySelector(".ang-k"), ()=>{ ang.lang=hrSprache?"de":"hr"; saveAng(); openMedjugorje(); });
+    box.appendChild(h);
+
+    if(!b){
+      const p=document.createElement("p"); p.className="kru-note";
+      p.textContent = !calCfg.bote
+        ? "Für die Botschaft braucht es den Boten — in der Wochenansicht unter „Bote einrichten“."
+        : "Noch keine Botschaft geladen. Einmal antippen, um sie zu holen.";
+      box.appendChild(p);
+    }else{
+      const d=document.createElement("div"); d.className="medj-datum";
+      d.textContent = b.datumText || (b.date ? new Date(b.date+"T00:00:00").toLocaleDateString(istHr?"hr-HR":"de-DE",{day:"numeric",month:"long",year:"numeric"}) : "");
+      box.appendChild(d);
+      const t=document.createElement("p"); t.className="ang-l medj-text"; t.textContent=b.text;
+      box.appendChild(t);
+      const q=document.createElement("p"); q.className="kru-note";
+      q.innerHTML=(hrSprache?"Župa Međugorje · ":"Pfarrei Medjugorje · ")+
+        `<a href="${esc(b.url||"https://www.medjugorje.hr/")}" target="_blank" rel="noopener noreferrer">medjugorje.hr</a>`;
+      box.appendChild(q);
+      medjGesehen();
+    }
+
+    const acts=document.createElement("div"); acts.className="ang-acts";
+    const neu=document.createElement("button"); neu.type="button"; neu.className="ang-done";
+    neu.textContent=hrSprache?"osvježi":"neu laden";
+    neu.addEventListener("click",async()=>{ neu.disabled=true; neu.textContent="…"; const ok=await medjLaden(true); openMedjugorje(); if(!ok) toast(calCfg.bote?"Keine neue Botschaft":"Bote fehlt"); });
+    const zu=document.createElement("button"); zu.type="button"; zu.className="ang-close";
+    zu.textContent=hrSprache?"zatvori":"schließen";
+    zu.addEventListener("click",()=>{ ov.remove(); renderHeute(); });
+    acts.append(neu,zu); box.appendChild(acts);
+    ov.appendChild(box);
+    ov.addEventListener("click",e=>{ if(e.target===ov){ ov.remove(); renderHeute(); } });
+    document.body.appendChild(ov);
+    if(!b && calCfg.bote) medjLaden(true).then(ok=>{ if(ok) openMedjugorje(); });
   }
 
   /* ---------- Weihe an Jesus durch Maria ----------
@@ -6928,8 +7012,9 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
     const rest=[litPrayed()?"":"L", krunicaPrayed()?"":"K"].filter(Boolean).length;
     row.innerHTML=`<span class="al-ic">✦</span>
       <span class="al-t">Angelus ${esc(nx.time)}</span>
-      <span class="al-dots">${dots}</span>
-      <span class="al-ch">›</span>`;
+      <span class="al-dots">${dots}</span>`+
+      (medjNeu()?`<span class="al-medj">Botschaft</span>`:``)+
+      `<span class="al-ch">›</span>`;
     row.title="Gebet";
     row.addEventListener("click",openGebet);
     host.appendChild(row);
@@ -6939,6 +7024,7 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
   function openGebet(){
     document.querySelectorAll(".geb-overlay").forEach(x=>x.remove());
     loadAng();
+    try{ medjLaden(false).then(ok=>{ if(ok && document.querySelector(".geb-overlay")) openGebet(); }); }catch(e){}
     const hr=(ang.lang==="hr");
     const ov=document.createElement("div"); ov.className="geb-overlay open";
     const box=document.createElement("div"); box.className="geb-box";
@@ -6966,6 +7052,8 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
       times.appendChild(b);
     });
     a.appendChild(times); box.appendChild(a);
+
+    const examen=uButton('',()=>{ov.remove();openExamen();},'geb-card row');examen.append(uNode('span','geb-c-t','Gewissenserforschung'));box.append(examen);
 
     // Krunica mit dem Geheimnis des Tages
     const kru=krunicaToday();
@@ -7006,12 +7094,25 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
     wz.addEventListener("click",()=>{ ov.remove(); openWeihe(); });
     box.appendChild(wz);
 
+    // Botschaft aus Medjugorje — mit Datum, und „neu“, solange sie ungelesen ist
+    {
+      const b=medjAktuell();
+      const mz=document.createElement("button"); mz.type="button"; mz.className="geb-card row medj"+(medjNeu()?" neu":"");
+      const dat = b && b.date ? new Date(b.date+"T00:00:00").toLocaleDateString("de-DE",{day:"numeric",month:"short",year:"numeric"}) : "";
+      mz.innerHTML=`<span class="geb-c-t">${hr?"Poruka iz Međugorja":"Botschaft aus Medjugorje"}</span>`+
+        (dat?`<span class="geb-c-s">${esc(dat)}</span>`:``)+
+        (medjNeu()?`<span class="geb-neu">${hr?"novo":"neu"}</span>`:``);
+      mz.addEventListener("click",()=>{ ov.remove(); openMedjugorje(); });
+      box.appendChild(mz);
+    }
+
     // Sieben Tage
     const strip=document.createElement("div"); strip.className="geb-strip";
     let sh=`<span class="gs-l">7 Tage</span>`;
     for(let i=6;i>=0;i--){
       const kd=addDays(today,-i);
-      const n=((ang.log&&ang.log[kd])||[]).length + (((ang.lit||{})[kd])?1:0) + (((ang.kru||{})[kd])?1:0);
+      const n=((ang.log&&ang.log[kd])||[]).length
+        + ["lit","kru","gross","psalm","michael","weihe"].reduce((z,k)=>z+(((ang[k]||{})[kd])?1:0),0);
       const lvl=n===0?0:n<=1?1:n<=2?2:n<=3?3:4;
       sh+=`<span class="gs-d l${lvl}" title="${kd}"></span>`;
     }
@@ -7436,7 +7537,6 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
     savePrios();
   }
   // Ansichten als Filter
-  const allItems   = ()=>{ ensurePrios(); return prios.all; };
   const priosOf    = ()=>prios.all.filter(x=>x.day===today && x.prio);
   const todosOf    = ()=>prios.all.filter(x=>x.day===today && !x.prio);
   const parkOf     = ()=>prios.all.filter(x=>x.day===null && !x.week);
@@ -7453,13 +7553,11 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
   }
   const allTasks=()=> prios.all.filter(x=>x.day===today && (x.text||"").trim())
                         .map(x=>({o:x, type:x.prio?"prio":"todo"}));
-  const findTask=id=> allTasks().find(x=>x.o.id===id);
 
   /* ==================== FOKUS-BLOCKER ==================== */
   let focus=null;
   const fMinToClock=m=>{ if(m==null) return "--:--"; const h=Math.floor(m/60),mm=m%60; return String(h).padStart(2,"0")+":"+String(mm).padStart(2,"0"); };
   const nowMin=()=>{ const d=new Date(); return d.getHours()*60+d.getMinutes(); };
-  const roundUp15=m=>Math.ceil(m/15)*15;
   function readFocus(){ return read(FOCUS,{day:today, clockIn:null, blocks:[], thoughts:[], archive:[]}); }
   function saveFocus(){ write(FOCUS,focus); }
   function ensureFocus(){
@@ -7714,7 +7812,6 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
     return null;
   }
   // Quellen ohne Bild — hier gibt es nichts zu verstecken
-  const srcIsAudioOnly=p=>!!p && p.kind!=="yt";
   function srcEmbed(p){
     if(p.kind==="yt"){
       const base="https://www.youtube-nocookie.com/embed/";
@@ -7725,7 +7822,6 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
     if(p.kind==="apple") return p.url.replace(/music\.apple\.com/,"embed.music.apple.com");
     return "";
   }
-  function stopYT(){ ytOn=false; }
 
   /* Der Spieler lebt außerhalb des Fokus-Bogens und wird nur bei Quellwechsel neu geladen,
      damit die Wiedergabe Neuzeichnen und Tabwechsel übersteht. */
@@ -8490,63 +8586,6 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
     panel.appendChild(rp);
   }
 
-  function buildHeuteList(panel){
-    const ps=priosOf();
-    const lblP=document.createElement("div"); lblP.className="sub-label"; lblP.textContent="Prioritäten";
-    panel.appendChild(lblP);
-    ps.forEach((it,idx)=>{
-      const row=document.createElement("div"); row.className="prio-row"+(isDoneI(it)?" done":"");
-      if((it.text||"").trim()){ row.draggable=true; row.addEventListener("dragstart",e=>{ e.dataTransfer.setData("text/plain",it.id); }); }
-      const check=document.createElement("button"); check.className="todo-check"; check.type="button"; check.setAttribute("aria-label","Erledigt umschalten");
-      check.innerHTML=`<svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>`;
-      check.addEventListener("click",()=>setDone(it,!isDoneI(it)));
-      const inp=document.createElement("input"); inp.type="text"; inp.value=it.text||"";
-      inp.placeholder=(ps.length>1?`Priorität ${idx+1} …`:"Die eine Sache heute …"); inp.setAttribute("aria-label","Priorität");
-      inp.addEventListener("input",()=>{ it.text=inp.value; savePrios(); });
-      inp.addEventListener("blur",()=>buildPrios());
-      const dot=document.createElement("button"); dot.className="prio-dot"; dot.type="button"; dot.title="In normale ToDo umwandeln"; dot.setAttribute("aria-label","In normale ToDo umwandeln");
-      dot.addEventListener("click",()=>{ it.prio=false; savePrios(); buildPrios(); });
-      row.append(check,inp,dot); panel.appendChild(row);
-    });
-    if(ps.length<3){
-      const addP=document.createElement("button"); addP.className="prio-more"; addP.type="button";
-      addP.textContent="+"; addP.title="Weitere Priorität"; addP.setAttribute("aria-label","Weitere Priorität hinzufügen");
-      addP.addEventListener("click",()=>{ addItem({prio:true}); buildPrios();
-        const ins=document.querySelectorAll(".prio-row input"); if(ins.length) ins[ins.length-1].focus(); });
-      panel.appendChild(addP);
-    }
-    const lblT=document.createElement("div"); lblT.className="sub-label with-line"; lblT.textContent="Weitere ToDos";
-    panel.appendChild(lblT);
-    const add=document.createElement("div"); add.className="add-row";
-    const input=document.createElement("input"); input.type="text"; input.maxLength=90; input.placeholder="Weitere ToDo hinzufügen …"; input.setAttribute("aria-label","Neue ToDo");
-    const addBtn=document.createElement("button"); addBtn.className="add-btn"; addBtn.type="button"; addBtn.textContent="+"; addBtn.setAttribute("aria-label","Hinzufügen");
-    const commit=()=>{ const v=input.value.trim(); if(!v) return; addItem({text:v}); buildPrios();
-      const ni=document.querySelector("#view-prios .add-row input"); if(ni) ni.focus(); };
-    addBtn.addEventListener("click",commit);
-    input.addEventListener("keydown",e=>{ if(e.key==="Enter") commit(); });
-    add.append(input,addBtn); panel.appendChild(add);
-    todosOf().forEach(t=>{
-      const row=document.createElement("div"); row.className="todo"+(isDoneI(t)?" done":"")+(t.status==="started"?" started":"");
-      row.draggable=true; row.addEventListener("dragstart",e=>{ e.dataTransfer.setData("text/plain",t.id); });
-      const check=document.createElement("button"); check.className="todo-check"; check.type="button"; check.setAttribute("aria-label","Erledigt umschalten");
-      check.innerHTML=`<svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>`;
-      check.addEventListener("click",()=>setDone(t,!isDoneI(t)));
-      const txt=document.createElement("span"); txt.className="todo-text"+(t.focus?" from-focus":""); txt.textContent=t.text||"";
-      txt.addEventListener("click",()=>setDone(t,!isDoneI(t)));
-      if(t.fixed && typeof t.start==="number"){
-        const tm=document.createElement("span"); tm.className="todo-time";
-        tm.textContent=fMinToClock(t.start);
-        tm.title="Feste Zeit — im Tagesplan eingetragen";
-        txt.appendChild(tm);
-      }
-      const up=document.createElement("button"); up.className="todo-up"; up.type="button"; up.textContent="↑";
-      up.title="Zur Priorität machen"; up.setAttribute("aria-label","Zur Priorität machen");
-      up.addEventListener("click",()=>{ if(priosOf().length>=3){ toast("Höchstens drei Prioritäten"); return; } t.prio=true; savePrios(); buildPrios(); });
-      const del=document.createElement("button"); del.className="row-del"; del.type="button"; del.textContent="×"; del.setAttribute("aria-label","Löschen");
-      del.addEventListener("click",()=>{ delItem(t.id); buildPrios(); if(state.tab==="fokus") buildFokus(); });
-      row.append(check,txt,up,del); panel.appendChild(row);
-    });
-  }
 
   /* ---------- Tagesansicht 6–23 Uhr ---------- */
   /* ---------- Tagesansicht 6–24 Uhr (frei ziehbare Blöcke) ---------- */
@@ -9193,10 +9232,6 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
       });
     });
   }
-  function demotePrio(it){
-    it.prio=false;
-    savePrios(); buildPrios();
-  }
   function parkBackOne(p){
     // Kein Kopieren mehr — der Eintrag bekommt einfach ein Datum
     p.day=today; p.status="open";
@@ -9208,27 +9243,6 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
       p.day=today; p.status="open"; p.prio=false;
     });
     state.priosSub="heute"; savePrios(); buildPrios();
-  }
-  function buildParkplatz(panel){
-    const pk=parkOf();
-    if(pk.length===0){
-      const e=document.createElement("div"); e.className="empty";
-      e.textContent="Leer. Hier sammeln sich Prios und ToDos, die du an einem Tag nicht abgehakt hast.";
-      panel.appendChild(e); return;
-    }
-    const all=document.createElement("button"); all.className="ghost-add mint"; all.type="button"; all.textContent="↩ Alle zu Heute holen";
-    all.addEventListener("click",parkBackAll);
-    panel.appendChild(all);
-    pk.forEach(p=>{
-      const isTodo=!p.prio;
-      const row=document.createElement("div"); row.className="park-row"+(isTodo?" muted":"");
-      const txt=document.createElement("span"); txt.className="park-text"; txt.textContent=p.text;
-      const back=document.createElement("button"); back.className="park-back"; back.type="button"; back.textContent="→ Heute";
-      back.addEventListener("click",()=>parkBackOne(p));
-      const del=document.createElement("button"); del.className="row-del"; del.type="button"; del.textContent="×"; del.setAttribute("aria-label","Löschen");
-      del.addEventListener("click",()=>{ prios.park=prios.park.filter(x=>x.id!==p.id); savePrios(); buildPrios(); });
-      row.append(txt,back,del); panel.appendChild(row);
-    });
   }
 
   /* ---------- Zitate ---------- */
@@ -9397,12 +9411,6 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
 
   /* ---------- Vizija ---------- */
   function saveVision(){ write(VIS,vision); }
-  const firstText=arr=>{ const p=(arr||[]).find(x=>x.text&&x.text.trim()); return p?p.text.trim():""; };
-  function yearInfo(){
-    const y=new Date().getFullYear(), start=y+"-01-01", end=y+"-12-31";
-    const total=daysBetween(start,end)+1, dayNo=Math.min(total,daysBetween(start,today)+1);
-    return {label:""+y, dayNo, total, remaining:total-dayNo, pct:Math.round(dayNo/total*100)};
-  }
   function quarterInfo(){
     const now=new Date(), y=now.getFullYear(), q=Math.floor(now.getMonth()/3), sm=q*3;
     const start=ymd(new Date(y,sm,1)), end=ymd(new Date(y,sm+3,0));
@@ -9494,7 +9502,6 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
 
   // Meta pro Ebene: Punkte holen, Farbe, Kopplungsziel
   function visPoints(key){ return key==="year"?vision.year.points : key==="quarter"?vision.quarter.points : key==="week"?vision.week.points : vision.points; }
-  function visParentKey(key){ return key==="week"?"quarter" : key==="quarter"?"year" : key==="year"?"big" : null; }
   // Rendert eine Ebene als klappbare Stufe der Kaskade
   function renderVisTier(cfg){
     const {key, num, kicker, grad, accent, tint, placeholder, coupleTo, coupleLabel, meta} = cfg;
@@ -9897,14 +9904,14 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
      Acht Schritte, einer nach dem anderen. Rau statt perfekt — 3 bis 5 Minuten je Schritt. */
   const CC_STEPS=[
     {id:"wins",  t:"Wins",            f:"Was waren letzte Woche deine größten Einsichten und Fortschritte?"},
-    {id:"apex",  t:"Apex Vision",     f:"Beschreibe das Leben, das du führen willst — als hättest du es schon. Gesundheit, Finanzen, Berufung, Beziehungen, Erholung."},
-    {id:"quart", t:"Quartals-SCOPE",  f:"Stimmt das noch? Was ist gerade wirklich das Wichtigste?"},
+    {id:"quart", t:"Quartals-SCOPE",  f:"Einen Blick auf den Nordstern. Dann: Stimmt das noch? Was ist gerade wirklich das Wichtigste?"},
     {id:"woche", t:"Wochen-SCOPE",    f:"Wie packst du diese Woche deine Pflichten und Quartalsziele an?"},
     {id:"staq",  t:"STAQ",            f:"Welche Gewohnheiten tragen genau diese Woche? Hardline, Mainline, Softline."},
     {id:"meta",  t:"Metascript",      f:"Was liegt dir gerade auf Herz und Verstand?"},
-    {id:"msg",   t:"Nachricht an dich",f:"Schreib deinem heutigen Ich aus der Sicht dessen, der diesen Plan mit Freude durchzieht."},
-    {id:"vis",   t:"Visualisierung",  f:"Geh die Woche im Geist durch."}
+    {id:"msg",   t:"Nachricht an dich",f:"Geh die Woche im Geist durch. Dann schreib deinem heutigen Ich aus der Sicht dessen, der diesen Plan mit Freude durchzieht."}
   ];
+  // Frühere Schritte, deren Antworten im Verlauf weiter lesbar bleiben
+  const CC_ALT=[{id:"apex", t:"Apex Vision"},{id:"vis", t:"Visualisierung"}];
   /* ---------- Beispiele in den Metascript-Feldern ----------
      Nach der Metascript-Methode: Wunsch benennen (auch das Widersprüchliche),
      Wege abwägen und den stimmigsten markieren, dann aus der Person heraus
@@ -10019,7 +10026,6 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
   const MONAT="ht_monatsbericht_v1";
   const monAlle=()=>read(MONAT,{});
   const monSave=o=>write(MONAT,o);
-  const monKey=d=>d.slice(0,7);
   function monVormonat(){
     const n=new Date(today+"T00:00:00");
     const v=new Date(n.getFullYear(), n.getMonth()-1, 1);
@@ -10083,7 +10089,6 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
     st[k]={daten:d, gesehen:false, at:d.at}; monSave(st);
     return d;
   }
-  const monGesehen=k=>!!(monAlle()[k]||{}).gesehen;
   function monAbhaken(k){ const st=monAlle(); if(st[k]){ st[k].gesehen=true; monSave(st); } }
 
   // Beim Start prüfen: liegt ein ungesehener Bericht vor?
@@ -10250,7 +10255,7 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
           auf.addEventListener("click",()=>alleOeffnen(ccFelder(r),buildVision));
           d.appendChild(auf);
         }
-        CC_STEPS.forEach(stp=>{
+        CC_STEPS.concat(CC_ALT.filter(a=>typeof (r.a||{})[a.id]==="string"||isEnc((r.a||{})[a.id]))).forEach(stp=>{
           const v=(r.a||{})[stp.id];
           let inhalt="";
           if(isEnc(v)) inhalt=`<span class="tli-zu">· · · · ·</span>`;
@@ -10375,11 +10380,11 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
     const kopf=document.createElement("div"); kopf.className="cc-kopf";
     kopf.innerHTML=`<span class="cc-n">${ccStep+1}</span><span class="cc-t">${esc(step.t)}</span>`;
     const uhr=document.createElement("button"); uhr.type="button"; uhr.className="cc-uhr";
-    uhr.textContent=ccRest?fmtMMSS(ccRest):"45 min";
+    uhr.textContent=ccRest?fmtMMSS(ccRest):"30 min";
     uhr.title="Zeitfenster setzen — rau statt perfekt";
     uhr.addEventListener("click",()=>{
-      if(ccTimer){ ccStop(); ccRest=0; uhr.textContent="45 min"; return; }
-      ccRest=2700;
+      if(ccTimer){ ccStop(); ccRest=0; uhr.textContent="30 min"; return; }
+      ccRest=1800;
       ccTimer=setInterval(()=>{ ccRest--; uhr.textContent=fmtMMSS(ccRest);
         if(ccRest<=0){ ccStop(); uhr.textContent="fertig"; try{playGong();}catch(e){} } },1000);
     });
@@ -10502,17 +10507,19 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
       body.appendChild(ccFeld(rec,"wins","Fortschritte, Einsichten, kleine Siege …",5));
       return;
     }
-    if(step.id==="apex"){
-      if((vision.prosa||"").trim()){
-        const b=document.createElement("button"); b.type="button"; b.className="cc-link";
-        b.textContent="Deinen Vizija-Text öffnen →";
-        b.addEventListener("click",()=>{ ccStop();cExitCC(()=>{prosaOn=true;buildVision();}); });
-        body.appendChild(b);
-      }
-      body.appendChild(ccFeld(rec,"apex","Ich wache auf und …",6));
-      return;
-    }
     if(step.id==="quart"){
+      // Der Nordstern darüber — in der grauen Schrift, ohne eigenes Feld
+      const stern=(vision.points||[]).filter(p=>(p.text||"").trim());
+      if(stern.length){
+        const ns=document.createElement("div"); ns.className="cc-nordstern";
+        ns.innerHTML=stern.map(p=>`<p class="cc-vis-t dim">${esc(p.text.trim())}</p>`).join("");
+        if((vision.prosa||"").trim()){
+          const b=document.createElement("button"); b.type="button"; b.className="cc-link"; b.textContent="Deinen Vizija-Text öffnen →";
+          b.addEventListener("click",()=>{ ccStop();cExitCC(()=>{prosaOn=true;buildVision();}); });
+          ns.appendChild(b);
+        }
+        body.appendChild(ns);
+      }
       const pts=(scope.quarter.points||[]).filter(p=>(p.text||"").trim());
       const l=document.createElement("div"); l.className="cc-ziele";
       if(!pts.length){ l.innerHTML=`<div class="cc-q-leer">Noch keine Quartalsziele.</div>`; }
@@ -10635,21 +10642,13 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
       return;
     }
     if(step.id==="msg"){
-      const h=document.createElement("div"); h.className="cc-quelle";
-      h.innerHTML=`<div class="cc-q-leer">Setz einen Timer auf zwei bis fünf Minuten und schreib frei — Ermutigung, Zuversicht, was du dir merken sollst.</div>`;
-      body.appendChild(h);
-      body.appendChild(ccFeld(rec,"msg","Lieber ich, …",8));
-      return;
-    }
-    if(step.id==="vis"){
+      // Die Woche im Geist durchgehen — als graue Einleitung, nicht als eigener Schritt
       const l=document.createElement("div"); l.className="cc-vis";
-      l.innerHTML=`<p class="cc-vis-t">Sieh dich durch diese Woche gehen. Du ziehst deine Ziele durch, hältst deine Gewohnheiten, zeigst dich als der, der du sein willst.</p>
-        <p class="cc-vis-t">Sieh dich beim nächsten Command Center sitzen und deine Wins aufschreiben.</p>
-        <p class="cc-vis-t dim">Halt das Gefühl einen Moment. Als wäre es schon so.</p>`;
-      const wi2=weekInfo();
+      l.innerHTML=`<p class="cc-vis-t dim">Sieh dich durch diese Woche gehen: Ziele durchgezogen, Gewohnheiten gehalten, als der, der du sein willst. Halt das Gefühl einen Moment.</p>`;
       const z=(scope.week.points||[]).filter(p=>(p.text||"").trim());
       if(z.length) l.innerHTML+=`<div class="cc-vis-z">`+z.map(p=>`<span>${esc(p.text.trim())}</span>`).join("")+`</div>`;
       body.appendChild(l);
+      body.appendChild(ccFeld(rec,"msg","Lieber ich, … — zwei bis fünf Minuten, frei heraus: Ermutigung, Zuversicht, was du dir merken sollst.",8));
       // Ein Satz, der die Woche über bleibt
       if(satzQuelle().length){
         const w=document.createElement("div"); w.className="cc-satz";
@@ -11175,6 +11174,7 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
   refreshVidBadge().then(adoptSyncedVideo);
   startAngelusWatch();
   try{ monPruefen(); }catch(e){}
+  setTimeout(()=>{ try{ medjLaden(false); }catch(e){} }, 2500);
   (function(){
     const b=document.getElementById("bkBtn"); if(!b) return;
     b.addEventListener("click",backupExport);
@@ -11198,9 +11198,9 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
     if(wipeOffen) setTimeout(()=>{ const w=document.getElementById("wipeBar");
       if(w&&w.scrollIntoView) w.scrollIntoView({behavior:"smooth",block:"center"}); },80);
   });
-  document.getElementById("saveBtn").addEventListener("click",doBackup);
-  document.getElementById("loadBtn").addEventListener("click",doRestore);
-  document.getElementById("syncBtn").addEventListener("click",async()=>{
+  document.getElementById("saveBtn")?.addEventListener("click",doBackup);
+  document.getElementById("loadBtn")?.addEventListener("click",doRestore);
+  document.getElementById("syncBtn")?.addEventListener("click",async()=>{
     if(!syncOn()){ setupSync(); return; }
     const r=await syncNow();
     if(r==="badid"||r==="offline"||r==="badpw"||r==="error") setupSync();
@@ -11638,7 +11638,6 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
     group('Deine Daten');
     action('download','Sicherung exportieren','Alle Textbereiche · auf Wunsch verschlüsselt',backupExport);
     action('upload','Sicherung importieren','Eine Heute-Sicherungsdatei wiederherstellen',backupImport);
-    action('backup','Klassische Datei laden','Das bisherige Format mit app: heute-tracker',doRestore);
     const tip=document.createElement('p'); tip.className='ui-tools-tip'; tip.textContent='Vor einem Update: Daten sichern. Deine bestehenden Langdruck-Zugänge bleiben erhalten. Videos, die nur auf dem Gerät liegen, zusätzlich separat aufbewahren.'; tools.appendChild(tip);
     document.body.appendChild(tools);
     tools.addEventListener('click',e=>{ if(e.target===tools){ const r=tools.getBoundingClientRect(); if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom) tools.close(); } });
@@ -11873,15 +11872,6 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
     const events=(calEvents[day]||[]).filter(e=>!e.allDay&&Number.isFinite(e.start)&&Number.isFinite(e.dur)&&e.dur>0).map(e=>({start:e.start,end:Math.min(1440,e.start+e.dur),title:e.title||'Termin'}));
     return tasks.concat(events).sort((a,b)=>a.start-b.start||a.end-b.end);
   }
-  function uAgenda(day){
-    const intervals=uIntervals(day),conflicts=[];
-    for(let i=0;i<intervals.length;i++)for(let j=i+1;j<intervals.length&&intervals[j].start<intervals[i].end;j++)conflicts.push([intervals[i],intervals[j]]);
-    let cursor=day===today?Math.max(480,Math.ceil(nowMin()/15)*15):480;const end=1200;let gap=null;
-    for(const x of intervals){if(x.end<=cursor)continue;if(x.start>=end)break;if(x.start-cursor>=25){gap={start:cursor,dur:Math.min(50,x.start-cursor)};break;}cursor=Math.max(cursor,x.end);}
-    if(!gap&&end-cursor>=25)gap={start:cursor,dur:Math.min(50,end-cursor)};
-    const now=day===today?nowMin():0,next=intervals.find(x=>x.end>now);
-    return {conflicts,gap,next};
-  }
   function uPlan(view){
     if(!uReady)return;
     const head=view.querySelector('.panel-head');
@@ -11988,7 +11978,7 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
     if(vEditor)vEditor.closePanel();vReturnY=window.scrollY;vEditorKey=key;
     const labels={big:'Nordstern',year:'Jahresziele',quarter:'Quartalsziele',week:'Wochenziele'};
     const dlg=uDialog(labels[key]+' bearbeiten');vEditor=dlg;dlg.classList.add('v-editor');dlg.append(uNode('div','v-editor-body'));
-    const originalClose=dlg.closePanel;dlg.closePanel=()=>{vEditor=null;vEditorKey=null;originalClose();buildVision();const back=key==='big'?document.querySelector('.v-media-actions button'):document.querySelector('.vr-station[data-level="'+key+'"] .v-tier-edit');back?.focus({preventScroll:true});window.scrollTo({top:vReturnY,behavior:'auto'});};
+    const originalClose=dlg.closePanel;dlg.closePanel=()=>{vEditor=null;vEditorKey=null;originalClose();buildVision();const back=key==='big'?document.querySelector('.vr-akt .vr-edit'):document.querySelector('.vr-station[data-level="'+key+'"] .v-goal-actions');back?.focus({preventScroll:true});window.scrollTo({top:vReturnY,behavior:'auto'});};
     dlg.append(uButton('Fertig',()=>dlg.closePanel(),'u-primary'));vRenderEditor();dlg.showModal();
     const row=[...dlg.querySelectorAll('.vgoal')].find(n=>n.dataset.id===id);const target=row?.querySelector(link?'.vgoal-link':'textarea');if(target){target.focus();if(link)target.click();}
   }
@@ -11996,7 +11986,6 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
     const key=vEditorKey,labels={big:'Nordstern',year:'Jahr',quarter:'Quartal',week:'Diese Woche'},parent=key==='week'?'quarter':key==='quarter'?'year':null;
     const tier=renderVisTier({key,num:'',kicker:labels[key],grad:'linear-gradient(120deg,#343958,#24283e)',accent:'var(--violet)',tint:'var(--violet-tint)',placeholder:'Ziel ergänzen',coupleTo:parent,coupleLabel:parent==='year'?'Jahresziel':'Quartalsziel'});tier.classList.add('open');vEditor.querySelector('.v-editor-body').replaceChildren(tier);
   }
-  function vOpenFull(section){vReturnY=window.scrollY;visEdit=true;buildVision();requestAnimationFrame(()=>document.querySelector(section==='media'?'.vis-images':'.vflow')?.scrollIntoView({block:'start',behavior:'auto'}));}
   function vFullEditor(panel){if(!vReady)return;panel.querySelector('.vr-edit')?.addEventListener('click',()=>window.scrollTo({top:vReturnY,behavior:'auto'}));panel.querySelectorAll('.thumb').forEach((cell,i)=>{const im=vision.images[i];cell.append(uButton('Ausschnitt',()=>vCrop(im),'v-thumb-crop'));});}
   function vCrop(im){
     const dlg=uDialog('Bildausschnitt');dlg.classList.add('v-crop');
@@ -12127,23 +12116,24 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
     paint(selected);return box;
   }
   function qComposer(host,initial=qDefault(),parent=null){
-    const scope=state.priosSub+':'+wpOffset+':'+(parent?.id||'');
+    const scope=state.priosSub+':'+(state.priosSub==='datum'?qDay():wpOffset)+':'+(parent?.id||'');
     let target={...(state.planCapture?.scope===scope?state.planCapture.target:initial)};
     const box=uNode('form','q-composer');box.setAttribute('aria-label',parent?'Unteraufgabe hinzufügen':'Aufgabe hinzufügen');
     const row=uNode('div','add-row'),input=uNode('input');input.type='text';input.maxLength=500;input.placeholder=parent?'Unteraufgabe …':'Aufgabe …';input.setAttribute('aria-label',parent?'Neue Unteraufgabe':'Neue ToDo');
+    state.planDrafts=state.planDrafts||{};input.value=state.planDrafts[scope]||'';input.addEventListener('input',()=>{state.planDrafts[scope]=input.value;});
     const add=uButton('+',()=>{},'add-btn');add.type='submit';add.setAttribute('aria-label','Hinzufügen');row.append(input,add);box.append(row);
     const controls=uNode('div','q-capture-controls');controls.append(qDatePicker(target,v=>{target=v;state.planCapture={scope,target};},true,true));
-    if(!parent)controls.append(uButton('Projekt',()=>qEdit(null,{...target,project:true,text:input.value.trim()}),'q-project-add'));
+    if(!parent)controls.append(uButton('Projekt',()=>qEdit(null,{...target,project:true,text:input.value.trim()},()=>{delete state.planDrafts[scope];}),'q-project-add'));
     box.append(controls);
     box.addEventListener('submit',e=>{
       e.preventDefault();const text=input.value.trim();if(!text)return;
       const task=addItem({text,...target,...(parent?{projectId:parent.id}:{})});if(parent){parent.project=true;qUpdateParent(task);savePrios();}
-      qRefresh();toast('Gespeichert');document.querySelector('#view-prios .q-composer input[type=text]')?.focus();
+      delete state.planDrafts[scope];qRefresh();toast('Gespeichert');document.querySelector('#view-prios .q-composer input[type=text]')?.focus();
     });host.append(box);
   }
   function qRow(t,context={}){
     const root=uNode('div','q-task'+(t.status==='done'?' done':'')+(t.prio?' q-priority':''));root.dataset.taskId=t.id;
-    const row=uNode('div','q-task-line'),check=uButton(t.status==='done'?'✓':'',()=>setDone(t,t.status!=='done'),'todo-check');check.setAttribute('aria-label','Erledigt umschalten: '+t.text);check.setAttribute('aria-pressed',String(t.status==='done'));
+    const row=uNode('div','q-task-line'),check=uButton(t.status==='done'?'✓':'',()=>{setDone(t,t.status!=='done');eTaskFocus(t.id,'.todo-check');},'todo-check');check.setAttribute('aria-label','Erledigt umschalten: '+t.text);check.setAttribute('aria-pressed',String(t.status==='done'));
     const main=uNode('div','q-task-main'),title=uButton(t.text||'Unbenannte Aufgabe',()=>qEdit(t),'q-task-title');main.append(title);
     const parent=prios.all.find(x=>x.id===t.projectId),children=qChildren(t),meta=[];
     if(parent&&!context.nested)meta.push(parent.text);
@@ -12164,10 +12154,10 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
     return root;
   }
   function qMove(t){
-    const dlg=uDialog('Aufgabe einplanen',t.text);dlg.append(qDatePicker(t,target=>{qSchedule(t,target);dlg.closePanel();qRefresh();}));
+    const dlg=uDialog('Aufgabe einplanen',t.text);dlg.append(qDatePicker(t,target=>{qSchedule(t,target);dlg.closePanel();qRefresh();eTaskFocus(t.id,'.q-task-when');}));
     dlg.append(uButton('Schließen',()=>dlg.closePanel()));dlg.showModal();
   }
-  function qEdit(t,preset={}){
+  function qEdit(t,preset={},afterSave=null){
     const draft=t||preset;let target={day:draft.day===undefined?qDefault().day:draft.day,week:draft.week||null};
     const dlg=uDialog(t?'Aufgabe bearbeiten':draft.project?'Projekt anlegen':draft.projectId?'Unteraufgabe anlegen':'Aufgabe anlegen');
     const title=uNode('input','q-edit-title');title.type='text';title.maxLength=500;title.value=draft.text||'';title.placeholder=draft.project?'Projektname':'Was möchtest du erledigen?';title.setAttribute('aria-label','Aufgabentext');dlg.append(title,qDatePicker(target,v=>target=v));
@@ -12180,7 +12170,7 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
     goal.append(new Option('Kein Wochenziel',''));const goals=(vision.week.points||[]).filter(g=>g.text?.trim());
     goals.forEach(g=>goal.append(new Option(g.text,g.id)));
     if(draft.goalId&&!goals.some(g=>g.id===draft.goalId))goal.append(new Option(draft.goalLabel||'Früheres Wochenziel',draft.goalId));
-    goal.value=draft.goalId||'';goalLabel.append(goal);settings.append(goalLabel);dlg.append(settings);
+    goal.value=draft.goalId||'';goalLabel.append(goal);settings.append(goalLabel);const more=uNode('details','q-edit-more');more.append(uNode('summary','','Details'),settings);dlg.append(more);
     const error=uNode('p','q-error');error.setAttribute('role','alert');dlg.append(error);
     const actions=uNode('div','u-sheet-actions');actions.append(uButton('Abbrechen',()=>dlg.closePanel()),uButton('Speichern',()=>{
       if(!title.value.trim()){error.textContent='Bitte einen Aufgabentext eingeben.';title.focus();return;}
@@ -12188,7 +12178,7 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
       item.text=title.value.trim();item.prio=priority.checked;item.focus=focusTask.checked;if(project)item.project=project.checked;
       if(goal.value){const g=goals.find(x=>x.id===goal.value);item.goalId=goal.value;if(g){item.goalWeek=weekInfo().start;item.goalLabel=g.text;}}
       else{delete item.goalId;delete item.goalWeek;delete item.goalLabel;}
-      qSchedule(item,target);qUpdateParent(item);savePrios();dlg.closePanel();qRefresh();toast('Gespeichert');
+      qSchedule(item,target);qUpdateParent(item);savePrios();if(afterSave)afterSave();dlg.closePanel();qRefresh();toast('Gespeichert');
     },'u-primary'));
     if(t){actions.append(uButton('Löschen',()=>{
       const confirm=uDialog('Aufgabe löschen?',t.project?'Unteraufgaben bleiben als einzelne Aufgaben erhalten.':t.text);
@@ -12242,6 +12232,61 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
     if(daily){tlMode='day';buildTimeline(view);}else if(state.priosSub==='woche'){tlMode='week';buildTimeline(view);}
     const foot=uNode('div','prios-foot');foot.append(uButton('Parkplatz'+(parkOf().length?' · '+parkOf().length:''),()=>{state.priosSub='park';buildPrios();},'pf-link'),uButton('Archiv',()=>{state.priosSub='archiv';buildPrios();},'pf-link'));
     view.append(foot);cRefresh();uPlan(view);
+  }
+
+  // Guided prayer only: no notes, completion log, storage key or network request.
+  function openExamen(){
+    document.querySelectorAll('.e-examen').forEach(d=>d.closePanel());
+    const dlg=uDialog('Gewissenserforschung');dlg.classList.add('e-examen');
+    const originalClose=dlg.closePanel;dlg.closePanel=()=>{originalClose();if(document.activeElement===document.body)document.querySelector('#uiPrayerShortcut')?.focus({preventScroll:true});};
+    const heading=dlg.querySelector('h2');heading.tabIndex=-1;
+    const close=uButton('×',()=>dlg.closePanel(),'e-close');close.setAttribute('aria-label','Gewissenserforschung schließen');dlg.prepend(close);
+    const progress=uNode('nav','e-progress');progress.setAttribute('aria-label','Schritte der Gewissenserforschung');
+    const body=uNode('div','e-body'),nav=uNode('div','e-nav');dlg.append(progress,body,nav);
+    const steps=[
+      {title:'Für das Gute danken',text:'Was wurde mir heute geschenkt?',more:['Welche Begegnung, Hilfe oder Freude hat mir gutgetan?','Wo konnte ich selbst etwas Gutes tun?']},
+      {title:'Gott um Klarheit bitten',text:'Bitte Gott, deinen Tag ehrlich betrachten zu können und deine Fehler zu erkennen.'},
+      {title:'Den Tag durchgehen',text:'Erinnere dich an den Morgen, Mittag und Abend: Was habe ich gedacht, gesagt und getan?',more:['War ich ehrlich, liebevoll und gerecht?','Habe ich jemanden verletzt oder schlecht über andere gesprochen?','Habe ich notwendige Hilfe unterlassen?','Welchen Raum habe ich Gott gegeben?']},
+      {title:'Um Vergebung bitten',text:'Sprich vor Gott aus, was dir leidtut. Vertraue auf seine Barmherzigkeit.'},
+      {title:'Einen Vorsatz fassen',text:'Was möchte ich morgen mit Gottes Hilfe besser machen?',more:['Jemanden um Entschuldigung bitten.','Etwas wiedergutmachen.','In einer bestimmten Situation geduldiger sein.']}
+    ];
+    let current=-1;
+    function render(focus=false){
+      progress.replaceChildren();body.replaceChildren();nav.replaceChildren();
+      for(let i=0;i<steps.length;i++){
+        const b=uButton(String(i+1),()=>{current=i;render(true);},'e-step');b.setAttribute('aria-label',(i+1)+'. '+steps[i].title);
+        if(i===current)b.setAttribute('aria-current','step');progress.append(b);
+      }
+      progress.hidden=current<0||current>=steps.length;
+      if(current<0){
+        heading.textContent='Gewissenserforschung';
+        body.append(uNode('p','e-meta','Tagesrückblick nach Ignatius · 5–10 Minuten'),uNode('p','','Komm zur Ruhe und beginne mit einem Kreuzzeichen.'),uNode('p','e-prayer','Im Namen des Vaters und des Sohnes und des Heiligen Geistes. Amen.'));
+        nav.append(uButton('Beginnen',()=>{current=0;render(true);},'u-primary'));
+        const source=uNode('details','e-source');source.append(uNode('summary','','Quelle'));const link=uNode('a','','Jesuiten · Tagesrückblick');link.href='https://www.jesuiten.org/unsere-spiritualitaet/tagesrueckblick';link.target='_blank';link.rel='noopener noreferrer';source.append(link);body.append(source);
+      }else if(current<steps.length){
+        const step=steps[current];heading.textContent=step.title;body.append(uNode('p','e-meta',(current+1)+' / 5'),uNode('p','e-question',step.text));
+        if(step.more){const details=uNode('details','e-questions');details.append(uNode('summary','',current===4?'Beispiele':'Weitere Fragen'));for(const text of step.more)details.append(uNode('p','',text));body.append(details);}
+        nav.append(uButton('Zurück',()=>{current--;render(true);}),uButton(current===4?'Zum Abschluss':'Weiter',()=>{current++;render(true);},'u-primary'));
+      }else{
+        heading.textContent='Vaterunser';
+        body.append(uNode('p','e-prayer','Vater unser im Himmel,\ngeheiligt werde dein Name.\nDein Reich komme.\nDein Wille geschehe,\nwie im Himmel so auf Erden.\nUnser tägliches Brot gib uns heute.\nUnd vergib uns unsere Schuld,\nwie auch wir vergeben unsern Schuldigern.\nUnd führe uns nicht in Versuchung,\nsondern erlöse uns von dem Bösen.\nAmen.'),uNode('p','e-prayer','Gott, dir vertraue ich diese Nacht und den kommenden Tag an. Amen.'));
+        nav.append(uButton('Zurück',()=>{current=4;render(true);}),uButton('Schließen',()=>dlg.closePanel(),'u-primary'));
+        body.append(uButton('Morgen planen',()=>{dlg.closePanel();qGoDay(addDays(today,1));},'e-plan'));
+      }
+      dlg.scrollTop=0;if(focus)heading.focus({preventScroll:true});
+    }
+    render();dlg.showModal();heading.focus({preventScroll:true});
+  }
+  function eTagesabschluss(root){
+    const section=root?.querySelector('.tages');if(!section)return;
+    const actions=uNode('div','e-evening');actions.append(uButton('Gewissenserforschung',openExamen,'e-prayer-link'));section.querySelector('.lockin-head').after(actions);
+    const dots=section.querySelectorAll('.tag-prog .cc-dot');
+    dots.forEach((b,i)=>{const label=['Aufgaben','Gewohnheiten','Rückblick'][i];b.textContent=label;b.setAttribute('aria-label',label);if(i===tagStep)b.setAttribute('aria-current','step');});
+  }
+  function eTaskFocus(id,selector){
+    if(state.tab!=='prios')return;
+    const row=[...document.querySelectorAll('#view-prios .q-task')].find(n=>n.dataset.taskId===id);
+    row?.querySelector(selector)?.focus({preventScroll:true});
   }
 
 function rText(value){

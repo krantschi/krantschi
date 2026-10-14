@@ -6177,7 +6177,7 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
       box.appendChild(t);
       const q=document.createElement("p"); q.className="kru-note";
       q.innerHTML=(hrSprache?"Župa Međugorje · ":"Pfarrei Medjugorje · ")+
-        `<a href="${esc(b.url||"https://www.medjugorje.hr/")}" target="_blank" rel="noopener noreferrer">medjugorje.hr</a>`;
+        `<a href="${esc(b.url||"https://www.medjugorje.hr/")}" target="_blank" rel="noopener noreferrer">${esc(b.source||"medjugorje.hr")}</a>`;
       box.appendChild(q);
       medjGesehen();
     }

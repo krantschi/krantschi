@@ -3063,6 +3063,14 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
 .e-body{clear:both}.e-body p{font-size:16px;line-height:1.7;margin:14px 0;color:var(--ink)}.e-body .e-meta{font-size:12px;color:var(--ink-soft);margin:10px 0}.e-body .e-prayer{white-space:pre-line;font-size:16px}.e-progress{display:flex;gap:8px;margin:6px 0 16px}.e-step{flex:1;min-width:0;min-height:44px;border:1px solid var(--line);border-radius:8px;color:var(--ink-soft);background:transparent;font:500 13px var(--ui-font);cursor:pointer}.e-step[aria-current=step]{background:var(--brass-tint);border-color:var(--brass);color:var(--brass)}
 .e-questions,.e-source{border-top:1px solid var(--line);margin-top:18px}.e-questions>summary,.e-source>summary{cursor:pointer;min-height:44px;align-content:center;color:var(--ink-soft);font-size:13px}.e-source a{display:inline-block;color:var(--ink-soft);font-size:12px;padding:4px 0 12px}.e-nav{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:24px}.e-nav .u-primary{margin-left:auto;min-height:44px}.e-examen button:focus-visible,.e-prayer-link:focus-visible{outline:2px solid var(--brass);outline-offset:3px}
 @media(max-width:540px){.cc-prog:not(.tag-prog){grid-template-columns:repeat(2,minmax(0,1fr))}.e-examen{padding:20px}.e-evening{padding-inline:16px}.tag-prog{gap:4px}.tag-prog .cc-dot{font-size:10px}}
+.ex-panel .ex-kopf{display:flex;align-items:center;gap:10px;margin:4px 0 2px}.ex-panel .ex-kopf .cc-t{font-size:19px;font-weight:600;line-height:1.35}
+.ex-prog{margin:2px 0 12px}.ex-prog .e-step{font-size:11.5px;padding:0 2px;overflow-wrap:anywhere}
+.ex-body p{font-size:15.5px;line-height:1.65;margin:10px 0}.ex-body .e-meta{font-size:12px;margin:8px 0}.ex-body .e-questions{margin-top:10px}.ex-body .e-questions p{font-size:14px;color:var(--ink-soft)}
+.ex-feld{margin:14px 0 4px}.ex-l{font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:-2px}.ex-ta{display:block;width:100%;box-sizing:border-box;border:0;border-bottom:1px dashed var(--line);border-radius:0;background:transparent;font:inherit;font-size:14px;line-height:1.5;color:var(--ink);padding:5px 0 6px;resize:none;min-height:30px;overflow:hidden;outline:none}
+.ex-ta::placeholder{color:var(--ink-faint);opacity:1}.ex-ta:focus{border-bottom-color:var(--brass)}.ex-akt{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}.ex-akt .key-btn{font-size:11px;min-height:30px;padding:3px 9px}.ex-mask{font-size:13px;padding:6px 0;color:var(--ink-soft)}
+.ex-h{margin-top:16px}.ex-staq{margin:0 0 6px}.ex-staq .cc-l-h{font-size:11px}.ex-staq .ts-z{padding:3px 0}.ex-offen{margin-top:14px}.ex-offen .to-z{width:100%}
+.ex-nav{margin-top:18px}.ex-nav .tag-fertig{width:auto;padding:8px 16px}.ex-body .cc-link{margin-top:8px}
+@media(max-width:540px){.ex-prog{gap:4px}.ex-prog .e-step{font-size:10.5px}}
 @media(prefers-reduced-motion:reduce){.e-examen *{animation:none!important;transition:none!important}}
 
 </style>
@@ -3216,7 +3224,7 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
   const ABSICHT="ht_absicht_v1";   // wandert als einziges mit auf das andere Gerät
   const MSNOTIZ="ht_metanotiz_v1";  // spontan Festgehaltenes, strikt lokal   // wandert als einziges mit auf das andere Gerät   // "morgen" = morgens für heute, "abend" = abends für morgen  // Satz der Woche
   const ANGELUS="ht_angelus_v1";
-  const APP_VERSION="2026-10-13-schlank";   // wird beim Aktualisieren hochgezählt
+  const APP_VERSION="2026-10-14-examen";   // wird beim Aktualisieren hochgezählt
   const LOCKIN="ht_lockin_v1";
   const LOCKTXT="ht_lockintext_v1", CRYPTO="ht_crypto_v1", CAL="ht_cal_v1", QUOTES="ht_quotes_v1", LOCKCFG="ht_lockin_cfg_v1", SCHATZ="ht_schatz_v1", GOSPELC="ht_gospel_v1";
   const MAX_PRIOS=8;
@@ -3949,7 +3957,7 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
     try{
       const payload=await encWith(pw, unb64(cryptoRec.salt), text); setText(D,id,payload);
       // Wer etwas geschrieben und abgelegt hat, hat den Punkt getan — Haken setzt sich selbst
-      if(id!=="tagesabschluss"){
+      if(id!=="tagesabschluss" && !/^examen_/.test(id)){
         if(!lockinLog[D]) lockinLog[D]={};
         if(!lockinLog[D][id]){ lockinLog[D][id]=true; write(LOCKIN,lockinLog); }
       }
@@ -5005,6 +5013,10 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
       }
       if(typeof wins==="string" && wins.trim())
         h+=`<div class="li-wins"><span class="li-wins-k">Wins</span>${esc(wins.trim())}</div>`;
+      // Der Vorsatz aus der Gewissenserforschung — für heute
+      const vs=vt.examen_vorsatz;
+      if(typeof vs==="string" && vs.trim())
+        h+=`<div class="li-wins li-vorsatz"><span class="li-wins-k">Vorsatz</span>${esc(vs.trim())}</div>`;
       if(isEnc(ber)) h+=`<div class="cc-q-leer">Der Bericht ist abgelegt.</div>`;
       else if(typeof ber==="string" && ber.trim()) h+=`<div class="li-bericht">${esc(ber.trim())}</div>`;
       else if(!ab && !(typeof wins==="string"&&wins.trim())) h+=`<div class="cc-q-leer">Noch kein Tagesabschluss vorhanden. Was du abends festhältst, steht am nächsten Morgen hier.</div>`;
@@ -5420,123 +5432,152 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
                       .sort((a,b)=>(a.start??9999)-(b.start??9999));
     }catch(e){ return []; }
   }
+  // Der Tagesabschluss ist die Gewissenserforschung nach Ignatius — fünf Schritte,
+  // dazwischen kleine, stille Felder, falls du etwas festhalten willst.
+  const EX_STEPS=[
+    {id:"danken",  k:"Danken",   title:"Für das Gute danken", text:"Was wurde mir heute geschenkt?",
+      more:["Welche Begegnung, Hilfe oder Freude hat mir gutgetan?","Wo konnte ich selbst etwas Gutes tun?"]},
+    {id:"bitten",  k:"Bitten",   title:"Gott um Klarheit bitten", text:"Bitte Gott, deinen Tag ehrlich betrachten zu können und deine Fehler zu erkennen."},
+    {id:"tag",     k:"Der Tag",  title:"Den Tag durchgehen", text:"Erinnere dich an den Morgen, Mittag und Abend: Was habe ich gedacht, gesagt und getan?",
+      more:["War ich ehrlich, liebevoll und gerecht?","Habe ich jemanden verletzt oder schlecht über andere gesprochen?","Habe ich notwendige Hilfe unterlassen?","Welchen Raum habe ich Gott gegeben?"]},
+    {id:"vergeben",k:"Vergebung",title:"Um Vergebung bitten", text:"Sprich vor Gott aus, was dir leidtut. Vertraue auf seine Barmherzigkeit."},
+    {id:"vorsatz", k:"Vorsatz",  title:"Einen Vorsatz fassen", text:"Was möchte ich morgen mit Gottes Hilfe besser machen?",
+      more:["Jemanden um Entschuldigung bitten.","Etwas wiedergutmachen.","In einer bestimmten Situation geduldiger sein."]}
+  ];
+  // tagStep: 0 = Einstieg, 1–5 = Schritte, 6 = Abschluss
+  function exFeld(D,id,ph,opt={}){
+    // Ein kleines, ruhiges Feld: graue Schrift, nur eine feine Linie. Optional ablegbar.
+    const ro=!canEdit(), cur=getText(D,id);
+    const w=document.createElement("div"); w.className="ex-feld";
+    if(opt.l){ const l=document.createElement("div"); l.className="ex-l"; l.textContent=opt.l; w.appendChild(l); }
+    if(opt.ablegbar && isEnc(cur)){
+      const mask=document.createElement("div"); mask.className="enc-mask ex-mask"; mask.textContent="· · · · ·"; mask.title="Antippen zum Öffnen";
+      const key=document.createElement("button"); key.className="key-btn open"; key.type="button"; key.textContent="öffnen";
+      key.addEventListener("click",()=>unlockField(D,id));
+      const z=document.createElement("div"); z.className="cc-feld-akt ex-akt"; z.appendChild(key);
+      if(!ro) z.appendChild(delBtn(D,id));
+      w.append(mask,z); return w;
+    }
+    const ta=document.createElement("textarea"); ta.className="ex-ta"; ta.rows=opt.rows||1;
+    ta.placeholder=ph; ta.value=(typeof cur==="string")?cur:"";
+    const wachsen=()=>{ ta.style.height="auto"; ta.style.height=Math.max(30,ta.scrollHeight)+"px"; };
+    if(ro){ ta.readOnly=true; }
+    else { ta.addEventListener("input",()=>{ setText(D,id,ta.value); wachsen(); if(opt.nach) opt.nach(ta.value); }); }
+    w.appendChild(ta); setTimeout(wachsen,0);
+    if(opt.ablegbar && !ro){
+      const z=document.createElement("div"); z.className="cc-feld-akt ex-akt";
+      const key=document.createElement("button"); key.className="key-btn"; key.type="button"; key.textContent="ablegen"; key.title="Geschützt ablegen";
+      key.addEventListener("click",()=>lockField(D,id));
+      z.appendChild(key);
+      if(typeof cur==="string" && cur.trim()) z.appendChild(delBtn(D,id));
+      w.appendChild(z);
+    }
+    return w;
+  }
+  function exHabits(D){
+    // Jede Gewohnheit bekommt heute eine Antwort — gemacht oder nicht
+    const ro=!canEdit();
+    const l=document.createElement("div"); l.className="tag-staq ex-staq";
+    (config.cats||[]).forEach(c=>{
+      const hs=(config.habits||[]).filter(h=>h.cat===c.id);
+      if(!hs.length) return;
+      const g=document.createElement("div"); g.className="li-linie";
+      g.innerHTML=`<div class="cc-l-h" style="--lc:${c.color}">${esc(c.title)}</div>`;
+      hs.forEach(h=>{
+        const v=(log[D]||{})[h.id];
+        const r=document.createElement("div"); r.className="ts-z"+(v===undefined?" offen":"");
+        r.innerHTML=`<span class="ts-n">${esc(h.name)}</span>`;
+        const w=document.createElement("div"); w.className="ts-w";
+        [["ja","gemacht",true],["nein","nicht","miss"]].forEach(([kls,txt,wert])=>{
+          const b=document.createElement("button"); b.type="button";
+          b.className="ts-b "+kls+((v===wert)?" on":"");
+          b.textContent=txt; b.disabled=ro;
+          b.addEventListener("click",()=>{
+            if(!log[D]) log[D]={};
+            if(log[D][h.id]===wert) delete log[D][h.id]; else log[D][h.id]=wert;
+            write(LOG,log); buildTagesabschluss(); buildCats(); buildRing(); buildStrip();
+          });
+          w.appendChild(b);
+        });
+        r.appendChild(w); g.appendChild(r);
+      });
+      l.appendChild(g);
+    });
+    return l;
+  }
   function buildTagesabschluss(){
     const D=state.viewDate, ro=!canEdit();
     const root=document.getElementById("tagesabschluss"); if(!root) return; root.innerHTML="";
-    const cur=getText(D,"tagesabschluss");
-    const has = isEnc(cur) ? true : (typeof cur==="string" && cur.trim().length>0);
+    const cur=getText(D,"tagesabschluss"), wv=getText(D,"wins");
+    const has = isEnc(cur) || (typeof cur==="string" && cur.trim().length>0) || (typeof wv==="string" && wv.trim().length>0);
     const sec=document.createElement("section"); sec.className="cat tages";
     const head=document.createElement("button"); head.className="lockin-head"; head.type="button"; head.setAttribute("aria-expanded", state.tagOpen?"true":"false");
     head.innerHTML=`<span class="tag-icon" aria-hidden="true">🌙</span><span class="lockin-title">Mein Tagesabschluss</span>${has?'<span class="tag-dot"></span>':''}<span class="chev" aria-hidden="true">⌄</span>`;
     head.addEventListener("click",()=>{ state.tagOpen=!state.tagOpen; if(!state.tagOpen){ tagStop(); tagRest=0; tagStep=0; } buildTagesabschluss(); });
     sec.appendChild(head);
-    if(state.tagOpen){
-      const panel=document.createElement("div"); panel.className="lockin-panel";
-      if(canEdit()){
-        // Drei Schritte: erst aufräumen, dann erfassen, dann zurückschauen
-        const pr=document.createElement("div"); pr.className="cc-prog tag-prog";
-        ["Offene Punkte","Gewohnheiten","Rückblick"].forEach((l,i)=>{
-          const d=document.createElement("button"); d.type="button";
-          d.className="cc-dot"+(i===tagStep?" on":"")+((i===0&&tagOffen().length===0)||(i===1&&tagUnerfasst().length===0)?" done":"");
-          d.title=(i+1)+". "+l;
-          d.addEventListener("click",()=>{ tagStep=i; buildTagesabschluss(); });
-          pr.appendChild(d);
-        });
-        panel.appendChild(pr);
-        const kp=document.createElement("div"); kp.className="li-kopf";
-        kp.innerHTML=`<span class="cc-n">${tagStep+1}</span><span class="cc-t">${["Offene Punkte","Gewohnheiten","Rückblick"][tagStep]}</span>`;
-        panel.appendChild(kp);
-      }
-      if(canEdit() && tagStep===0){
-        // Schritt 1: was noch offen ist, hier abhaken
-        const offen=tagOffen();
-        const f=document.createElement("p"); f.className="cc-frage";
-        f.textContent = offen.length
-          ? "Offene Aufgaben"
-          : "Alles erledigt.";
-        panel.appendChild(f);
-        const l=document.createElement("div"); l.className="tag-offen";
+    if(!state.tagOpen){ root.appendChild(sec); return; }
+    const panel=document.createElement("div"); panel.className="lockin-panel ex-panel";
+    const N=EX_STEPS.length;
+    if(tagStep<0||tagStep>N+1) tagStep=0;
+    const geh=()=>{ buildTagesabschluss(); setTimeout(()=>{ const k=root.querySelector(".ex-kopf"); if(k&&k.scrollIntoView) k.scrollIntoView({behavior:"smooth",block:"nearest"}); },30); };
+
+    // Fortschritt — fünf kleine Schritte
+    if(tagStep>=1 && tagStep<=N){
+      const pr=document.createElement("div"); pr.className="e-progress ex-prog";
+      EX_STEPS.forEach((s,i)=>{
+        const b=document.createElement("button"); b.type="button"; b.className="e-step"; b.textContent=s.k;
+        b.setAttribute("aria-label",(i+1)+". "+s.title);
+        if(i+1===tagStep) b.setAttribute("aria-current","step");
+        b.addEventListener("click",()=>{ tagStep=i+1; geh(); });
+        pr.appendChild(b);
+      });
+      panel.appendChild(pr);
+    }
+    const kopf=document.createElement("div"); kopf.className="ex-kopf";
+    const body=document.createElement("div"); body.className="e-body ex-body";
+    const nav=document.createElement("div"); nav.className="e-nav ex-nav";
+    const P=(cls,txt)=>{ const p=document.createElement("p"); if(cls) p.className=cls; p.textContent=txt; return p; };
+    const B=(txt,fn,cls)=>{ const b=document.createElement("button"); b.type="button"; if(cls) b.className=cls; b.textContent=txt; b.addEventListener("click",fn); return b; };
+
+    if(tagStep===0){
+      kopf.innerHTML=`<span class="cc-t">Gewissenserforschung</span>`;
+      body.append(P("e-meta","Tagesrückblick nach Ignatius · 5–10 Minuten"),
+                  P("","Komm zur Ruhe und beginne mit einem Kreuzzeichen."),
+                  P("e-prayer","Im Namen des Vaters und des Sohnes und des Heiligen Geistes. Amen."));
+      // Was heute noch offen ist — leise, zum Abhaken, bevor du beginnst
+      const offen=tagOffen();
+      if(offen.length && !ro){
+        const o=document.createElement("div"); o.className="ex-offen";
+        o.appendChild(P("e-meta","Noch offen von heute — abhaken oder stehen lassen"));
         offen.forEach(x=>{
           const r=document.createElement("button"); r.type="button"; r.className="to-z"+(x.status==="started"?" halb":"");
           r.innerHTML=`<span class="to-c">${x.status==="started"?"◐":"○"}</span><span class="to-t">${esc(x.text.trim())}</span>`+
             (x.fixed&&typeof x.start==="number"?`<span class="to-z2">${fMinToClock(x.start)}</span>`:``);
-          r.disabled=ro;
           r.addEventListener("click",()=>{ setDone(x,true); buildTagesabschluss(); });
-          l.appendChild(r);
+          o.appendChild(r);
         });
-        if(!offen.length){
-          const e=document.createElement("div"); e.className="cc-q-leer"; e.textContent="Alles abgehakt.";
-          l.appendChild(e);
-        }
-        panel.appendChild(l);
-        const nav1=document.createElement("div"); nav1.className="cc-nav";
-        const zu=document.createElement("button"); zu.type="button"; zu.className="cc-link";
-        zu.textContent="In den Tagesplan →";
-        zu.addEventListener("click",()=>{ state.priosSub="heute"; setTab("prios"); });
-        const w1=document.createElement("button"); w1.type="button"; w1.className="cc-weiter"; w1.textContent="Weiter zu Gewohnheiten";
-        w1.addEventListener("click",()=>{ tagStep=1; buildTagesabschluss(); });
-        nav1.append(zu,w1); panel.appendChild(nav1);
-        sec.appendChild(panel); root.appendChild(sec);eTagesabschluss(root); return;
+        body.appendChild(o);
       }
-      if(canEdit() && tagStep===1){
-        // Schritt 2: jede Gewohnheit bekommt heute eine Antwort
-        const offen=tagUnerfasst();
-        const f=document.createElement("p"); f.className="cc-frage";
-        f.textContent = offen.length
-          ? "Gemacht oder ausgelassen?"
-          : "Alle Gewohnheiten sind erfasst.";
-        panel.appendChild(f);
-        const l=document.createElement("div"); l.className="tag-staq";
-        (config.cats||[]).forEach(c=>{
-          const hs=(config.habits||[]).filter(h=>h.cat===c.id);
-          if(!hs.length) return;
-          const g=document.createElement("div"); g.className="li-linie";
-          g.innerHTML=`<div class="cc-l-h" style="--lc:${c.color}">${esc(c.title)}</div>`;
-          hs.forEach(h=>{
-            const v=(log[D]||{})[h.id];
-            const r=document.createElement("div"); r.className="ts-z"+(v===undefined?" offen":"");
-            r.innerHTML=`<span class="ts-n">${esc(h.name)}</span>`;
-            const w=document.createElement("div"); w.className="ts-w";
-            [["ja","gemacht",true],["nein","nicht","miss"]].forEach(([kls,txt,wert])=>{
-              const b=document.createElement("button"); b.type="button";
-              b.className="ts-b "+kls+((v===wert)?" on":"");
-              b.textContent=txt; b.disabled=ro;
-              b.addEventListener("click",()=>{
-                if(!log[D]) log[D]={};
-                if(log[D][h.id]===wert) delete log[D][h.id]; else log[D][h.id]=wert;
-                write(LOG,log); buildTagesabschluss(); renderHeute();
-              });
-              w.appendChild(b);
-            });
-            r.appendChild(w); g.appendChild(r);
-          });
-          l.appendChild(g);
-        });
-        panel.appendChild(l);
-        const nav=document.createElement("div"); nav.className="cc-nav";
-        const zur=document.createElement("button"); zur.type="button"; zur.className="cc-zur"; zur.textContent="zurück";
-        zur.addEventListener("click",()=>{ tagStep=0; buildTagesabschluss(); });
-        const w2=document.createElement("button"); w2.type="button"; w2.className="cc-weiter";
-        w2.textContent = offen.length ? "weiter ("+offen.length+" offen)" : "weiter zum Rückblick";
-        w2.addEventListener("click",()=>{ tagStep=2; buildTagesabschluss(); });
-        nav.append(zur,w2); panel.appendChild(nav);
-        sec.appendChild(panel); root.appendChild(sec);eTagesabschluss(root); return;
+      const src=document.createElement("details"); src.className="e-source";
+      src.innerHTML=`<summary>Quelle</summary><a href="https://www.jesuiten.org/unsere-spiritualitaet/tagesrueckblick" target="_blank" rel="noopener noreferrer">Jesuiten · Tagesrückblick</a>`;
+      body.appendChild(src);
+      nav.append(B("Beginnen",()=>{ tagStep=1; geh(); },"u-primary"));
+    }
+    else if(tagStep<=N){
+      const st=EX_STEPS[tagStep-1];
+      kopf.innerHTML=`<span class="cc-n">${tagStep}</span><span class="cc-t">${esc(st.title)}</span>`;
+      body.append(P("e-meta",tagStep+" / "+N), P("e-question",st.text));
+      if(st.more){
+        const d=document.createElement("details"); d.className="e-questions";
+        const s=document.createElement("summary"); s.textContent=st.id==="vorsatz"?"Beispiele":"Weitere Fragen"; d.appendChild(s);
+        st.more.forEach(t=>d.appendChild(P("",t)));
+        body.appendChild(d);
       }
-      if(canEdit()){
-        // Zeitfenster für den Abschluss — rau statt perfekt
-        const uz=document.createElement("div"); uz.className="tag-uhrzeile";
-        const uhr=document.createElement("button"); uhr.type="button"; uhr.className="cc-uhr";
-        uhr.textContent=tagRest?fmtMMSS(tagRest):"15 min";
-        uhr.title="Zeitfenster setzen";
-        uhr.addEventListener("click",()=>{
-          if(tagTimer){ tagStop(); tagRest=0; uhr.textContent="15 min"; return; }
-          tagRest=900;
-          tagTimer=setInterval(()=>{ tagRest--; uhr.textContent=fmtMMSS(tagRest);
-            if(tagRest<=0){ tagStop(); uhr.textContent="fertig"; try{playGong();}catch(e){} } },1000);
-        });
-        uz.appendChild(uhr); panel.appendChild(uz);
+      if(st.id==="danken"){
+        // Die Wins — bleiben offen, damit sie morgen früh und im Command Center erscheinen
+        body.appendChild(exFeld(D,"wins","Was ist gelungen? Auch Kleines zählt.",{l:"Wins"}));
       }
-      if(canEdit()){
+      if(st.id==="tag"){
         // Die Absicht des Morgens — und ob sie gehalten hat
         const ab=getText(D,"absicht");
         if(typeof ab==="string" && ab.trim()){
@@ -5558,118 +5599,57 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
             ki.addEventListener("input",()=>setText(D,"absicht_komm",ki.value));
             a.appendChild(ki);
           }
-          panel.appendChild(a);
+          body.appendChild(a);
         }
-        // Plan gegen Wirklichkeit — was du morgens gebaut hast
+        // Gewohnheiten — jede bekommt eine Antwort
+        const un=tagUnerfasst();
+        body.appendChild(P("e-meta ex-h", un.length ? "Gewohnheiten — gemacht oder ausgelassen?" : "Gewohnheiten — alle erfasst."));
+        body.appendChild(exHabits(D));
+        // Plan gegen Wirklichkeit — nur als stille Zeile
         try{
           ensurePrios();
           const plan=prios.all.filter(x=>x.day===D && (x.text||"").trim());
           if(plan.length){
-            const pl=document.createElement("div"); pl.className="tag-plan";
             const erf=plan.filter(isDoneI).length;
-            pl.innerHTML=`<div class="tp-h">Dein Plan · ${erf} von ${plan.length}</div>`+
-              plan.map(x=>`<div class="tp-z ${isDoneI(x)?"ok":x.status==="started"?"halb":"offen"}">
-                <span class="tp-c">${isDoneI(x)?"✓":x.status==="started"?"◐":"○"}</span>
-                <span class="tp-t">${esc(x.text.trim())}</span></div>`).join("");
-            panel.appendChild(pl);
+            body.appendChild(P("e-meta",`Dein Plan · ${erf} von ${plan.length} erledigt`));
           }
         }catch(e){}
-        const b=dayBilanz();
-        if(b){ const bd=document.createElement("div"); bd.className="tag-bilanz"; bd.innerHTML=b; panel.appendChild(bd); }
-        // Der Lock-In dieses Tages — aufklappbar, damit du ihn durchgehen kannst
-        const li=document.createElement("div"); li.className="tag-li";
-        const kopf=document.createElement("button"); kopf.type="button"; kopf.className="tli-h"+(state.tagLiOpen?" on":"");
-        const gesetzt=lockinItems().filter(it=>{
-          const v=getText(D,it.id);
-          return lockinOn(it.id,D) || isEnc(v) || (typeof v==="string" && v.trim());
-        }).length;
-        kopf.innerHTML=`<span>Mein Morgen</span><span class="tli-n">${gesetzt}/${lockinItems().length}</span><span class="tli-c">⌄</span>`;
-        kopf.addEventListener("click",()=>{ state.tagLiOpen=!state.tagLiOpen; buildTagesabschluss(); });
-        li.appendChild(kopf);
-        if(state.tagLiOpen){
-          const b=document.createElement("div"); b.className="tli-b";
-          lockinItems().forEach(it=>{
-            const v=getText(D,it.id);
-            const z=document.createElement("div"); z.className="tli-z"+(lockinOn(it.id,D)?" ok":"");
-            let inhalt="";
-            if(isEnc(v)) inhalt=`<span class="tli-zu">· · · · ·</span>`;
-            else if(typeof v==="string" && v.trim()) inhalt=`<div class="tli-t">${esc(v.trim())}</div>`;
-            z.innerHTML=`<span class="tli-c2">${lockinOn(it.id,D)?"✓":"○"}</span>
-              <div class="tli-in"><span class="tli-l">${esc(it.label||"Rückblick")}</span>${inhalt}</div>`;
-            b.appendChild(z);
-          });
-          const auf=document.createElement("button"); auf.type="button"; auf.className="cc-link";
-          auf.textContent="Morgen öffnen und durchgehen →";
-          auf.addEventListener("click",()=>{ state.lockinOpen=true; liStep=0; renderHeute();
-            setTimeout(()=>{ const el=document.getElementById("lockin"); if(el&&el.scrollIntoView) el.scrollIntoView({behavior:"smooth",block:"start"}); },80); });
-          b.appendChild(auf);
-          li.appendChild(b);
-        }
-        panel.appendChild(li);
-
-        const h=document.createElement("div"); h.className="tag-hint";
-        h.textContent="";
-        panel.appendChild(h);
+        body.appendChild(exFeld(D,"tagesabschluss","Was hat gezogen, was getragen …",{l:"Notiz",ablegbar:true}));
       }
-      const wrap=document.createElement("div"); wrap.className="lockin-text tages-text";
-      wrap.dataset.rolle="bericht";
-
-      // Oben die Wins — bleiben offen, damit sie im Command Center erscheinen
-      const wv=getText(D,"wins");
-      const wta=document.createElement("textarea"); wta.className="lockin-ta tages-wins"; wta.rows=2;
-      wta.placeholder="Wins — was ist gelungen? Auch Kleines zählt.";
-      wta.value=(typeof wv==="string")?wv:"";
-      if(ro){ wta.readOnly=true; } else { wta.addEventListener("input",()=>setText(D,"wins",wta.value)); }
-      wrap.appendChild(wta);
-
-      const linie=document.createElement("div"); linie.className="tages-linie";
-      wrap.appendChild(linie);
-
-      // Darunter der freie Text — nur dieser lässt sich ablegen
-      if(isEnc(cur)){
-        const mask=document.createElement("div"); mask.className="enc-mask"; mask.textContent="· · · · ·"; mask.title="Antippen zum Öffnen";
-        const key=document.createElement("button"); key.className="key-btn open"; key.type="button"; key.textContent="öffnen"; key.title="Text sichtbar machen";
-        key.addEventListener("click",()=>unlockField(D,"tagesabschluss"));
-        const z=document.createElement("div"); z.className="cc-feld-akt"; z.appendChild(key);
-        if(!ro) z.appendChild(delBtn(D,"tagesabschluss"));
-        wrap.append(mask,z);
-      }else{
-        const ta=document.createElement("textarea"); ta.className="lockin-ta"; ta.rows=3;
-        ta.placeholder="Wie war der Tag? Was hat gezogen, was getragen …";
-        ta.value=(typeof cur==="string")?cur:"";
-        if(ro){ ta.readOnly=true; } else { ta.addEventListener("input",()=>setText(D,"tagesabschluss",ta.value)); }
-        wrap.appendChild(ta);
-        if(!ro){
-          const key=document.createElement("button"); key.className="key-btn"; key.type="button";
-          key.textContent="ablegen"; key.title="Nur diesen Text geschützt ablegen — die Wins bleiben offen";
-          key.addEventListener("click",()=>lockField(D,"tagesabschluss"));
-          const z=document.createElement("div"); z.className="cc-feld-akt"; z.appendChild(key);
-          if(typeof cur==="string" && cur.trim()) z.appendChild(delBtn(D,"tagesabschluss"));
-          wrap.appendChild(z);
-        }
+      if(st.id==="vergeben"){
+        body.appendChild(exFeld(D,"examen_reue","Was dir leidtut …",{l:"Nur für dich",ablegbar:true}));
       }
-      panel.appendChild(wrap);
-      if(canEdit() && !ro){
-        const nav=document.createElement("div"); nav.className="tag-nav";
-        const zur=document.createElement("button"); zur.type="button"; zur.className="cc-zur"; zur.textContent="zurück";
-        zur.addEventListener("click",()=>{ tagStep=1; buildTagesabschluss(); });
-        nav.appendChild(zur);
-        const fertig=document.createElement("button"); fertig.type="button"; fertig.className="tag-fertig";
-        fertig.textContent = liRhythmus()==="abend" ? "Abschließen und morgen planen →" : "Abschließen";
-        fertig.addEventListener("click",()=>{
+      if(st.id==="vorsatz"){
+        body.appendChild(exFeld(D,"examen_vorsatz","Für morgen …",{l:"Vorsatz"}));
+      }
+      nav.append(B("Zurück",()=>{ tagStep--; geh(); },"u-secondary"), B(tagStep===N?"Zum Abschluss":"Weiter",()=>{ tagStep++; geh(); },"u-primary"));
+    }
+    else {
+      kopf.innerHTML=`<span class="cc-t">Vaterunser</span>`;
+      body.append(P("e-prayer","Vater unser im Himmel,\ngeheiligt werde dein Name.\nDein Reich komme.\nDein Wille geschehe,\nwie im Himmel so auf Erden.\nUnser tägliches Brot gib uns heute.\nUnd vergib uns unsere Schuld,\nwie auch wir vergeben unsern Schuldigern.\nUnd führe uns nicht in Versuchung,\nsondern erlöse uns von dem Bösen.\nAmen."),
+                  P("e-prayer","Gott, dir vertraue ich diese Nacht und den kommenden Tag an. Amen."));
+      const vs=getText(D,"examen_vorsatz");
+      if(typeof vs==="string" && vs.trim()) body.append(P("e-meta","Dein Vorsatz: "+vs.trim()));
+      nav.append(B("Zurück",()=>{ tagStep=N; geh(); },"u-secondary"));
+      if(!ro){
+        const fertig=B(liRhythmus()==="abend" ? "Abschließen und morgen planen →" : "Abschließen",()=>{
           tagStop(); tagRest=0; tagStep=0;
           state.tagOpen=false;
-          if(liRhythmus()==="abend"){ state.lockinOpen=true; liStep=0;state.priosSub="morgen"; }
+          if(liRhythmus()==="abend"){ state.lockinOpen=true; liStep=0; state.priosSub="morgen"; }
           renderHeute();
           setTimeout(()=>{ const el=document.getElementById(liRhythmus()==="abend"?"lockin":"cats");
             if(el&&el.scrollIntoView) el.scrollIntoView({behavior:"smooth",block:"start"}); },80);
-        });
+        },"u-primary tag-fertig");
         nav.appendChild(fertig);
-        panel.appendChild(nav);
+        if(liRhythmus()!=="abend" && isToday()){
+          body.appendChild(B("Morgen planen →",()=>{ tagStep=0; state.tagOpen=false; qGoDay(addDays(today,1)); },"cc-link"));
+        }
+      } else {
+        nav.append(B("Schließen",()=>{ tagStep=0; state.tagOpen=false; buildTagesabschluss(); },"u-primary"));
       }
-      sec.appendChild(panel);
     }
-    root.appendChild(sec);eTagesabschluss(root);
+    panel.append(kopf,body,nav);
+    sec.appendChild(panel); root.appendChild(sec);
   }
 
   function buildCats(){
@@ -11311,7 +11291,7 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
     const out=[];
     try{ Object.keys(lockinText||{}).forEach(d=>{ const e=lockinText[d]||{};
       Object.keys(e).forEach(id=>{ const v=e[id];
-        if(typeof v==="string" && v.trim()) out.push({d, wo:id==="tagesabschluss"?"Tagesabschluss":id==="wins"?"Wins":"Lock In", t:v}); }); }); }catch(e){}
+        if(typeof v==="string" && v.trim()) out.push({d, wo:id==="tagesabschluss"?"Tagesabschluss":id==="wins"?"Wins":/^examen_/.test(id)?"Gewissenserforschung":"Lock In", t:v}); }); }); }catch(e){}
     try{ ensurePrios();
       prios.all.forEach(x=>{ if((x.text||"").trim()) out.push({d:x.day||"", wo:x.prio?"Priorität":x.fixed?"Blocker":"ToDo", t:x.text}); });
       (prios.archive||[]).forEach(a=>{ if((a.text||"").trim()) out.push({d:a.day||"", wo:"Archiv", t:a.text}); }); }catch(e){}
@@ -11760,7 +11740,7 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
     if(!isToday()){h.textContent='Ein Blick zurück';p.textContent='Du siehst den '+fmtShort(state.viewDate)+'.';b.textContent='Zum heutigen Tag';b.onclick=()=>{state.viewDate=today;renderHeute();};}
     else if(['flow','break','breakwait'].includes(fclock.phase)){h.textContent=fclock.phase==='flow'?'Dein Fokus läuft':fclock.phase==='break'?'Pause läuft':'Deine Fokuszeit ist um';p.textContent='Uhr und Aufgabe im Fokusbereich öffnen.';b.textContent='Zur Session';b.onclick=()=>setTab('fokus');}
     else if(resume?.type==='cc'&&!ccAll()[resume.week]?.done){h.textContent='Command Center fortsetzen';p.textContent='Command Center · KW '+ccWochenNr(resume.week)+' · Schritt '+(resume.step+1)+' von 8';b.textContent='Fortsetzen';b.onclick=()=>cResume(resume);}
-    else if(dayPhase()==='abend'){h.textContent='Tagesabschluss';p.textContent='Offene Punkte, Gewohnheiten und dein Rückblick.';b.textContent='Tagesabschluss öffnen';b.onclick=()=>{state.tagOpen=true;buildTagesabschluss();document.getElementById('tagesabschluss').scrollIntoView({block:'start'});};}
+    else if(dayPhase()==='abend'){h.textContent='Tagesabschluss';p.textContent='Gewissenserforschung nach Ignatius — fünf Schritte, 5–10 Minuten.';b.textContent='Tagesabschluss öffnen';b.onclick=()=>{state.tagOpen=true;tagStep=0;buildTagesabschluss();document.getElementById('tagesabschluss').scrollIntoView({block:'start'});};}
     else if(dayPhase()==='morgen'){h.textContent='Morgenritual';p.textContent='Dein Morgenablauf wartet dort, wo du weitermachst.';b.textContent='Morgenablauf öffnen';b.onclick=()=>{state.lockinOpen=true;buildLockIn();document.getElementById('lockin').scrollIntoView({block:'start'});};}
     else {const task=prios.all?.find(t=>t.day===today&&t.prio&&t.status!=='done'&&t.text?.trim());h.textContent=task?.text||'Prioritäten';p.textContent=task?'Deine nächste offene Priorität.':'Für heute ist noch keine offene Priorität eingetragen.';b.textContent=task?'Dafür Fokus öffnen':'Tag planen';b.onclick=()=>{if(task){task.focus=true;savePrios();cRuntime.taskId=task.id;cSave();fclock.open=true;setTab('fokus');}else setTab('prios');};}
     box.append(h,p,b);if(!p.textContent.startsWith('Command Center ·'))p.remove();if(!p.textContent.startsWith('Command Center ·'))p.remove();
@@ -12236,52 +12216,10 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
 
   // Guided prayer only: no notes, completion log, storage key or network request.
   function openExamen(){
-    document.querySelectorAll('.e-examen').forEach(d=>d.closePanel());
-    const dlg=uDialog('Gewissenserforschung');dlg.classList.add('e-examen');
-    const originalClose=dlg.closePanel;dlg.closePanel=()=>{originalClose();if(document.activeElement===document.body)document.querySelector('#uiPrayerShortcut')?.focus({preventScroll:true});};
-    const heading=dlg.querySelector('h2');heading.tabIndex=-1;
-    const close=uButton('×',()=>dlg.closePanel(),'e-close');close.setAttribute('aria-label','Gewissenserforschung schließen');dlg.prepend(close);
-    const progress=uNode('nav','e-progress');progress.setAttribute('aria-label','Schritte der Gewissenserforschung');
-    const body=uNode('div','e-body'),nav=uNode('div','e-nav');dlg.append(progress,body,nav);
-    const steps=[
-      {title:'Für das Gute danken',text:'Was wurde mir heute geschenkt?',more:['Welche Begegnung, Hilfe oder Freude hat mir gutgetan?','Wo konnte ich selbst etwas Gutes tun?']},
-      {title:'Gott um Klarheit bitten',text:'Bitte Gott, deinen Tag ehrlich betrachten zu können und deine Fehler zu erkennen.'},
-      {title:'Den Tag durchgehen',text:'Erinnere dich an den Morgen, Mittag und Abend: Was habe ich gedacht, gesagt und getan?',more:['War ich ehrlich, liebevoll und gerecht?','Habe ich jemanden verletzt oder schlecht über andere gesprochen?','Habe ich notwendige Hilfe unterlassen?','Welchen Raum habe ich Gott gegeben?']},
-      {title:'Um Vergebung bitten',text:'Sprich vor Gott aus, was dir leidtut. Vertraue auf seine Barmherzigkeit.'},
-      {title:'Einen Vorsatz fassen',text:'Was möchte ich morgen mit Gottes Hilfe besser machen?',more:['Jemanden um Entschuldigung bitten.','Etwas wiedergutmachen.','In einer bestimmten Situation geduldiger sein.']}
-    ];
-    let current=-1;
-    function render(focus=false){
-      progress.replaceChildren();body.replaceChildren();nav.replaceChildren();
-      for(let i=0;i<steps.length;i++){
-        const b=uButton(String(i+1),()=>{current=i;render(true);},'e-step');b.setAttribute('aria-label',(i+1)+'. '+steps[i].title);
-        if(i===current)b.setAttribute('aria-current','step');progress.append(b);
-      }
-      progress.hidden=current<0||current>=steps.length;
-      if(current<0){
-        heading.textContent='Gewissenserforschung';
-        body.append(uNode('p','e-meta','Tagesrückblick nach Ignatius · 5–10 Minuten'),uNode('p','','Komm zur Ruhe und beginne mit einem Kreuzzeichen.'),uNode('p','e-prayer','Im Namen des Vaters und des Sohnes und des Heiligen Geistes. Amen.'));
-        nav.append(uButton('Beginnen',()=>{current=0;render(true);},'u-primary'));
-        const source=uNode('details','e-source');source.append(uNode('summary','','Quelle'));const link=uNode('a','','Jesuiten · Tagesrückblick');link.href='https://www.jesuiten.org/unsere-spiritualitaet/tagesrueckblick';link.target='_blank';link.rel='noopener noreferrer';source.append(link);body.append(source);
-      }else if(current<steps.length){
-        const step=steps[current];heading.textContent=step.title;body.append(uNode('p','e-meta',(current+1)+' / 5'),uNode('p','e-question',step.text));
-        if(step.more){const details=uNode('details','e-questions');details.append(uNode('summary','',current===4?'Beispiele':'Weitere Fragen'));for(const text of step.more)details.append(uNode('p','',text));body.append(details);}
-        nav.append(uButton('Zurück',()=>{current--;render(true);}),uButton(current===4?'Zum Abschluss':'Weiter',()=>{current++;render(true);},'u-primary'));
-      }else{
-        heading.textContent='Vaterunser';
-        body.append(uNode('p','e-prayer','Vater unser im Himmel,\ngeheiligt werde dein Name.\nDein Reich komme.\nDein Wille geschehe,\nwie im Himmel so auf Erden.\nUnser tägliches Brot gib uns heute.\nUnd vergib uns unsere Schuld,\nwie auch wir vergeben unsern Schuldigern.\nUnd führe uns nicht in Versuchung,\nsondern erlöse uns von dem Bösen.\nAmen.'),uNode('p','e-prayer','Gott, dir vertraue ich diese Nacht und den kommenden Tag an. Amen.'));
-        nav.append(uButton('Zurück',()=>{current=4;render(true);}),uButton('Schließen',()=>dlg.closePanel(),'u-primary'));
-        body.append(uButton('Morgen planen',()=>{dlg.closePanel();qGoDay(addDays(today,1));},'e-plan'));
-      }
-      dlg.scrollTop=0;if(focus)heading.focus({preventScroll:true});
-    }
-    render();dlg.showModal();heading.focus({preventScroll:true});
-  }
-  function eTagesabschluss(root){
-    const section=root?.querySelector('.tages');if(!section)return;
-    const actions=uNode('div','e-evening');actions.append(uButton('Gewissenserforschung',openExamen,'e-prayer-link'));section.querySelector('.lockin-head').after(actions);
-    const dots=section.querySelectorAll('.tag-prog .cc-dot');
-    dots.forEach((b,i)=>{const label=['Aufgaben','Gewohnheiten','Rückblick'][i];b.textContent=label;b.setAttribute('aria-label',label);if(i===tagStep)b.setAttribute('aria-current','step');});
+    // Die Gewissenserforschung ist der Tagesabschluss — sie lebt im Heute-Panel
+    tagStep=0; state.tagOpen=true;
+    if(state.tab!=="heute") setTab("heute"); else renderHeute();
+    setTimeout(()=>{ const el=document.getElementById("tagesabschluss"); if(el&&el.scrollIntoView) el.scrollIntoView({behavior:"smooth",block:"start"}); },80);
   }
   function eTaskFocus(id,selector){
     if(state.tab!=='prios')return;

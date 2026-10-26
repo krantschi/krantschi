@@ -1513,8 +1513,8 @@
   .wp-foot span{font-size:10.5px; color:var(--ink-faint); display:flex; align-items:baseline; gap:4px}
   .wp-foot strong{font-size:14px; font-weight:750; color:var(--ink); font-variant-numeric:tabular-nums}
   /* Blocker in der Tagesansicht */
-  .tl-blk{position:absolute; left:50px; right:10px; z-index:2; border-radius:7px; padding:4px 9px; cursor:pointer;
-    background:var(--brass); color:var(--on-ink); box-shadow:0 8px 20px -12px rgba(0,0,0,.7); overflow:hidden}
+  .tl-blk{position:absolute; left:4px; right:6px; z-index:2; border-radius:7px; padding:4px 9px; cursor:pointer;
+    background:var(--brass-tint); color:var(--ink); border-left:2.5px solid var(--brass); overflow:hidden}
   .tl-blk:hover{filter:brightness(1.06)}
   .tlb-tx{display:block; font-size:12px; font-weight:750; line-height:1.25}
   .tlb-t{display:block; font-size:9.5px; opacity:.75; font-variant-numeric:tabular-nums}
@@ -3071,6 +3071,42 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
 .ex-h{margin-top:16px}.ex-staq{margin:0 0 6px}.ex-staq .cc-l-h{font-size:11px}.ex-staq .ts-z{padding:3px 0}.ex-offen{margin-top:14px}.ex-offen .to-z{width:100%}
 .ex-nav{margin-top:18px}.ex-nav .tag-fertig{width:auto;padding:8px 16px}.ex-body .cc-link{margin-top:8px}
 @media(max-width:540px){.ex-prog{gap:4px}.ex-prog .e-step{font-size:10.5px}}
+/* Aufgaben wie in Todoist */
+.q-erkannt{display:flex;flex-wrap:wrap;gap:4px;padding:4px 0 0}.q-erkannt:empty{display:none}.q-erk{font:500 11px var(--ui-font);padding:3px 7px;border-radius:6px;background:var(--rose-tint);color:var(--rose)}.q-erk.label,.q-erk.projekt{background:var(--sky-tint);color:var(--sky)}.q-erk.rep,.q-erk.termin{background:var(--mint-tint);color:var(--mint)}.q-erk-text{font-size:11px;color:var(--ink-faint);padding:3px 2px}
+.q-flag[aria-pressed=true]{background:var(--rose-tint);color:var(--rose)}
+.q-filter{display:flex;gap:4px;overflow-x:auto;padding:0 20px 6px;scrollbar-width:none}.q-filter::-webkit-scrollbar{display:none}.q-filter .q-chip{flex:none;border:1px solid var(--line);min-height:28px;padding:3px 8px}.q-trenner{width:1px;height:16px;background:var(--line);align-self:center;margin:0 2px}.q-when{align-items:center}.q-filter .q-chip[aria-pressed=true]{border-color:var(--rose)}
+.q-priority>.q-task-line .todo-check{border-color:var(--rose)}.q-priority.done>.q-task-line .todo-check{background:var(--rose);border-color:var(--rose)}
+.q-task-meta{display:flex;flex-wrap:wrap;gap:2px 8px}.q-m.zeit{color:var(--sky);font-weight:600}.q-m.label{color:var(--sky)}.q-m.rep{color:var(--mint)}.q-m.faellig{color:var(--rose);font-weight:600}.q-m.proj{color:var(--ink-soft)}
+.q-task-note{display:block;font-size:11px;color:var(--ink-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.q-t-ico{font-size:11px;margin-right:5px;opacity:.85}.q-termin .q-t-ico{color:var(--sky);opacity:1}
+.q-task-when.faellig{color:var(--rose);font-weight:600}.q-overdue .q-section-title{color:var(--rose);display:flex;align-items:center;justify-content:space-between}.q-overdue .q-section-title .q-chip{font-weight:500;color:var(--ink-soft)}
+.q-leer{font-size:12px;color:var(--ink-faint);margin:2px 0 4px}
+.q-next{margin:4px 20px 0}.q-day{padding:8px 0 4px;border-top:1px solid var(--line)}.q-day-h{display:flex;align-items:center;justify-content:space-between;gap:8px}.q-day-t{font:600 12px var(--ui-font);color:var(--ink-soft)}.q-is-today .q-day-t{color:var(--rose)}.q-we .q-day-t{opacity:.7}.q-day-plus{min-width:36px;min-height:36px;border:0;background:transparent;color:var(--ink-soft);font-size:18px;cursor:pointer;border-radius:8px}
+.q-day.ziel,.q-tab.ziel,.tl-track.ziel{background:var(--rose-tint);border-radius:8px;outline:2px dashed var(--rose);outline-offset:-2px}.wp-col.ziel{background:var(--rose-tint)}
+.q-task{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;touch-action:pan-y}.q-haelt{opacity:.45}.q-fliegt{max-width:70vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}body.q-zieht,body.q-zieht *{cursor:grabbing!important}
+.q-cal .q-task-title{color:var(--ink-soft);cursor:default}.q-cal.done .q-task-title{text-decoration:line-through;color:var(--ink-faint)}
+.q-edit-zeit{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;margin:8px 0 2px}.q-art{display:flex;gap:4px}.q-art .q-chip{border:1px solid var(--line);min-height:36px}.q-art .q-chip[aria-pressed=true]{border-color:var(--rose);background:var(--rose-tint);color:var(--rose)}.q-zeit-l{display:flex;flex-direction:column;gap:3px;font-size:11px;color:var(--ink-soft)}.q-zeit-l input,.q-zeit-l select{min-height:36px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;padding:4px 6px}
+.q-note{width:100%;box-sizing:border-box;min-height:44px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;padding:6px 8px;resize:vertical}
+.q-field{margin:8px 0}.q-field input[type=text]{min-height:38px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;padding:4px 8px}
+.q-review-actions{display:flex;flex-wrap:wrap;gap:2px;padding:0 0 4px 31px}
+.q-day.leer{padding:0}.q-day.leer .q-day-h{min-height:36px}.q-day.leer .q-day-t{color:var(--ink-faint);font-weight:500}.q-day.leer.q-is-today .q-day-t{color:var(--rose)}
+.q-composer .q-when{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}.q-composer .q-when::-webkit-scrollbar{display:none}.q-composer .q-when .q-chip{flex:none}
+.wstrip:has(.ws-empty){padding:8px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}.wstrip:has(.ws-empty) .ws-head{margin:0}.wstrip:has(.ws-empty) .ws-empty{display:none}.wstrip:has(.ws-empty) .ws-go{margin:0}
+.wp-blk.wp-tsk{background:var(--card);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line),inset 2px 0 0 var(--ink-faint)}.wp-blk.wp-tsk .wpb-tx{color:var(--ink);font-weight:600}
+.timeline .panel-head .v-time-picker{min-height:34px;padding:5px 10px;font-size:12px}.timeline .tl-hint{white-space:nowrap}
+@media(max-width:540px){.timeline .tl-hint{display:none}}
+@media(max-width:540px){.head .ring{width:66px;height:66px}.head .ring-num{font-size:21px}.head .ring-num small{font-size:9px}.head .ring-label{font-size:7px;letter-spacing:.08em;margin-top:2px}}
+/* Politur: Wischen, Plus-Knopf, Zeitleiste, Vizija */
+.q-task{position:relative;overflow:hidden}.q-task>.q-task-line{position:relative;z-index:1;background:var(--card)}.q-wisch-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font:600 12px var(--ui-font);color:var(--on-accent);background:var(--sky)}.q-wisch-bg.rechts{background:var(--mint)}.q-wisch-bg .l{opacity:0}.q-wisch-bg .r{opacity:1}.q-wisch-bg.rechts .l{opacity:1}.q-wisch-bg.rechts .r{opacity:0}.q-wisch-bg.scharf{font-size:13px}
+.q-fab{display:none;position:fixed;right:18px;bottom:calc(92px + env(safe-area-inset-bottom));z-index:55;width:54px;height:54px;border-radius:50%;border:0;background:var(--ui-accent);color:var(--ui-accent-ink);font:300 30px/1 var(--ui-font);box-shadow:0 10px 24px -8px rgba(0,0,0,.45);cursor:pointer}
+@media(max-width:700px){body.tab-prios .q-fab{display:flex;align-items:center;justify-content:center}}
+.tl-clip{overflow:hidden;position:relative}.tl-rand{display:block;width:100%;border:0;background:transparent;color:var(--ink-faint);font:500 11px var(--ui-font);min-height:30px;cursor:pointer;text-align:left;padding:4px 0 4px 46px}.tl-rand:hover{color:var(--ink-soft)}
+.vr-st-h{flex-wrap:nowrap}.vr-st-l{white-space:nowrap}.vr-st-n{flex:none}@media(max-width:420px){.vread .vr-st-n{order:0;flex-basis:auto;padding:3px 9px}}
+.vr-schau{background:transparent;color:var(--brass);padding:5px 0;letter-spacing:.02em;font-size:12px;box-shadow:none}.vr-schau:hover{text-decoration:underline}
+.vr-foot{display:grid;grid-template-columns:1fr 1fr;gap:8px}.vr-flink{justify-content:center;text-align:center;min-width:0}@media(min-width:701px){.vr-foot{grid-template-columns:repeat(4,1fr)}}
+@media(hover:hover){.v-goal-actions{opacity:0;transition:opacity .15s}.vr-goal:hover .v-goal-actions,.vr-goal:focus-within .v-goal-actions,.v-goal-actions:focus-visible{opacity:1}}@media(hover:none){.v-goal-actions{opacity:.35}}
+.v-goal-select{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+.li-flow .cc-nav{margin-left:-14px;margin-right:-14px;padding-left:16px;padding-right:16px;box-shadow:none;border-radius:0 0 22px 22px}.v-current-ritual{box-shadow:none}
 @media(prefers-reduced-motion:reduce){.e-examen *{animation:none!important;transition:none!important}}
 
 </style>
@@ -3224,7 +3260,7 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
   const ABSICHT="ht_absicht_v1";   // wandert als einziges mit auf das andere Gerät
   const MSNOTIZ="ht_metanotiz_v1";  // spontan Festgehaltenes, strikt lokal   // wandert als einziges mit auf das andere Gerät   // "morgen" = morgens für heute, "abend" = abends für morgen  // Satz der Woche
   const ANGELUS="ht_angelus_v1";
-  const APP_VERSION="2026-10-14-examen";   // wird beim Aktualisieren hochgezählt
+  const APP_VERSION="2026-10-26-politur";   // wird beim Aktualisieren hochgezählt
   const LOCKIN="ht_lockin_v1";
   const LOCKTXT="ht_lockintext_v1", CRYPTO="ht_crypto_v1", CAL="ht_cal_v1", QUOTES="ht_quotes_v1", LOCKCFG="ht_lockin_cfg_v1", SCHATZ="ht_schatz_v1", GOSPELC="ht_gospel_v1";
   const MAX_PRIOS=8;
@@ -7526,6 +7562,22 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
   function delItem(id){ const t=prios.all.find(x=>x.id===id);if(!t)return;qChildren(t).forEach(x=>{delete x.projectId;});prios.all=prios.all.filter(x=>x.id!==id);qUpdateParent(t);savePrios(); }
   function setDone(obj,val){
     if(val&&obj.project&&qChildren(obj).some(x=>x.status!=='done')){toast('Bitte zuerst die offenen Unteraufgaben erledigen.');return;}
+    // Wiederkehrend: der heutige Eintrag bleibt als erledigt stehen, die Aufgabe selbst rückt zum nächsten Mal
+    if(val && obj.rep && obj.day && !obj.projectId){
+      const next=qNext(obj.rep,obj.day,false);
+      if(next){
+        const klon={...obj,id:uid(),status:'done',doneAt:new Date().toISOString(),recurOf:obj.id}; delete klon.rep;
+        prios.all.push(klon);
+        obj.day=next; obj.week=qWeek(next); obj.status='open'; obj.doneAt=null;
+        savePrios(); buildPrios(); if(state.tab==="fokus") buildFokus();
+        toast('Erledigt · nächstes Mal '+qWhen({day:next}));
+        return;
+      }
+    }
+    if(!val && obj.recurOf){
+      const master=prios.all.find(x=>x.id===obj.recurOf);
+      if(master && obj.day){ master.day=obj.day; master.week=qWeek(obj.day); master.status='open'; master.doneAt=null; prios.all=prios.all.filter(x=>x.id!==obj.id); savePrios(); buildPrios(); if(state.tab==="fokus") buildFokus(); return; }
+    }
     obj.status = val ? "done" : "open";
     obj.doneAt = val ? new Date().toISOString() : null;
     qUpdateParent(obj);savePrios(); buildPrios();
@@ -8697,12 +8749,12 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
         f.title="Fokus "+fMinToClock(bl.start)+"–"+fMinToClock(bl.end);
         body.appendChild(f);
       });
-      // Blocker
-      blockersFor(k).forEach(b=>{
-        const el=document.createElement("div"); el.className="wp-blk"+(isDoneI(b)?" done":"");
+      // Termine und Aufgaben mit Uhrzeit
+      blockersFor(k).concat(prios.all.filter(x=>!x.fixed && x.day===k && typeof x.start==="number" && (x.text||"").trim())).forEach(b=>{
+        const el=document.createElement("div"); el.className="wp-blk"+(b.fixed?"":" wp-tsk")+(isDoneI(b)?" done":"");
         el.style.top=((b.start-TL_START)*WP_PXMIN)+"px";
-        el.style.height=Math.max(13,b.dur*WP_PXMIN-1)+"px";
-        el.title=(b.text||"Blocker")+" · "+fMinToClock(b.start)+"–"+fMinToClock(b.start+b.dur);
+        el.style.height=Math.max(13,taskDur(b)*WP_PXMIN-1)+"px";
+        el.title=(b.text||"Blocker")+" · "+fMinToClock(b.start)+"–"+fMinToClock(b.start+taskDur(b));
         el.innerHTML=`<span class="wpb-tx">${esc(b.text||"Blocker")}</span><span class="wpb-grip"></span>`;
         wpDragBlocker(el,b,grid);
         body.appendChild(el);
@@ -8907,7 +8959,7 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
     let art=null, y0=0, start0=0, dur0=0, bewegt=false, halten=null;
     const los=e=>{
       art = e.target.classList.contains("wpb-grip") ? "dauer" : "zug";
-      y0=e.clientY; start0=b.start; dur0=b.dur; bewegt=false;
+      y0=e.clientY; start0=b.start; dur0=taskDur(b); bewegt=false;
       el.classList.add("zieht");
       el.setPointerCapture&&el.setPointerCapture(e.pointerId);
     };
@@ -8939,10 +8991,10 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
     const ende=e=>{
       if(halten){ clearTimeout(halten); halten=null; }
       el.classList.remove("zieht");
-      if(!art){ e.stopPropagation(); editBlocker(b); return; }
+      if(!art){ e.stopPropagation(); if(b.fixed) editBlocker(b); else qEdit(b); return; }
       art=null;
       if(bewegt){ savePrios(); buildPrios(); }
-      else editBlocker(b);
+      else if(b.fixed) editBlocker(b); else qEdit(b);
       e.stopPropagation();
     };
     el.addEventListener("pointerdown",start);
@@ -8974,7 +9026,7 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
     const panel=document.createElement("section"); panel.className="panel timeline";
     panel.style.setProperty("--c","var(--sky)"); panel.style.setProperty("--c-tint","var(--sky-tint)");
     const head=document.createElement("div"); head.className="panel-head";
-    head.innerHTML=`<span class="dot"></span><span class="eyebrow">${tlMode==="week"?"Blocker":"Tagesansicht"}</span>`+
+    head.innerHTML=`<span class="dot"></span><span class="eyebrow">${tlMode==="week"?"Woche":"Tagesansicht"}</span>`+
       `<span class="tl-hint">${tlMode==="week"?"":"gedrückt halten legt an"}</span>`;
 
     panel.appendChild(head);
@@ -9123,7 +9175,26 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
       el.addEventListener("click",e=>{ e.stopPropagation(); editBlocker(b); });
       track.appendChild(el);
     });
-    wrap.appendChild(track); panel.appendChild(wrap);
+    // Standard 7–20 Uhr; Ränder nur, wenn dort etwas liegt oder du sie aufklappst
+    (function(){
+      const D=qDay(); const FR=7*60, SP=20*60; let fruehNoetig=false, spaetNoetig=false;
+      const pruef=(a,b)=>{ if(a<FR) fruehNoetig=true; if(b>SP) spaetNoetig=true; };
+      qVisibleDay(D).forEach(o=>{ const st=taskStart(o); if(st!==null) pruef(st, st+taskDur(o)); });
+      (calEvents[D]||[]).forEach(ev=>{ if(typeof ev.start==="number"&&!ev.allDay) pruef(ev.start, ev.start+(ev.dur||60)); });
+      if(D===today){ const nm=nowMin(); if(nm>=TL_START&&nm<=TL_END) pruef(nm,nm); }
+      const frueh=fruehNoetig||!!state.tlFrueh, spaet=spaetNoetig||!!state.tlSpaet;
+      const von=frueh?TL_START:FR, bis=spaet?TL_END:SP;
+      const clip=document.createElement("div"); clip.className="tl-clip";
+      clip.style.height=((bis-von)*TL_PXMIN)+"px"; clip.style.paddingTop="9px";
+      track.style.marginTop=(-(von-TL_START)*TL_PXMIN)+"px";
+      const kn=(txt,fn,cls)=>{ const b=document.createElement("button"); b.type="button"; b.className="tl-rand "+cls; b.textContent=txt; b.addEventListener("click",fn); return b; };
+      if(!frueh) wrap.appendChild(kn("06–07 Uhr einblenden",()=>{ state.tlFrueh=true; buildPrios(); },"oben"));
+      else if(!fruehNoetig&&state.tlFrueh) wrap.appendChild(kn("ab 07 Uhr",()=>{ state.tlFrueh=false; buildPrios(); },"oben"));
+      clip.appendChild(track); wrap.appendChild(clip);
+      if(!spaet) wrap.appendChild(kn("20–24 Uhr einblenden",()=>{ state.tlSpaet=true; buildPrios(); },"unten"));
+      else if(!spaetNoetig&&state.tlSpaet) wrap.appendChild(kn("bis 20 Uhr",()=>{ state.tlSpaet=false; buildPrios(); },"unten"));
+    })();
+    panel.appendChild(wrap);
 
     const foot=document.createElement("div"); foot.className="tl-foot";
     const cfgBtn=document.createElement("button"); cfgBtn.className="tl-cal-btn"; cfgBtn.type="button";
@@ -10862,7 +10933,7 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
 
     // Kopfzeile: nur Titel, versteckte Zugänge, Bearbeiten
     const head=document.createElement("div"); head.className="vr-head reveal";
-    head.innerHTML=`<span class="dot secret" title="…"></span><span class="eyebrow secret">Vizija</span>`;
+    head.innerHTML=`<span class="dot secret" title="…"></span><span class="eyebrow secret">Nordstern</span>`;
     armSecret(head.querySelector(".dot"));
     armSecret(head.querySelector(".eyebrow"), toggleProsa);
     const eb=document.createElement("button"); eb.type="button"; eb.className="vr-edit"; eb.textContent="bearbeiten";
@@ -10930,10 +11001,12 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
       }
       let html=`<div class="vr-st-h"><span class="vr-node"></span><span class="vr-st-l">${lbl}</span>${zaehl}</div>`;
       if(pts.length){
+        let letztePar="";
         html+=pts.map(p=>{
           const par=key!=="year"?parentTextOf(p,key==="week"?"quarter":"year"):"";
+          const zeig=par&&par!==letztePar; letztePar=par;
           return `<div class="vr-goal${p.done?" erreicht":""}"><span class="vr-g-t">${esc(p.text.trim())}</span>`+
-                 (par?`<span class="vr-g-p">↳ ${esc(par)}</span>`:``)+`</div>`;
+                 (zeig?`<span class="vr-g-p">↳ ${esc(par)}</span>`:``)+`</div>`;
         }).join("");
       }else{
         html+=`<div class="vr-goal leer">noch nichts festgelegt</div>`;
@@ -11594,7 +11667,7 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
     document.getElementById('calBtn').innerHTML=uiIcon('plan');
     todayView.prepend(hero);
     const shortcuts=document.createElement('div'); shortcuts.className='ui-shortcuts';
-    shortcuts.innerHTML='<button class="ui-shortcut" id="uiFocusShortcut" type="button">'+uiIcon('focus')+'<span><strong>Fokus</strong><small>Aufgaben und Uhr</small></span></button><button class="ui-shortcut" id="uiPrayerShortcut" type="button">'+uiIcon('prayer')+'<span><strong>Gebete</strong><small>Gebetssammlung öffnen</small></span></button>';
+    shortcuts.innerHTML='<button class="ui-shortcut" id="uiFocusShortcut" type="button">'+uiIcon('focus')+'<span><strong>Fokus</strong><small>Aufgaben und Uhr</small></span></button><button class="ui-shortcut" id="uiPrayerShortcut" type="button">'+uiIcon('prayer')+'<span><strong>Gebete</strong><small>Sammlung öffnen</small></span></button>';
     hero.after(shortcuts);
     shortcuts.querySelector('#uiFocusShortcut').addEventListener('click',()=>{ fclock.open=true; setTab('fokus'); window.scrollTo({top:0,behavior:'auto'}); });
     shortcuts.querySelector('#uiPrayerShortcut').addEventListener('click',openGebet);
@@ -11933,6 +12006,11 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
         const p=pts[n];row.dataset.id=p.id;row.dataset.level=key;
         const select=uButton('',()=>vHighlight(panel,key,p.id),'v-goal-select');select.setAttribute('aria-pressed','false');select.setAttribute('aria-label',p.text+' · Verknüpfungen');while(row.firstChild)select.append(row.firstChild);row.append(select);
         const actions=uButton('···',()=>vGoalActions(key,p),'v-goal-actions');actions.setAttribute('aria-label','Aktionen für '+p.text);row.append(actions);
+        let halt=null,hx=0,hy=0;select.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;hx=e.clientX;hy=e.clientY;halt=setTimeout(()=>{halt=null;select.dataset.sperre='1';vGoalActions(key,p);setTimeout(()=>{delete select.dataset.sperre;},500);},450);});
+        select.addEventListener('pointermove',e=>{if(halt&&Math.hypot(e.clientX-hx,e.clientY-hy)>8){clearTimeout(halt);halt=null;}});
+        ['pointerup','pointercancel'].forEach(ev=>select.addEventListener(ev,()=>{if(halt){clearTimeout(halt);halt=null;}}));
+        select.addEventListener('click',e=>{if(select.dataset.sperre){e.stopImmediatePropagation();e.preventDefault();}},true);
+        select.addEventListener('contextmenu',e=>e.preventDefault());
       });
     });
     const foot=panel.querySelector('.vr-foot'),cc=[...foot.children].find(n=>n.textContent.startsWith('Command Center'));
@@ -12028,12 +12106,14 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
     if(state.tab==='vizija')buildVision();
   }
   vInit();
-  /* Centrala: one task record, optional day or ISO-week, optional project. */
+  /* Centrala: one task record, optional day or ISO-week, optional project.
+     Aufgaben wie in Todoist: Schnelleingabe in Sprache, Labels, Wiederholung,
+     kurze Notiz, Termin oder Aufgabe — und alles lässt sich in den Kalender ziehen. */
   function qWeek(day){ return ymd(weekStart(new Date(day+'T12:00:00'))); }
   function qTaskWeek(t){ return t.day?qWeek(t.day):(t.week||null); }
   function qPlanWeek(){ return addDays(weekInfo().start,wpOffset*7); }
   function qDay(){ return state.priosSub==='morgen'?addDays(today,1):state.priosSub==='datum'?(state.planDate||today):today; }
-  function qDefault(){ return state.priosSub==='woche'?{day:null,week:qPlanWeek()}:state.priosSub==='park'?{day:null,week:null}:{day:qDay(),week:null}; }
+  function qDefault(){ return state.priosSub==='naechst'?{day:today,week:null}:state.priosSub==='park'?{day:null,week:null}:{day:qDay(),week:null}; }
   function qChildren(t){ return prios.all.filter(x=>x.projectId===t.id); }
   function qValidDate(s){ return /^\d{4}-\d{2}-\d{2}$/.test(s||'')&&ymd(new Date(s+'T12:00:00'))===s; }
   function qMigrate(){
@@ -12077,6 +12157,7 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
     if(target.day&&!qValidDate(target.day))return false;
     const oldWeek=qTaskWeek(t);
     t.day=target.day||null;t.week=t.day?qWeek(t.day):(target.week||null);
+    if(typeof target.start==='number'){ t.start=clampMin(target.start); delete t.hour; if(typeof target.dur==='number') t.dur=target.dur; }
     // Moving a project moves only its undated children. Explicit child dates remain decisions.
     if(t.project)qChildren(t).filter(x=>!x.day&&(!x.week||x.week===oldWeek)).forEach(x=>{x.week=t.week;});
     savePrios();return true;
@@ -12084,6 +12165,157 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
   function qRefresh(){ buildPrios();if(state.tab==='fokus')buildFokus();if(state.tab==='heute')renderHeute(); }
   function qGoDay(day){state.priosSub=day===today?'heute':day===addDays(today,1)?'morgen':'datum';state.planDate=day;setTab('prios');}
   function qWhen(t){return t.day?(t.day===today?'Heute':t.day===addDays(today,1)?'Morgen':fmtShort(t.day)):t.week?(t.week===weekInfo().start?'Diese Woche':'Woche ab '+fmtShort(t.week)):'Parkplatz';}
+
+  /* ---------- Schnelleingabe in Sprache ----------
+     „Steuer morgen 15:00 p1 #Agentur @büro jeden Montag“ — erkannt wird, was wie ein
+     Datum, eine Uhrzeit, eine Priorität, ein Projekt, ein Label oder eine Wiederholung aussieht. */
+  function qWdMap(){ return {montag:1,mo:1,dienstag:2,di:2,mittwoch:3,mi:3,donnerstag:4,do:4,freitag:5,fr:5,samstag:6,sa:6,sonntag:7,so:7}; }
+  function qWdName(i){ return ['','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'][i]||''; }
+  function qIsoWd(d){ const n=new Date(d+'T12:00:00').getDay(); return n===0?7:n; }
+  function qNextWd(from,wd,strictAfter){ let d=from; if(strictAfter) d=addDays(d,1); let g=0; while(qIsoWd(d)!==wd && g++<8) d=addDays(d,1); return d; }
+  function qRepText(rep){
+    if(!rep) return '';
+    const n=rep.n||1;
+    if(rep.f==='d') return n===1?'täglich':'alle '+n+' Tage';
+    if(rep.f==='w'){
+      const wd=(rep.wd||[]);
+      if(wd.length===5&&!wd.includes(6)&&!wd.includes(7)) return 'jeden Werktag';
+      const tage=wd.map(x=>qWdName(x).slice(0,2)).join(', ');
+      return (n===1?'jeden ':'alle '+n+' Wochen · ')+(tage||'Woche')+(n===1&&!tage?'':'');
+    }
+    if(rep.f==='m') return n===1?('monatlich'+(rep.dom?' am '+rep.dom+'.':'')):'alle '+n+' Monate';
+    if(rep.f==='y') return 'jährlich';
+    return '';
+  }
+  // Nächstes Vorkommen nach einem Tag (oder ab einschließlich, wenn incl)
+  function qNext(rep,from,incl){
+    if(!rep||!from) return null;
+    const n=Math.max(1,rep.n||1);
+    if(rep.f==='d') return addDays(from,incl?0:n);
+    if(rep.f==='w'){
+      const wd=(rep.wd&&rep.wd.length)?rep.wd.slice().sort():[qIsoWd(from)];
+      let d=incl?from:addDays(from,1);
+      for(let g=0; g<400; g++){
+        const w=qIsoWd(d);
+        if(wd.includes(w)){
+          if(n===1) return d;
+          const wochen=Math.round((new Date(qWeek(d)+'T12:00:00')-new Date(qWeek(from)+'T12:00:00'))/6048e5);
+          if(wochen%n===0 && (incl||d!==from)) return d;
+        }
+        d=addDays(d,1);
+      }
+      return null;
+    }
+    if(rep.f==='m'){
+      const dom=rep.dom||Number(from.slice(8,10));
+      let y=Number(from.slice(0,4)), m=Number(from.slice(5,7));
+      if(!incl || Number(from.slice(8,10))>=dom){ m+=n; }
+      for(let g=0; g<24; g++){
+        while(m>12){ m-=12; y++; }
+        const last=new Date(y,m,0).getDate();
+        const d=`${y}-${String(m).padStart(2,'0')}-${String(Math.min(dom,last)).padStart(2,'0')}`;
+        if(d>from || (incl&&d>=from)) return d;
+        m+=n;
+      }
+      return null;
+    }
+    if(rep.f==='y'){
+      let y=Number(from.slice(0,4))+(incl?0:n);
+      for(let g=0; g<5; g++){ const d=String(y)+from.slice(4); if(qValidDate(d)&&(d>from||(incl&&d>=from))) return d; if(!qValidDate(d)){ const alt=String(y)+'-02-28'; if(from.slice(5,7)==='02'&&alt>from) return alt; } y+=n; }
+      return null;
+    }
+    return null;
+  }
+  function qParse(raw, basis){
+    basis=basis||today;
+    let s=' '+String(raw||'').replace(/\s+/g,' ')+' ';
+    const r={day:undefined, start:undefined, dur:undefined, prio:false, fixed:false, labels:[], projectId:null, projectText:'', rep:null, found:[]};
+    const nimm=(re,fn)=>{ const m=s.match(re); if(!m) return false; const out=fn(m); if(out===false) return false; s=s.replace(m[0],' '); return true; };
+    const pad=n=>String(n).padStart(2,'0');
+    // Labels und Projekte
+    let m;
+    while((m=s.match(/(^|\s)@([\wäöüÄÖÜß\-\/]+)/))){ r.labels.push(m[2]); r.found.push({t:'label',l:'@'+m[2]}); s=s.replace(m[0],' '); }
+    while((m=s.match(/(^|\s)#([\wäöüÄÖÜß\-\/]+)/))){
+      const name=m[2].toLowerCase();
+      const p=prios.all.find(x=>x.project&&(x.text||'').trim().toLowerCase().startsWith(name));
+      if(!p){ break; }
+      r.projectId=p.id; r.projectText=p.text.trim(); r.found.push({t:'projekt',l:'#'+p.text.trim()}); s=s.replace(m[0],' ');
+    }
+    // Priorität
+    if(nimm(/(^|\s)(p1|!!?)(?=\s|$)/i,()=>{ r.prio=true; })) r.found.push({t:'prio',l:'Prio'});
+    // Termin als Wort
+    if(nimm(/(^|\s)(termin)(?=\s|$)/i,()=>{ r.fixed=true; })) r.found.push({t:'termin',l:'Termin'});
+    // Dauer: 30min, 1h, 1,5 h, 2 std
+    nimm(/(^|\s)(\d+(?:[.,]\d+)?)\s*(min|minuten|h|std|stunden?)(?=\s|$)/i,mm=>{
+      const z=Number(mm[2].replace(',','.')); const einh=mm[3].toLowerCase();
+      r.dur=Math.round(/^m/.test(einh)?z:z*60); if(!(r.dur>=5)){ r.dur=undefined; return false; }
+    });
+    // Zeitspanne: 15-16, 15:00-16:30, 15 bis 16 uhr, von 9 bis 10
+    nimm(/(^|\s)(?:von\s+)?(\d{1,2})(?::(\d{2}))?\s*(?:-|–|bis)\s*(\d{1,2})(?::(\d{2}))?\s*(?:uhr)?(?=\s|$)/i,mm=>{
+      const a=Number(mm[2])*60+Number(mm[3]||0), b=Number(mm[4])*60+Number(mm[5]||0);
+      if(Number(mm[2])>23||Number(mm[4])>23||b<=a) return false;
+      // nackte Zahlen wie „3-4“ ohne Uhr/Doppelpunkt sind zu unsicher
+      if(!mm[3]&&!mm[5]&&!/uhr/i.test(mm[0])&&Number(mm[2])<7) return false;
+      r.start=a; r.dur=r.dur||b-a; r.found.push({t:'zeit',l:fMinToClock(a)+'–'+fMinToClock(b)});
+    });
+    // Uhrzeit: 15:00, 15 uhr, um 15, 9:30 uhr
+    if(r.start===undefined) nimm(/(^|\s)(?:um\s+)?(\d{1,2}):(\d{2})\s*(?:uhr)?(?=\s|$)|(^|\s)(?:um\s+)?(\d{1,2})\s*uhr(?=\s|$)|(^|\s)um\s+(\d{1,2})(?=\s|$)/i,mm=>{
+      const h=Number(mm[2]??mm[5]??mm[7]), mi=Number(mm[3]||0);
+      if(h>23||mi>59) return false;
+      r.start=h*60+mi; r.found.push({t:'zeit',l:fMinToClock(r.start)});
+    });
+    // Wiederholung
+    const wdListe=str=>{ const out=[]; str.toLowerCase().split(/\s*(?:,|und|\+|\/)\s*/).forEach(w=>{ w=w.replace(/\.$/,''); const M=qWdMap(); if(M[w]) out.push(M[w]); else if(/^werktag/.test(w)) out.push(1,2,3,4,5); }); return [...new Set(out)].sort(); };
+    const WDRE='(?:montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag|werktag|mo|di|mi|do|fr|sa|so)s?\\.?';
+    if(nimm(/(^|\s)(täglich|jeden tag|alle tage)(?=\s|$)/i,()=>{ r.rep={f:'d',n:1}; })) {}
+    else if(nimm(/(^|\s)alle\s+(\d+)\s+tage(?=\s|$)/i,mm=>{ r.rep={f:'d',n:Number(mm[2])}; })) {}
+    else if(nimm(new RegExp('(^|\\s)(?:jeden|jede|jedes)\\s+('+WDRE+'(?:\\s*(?:,|und|\\+|/)\\s*'+WDRE+')*)(?=\\s|$)','i'),mm=>{ const wd=wdListe(mm[2]); if(!wd.length) return false; r.rep={f:'w',n:1,wd}; })) {}
+    else if(nimm(new RegExp('(^|\\s)alle\\s+(\\d+)\\s+wochen(?:\\s+(?:am\\s+)?('+WDRE+'))?(?=\\s|$)','i'),mm=>{ r.rep={f:'w',n:Number(mm[2]),wd:mm[3]?wdListe(mm[3]):[]}; })) {}
+    else if(nimm(/(^|\s)(wöchentlich|jede woche)(?=\s|$)/i,()=>{ r.rep={f:'w',n:1,wd:[]}; })) {}
+    else if(nimm(/(^|\s)(?:jeden|jedes)\s+(\d{1,2})\.(?=\s|$)/i,mm=>{ r.rep={f:'m',n:1,dom:Number(mm[2])}; })) {}
+    else if(nimm(/(^|\s)(monatlich|jeden monat)(?=\s|$)/i,()=>{ r.rep={f:'m',n:1}; })) {}
+    else if(nimm(/(^|\s)alle\s+(\d+)\s+monate(?=\s|$)/i,mm=>{ r.rep={f:'m',n:Number(mm[2])}; })) {}
+    else if(nimm(/(^|\s)(jährlich|jedes jahr)(?=\s|$)/i,()=>{ r.rep={f:'y',n:1}; })) {}
+    // Datum
+    const setDay=(d,l)=>{ r.day=d; r.found.push({t:'datum',l:l||qWhen({day:d})}); };
+    if(nimm(/(^|\s)(heute)(?=\s|$)/i,()=>setDay(basis,'Heute'))) {}
+    else if(nimm(/(^|\s)(übermorgen)(?=\s|$)/i,()=>setDay(addDays(basis,2)))) {}
+    else if(nimm(/(^|\s)(morgen)(?=\s|$)/i,()=>setDay(addDays(basis,1),'Morgen'))) {}
+    else if(nimm(/(^|\s)(?:am\s+)?(\d{1,2})\.(\d{1,2})\.(?:(\d{2}|\d{4}))?(?=\s|$)/,mm=>{
+      const d=Number(mm[2]), mo=Number(mm[3]); if(d<1||d>31||mo<1||mo>12) return false;
+      let y=mm[4]?Number(mm[4]):Number(basis.slice(0,4)); if(mm[4]&&mm[4].length===2) y+=2000;
+      let iso=`${y}-${pad(mo)}-${pad(d)}`; if(!qValidDate(iso)) return false;
+      if(!mm[4]&&iso<basis) iso=`${y+1}-${pad(mo)}-${pad(d)}`;
+      setDay(iso);
+    })) {}
+    else if(nimm(/(^|\s)in\s+(\d+|einer|einem|zwei|drei|vier|fünf|sechs)\s+(tag|tagen|woche|wochen|monat|monaten)(?=\s|$)/i,mm=>{
+      const zahl={einer:1,einem:1,zwei:2,drei:3,vier:4,fünf:5,sechs:6}[mm[2].toLowerCase()]||Number(mm[2]);
+      const e=mm[3].toLowerCase();
+      if(/^tag/.test(e)) setDay(addDays(basis,zahl));
+      else if(/^woche/.test(e)) setDay(addDays(basis,7*zahl));
+      else { let y=Number(basis.slice(0,4)), m=Number(basis.slice(5,7))+zahl; while(m>12){m-=12;y++;} const last=new Date(y,m,0).getDate(); setDay(`${y}-${pad(m)}-${pad(Math.min(Number(basis.slice(8,10)),last))}`); }
+    })) {}
+    else if(nimm(/(^|\s)nächste\s+woche(?=\s|$)/i,()=>setDay(addDays(weekInfo().start,7)))) {}
+    else if(nimm(new RegExp('(^|\\s)(?:am\\s+|nächsten\\s+|nächster\\s+)?(montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag)(?=\\s|$)','i'),mm=>{ setDay(qNextWd(basis,qWdMap()[mm[2].toLowerCase()],true)); })) {}
+    else if(nimm(/(^|\s)am\s+(mo|di|mi|do|fr|sa|so)\.?(?=\s|$)/i,mm=>{ setDay(qNextWd(basis,qWdMap()[mm[2].toLowerCase()],true)); })) {}
+    else if(nimm(/(^|\s)(mo|di|mi|fr|sa)\.?(?=\s|$)/i,mm=>{ setDay(qNextWd(basis,qWdMap()[mm[2].toLowerCase()],true)); })) {}
+    else if(nimm(/(^|\s)am\s+(\d{1,2})\.(?=\s|$)/i,mm=>{
+      const d=Number(mm[2]); if(d<1||d>31) return false;
+      let y=Number(basis.slice(0,4)), mo=Number(basis.slice(5,7));
+      let iso=`${y}-${pad(mo)}-${pad(d)}`; if(!qValidDate(iso)||iso<basis){ mo++; if(mo>12){mo=1;y++;} iso=`${y}-${pad(mo)}-${pad(d)}`; }
+      if(!qValidDate(iso)) return false; setDay(iso);
+    })) {}
+    // Wiederholung ohne Datum: das nächste Vorkommen ab heute
+    if(r.rep && r.day===undefined){
+      if(r.rep.f==='w'&&!(r.rep.wd||[]).length) r.rep.wd=[qIsoWd(basis)];
+      r.day=qNext(r.rep,basis,true);
+    }
+    if(r.rep) r.found.push({t:'rep',l:'↻ '+qRepText(r.rep)});
+    if(r.start!==undefined && r.day===undefined && !r.rep) { /* Uhrzeit ohne Tag: bleibt beim Zielkontext */ }
+    r.text=s.replace(/\s+/g,' ').trim();
+    return r;
+  }
+
   function qDatePicker(value,onChange,includePark=true,compact=false){
     let selected={...value};const box=uNode('div','q-when');box.setAttribute('aria-label','Einplanen für');
     const options=[['Heute',{day:today}],['Morgen',{day:addDays(today,1)}],['Diese Woche',{day:null,week:weekInfo().start}]];
@@ -12093,44 +12325,94 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
     if(compact){more=uButton('···',()=>{const dlg=uDialog('Einplanen');dlg.append(qDatePicker(selected,v=>{onChange(v);paint(v);dlg.closePanel();},includePark));dlg.append(uButton('Schließen',()=>dlg.closePanel()));dlg.showModal();},'q-chip');more.setAttribute('aria-label','Weitere Zeiträume und Datum');box.append(more);}
     else{const label=uNode('label','q-date-label','Datum');date=uNode('input');date.type='date';date.setAttribute('aria-label','Datum wählen');date.addEventListener('change',()=>{if(qValidDate(date.value)){const v={day:date.value};onChange(v);paint(v);}});label.append(date);box.append(label);}
     function paint(v){selected={...v};if(date)date.value=v.day||'';let match=false;box.querySelectorAll('.q-chip[data-day]').forEach(b=>{const active=(b.dataset.day||null)===(v.day||null)&&(!v.day?(b.dataset.week||null)===(v.week||null):true);match=match||active;b.setAttribute('aria-pressed',String(active));});if(more)more.textContent=match?'···':qWhen(v);}
-    paint(selected);return box;
+    paint(selected);box.paint=paint;return box;
   }
   function qComposer(host,initial=qDefault(),parent=null){
-    const scope=state.priosSub+':'+(state.priosSub==='datum'?qDay():wpOffset)+':'+(parent?.id||'');
+    const scope=state.priosSub+':'+(state.priosSub==='datum'?qDay():wpOffset)+':'+(parent?.id||'')+':'+(initial.day||initial.week||'');
     let target={...(state.planCapture?.scope===scope?state.planCapture.target:initial)};
+    let flags={prio:false,fixed:false};
     const box=uNode('form','q-composer');box.setAttribute('aria-label',parent?'Unteraufgabe hinzufügen':'Aufgabe hinzufügen');
-    const row=uNode('div','add-row'),input=uNode('input');input.type='text';input.maxLength=500;input.placeholder=parent?'Unteraufgabe …':'Aufgabe …';input.setAttribute('aria-label',parent?'Neue Unteraufgabe':'Neue ToDo');
-    state.planDrafts=state.planDrafts||{};input.value=state.planDrafts[scope]||'';input.addEventListener('input',()=>{state.planDrafts[scope]=input.value;});
+    const row=uNode('div','add-row'),input=uNode('input');input.type='text';input.maxLength=500;input.placeholder=parent?'Unteraufgabe …':'Aufgabe … z. B. „Angebot morgen 15:00 p1 @büro“';input.setAttribute('aria-label',parent?'Neue Unteraufgabe':'Neue Aufgabe');input.autocomplete='off';
+    state.planDrafts=state.planDrafts||{};input.value=state.planDrafts[scope]||'';
     const add=uButton('+',()=>{},'add-btn');add.type='submit';add.setAttribute('aria-label','Hinzufügen');row.append(input,add);box.append(row);
-    const controls=uNode('div','q-capture-controls');controls.append(qDatePicker(target,v=>{target=v;state.planCapture={scope,target};},true,true));
-    if(!parent)controls.append(uButton('Projekt',()=>qEdit(null,{...target,project:true,text:input.value.trim()},()=>{delete state.planDrafts[scope];}),'q-project-add'));
+    // Erkanntes aus dem Text — als leise Chips
+    const vorschau=uNode('div','q-erkannt');box.append(vorschau);
+    const controls=uNode('div','q-capture-controls');
+    const picker=qDatePicker(target,v=>{target=v;state.planCapture={scope,target};},true,true);controls.append(picker);
+    const prioChip=uButton('Prio',()=>{flags.prio=!flags.prio;prioChip.setAttribute('aria-pressed',String(flags.prio));},'q-chip q-flag');prioChip.setAttribute('aria-pressed','false');
+    const terminChip=uButton('Termin',()=>{flags.fixed=!flags.fixed;terminChip.setAttribute('aria-pressed',String(flags.fixed));},'q-chip q-flag');terminChip.setAttribute('aria-pressed','false');terminChip.title='Fester Termin statt Aufgabe';
+    picker.append(uNode('span','q-trenner'),prioChip,terminChip);
+    if(!parent)picker.append(uButton('Projekt',()=>qEdit(null,{...target,project:true,text:input.value.trim()},()=>{delete state.planDrafts[scope];}),'q-chip'));
     box.append(controls);
+    let parsed=null;
+    const lesen=()=>{
+      state.planDrafts[scope]=input.value;
+      parsed=qParse(input.value, target.day||today);
+      vorschau.replaceChildren();
+      if(!parsed.found.length) return;
+      parsed.found.forEach(f=>{ const c=uNode('span','q-erk '+f.t,f.l); vorschau.append(c); });
+      if(parsed.text) vorschau.append(uNode('span','q-erk-text','→ '+parsed.text));
+    };
+    input.addEventListener('input',lesen); lesen();
     box.addEventListener('submit',e=>{
-      e.preventDefault();const text=input.value.trim();if(!text)return;
-      const task=addItem({text,...target,...(parent?{projectId:parent.id}:{})});if(parent){parent.project=true;qUpdateParent(task);savePrios();}
-      delete state.planDrafts[scope];qRefresh();toast('Gespeichert');document.querySelector('#view-prios .q-composer input[type=text]')?.focus();
+      e.preventDefault();const p=qParse(input.value, target.day||today);const text=p.text;if(!text){ if(input.value.trim()) toast('Da fehlt noch der Aufgabentext.'); return; }
+      const ziel = p.day!==undefined ? {day:p.day,week:null} : target;
+      const o={text,...ziel,...(parent?{projectId:parent.id}:{})};
+      if(p.projectId&&!parent) o.projectId=p.projectId;
+      if(p.prio||flags.prio) o.prio=true;
+      if(p.fixed||flags.fixed) o.fixed=true;
+      if(p.labels.length) o.labels=p.labels;
+      if(p.rep) o.rep=p.rep;
+      if(typeof p.start==='number'&&o.day){ o.start=clampMin(p.start); o.dur=p.dur||(o.fixed?60:30); }
+      else if(typeof p.dur==='number') o.dur=p.dur;
+      if(o.fixed&&typeof o.start!=='number'&&o.day){ o.start=clampMin(uDefaultStart?uDefaultStart(o.day):540); o.dur=o.dur||60; }
+      const task=addItem(o);
+      const eltern=prios.all.find(x=>x.id===task.projectId); if(eltern){eltern.project=true;qUpdateParent(task);savePrios();}
+      delete state.planDrafts[scope];flags={prio:false,fixed:false};qRefresh();
+      toast(o.day?('Eingeplant · '+qWhen({day:o.day})+(typeof o.start==='number'?' '+fMinToClock(o.start):'')+(o.rep?' · ↻':'')):'Gespeichert');
+      document.querySelector('#view-prios .q-composer input[type=text]')?.focus();
     });host.append(box);
   }
+  function qLabels(){ const s=new Set(); prios.all.forEach(t=>{ if(t.status!=='done') (t.labels||[]).forEach(l=>s.add(l)); }); return [...s].sort((a,b)=>a.localeCompare(b,'de')); }
+  function qFilterRow(host){
+    const labels=qLabels(); if(!labels.length){ state.labelFilter=null; return; }
+    if(state.labelFilter&&!labels.includes(state.labelFilter)) state.labelFilter=null;
+    const row=uNode('div','q-filter');row.setAttribute('aria-label','Nach Label filtern');
+    const alle=uButton('Alle',()=>{state.labelFilter=null;buildPrios();},'q-chip');alle.setAttribute('aria-pressed',String(!state.labelFilter));row.append(alle);
+    labels.forEach(l=>{ const b=uButton('@'+l,()=>{state.labelFilter=state.labelFilter===l?null:l;buildPrios();},'q-chip');b.setAttribute('aria-pressed',String(state.labelFilter===l));row.append(b); });
+    host.append(row);
+  }
+  function qSichtbar(t){ return !state.labelFilter||(t.labels||[]).includes(state.labelFilter)||qChildren(t).some(c=>(c.labels||[]).includes(state.labelFilter)); }
+  function qSort(a,b){ const sa=typeof a.start==='number'?a.start:9999, sb=typeof b.start==='number'?b.start:9999; if(sa!==sb) return sa-sb; if(!!a.prio!==!!b.prio) return a.prio?-1:1; return String(a.created||'').localeCompare(String(b.created||'')); }
   function qRow(t,context={}){
-    const root=uNode('div','q-task'+(t.status==='done'?' done':'')+(t.prio?' q-priority':''));root.dataset.taskId=t.id;
+    const root=uNode('div','q-task'+(t.status==='done'?' done':'')+(t.prio?' q-priority':'')+(t.fixed?' q-termin':''));root.dataset.taskId=t.id;
     const row=uNode('div','q-task-line'),check=uButton(t.status==='done'?'✓':'',()=>{setDone(t,t.status!=='done');eTaskFocus(t.id,'.todo-check');},'todo-check');check.setAttribute('aria-label','Erledigt umschalten: '+t.text);check.setAttribute('aria-pressed',String(t.status==='done'));
-    const main=uNode('div','q-task-main'),title=uButton(t.text||'Unbenannte Aufgabe',()=>qEdit(t),'q-task-title');main.append(title);
-    const parent=prios.all.find(x=>x.id===t.projectId),children=qChildren(t),meta=[];
-    if(parent&&!context.nested)meta.push(parent.text);
-    if(t.project)meta.push(children.filter(x=>x.status==='done').length+'/'+children.length);
-    if(t.goalLabel)meta.push(t.goalLabel);
-    if(t.day&&Number.isFinite(t.start))meta.push(fMinToClock(t.start)+' · '+taskDur(t)+' Min.');
-    if(meta.length)main.append(uNode('small','q-task-meta',meta.join(' · ')));
-    const when=uButton(qWhen(t),()=>qMove(t),'q-task-when');when.setAttribute('aria-label','Zeitzuordnung ändern: '+t.text);
-    row.append(check,main,when);root.append(row);
-    if(context.review){const actions=uNode('div','q-review-actions');for(const [label,target] of [['Heute',{day:today}],['Morgen',{day:addDays(today,1)}],['Diese Woche',{day:null,week:weekInfo().start}],['Parken',{day:null,week:null}]])actions.append(uButton(label,()=>{qSchedule(t,target);qRefresh();},'q-chip'));root.append(actions);}
+    const main=uNode('div','q-task-main'),title=uButton('',()=>qEdit(t),'q-task-title');
+    if(t.fixed) title.append(uNode('span','q-t-ico','⏱'));
+    title.append(document.createTextNode(t.text||'Unbenannte Aufgabe'));main.append(title);
+    const parent=prios.all.find(x=>x.id===t.projectId),children=qChildren(t),meta=uNode('small','q-task-meta');
+    const stueck=(cls,txt)=>{ meta.append(uNode('span','q-m '+cls,txt)); };
+    if(t.day&&Number.isFinite(t.start)) stueck('zeit',fMinToClock(t.start)+(t.fixed||t.dur?'–'+fMinToClock(Math.min(TL_END,t.start+taskDur(t))):''));
+    if(t.rep) stueck('rep','↻ '+qRepText(t.rep));
+    if(parent&&!context.nested) stueck('proj','#'+parent.text);
+    if(t.project) stueck('proj',children.filter(x=>x.status==='done').length+'/'+children.length);
+    (t.labels||[]).forEach(l=>stueck('label','@'+l));
+    if(t.goalLabel) stueck('ziel',t.goalLabel);
+    if(meta.childNodes.length) main.append(meta);
+    if((t.note||'').trim()){ const n=uNode('small','q-task-note',t.note.trim().split('\n')[0]); n.title=t.note.trim(); main.append(n); }
+    row.append(check,main);
+    // Das Datum nur zeigen, wenn es nicht ohnehin die Ansicht ist
+    const zeigeWann = context.overdue || !context.day || t.day!==context.day;
+    if(zeigeWann){ const when=uButton(qWhen(t),()=>qMove(t),'q-task-when'+(context.overdue?' faellig':''));when.setAttribute('aria-label','Zeitzuordnung ändern: '+t.text);row.append(when); }
+    root.append(row);
+    if(context.review){const actions=uNode('div','q-review-actions');for(const [label,target] of [['Heute',{day:today}],['Morgen',{day:addDays(today,1)}],['Nächste Woche',{day:addDays(weekInfo().start,7)}],['Parken',{day:null,week:null}]])actions.append(uButton(label,()=>{qSchedule(t,target);qRefresh();},'q-chip'));root.append(actions);}
     if(t.project){
       const details=uNode('details','q-subtasks');details.open=!!state.planExpanded?.[t.id];details.append(uNode('summary','',children.length?'Unteraufgaben · '+children.length:'Unteraufgaben hinzufügen'));
       details.addEventListener('toggle',()=>{state.planExpanded=state.planExpanded||{};state.planExpanded[t.id]=details.open;});
-      children.forEach(x=>details.append(qRow(x,{nested:true})));
+      children.sort(qSort).forEach(x=>details.append(qRow(x,{nested:true,day:context.day})));
       details.append(uButton('+ Unteraufgabe',()=>qEdit(null,{projectId:t.id,day:null,week:qTaskWeek(t)}),'q-project-add'));root.append(details);
     }
-    if((t.text||'').trim()){root.draggable=!t.project;root.addEventListener('dragstart',e=>{if(e.target.closest('button,input,summary')){e.preventDefault();return;}e.dataTransfer.setData('text/plain',t.id);});}
+    if((t.text||'').trim()&&!t.project) qZiehbar(root,t);
     return root;
   }
   function qMove(t){
@@ -12140,24 +12422,56 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
   function qEdit(t,preset={},afterSave=null){
     const draft=t||preset;let target={day:draft.day===undefined?qDefault().day:draft.day,week:draft.week||null};
     const dlg=uDialog(t?'Aufgabe bearbeiten':draft.project?'Projekt anlegen':draft.projectId?'Unteraufgabe anlegen':'Aufgabe anlegen');
-    const title=uNode('input','q-edit-title');title.type='text';title.maxLength=500;title.value=draft.text||'';title.placeholder=draft.project?'Projektname':'Was möchtest du erledigen?';title.setAttribute('aria-label','Aufgabentext');dlg.append(title,qDatePicker(target,v=>target=v));
+    const title=uNode('input','q-edit-title');title.type='text';title.maxLength=500;title.value=draft.text||'';title.placeholder=draft.project?'Projektname':'Was möchtest du erledigen?';title.setAttribute('aria-label','Aufgabentext');
+    const picker=qDatePicker(target,v=>target=v);dlg.append(title,picker);
+    // Zeit und Dauer — direkt sichtbar, denn hier entscheidet sich Termin oder Aufgabe
+    const zeit=uNode('div','q-edit-zeit');
+    const art=uNode('div','q-art');
+    const artA=uButton('Aufgabe',()=>setArt(false),'q-chip'),artT=uButton('Termin',()=>setArt(true),'q-chip');art.append(artA,artT);
+    let fixed=!!draft.fixed;
+    const von=uNode('input');von.type='time';von.setAttribute('aria-label','Uhrzeit');von.value=Number.isFinite(draft.start)?fMinToClock(draft.start):'';
+    const dauer=uNode('select');dauer.setAttribute('aria-label','Dauer');[['','ohne'],[15,'15 min'],[30,'30 min'],[45,'45 min'],[60,'1 h'],[90,'1,5 h'],[120,'2 h'],[180,'3 h'],[240,'4 h']].forEach(([v,l])=>dauer.append(new Option(l,String(v))));
+    if(Number.isFinite(draft.dur)&&![...dauer.options].some(o=>o.value===String(draft.dur))) dauer.append(new Option(draft.dur+' min',String(draft.dur)));
+    dauer.value=Number.isFinite(draft.dur)?String(draft.dur):'';
+    const zl=uNode('label','q-zeit-l','Uhrzeit');zl.append(von);const dl=uNode('label','q-zeit-l','Dauer');dl.append(dauer);
+    zeit.append(art,zl,dl);dlg.append(zeit);
+    function setArt(f){fixed=f;artA.setAttribute('aria-pressed',String(!f));artT.setAttribute('aria-pressed',String(f));if(f&&!von.value)von.value='09:00';if(f&&!dauer.value)dauer.value='60';}
+    setArt(fixed);
     const settings=uNode('div','q-edit-settings');
     function option(text,value){const label=uNode('label','q-check-label'),input=uNode('input');input.type='checkbox';input.checked=!!value;label.append(input,document.createTextNode(text));settings.append(label);return input;}
     const priority=option('Priorität',draft.prio),focusTask=option('Im Fokus anzeigen',draft.focus);
     const project=draft.projectId?null:option('Projekt mit Unteraufgaben',draft.project);
     if(project&&t&&qChildren(t).length)project.disabled=true;
+    // Labels, Wiederholung, Notiz — kurz gehalten
+    const labLabel=uNode('label','q-field','Labels');const lab=uNode('input');lab.type='text';lab.placeholder='@büro @privat';lab.value=(draft.labels||[]).map(x=>'@'+x).join(' ');lab.setAttribute('aria-label','Labels');labLabel.append(lab);
+    const repLabel=uNode('label','q-field','Wiederholung');const rep=uNode('input');rep.type='text';rep.placeholder='z. B. jeden Montag, täglich, jeden 1.';rep.value=draft.rep?qRepText(draft.rep):'';rep.setAttribute('aria-label','Wiederholung');repLabel.append(rep);
+    const noteLabel=uNode('label','q-field','Notiz');const note=uNode('textarea','q-note');note.rows=2;note.placeholder='Kurz dazu …';note.value=draft.note||'';note.setAttribute('aria-label','Notiz');noteLabel.append(note);
     const goalLabel=uNode('label','q-field','Wochenziel (optional)'),goal=uNode('select');goal.setAttribute('aria-label','Wochenziel verknüpfen');
     goal.append(new Option('Kein Wochenziel',''));const goals=(vision.week.points||[]).filter(g=>g.text?.trim());
     goals.forEach(g=>goal.append(new Option(g.text,g.id)));
     if(draft.goalId&&!goals.some(g=>g.id===draft.goalId))goal.append(new Option(draft.goalLabel||'Früheres Wochenziel',draft.goalId));
-    goal.value=draft.goalId||'';goalLabel.append(goal);settings.append(goalLabel);const more=uNode('details','q-edit-more');more.append(uNode('summary','','Details'),settings);dlg.append(more);
+    goal.value=draft.goalId||'';goalLabel.append(goal);
+    dlg.append(labLabel,repLabel,noteLabel);
+    settings.append(goalLabel);const more=uNode('details','q-edit-more');more.append(uNode('summary','','Details'),settings);dlg.append(more);
     const error=uNode('p','q-error');error.setAttribute('role','alert');dlg.append(error);
     const actions=uNode('div','u-sheet-actions');actions.append(uButton('Abbrechen',()=>dlg.closePanel()),uButton('Speichern',()=>{
       if(!title.value.trim()){error.textContent='Bitte einen Aufgabentext eingeben.';title.focus();return;}
       const item=t||addItem({...preset,text:title.value.trim(),...target});
       item.text=title.value.trim();item.prio=priority.checked;item.focus=focusTask.checked;if(project)item.project=project.checked;
+      item.fixed=fixed||undefined; if(!item.fixed) delete item.fixed;
+      const labels=[...lab.value.matchAll(/@?([\wäöüÄÖÜß\-\/]+)/g)].map(m=>m[1]).filter(Boolean);
+      if(labels.length) item.labels=[...new Set(labels)]; else delete item.labels;
+      if(rep.value.trim()){ const p=qParse(rep.value.trim(), target.day||today); if(p.rep) item.rep=p.rep; else { error.textContent='Wiederholung nicht verstanden — z. B. „jeden Montag“ oder „alle 2 Wochen“.'; rep.focus(); return; } }
+      else delete item.rep;
+      if((note.value||'').trim()) item.note=note.value.trim(); else delete item.note;
+      if(von.value&&target.day){ const [h,mi]=von.value.split(':').map(Number); item.start=clampMin(h*60+mi); delete item.hour; }
+      else if(!von.value){ delete item.start; delete item.hour; }
+      if(dauer.value) item.dur=Number(dauer.value); else if(!item.fixed) delete item.dur;
+      if(item.fixed&&!Number.isFinite(item.start)&&target.day){ item.start=clampMin(540); }
+      if(item.fixed&&!Number.isFinite(item.dur)) item.dur=60;
       if(goal.value){const g=goals.find(x=>x.id===goal.value);item.goalId=goal.value;if(g){item.goalWeek=weekInfo().start;item.goalLabel=g.text;}}
       else{delete item.goalId;delete item.goalWeek;delete item.goalLabel;}
+      if(item.rep&&!target.day){ target={day:qNext(item.rep,today,true),week:null}; }
       qSchedule(item,target);qUpdateParent(item);savePrios();if(afterSave)afterSave();dlg.closePanel();qRefresh();toast('Gespeichert');
     },'u-primary'));
     if(t){actions.append(uButton('Löschen',()=>{
@@ -12166,54 +12480,188 @@ button:disabled{opacity:.55}button[hidden],[hidden]{display:none!important}
     },'q-delete'));}
     dlg.append(actions);dlg.showModal();title.focus();
   }
-  function qSection(host,title,tasks,{review=false,collapsed=false}={}){
-    const box=uNode(collapsed?'details':'section','q-section');box.append(uNode(collapsed?'summary':'h3','q-section-title',title+(tasks.length?' · '+tasks.length:'')));
-    tasks.forEach(t=>box.append(qRow(t,{review})));host.append(box);return box;
+  function qSection(host,title,tasks,{review=false,collapsed=false,day=null,overdue=false,empty=null}={}){
+    tasks=tasks.filter(qSichtbar);
+    if(!tasks.length&&!empty) return null;
+    const box=uNode(collapsed?'details':'section','q-section'+(overdue?' q-overdue':''));box.append(uNode(collapsed?'summary':'h3','q-section-title',title+(tasks.length?' · '+tasks.length:'')));
+    tasks.sort(qSort).forEach(t=>box.append(qRow(t,{review,day,overdue})));
+    if(!tasks.length&&empty) box.append(uNode('p','q-leer',empty));
+    host.append(box);return box;
   }
   function qVisibleDay(day){return prios.all.filter(t=>t.day===day&&t.text?.trim());}
   function qUnscheduled(week){return prios.all.filter(t=>!t.day&&t.week===week&&t.text?.trim()&&(!t.projectId||!prios.all.some(p=>p.id===t.projectId&&!p.day&&qTaskWeek(p)===week)));}
-  function qReview(host){
+  function qOverdue(){
     const overdue=prios.all.filter(t=>t.status!=='done'&&t.text?.trim()&&((t.day&&t.day<today)||(!t.day&&t.week&&t.week<weekInfo().start)));
     const ids=new Set(overdue.filter(t=>t.project).map(t=>t.id));
-    const roots=overdue.filter(t=>!ids.has(t.projectId));
-    if(roots.length)qSection(host,'Noch offen · neu einplanen',roots,{review:true,collapsed:true});
+    return overdue.filter(t=>!ids.has(t.projectId));
   }
+  function qReview(host){
+    const roots=qOverdue(); if(!roots.length) return;
+    const sec=qSection(host,'Überfällig',roots,{review:true,overdue:true});
+    if(sec){ const alle=uButton('alle auf heute',()=>{roots.forEach(t=>qSchedule(t,{day:today}));qRefresh();toast('Alles auf heute gelegt.');},'q-chip'); sec.querySelector('.q-section-title').append(alle); }
+  }
+  // Kalendertermine als stille Zeilen — abhakbar wie in der Zeitleiste
+  function qCalRows(host,day){
+    const evs=(calEvents[day]||[]).slice().sort((a,b)=>(a.start??0)-(b.start??0)); if(!evs.length) return;
+    evs.forEach(ev=>{
+      const fertig=calIstDone(day,ev);
+      const r=uNode('div','q-task q-cal'+(fertig?' done':''));
+      const line=uNode('div','q-task-line');
+      const ck=uButton(fertig?'✓':'',()=>{calToggle(day,ev);qRefresh();},'todo-check');ck.setAttribute('aria-label','Termin abhaken: '+(ev.title||''));
+      const main=uNode('div','q-task-main');const tt=uNode('span','q-task-title q-cal-t');tt.append(uNode('span','q-t-ico','📅'),document.createTextNode(ev.title||'Termin'));main.append(tt);
+      main.append(uNode('small','q-task-meta',ev.allDay?'ganztägig':fMinToClock(ev.start)+(ev.dur?'–'+fMinToClock(ev.start+ev.dur):'')));
+      line.append(ck,main);r.append(line);host.append(r);
+    });
+  }
+  function qDayLabel(day){ const d=new Date(day+'T12:00:00'); const w=d.toLocaleDateString('de-DE',{weekday:'long'}); return (day===today?'Heute · ':day===addDays(today,1)?'Morgen · ':'')+w+', '+d.toLocaleDateString('de-DE',{day:'numeric',month:'long'}); }
   function qBuildDay(panel){
-    const day=qDay();panel.append(uNode('div','q-date-heading',new Date(day+'T12:00:00').toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long'})));
-    qComposer(panel);if(day===today)qReview(panel);
+    const day=qDay();panel.append(uNode('div','q-date-heading',qDayLabel(day)));
+    qComposer(panel);qFilterRow(panel);if(day===today)qReview(panel);
     const items=qVisibleDay(day);
-    qSection(panel,'Prioritäten',items.filter(t=>t.prio));
+    qSection(panel,'Prioritäten',items.filter(t=>t.prio),{day,empty:''});
     panel.append(uButton('+ Priorität',()=>qEdit(null,{day,prio:true}),'q-project-add'));
-    qSection(panel,'Weitere ToDos',items.filter(t=>!t.prio),{empty:'Noch keine weiteren Aufgaben für diesen Tag.'});
+    qSection(panel,'Aufgaben & Termine',items.filter(t=>!t.prio),{day,empty:'Noch nichts für diesen Tag.'});
     const weekTasks=qUnscheduled(qWeek(day)).filter(t=>t.status!=='done');if(weekTasks.length)qSection(panel,'Diese Woche noch ohne Tag',weekTasks,{collapsed:true});
   }
-  function qBuildWeek(panel){
-    const week=qPlanWeek(),nav=uNode('div','q-week-nav');
-    nav.append(uButton('←',()=>{wpOffset--;buildPrios();},'q-chip'),uNode('strong','','KW '+isoWeek(week)+' · '+fmtShort(week)+' – '+fmtShort(addDays(week,6))),uButton('→',()=>{wpOffset++;buildPrios();},'q-chip'));
-    nav.firstChild.setAttribute('aria-label','Vorherige Woche');nav.lastChild.setAttribute('aria-label','Nächste Woche');panel.append(nav);
-    if(wpOffset!==0)panel.append(uButton('Zur aktuellen Woche',()=>{wpOffset=0;buildPrios();},'q-project-add'));
-    qComposer(panel,{day:null,week});qReview(panel);
-    qSection(panel,'Noch ohne Tag',qUnscheduled(week),{empty:'Keine undatierten Aufgaben für diese Woche.'});
-    const projects=prios.all.filter(t=>t.project&&t.text?.trim()&&qTaskWeek(t)!==week&&qChildren(t).some(c=>qTaskWeek(c)===week));
-    if(projects.length)qSection(panel,'Projekte',projects,{collapsed:true});
-    for(let i=0;i<7;i++){const day=addDays(week,i),items=qVisibleDay(day);const section=qSection(panel,new Date(day+'T12:00:00').toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'numeric'}),items,{empty:'Noch nichts eingeplant.'});
-      section.classList.toggle('q-is-today',day===today);section.append(uButton('+ Aufgabe',()=>qEdit(null,{day}),'q-project-add'));}
-    const goals=uNode('details','q-week-goals');goals.append(uNode('summary','','Wochenziele & Wochenbilanz'+(wpOffset!==0?' · aktuelle Woche':'')));buildWoche(goals);panel.append(goals);
+  // Demnächst: die nächsten 14 Tage untereinander — jeder Tag nimmt Aufgaben per Ziehen an
+  function qBuildNext(panel){
+    qComposer(panel,{day:today,week:null});qFilterRow(panel);qReview(panel);
+    const lose=qUnscheduled(weekInfo().start).concat(qUnscheduled(addDays(weekInfo().start,7))).filter(t=>t.status!=='done');
+    if(lose.length)qSection(panel,'Noch ohne Tag',lose,{collapsed:true});
+    const liste=uNode('div','q-next');
+    for(let i=0;i<14;i++){
+      const day=addDays(today,i),items=qVisibleDay(day).filter(qSichtbar).sort(qSort);
+      const grp=uNode('section','q-day'+(day===today?' q-is-today':'')+(qIsoWd(day)>=6?' q-we':''));grp.dataset.day=day;
+      const h=uNode('div','q-day-h');h.append(uNode('span','q-day-t',qDayLabel(day)));
+      const plus=uButton('+',()=>qEdit(null,{day}),'q-day-plus');plus.setAttribute('aria-label','Aufgabe für '+qDayLabel(day));h.append(plus);grp.append(h);
+      qCalRows(grp,day);
+      items.forEach(t=>grp.append(qRow(t,{day})));
+      if(!items.length&&!(calEvents[day]||[]).length) grp.classList.add('leer');
+      liste.append(grp);
+    }
+    panel.append(liste);
   }
-  function qBuildPark(panel){qComposer(panel,{day:null,week:null});qSection(panel,'Bewusst noch nicht eingeplant',parkOf().filter(t=>t.text?.trim()&&(!t.projectId||!parkOf().some(p=>p.id===t.projectId))),{empty:'Der Parkplatz ist leer. Offene Tagesaufgaben findest du unter „Noch offen“.'});}
+  function qBuildPark(panel){qComposer(panel,{day:null,week:null});qFilterRow(panel);qSection(panel,'Bewusst noch nicht eingeplant',parkOf().filter(t=>t.text?.trim()&&(!t.projectId||!parkOf().some(p=>p.id===t.projectId))),{empty:'Der Parkplatz ist leer. Alles, was keinen Tag hat, landet hier.'});}
   function qBuildPrios(){
     ensurePrios();scopeRollover();const view=document.getElementById('view-prios');view.innerHTML='';
+    if(state.priosSub==='woche') state.priosSub='naechst';
     const panel=uNode('section','panel q-plan');panel.style.setProperty('--c','var(--rose)');panel.style.setProperty('--c-tint','var(--rose-tint)');
-    const head=uNode('div','panel-head');head.append(uNode('span','dot'),uNode('span','eyebrow','Prios & ToDos'));panel.append(head);
+    const head=uNode('div','panel-head');head.append(uNode('span','dot'),uNode('span','eyebrow','Aufgaben'));panel.append(head);
     const nav=uNode('nav','q-tabs');nav.setAttribute('aria-label','Aufgabenzeitraum');
-    for(const [key,label] of [['heute','Heute'],['morgen','Morgen'],['woche','Diese Woche']]){const b=uButton(label,()=>{state.priosSub=key;state.planCapture=null;if(key==='woche')wpOffset=0;buildPrios();},'q-tab');b.setAttribute('aria-current',state.priosSub===key?'page':'false');nav.append(b);}panel.append(nav);
-    if(state.priosSub==='woche')qBuildWeek(panel);else if(state.priosSub==='park')qBuildPark(panel);else if(state.priosSub==='archiv')buildArchiv(panel);else{buildWeekStrip(panel);qBuildDay(panel);}
-    view.append(panel);const daily=!['woche','park','archiv'].includes(state.priosSub);view.classList.toggle('single',!daily);
-    if(daily){tlMode='day';buildTimeline(view);}else if(state.priosSub==='woche'){tlMode='week';buildTimeline(view);}
-    const foot=uNode('div','prios-foot');foot.append(uButton('Parkplatz'+(parkOf().length?' · '+parkOf().length:''),()=>{state.priosSub='park';buildPrios();},'pf-link'),uButton('Archiv',()=>{state.priosSub='archiv';buildPrios();},'pf-link'));
-    view.append(foot);cRefresh();uPlan(view);
+    const nPark=parkOf().filter(t=>t.text?.trim()&&t.status!=='done').length;
+    for(const [key,label] of [['heute','Heute'],['morgen','Morgen'],['naechst','Demnächst'],['park','Parkplatz'+(nPark?' · '+nPark:'')]]){const b=uButton(label,()=>{state.priosSub=key;state.planCapture=null;if(key==='naechst')wpOffset=0;buildPrios();},'q-tab');b.dataset.key=key;b.setAttribute('aria-current',(state.priosSub===key||(key==='heute'&&state.priosSub==='datum'))?'page':'false');nav.append(b);}panel.append(nav);
+    qTabZiel(nav);
+    if(state.priosSub==='naechst')qBuildNext(panel);else if(state.priosSub==='park')qBuildPark(panel);else if(state.priosSub==='archiv')buildArchiv(panel);else{buildWeekStrip(panel);qBuildDay(panel);}
+    view.append(panel);const daily=!['naechst','park','archiv'].includes(state.priosSub);view.classList.toggle('single',!daily);
+    if(daily){tlMode='day';buildTimeline(view);}else if(state.priosSub==='naechst'){tlMode='week';buildTimeline(view);}
+    const foot=uNode('div','prios-foot');foot.append(uButton('Archiv',()=>{state.priosSub='archiv';buildPrios();},'pf-link'));
+    view.append(foot);
+    if(state.priosSub!=='archiv'){
+      const fab=uButton('+',()=>{ const inp=view.querySelector('.q-composer input[type=text]'); if(!inp){ qEdit(null,qDefault()); return; }
+        const r=inp.getBoundingClientRect(); if(r.top<80||r.bottom>window.innerHeight-200){ inp.scrollIntoView({block:'center',behavior:'smooth'}); }
+        inp.focus({preventScroll:true}); },'q-fab');
+      fab.setAttribute('aria-label','Aufgabe hinzufügen'); view.append(fab);
+    }
+    cRefresh();uPlan(view);
   }
 
+  /* ---------- Ziehen: Liste → Zeitleiste, Wochenraster, Tag, Tab ----------
+     Maus: anfassen und ziehen. Finger: kurz halten, dann ziehen — wie in Apple Kalender. */
+  let qZug=null;
+  function qZielAn(x,y){
+    const el=document.elementFromPoint(x,y); if(!el) return null;
+    const track=el.closest('.tl-track');
+    if(track){ const r=track.getBoundingClientRect(); return {art:'zeit',el:track,day:qDay(),min:clampMin(y2min(y-r.top))}; }
+    const col=el.closest('.wp-col');
+    if(col&&col.dataset.day){ const b=col.querySelector('.wp-body'); const r=b.getBoundingClientRect(); if(y>=r.top&&y<=r.bottom) return {art:'woche',el:col,day:col.dataset.day,min:wpClamp(wpY2min(y-r.top))}; return {art:'tag',el:col,day:col.dataset.day}; }
+    const grp=el.closest('.q-day');
+    if(grp&&grp.dataset.day) return {art:'tag',el:grp,day:grp.dataset.day};
+    const tab=el.closest('.q-tab');
+    if(tab&&tab.dataset.key){ const k=tab.dataset.key; return k==='heute'?{art:'tag',el:tab,day:today}:k==='morgen'?{art:'tag',el:tab,day:addDays(today,1)}:k==='park'?{art:'park',el:tab}:null; }
+    return null;
+  }
+  function qZiehbar(row,t){
+    let halten=null, aktiv=false, x0=0, y0=0, ghost=null, ziel=null, pid=null, sperre=false, wisch=0, wischBg=null;
+    const line=row.querySelector(':scope > .q-task-line');
+    // Wischen (nur Finger): nach rechts erledigt, nach links neu planen
+    const wischZeig=dx=>{
+      wisch=Math.max(-140,Math.min(140,dx));
+      if(!wischBg){ wischBg=document.createElement('div'); wischBg.className='q-wisch-bg'; wischBg.innerHTML='<span class="l">✓ erledigt</span><span class="r">neu planen</span>'; row.prepend(wischBg); row.classList.add('q-wischt'); }
+      wischBg.classList.toggle('rechts',wisch>0); wischBg.classList.toggle('scharf',Math.abs(wisch)>=72);
+      if(line) line.style.transform='translateX('+wisch+'px)';
+    };
+    const wischEnde=()=>{
+      const w=wisch; wisch=0;
+      if(line){ line.style.transition='transform .18s ease'; line.style.transform=''; setTimeout(()=>{ if(line) line.style.transition=''; },200); }
+      if(wischBg){ wischBg.remove(); wischBg=null; } row.classList.remove('q-wischt');
+      if(w>=72){ setDone(t,t.status!=='done'); if(navigator.vibrate) try{navigator.vibrate(8);}catch(g){} }
+      else if(w<=-72){ qMove(t); }
+    };
+    const los=(x,y)=>{
+      aktiv=true; row.classList.add('q-haelt'); document.body.classList.add('q-zieht');
+      try{ row.setPointerCapture(pid); }catch(g){}
+      ghost=document.createElement('div'); ghost.className='wp-fliegt q-fliegt'; ghost.textContent=t.text; document.body.appendChild(ghost);
+      setzen(x,y); if(navigator.vibrate) try{navigator.vibrate(10);}catch(g){}
+    };
+    let rollen=null;
+    const setzen=(x,y)=>{
+      if(!ghost) return; ghost.style.left=x+'px'; ghost.style.top=y+'px';
+      // Am Rand weiterrollen, damit die Zeitleiste unter der Liste erreichbar bleibt
+      const H=window.innerHeight, dy=y>H-90?Math.ceil((y-(H-90))/6):y<110?-Math.ceil((110-y)/6):0;
+      if(rollen){ clearInterval(rollen); rollen=null; }
+      if(dy){ rollen=setInterval(()=>{ window.scrollBy(0,dy); const z=qZielAn(x,y); if(ziel&&(!z||z.el!==ziel.el)) ziel.el.classList.remove('ziel'); ziel=z; if(z) z.el.classList.add('ziel'); },30); }
+      const z=qZielAn(x,y);
+      if(ziel&&(!z||z.el!==ziel.el)) ziel.el.classList.remove('ziel');
+      ziel=z; if(z){ z.el.classList.add('ziel'); }
+      ghost.textContent=t.text+(z?(z.art==='zeit'||z.art==='woche'?' · '+(z.art==='woche'?fmtShort(z.day)+' ':'')+fMinToClock(z.min):z.art==='tag'?' · '+qWhen({day:z.day}):' · Parkplatz'):'');
+    };
+    const aufraeumen=()=>{ if(halten){clearTimeout(halten);halten=null;} if(rollen){clearInterval(rollen);rollen=null;} if(ziel){ziel.el.classList.remove('ziel');ziel=null;} if(ghost){ghost.remove();ghost=null;} row.classList.remove('q-haelt'); document.body.classList.remove('q-zieht'); aktiv=false; qZug=null; };
+    const down=e=>{
+      if(e.button&&e.button!==0) return;
+      if(e.target.closest('.todo-check,.q-task-when,.q-chip,.q-project-add,input,summary,select,textarea,a')) return;
+      if(e.target.closest('.q-task')!==row) return;   // Unteraufgaben ziehen sich selbst
+      x0=e.clientX; y0=e.clientY; pid=e.pointerId; qZug={row,t};
+      if(e.pointerType==='mouse'){ /* startet erst bei Bewegung */ }
+      else { halten=setTimeout(()=>{ halten=null; los(x0,y0); },280); }
+    };
+    const move=e=>{
+      if(pid===null) return;
+      const dx=e.clientX-x0, dy=e.clientY-y0;
+      if(wisch||row.classList.contains('q-wischt')){ e.preventDefault(); wischZeig(dx); return; }
+      if(!aktiv){
+        if(halten){
+          if(e.pointerType!=='mouse' && Math.abs(dx)>14 && Math.abs(dx)>Math.abs(dy)*1.6){ clearTimeout(halten); halten=null; try{ row.setPointerCapture(pid); }catch(g){} wischZeig(dx); return; }
+          if(Math.hypot(dx,dy)>8){ clearTimeout(halten); halten=null; pid=null; qZug=null; }
+          return;
+        }
+        if(e.pointerType==='mouse'&&Math.hypot(dx,dy)>6) los(e.clientX,e.clientY);
+        return;
+      }
+      e.preventDefault(); setzen(e.clientX,e.clientY);
+    };
+    const up=e=>{
+      if(pid===null) return; pid=null;
+      if(row.classList.contains('q-wischt')){ sperre=true; setTimeout(()=>{ sperre=false; },400); aufraeumen(); wischEnde(); return; }
+      if(!aktiv){ aufraeumen(); return; }
+      sperre=true; setTimeout(()=>{ sperre=false; },400);
+      const z=qZielAn(e.clientX,e.clientY); aufraeumen();
+      if(!z) return;
+      if(z.art==='zeit'||z.art==='woche'){ qSchedule(t,{day:z.day,week:null,start:z.min,dur:taskDur(t)}); toast(qWhen({day:z.day})+' · '+fMinToClock(z.min)); }
+      else if(z.art==='tag'){ qSchedule(t,{day:z.day,week:null}); toast('→ '+qWhen({day:z.day})); }
+      else if(z.art==='park'){ qSchedule(t,{day:null,week:null}); delete t.start; savePrios(); toast('→ Parkplatz'); }
+      qRefresh();
+    };
+    row.addEventListener('pointerdown',down);
+    row.addEventListener('pointermove',move);
+    row.addEventListener('pointerup',up);
+    row.addEventListener('pointercancel',()=>{ pid=null; aufraeumen(); if(row.classList.contains('q-wischt')){ wisch=0; wischEnde(); } });
+    // Nach dem Halten darf die Seite nicht mehr scrollen — Safari braucht dafür touchmove
+    row.addEventListener('touchmove',e=>{ if(aktiv||row.classList.contains('q-wischt')) e.preventDefault(); },{passive:false});
+    row.addEventListener('contextmenu',e=>{ if(aktiv||halten) e.preventDefault(); });
+    // Nach einem Zug ist der Tipp aufs Feld kein Klick
+    row.addEventListener('click',e=>{ if(sperre){ e.stopPropagation(); e.preventDefault(); } },true);
+  }
+  function qTabZiel(nav){ /* Tabs sind über qZielAn erreichbar — nichts weiter nötig */ }
   // Guided prayer only: no notes, completion log, storage key or network request.
   function openExamen(){
     // Die Gewissenserforschung ist der Tagesabschluss — sie lebt im Heute-Panel

@@ -128,6 +128,7 @@ body.zieht,body.zieht *{cursor:grabbing!important}
 .liste.woche{padding:0 16px 6px}.wtag{padding:8px 0 4px;border-top:1px solid var(--line)}.wtag:first-child{border-top:0}.wtag-h{display:flex;align-items:center;justify-content:space-between;gap:8px}.wtag-h .t{font:600 12px var(--ui);letter-spacing:.03em;text-transform:uppercase;color:var(--ink-soft)}.wtag.heute .wtag-h .t{color:var(--rose)}.wtag.vorbei .wtag-h .t{color:var(--ink-faint)}.wtag.leer{padding:0}.wtag.leer .wtag-h{min-height:36px}.wtag.leer .wtag-h .t{font-weight:500;color:var(--ink-faint)}
 .wtag .plus{min-width:36px;min-height:36px;color:var(--ink-faint);font-size:18px;border-radius:8px}.wtag .zeile{border-top:0;padding-left:0;padding-right:0;margin:0}.wtag .zeile>.inhalt{margin:-9px -4px -9px 0;padding:9px 4px 9px 0}.wtag.ziel{background:var(--rose-tint);border-radius:10px}
 
+.ccp{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:2px 0 14px}.ccd{min-height:34px;border:1px solid var(--line);border-radius:8px;font-size:11px;color:var(--ink-soft);padding:4px 6px;line-height:1.2}.ccd.on{border-color:var(--brass);background:var(--brass-tint);color:var(--brass)}.ccd.voll::before{content:'✓ ';font-size:10px}
 /* Horizont */
 .stern-box{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:22px}.stern-z{display:block;text-align:left;font-family:var(--serif);font-size:21px;line-height:1.45;margin:0 0 10px;width:100%}
 .ebene{margin:0 0 22px 4px;padding-left:16px;border-left:1.5px solid var(--line)}.ebene h4{margin:0 0 6px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);font-weight:600}
@@ -730,7 +731,7 @@ body.zieht,body.zieht *{cursor:grabbing!important}
 'use strict';
 /* ===== kern.js ===== */
 /* ===================== KERN: Werkzeuge, Speicher, Verschlüsselung, Dialoge ===================== */
-const APP_VERSION="2026-11-02-centrala2b";
+const APP_VERSION="2026-11-02-centrala2c";
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const pad=n=>String(n).padStart(2,'0');
 const ymd=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
@@ -1664,17 +1665,15 @@ function renderExamen(k,D){
 /* ===== woche.js ===== */
 /* ===================== WOCHE: sieben Tage, drei Ziele, sonntags das Command Center ===================== */
 function wocheKey(){ return addDays(wochenStart(today),state.wocheOffset*7); }
-function ccFaellig(){ const d=new Date(); const wd=isoWd(today), h=d.getHours(); return (wd===7&&h>=15)||(wd===1&&h<12); }
-function ccRec(W){ privat.cc=privat.cc||{}; return privat.cc[W]||null; }
 function renderWoche(){
   const root=$('#blick-woche'); root.replaceChildren(); const W=wocheKey();
   const kopf=el('div','kopf'); const h1=el('h1','','Woche'); const nav=el('div','tagnav');
   const lab=btn('KW '+isoWoche(W)+' · '+fmtKurz(W).replace(/^\S+ /,'')+' – '+fmtKurz(addDays(W,6)).replace(/^\S+ /,''),()=>{ state.wocheOffset=0; renderWoche(); },'datum');
   nav.append(btn('‹',()=>{ state.wocheOffset--; renderWoche(); },'pfeil'),lab,btn('›',()=>{ state.wocheOffset++; renderWoche(); },'pfeil')); kopf.append(h1,nav); root.append(kopf);
-  if(state.cc){ renderCC(root,W); return; }
+  if(state.cc){ renderCC(root); return; }
   // Ziele
   const z=el('div','ziele'); const zk=el('div','zk'); zk.append(el('div','ebr',state.wocheOffset===0?'Diese Woche':state.wocheOffset===1?'Nächste Woche':'Ziele'));
-  const rec=ccRec(W); const prevRec=ccRec(addDays(W,-7));
+  const rec=ccRec(ccPlanWoche()); const prevRec=ccRec(W);
   if(state.wocheOffset===0&&!rec&&ccFaellig()) zk.append(btn('Command Center',()=>{ state.cc={schritt:0}; renderWoche(); },'btn primär klein')); else zk.append(btn(rec?'Command Center ✓':'Command Center',()=>{ state.cc={schritt:0}; renderWoche(); },'btn leise klein'));
   z.append(zk);
   const ziele=wochenZiele(W);
@@ -1688,46 +1687,13 @@ function renderWoche(){
     if(!zeilen.length) g.classList.add('leer'); L.append(g); }
   root.append(L);
   const ot=ohneTag().filter(sichtbar); if(ot.length){ const ab=el('div','abschn'); ab.append(el('h3','','Ohne Tag'),el('small','',String(ot.length))); root.append(ab); const L2=el('div','liste'); const box=el('div','ohnezeit'); ot.forEach(x=>box.append(zeile(x,null))); L2.append(box); root.append(L2); }
-  if(prevRec&&state.wocheOffset===0&&prevRec.satz){ const s=schatz.find(q=>q.id===prevRec.satz); if(s) root.append(el('p','satz','„'+s.text+'“')); }
+  if(prevRec&&prevRec.satz){ const s=schatz.find(q=>q.id===prevRec.satz); if(s) root.append(el('p','satz','„'+s.text+'“')); }
 }
 function zielEdit(g,W){
   const f=el('div','editor'); const t=el('input'); t.type='text'; t.value=g?g.text:''; t.placeholder='Ein Ziel in einem Satz'; const lab=el('label','','Ziel'); lab.append(t); f.append(lab);
   const akt=el('div','akt'); akt.append(btn(g?'Speichern':'Anlegen',()=>{ const v=t.value.trim(); if(!v) return; if(g){ g.text=v; } else items.push(neuesItem({text:v,kind:'goal',week:W,day:null})); saveItems(); ov.schliessen(); renderAlles(); },'btn primär'));
   if(g) akt.append(btn('Löschen',()=>{ delItem(g.id); ov.schliessen(); renderAlles(); },'btn leise rot')); f.append(akt);
   const ov=blatt(g?'Ziel':'Neues Wochenziel',f); setTimeout(()=>t.focus(),30);
-}
-
-/* ---------- Command Center: drei Schritte, einmal die Woche ---------- */
-function renderCC(root,W){
-  privat.cc=privat.cc||{}; const rec=privat.cc[W]||(privat.cc[W]={}); const i=state.cc.schritt; const tage7=[]; for(let k=0;k<7;k++) tage7.push(addDays(W,k));
-  const k=el('div','jetzt cc'); k.append(el('div','ebr','Command Center · KW '+isoWoche(W)+' · '+(i+1)+' / 3'), schritte(3,i));
-  const sichern=()=>savePrivat();
-  const ta=(key,ph,rows)=>{ const t=el('textarea','ta'); t.rows=rows||2; t.placeholder=ph; t.value=rec[key]||''; t.addEventListener('input',()=>{ rec[key]=t.value; wachsen(t); sichern(); }); setTimeout(()=>wachsen(t),0); return t; };
-  if(i===0){
-    k.append(el('h2','','Die Woche'), el('p','hinweis','Was war gut, was hat getragen? Erst lesen, dann schreiben.'));
-    const g=el('div','gestern'); let hat=false;
-    tage7.forEach(d=>{ const w=tagText(d,'wins'); if(w){ hat=true; const p=el('p'); p.append(el('b','',WDN[isoWd(d)].slice(0,2)+' · '),document.createTextNode(w)); g.append(p); } });
-    const hs=habits(); if(hs.length){ let ok=0,soll=0; hs.forEach(h=>tage7.forEach(d=>{ if(d<=today&&faelltAuf(h,d)){ soll++; if(istErledigt(h,d)) ok++; } })); g.append(el('p','leise','Gewohnheiten: '+ok+' von '+soll)); hat=true; }
-    const n=tage7.reduce((a,d)=>a+tagesListe(d).filter(x=>istErledigt(x,d)).length,0); g.append(el('p','leise',n+' Vorhaben erledigt'));
-    if(!hat) g.append(el('p','leise','Keine Wins festgehalten – der Tagesabschluss sammelt sie.')); k.append(g);
-    k.append(el('div','fl','Wins der Woche'), ta('wins','Die drei Dinge, die zählen …',2));
-    navKn(k,()=>{ state.cc.schritt=1; renderWoche(); },()=>{ state.cc=null; renderWoche(); });
-  } else if(i===1){
-    k.append(el('h2','','Wochenziele'), el('p','hinweis','Abhaken, was erreicht ist. Ehrlich bleiben, was nicht.'));
-    const ziele=wochenZiele(W); if(!ziele.length) k.append(el('p','leer','Diese Woche hatte keine Ziele.'));
-    ziele.forEach(g=>{ const p=el('div','ziel'+(g.done?' ok':'')); p.append(btn('',()=>{ g.done=!g.done; saveItems(); renderWoche(); },'zi'),el('span','zt',g.text)); k.append(p); });
-    k.append(el('div','fl','Was hat gefehlt – was nehme ich mit?'), ta('gelernt','…',2));
-    navKn(k,()=>{ state.cc.schritt=2; renderWoche(); },()=>{ state.cc.schritt=0; renderWoche(); });
-  } else {
-    const W2=addDays(W,7); k.append(el('h2','','Nächste Woche'), el('p','hinweis','Drei Ziele, nicht mehr. Und ein Satz, der die Woche begleitet.'));
-    const vorhanden=wochenZiele(W2); const box=el('div','ziele-neu');
-    for(let n=0;n<3;n++){ const g=vorhanden[n]; const inp=el('input'); inp.type='text'; inp.placeholder=['Erstes Ziel','Zweites Ziel','Drittes Ziel'][n]; inp.value=g?g.text:''; inp.addEventListener('change',()=>{ const v=inp.value.trim(); const cur=wochenZiele(W2)[n]; if(cur){ if(v) cur.text=v; else delItem(cur.id); } else if(v) items.push(neuesItem({text:v,kind:'goal',week:W2,day:null})); saveItems(); }); box.append(inp); }
-    k.append(box);
-    k.append(el('div','fl','Satz der Woche'));
-    const sel=el('select'); sel.append(new Option('– keiner –','')); schatz.forEach(q=>sel.append(new Option(q.text.slice(0,60)+(q.author?' — '+q.author:''),q.id))); sel.value=rec.satz||''; sel.addEventListener('change',()=>{ rec.satz=sel.value; sichern(); }); k.append(sel);
-    navKn(k,()=>{ rec.fertig=new Date().toISOString(); sichern(); state.cc=null; state.wocheOffset=0; renderWoche(); toast('Die Woche steht.'); },()=>{ state.cc.schritt=1; renderWoche(); },'Abschließen');
-  }
-  root.append(k);
 }
 
 /* ===================== HORIZONT: Nordstern · Jahr · Quartal ===================== */
@@ -1749,6 +1715,139 @@ async function prosaLesen(){
   const akt=el('div','akt'); akt.append(btn('Speichern',()=>{ vision.prosa=ta.value.trim()||undefined; if(!vision.prosa) delete vision.prosa; saveVision(); ov.schliessen(); renderHorizont(); },'btn primär'));
   akt.append(btn('Ablegen',async()=>{ const v=ta.value.trim(); if(!v) return; const e=await verschluesseln(v); if(!e) return; vision.prosa=e; saveVision(); ov.schliessen(); toast('Vision abgelegt.'); renderHorizont(); },'btn leise')); f.append(akt);
   const ov=blatt('Vision',f,{cls:'hoch'});
+}
+
+
+/* ===== cc.js ===== */
+/* ===================== COMMAND CENTER: sechs Schritte, einmal die Woche ===================== */
+const META_PH={
+    scan:[
+      "Roh und ungeordnet, alles was zieht. Etwa: Unruhe wegen Freitag · das Gespräch, das ich vermeide · echte Lust, endlich anzufangen",
+      "Was drückt, was zieht. Etwa: drei Tage kein richtiger Fokusblock · Neid auf jemanden, den ich mag · das Gefühl, unter meinem Niveau zu leben",
+      "Ohne zu sortieren aufschreiben. Etwa: Angst vor dem Anruf · zu viel Bildschirm gestern · das Projekt will endlich angepackt werden",
+      "Schmerz und Leidenschaft nebeneinander. Etwa: Ich fühle mich übergangen · ich will der sein, der zuerst spricht",
+      "Was steht zwischen dir und einem klaren Tag? Etwa: unerledigte Zusage · Groll, den ich nicht ausgesprochen habe · Hunger nach Stille",
+      "Was ist heute lebendig in dir? Etwa: Ungeduld mit den Kindern · das Buch drängt · Erschöpfung, die kein Schlaf löst",
+      "Alles, was noch offen im Raum steht. Etwa: keine Bewegung seit vier Tagen · Zweifel, ob der Weg stimmt · Freude über gestern"
+    ],
+    titel:[
+      "Der eine Punkt mit der größten Ladung. Etwa: Ich schiebe das Kapitel seit drei Tagen vor mir her.",
+      "Wo sitzt die meiste Energie? Etwa: Ich weiche dem Gespräch aus, das längst fällig ist.",
+      "Was würdest du am liebsten übergehen? Genau das. Etwa: Ich fülle jede Lücke mit dem Handy.",
+      "Der Punkt, bei dem es innerlich zieht. Etwa: Ich arbeite viel und komme trotzdem nicht voran.",
+      "Ein Satz, der es trifft. Etwa: Ich sage zu allem Ja und bin abends leer.",
+      "Was beschäftigt dich, auch wenn du es wegschiebst? Etwa: Ich lebe gerade nicht wie der, der ich sein will.",
+      "Woran hängt heute am meisten? Etwa: Ich habe Angst, dass ich es doch nicht kann."
+    ],
+    q0:[
+      "Alles nennen, auch das Widersprüchliche. Etwa: Ich will das Kapitel fertig haben · Ich will heute Abend wirklich frei sein · Ich will nicht wieder als der dastehen, der zaudert",
+      "Zwei, drei Wünsche, die sich beißen dürfen. Etwa: Ich will vorankommen · Ich will Ruhe · Ich will niemanden enttäuschen",
+      "Was willst du wirklich, nicht was du solltest. Etwa: Ich will gesehen werden · Ich will meine Zeit zurück · Ich will stolz auf den Tag sein",
+      "Beide Seiten hinschreiben. Etwa: Ich will die Sache abschließen · Ich will nicht wieder alles allein tragen",
+      "Was zieht in welche Richtung? Etwa: Ich will präsent bei den Kindern sein · Ich will heute noch etwas schaffen, das zählt",
+      "Ehrlich, auch das Unbequeme. Etwa: Ich will recht behalten · Ich will Frieden · beides geht nicht zugleich",
+      "Was ist der eigentliche Wunsch darunter? Etwa: Ich will Klarheit · Ich will spüren, dass es vorwärtsgeht"
+    ],
+    q1:[
+      "Mehrere Wege nennen, den stimmigsten markieren. Etwa: Jetzt zwei Stunden durchziehen · Erst 25 Minuten anfangen und neu entscheiden ← das klingt am besten · Heute liegenlassen",
+      "Optionen auflisten, eine wählen. Etwa: Sofort anrufen · Heute Abend anrufen, vorher aufschreiben was ich sagen will ← das trägt · Noch warten",
+      "Welcher Weg gibt Kraft statt zu kosten? Etwa: Alles absagen · Eine Sache absagen und die wichtigste zu Ende bringen ← ja · Weitermachen wie bisher",
+      "Drei Möglichkeiten, dann fühlen welche stimmt. Etwa: Durchhalten · Pause, danach eine Stunde mit voller Kraft ← das ist es · Für heute schließen",
+      "Nicht die beste Lösung, die stimmigste. Etwa: Länger arbeiten · Früher aufhören und morgen früh anfangen ← das fühlt sich frei an",
+      "Wie sähe ein Gewinn heute aus? Etwa: Das Gespräch führen, auch unvollkommen ← das ist es · Es weiter vor mir herschieben",
+      "Welcher Weg macht dich morgen froh? Etwa: Handy in die Schublade und 40 Minuten ← ja · Erst die Kinder, danach ein Block"
+    ],
+    q2:[
+      "Wer bist du — und wer bist du nicht? Dann lass ihn sprechen. Etwa: Ich bin einer, der anfängt, bevor er Lust hat. Ich bin keiner, der auf den perfekten Moment wartet. „Ich weiß, die Sache ist zäh und du bist genervt. Das ist normal. Aber das hier ist ein Rätsel, und Rätsel machen Spaß, sobald du dich entspannst. Geh kurz an die Luft, komm zurück, gib dir eine Stunde. Reicht es nicht, machen wir Schluss — und du hast trotzdem einen guten Tag.“",
+      "Benenne beides, dann rede zu dir. Etwa: Ich bin ein Mann, der Arbeit und Nähe beides Platz gibt. Ich bin keine Maschine, die nur liefert. „Die Unruhe kommt nicht von zu wenig Arbeit, sie kommt davon, dass du zu lange allein warst. Geh heute Abend hin. Die eine wichtige Sache machst du vorher, den Rest planst du für morgen.“",
+      "Was gilt für dich, was gilt nicht? Etwa: Ich bin einer, der ruhig bleibt, wenn es eng wird. Ich bin keiner, der sich von einer Aufgabe erschrecken lässt. „Das ist kein Angriff auf dich, auch wenn es sich so anfühlt. Du hast Schwereres gelöst und dich hinterher gefragt, warum du dir Sorgen gemacht hast. Atme durch, mach den ersten Schritt.“",
+      "Wer wärst du heute Abend gern gewesen — und wer nicht? Etwa: Ich bin einer, der zuerst spricht. Ich bin keiner, der schluckt und danach grollt. „Du musst niemanden überzeugen. Sag ruhig, was wahr ist, ohne Rechtfertigung. Passt es jemandem nicht, ist das in Ordnung — deine Würde hängt nicht an seiner Zustimmung.“",
+      "Zieh die Grenze und sprich von innen. Etwa: Ich bin einer, der seine Zeit achtet. Ich bin keiner, der den Vormittag verschenkt. „Du kennst das Muster: erst nur kurz nachsehen, dann ist eine Stunde weg und die Laune auch. Leg das Ding weg, nimm dir vierzig Minuten. Danach darfst du alles Mögliche — aber aus freien Stücken, nicht aus Flucht.“",
+      "Sag beides, dann rede wie zu einem Freund. Etwa: Ich bin einer, der gibt. Ich bin keiner, der um Bestätigung wirbt. „Die Nervosität kommt daher, dass du etwas holen willst. Dreh es um: Du kannst Aufmerksamkeit geben, Humor, echtes Interesse. Das hast du reichlich. Und wenn jemand nichts damit anfangen kann, ändert das nichts an dir.“",
+      "Wer trägt dich heute — und wen lässt du zurück? Etwa: Ich bin einer, der zu Ende bringt. Ich bin keiner, der zehn Dinge anfängt. „Deshalb fühlst du dich abends leer, obwohl du beschäftigt warst. Heute nur eine Sache, dafür ganz. Alles andere darf warten. Ein abgeschlossenes Ding trägt weiter als fünf angefangene.“"
+    ],
+    schnell:[
+      "Was gerade zieht. Roh genügt. Etwa: Ungeduld im Gespräch eben — warum eigentlich?",
+      "Kurz festhalten, ehe es weg ist. Etwa: Diese Erleichterung nach dem Nein. Merken.",
+      "Was ist dir eben aufgefallen? Etwa: Ich weiche aus, sobald es unbequem wird.",
+      "Ein Satz reicht. Etwa: Gerade war ich ganz da. So fühlt sich richtig an.",
+      "Was will bemerkt werden? Etwa: Der Ärger von vorhin sitzt tiefer, als er sollte.",
+      "Notieren, nicht bewerten. Etwa: Zum dritten Mal heute zum Handy gegriffen, ohne Grund.",
+      "Was war das eben? Etwa: Kurze Angst vor dem Anruf — und danach war es leicht."
+    ]
+  };
+function metaPh(art,versatz){ const l=META_PH[art]||[]; if(!l.length) return '…'; let h=0; for(let i=0;i<today.length;i++) h=(h*31+today.charCodeAt(i))>>>0; return l[(h+(versatz||0))%l.length]; }
+const CC_SCHRITTE=[
+  {id:'wins', t:'Wins',            f:'Was waren letzte Woche deine größten Einsichten und Fortschritte?'},
+  {id:'quart',t:'Quartals-SCOPE',  f:'Einen Blick auf den Nordstern. Dann: Stimmt das noch? Was ist gerade wirklich das Wichtigste?'},
+  {id:'woche',t:'Wochen-SCOPE',    f:'Wie packst du diese Woche deine Pflichten und Quartalsziele an?'},
+  {id:'staq', t:'STAQ',            f:'Welche Gewohnheiten tragen genau diese Woche? Hardline, Mainline, Softline.'},
+  {id:'meta', t:'Metascript',      f:'Was liegt dir gerade auf Herz und Verstand?'},
+  {id:'msg',  t:'Nachricht an dich',f:'Geh die Woche im Geist durch. Dann schreib deinem heutigen Ich aus der Sicht dessen, der diesen Plan mit Freude durchzieht.'}
+];
+// Die Woche, die geplant wird: ab Freitag die kommende, sonst die laufende
+function ccPlanWoche(){ const W=wochenStart(today); return isoWd(today)>=5?addDays(W,7):W; }
+function ccFaellig(){ const wd=isoWd(today), h=new Date().getHours(); return (wd===7&&h>=15)||(wd===1&&h<12); }
+function ccRec(W){ privat.cc=privat.cc||{}; return privat.cc[W]||null; }
+// Ein Feld im Command Center — optional verschlüsselt ablegbar, Speicher: privat.cc[W]
+function ccFeld(rec,key,ph,opts){
+  opts=opts||{}; const w=el('div','feld'); if(opts.l) w.append(el('div','fl',opts.l));
+  const val=rec[key]; const k='cc|'+rec._w+'|'+key;
+  if(isEnc(val)&&!offen.has(k)){ const m=el('div','maske'); m.append(el('span','','· · · · ·'),el('span','fl','abgelegt')); w.append(m); const akt=el('div','akt klein'); akt.append(btn('öffnen',async()=>{ const t=await entschluesseln(val); if(t==null) return; offen.set(k,t); renderWoche(); },'chip')); w.append(akt); return w; }
+  const ta=el('textarea','ta'); ta.rows=opts.rows||2; ta.placeholder=ph||''; ta.value=isEnc(val)?offen.get(k):(val||''); ta.setAttribute('aria-label',opts.l||CC_SCHRITTE.find(s=>s.id===key)?.t||key);
+  let t=null; ta.addEventListener('input',()=>{ wachsen(ta); clearTimeout(t); t=setTimeout(async()=>{ if(isEnc(rec[key])||offen.has(k)){ offen.set(k,ta.value); if(sitzungsPw){ rec[key]=ta.value.trim()?await encWith(sitzungsPw,unb64(cryptoRec.salt),ta.value):''; } } else rec[key]=ta.value; savePrivat(); },350); });
+  w.append(ta); setTimeout(()=>wachsen(ta),0);
+  if(opts.ablegbar){ const akt=el('div','akt klein'); if(!isEnc(val)) akt.append(btn('ablegen',async()=>{ const txt=ta.value; if(!txt.trim()){ toast('Hier steht noch nichts.'); return; } const e=await verschluesseln(txt); if(!e) return; rec[key]=e; offen.set(k,txt); savePrivat(); toast('Abgelegt.'); renderWoche(); },'chip')); else akt.append(btn('schließen',()=>{ offen.delete(k); renderWoche(); },'chip')); w.append(akt); }
+  return w;
+}
+function renderCC(root){
+  const W=ccPlanWoche(), R=addDays(W,-7); privat.cc=privat.cc||{}; const rec=privat.cc[W]||(privat.cc[W]={}); rec._w=W;
+  const i=state.cc.schritt, S=CC_SCHRITTE[i]; const tage7=[]; for(let k=0;k<7;k++) tage7.push(addDays(R,k));
+  const k=el('div','jetzt cc'); k.append(el('div','ebr','Command Center · KW '+isoWoche(W)+' · '+(i+1)+' / 6'));
+  const pr=el('div','ccp'); CC_SCHRITTE.forEach((s,n)=>{ const b=btn(s.t,()=>{ state.cc.schritt=n; renderWoche(); },'ccd'+(n===i?' on':'')+(rec[s.id]&&String(rec[s.id]).trim?' voll':'')); b.setAttribute('aria-current',n===i?'step':'false'); pr.append(b); }); k.append(pr);
+  k.append(el('h2','',S.t), el('p','hinweis',S.f));
+  if(S.id==='wins'){
+    const g=el('div','gestern'); let hat=false;
+    tage7.forEach(d=>{ const w=tagText(d,'wins'); if(w){ hat=true; const p=el('p'); p.append(el('b','',WDN[isoWd(d)].slice(0,2)+' · '),document.createTextNode(w)); g.append(p); } });
+    const hs=habits(); if(hs.length){ let ok=0,soll=0; hs.forEach(h=>tage7.forEach(d=>{ if(d<=today&&faelltAuf(h,d)){ soll++; if(istErledigt(h,d)) ok++; } })); g.append(el('p','leise','Gewohnheiten: '+ok+' von '+soll+' · '+tage7.reduce((a,d)=>a+tagesListe(d).filter(x=>istErledigt(x,d)).length,0)+' Vorhaben erledigt')); hat=true; }
+    if(!hat) g.append(el('p','leise','Keine Wins festgehalten – der Tagesabschluss sammelt sie.')); k.append(g);
+    k.append(ccFeld(rec,'wins','Fortschritte, Einsichten, kleine Siege …',{rows:4}));
+  }
+  if(S.id==='quart'){
+    if(vision.stern.length){ const st=el('div','stern'); vision.stern.forEach(p=>st.append(el('p','',p.text))); k.append(st); }
+    const qi=quartalInfo(); k.append(el('div','fl','Quartal '+qi.q+' · noch '+qi.rest+' Tage'));
+    if(!vision.quartal.length) k.append(el('p','leer','Noch keine Quartalsziele.'));
+    vision.quartal.forEach(p=>{ const z=el('div','ziel'+(p.done?' ok':'')); z.append(btn('',()=>{ p.done=!p.done; saveVision(); renderWoche(); },'zi'),el('span','zt',p.text)); k.append(z); });
+    k.append(btn('Quartalsziele bearbeiten →',()=>zeige('horizont'),'btn leise klein'));
+    k.append(ccFeld(rec,'quart','Was ändert sich? Was bleibt?',{rows:3}));
+  }
+  if(S.id==='woche'){
+    const alt=wochenZiele(R).filter(g=>!g.done); if(alt.length&&R!==W){ const g=el('div','gestern'); g.append(el('p','leise','Offen geblieben aus KW '+isoWoche(R)+':')); alt.forEach(z=>{ const p=el('p'); p.append(document.createTextNode(z.text+' ')); p.append(btn('übernehmen',()=>{ z.week=W; saveItems(); renderWoche(); },'chip klein')); g.append(p); }); k.append(g); }
+    k.append(el('div','fl','Wochenziele KW '+isoWoche(W)));
+    const ziele=wochenZiele(W); ziele.forEach(g=>{ const z=el('div','ziel'+(g.done?' ok':'')); z.append(btn('',()=>{ g.done=!g.done; saveItems(); renderWoche(); },'zi'),btn(g.text,()=>zielEdit(g),'zt')); k.append(z); });
+    k.append(btn('+ Wochenziel',()=>zielEdit(null,W),'chip'));
+    k.append(btn('Zeiten in der Woche setzen →',()=>{ state.cc=null; state.wocheOffset=Math.round((vonYmd(W)-vonYmd(wochenStart(today)))/6048e5); renderWoche(); },'btn leise klein'));
+  }
+  if(S.id==='staq'){
+    const hs=habits(); if(!hs.length) k.append(el('p','leer','Noch keine Gewohnheiten.'));
+    hs.forEach(h=>{ const q=habitQuote(h,28); const z=el('div','ht-z'); z.append(el('span','n',h.text+(h.cat?' · '+h.cat:''))); const w=el('div','w'); w.append(el('span','leise','Kette '+kette(h)+' · '+q.ok+'/'+q.soll)); w.append(btn('ändern',()=>editor(h),'chip klein')); z.append(w); k.append(z); });
+    k.append(btn('+ Gewohnheit',()=>editor(null,{habit:true}),'chip'));
+    k.append(ccFeld(rec,'staq','Was ändere ich für diese Woche? Feiertage, Fristen, besondere Umstände …',{rows:3}));
+  }
+  if(S.id==='meta'){
+    k.append(ccFeld(rec,'scan',metaPh('scan',5),{l:'Scan – roh und ungeordnet',rows:4,ablegbar:true}));
+    k.append(ccFeld(rec,'meta',metaPh('q2',9),{l:'Wer bin ich – und wer bin ich nicht?',rows:5,ablegbar:true}));
+  }
+  if(S.id==='msg'){
+    k.append(ccFeld(rec,'msg','Lieber ich, … — zwei bis fünf Minuten, frei heraus: Ermutigung, Zuversicht, was du dir merken sollst.',{rows:8,ablegbar:true}));
+    k.append(el('div','fl','Satz der Woche'));
+    const sel=el('select'); sel.append(new Option('– keiner –','')); schatz.forEach(q=>sel.append(new Option(q.text.slice(0,70)+(q.author?' — '+q.author:''),q.id))); sel.value=rec.satz||''; sel.addEventListener('change',()=>{ rec.satz=sel.value; savePrivat(); }); k.append(sel);
+  }
+  const akt=el('div','akt');
+  if(i<5) akt.append(btn('Weiter · '+CC_SCHRITTE[i+1].t,()=>{ state.cc.schritt=i+1; renderWoche(); },'btn primär'));
+  else akt.append(btn('Die Woche steht',async()=>{ for(const key of ['scan','meta','msg']){ const v=rec[key]; if(v&&!isEnc(v)&&String(v).trim()&&sitzungsPw){ rec[key]=await encWith(sitzungsPw,unb64(cryptoRec.salt),v); offen.delete('cc|'+W+'|'+key); } } rec.fertig=new Date().toISOString(); delete rec._w; savePrivat(); state.cc=null; state.wocheOffset=0; renderWoche(); toast('Die Woche steht.'); },'btn primär'));
+  if(i>0) akt.append(btn('Zurück',()=>{ state.cc.schritt=i-1; renderWoche(); },'btn leise')); else akt.append(btn('Später',()=>{ delete rec._w; savePrivat(); state.cc=null; renderWoche(); },'btn leise'));
+  k.append(akt); root.append(k);
 }
 
 

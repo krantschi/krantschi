@@ -129,6 +129,7 @@ body.zieht,body.zieht *{cursor:grabbing!important}
 .wtag .plus{min-width:36px;min-height:36px;color:var(--ink-faint);font-size:18px;border-radius:8px}.wtag .zeile{border-top:0;padding-left:0;padding-right:0;margin:0}.wtag .zeile>.inhalt{margin:-9px -4px -9px 0;padding:9px 4px 9px 0}.wtag.ziel{background:var(--rose-tint);border-radius:10px}
 
 .ccp{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:2px 0 14px}.ccd{min-height:34px;border:1px solid var(--line);border-radius:8px;font-size:11px;color:var(--ink-soft);padding:4px 6px;line-height:1.2}.ccd.on{border-color:var(--brass);background:var(--brass-tint);color:var(--brass)}.ccd.voll::before{content:'✓ ';font-size:10px}
+.notiz-z{padding:10px 0;border-top:1px solid var(--line)}.notiz-z:first-child{border-top:0}.notiz-k .fl{margin:0}
 /* Horizont */
 .stern-box{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:22px}.stern-z{display:block;text-align:left;font-family:var(--serif);font-size:21px;line-height:1.45;margin:0 0 10px;width:100%}
 .ebene{margin:0 0 22px 4px;padding-left:16px;border-left:1.5px solid var(--line)}.ebene h4{margin:0 0 6px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);font-weight:600}
@@ -731,7 +732,7 @@ body.zieht,body.zieht *{cursor:grabbing!important}
 'use strict';
 /* ===== kern.js ===== */
 /* ===================== KERN: Werkzeuge, Speicher, Verschlüsselung, Dialoge ===================== */
-const APP_VERSION="2026-11-02-centrala2c";
+const APP_VERSION="2026-11-02-centrala2d";
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const pad=n=>String(n).padStart(2,'0');
 const ymd=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
@@ -1344,6 +1345,7 @@ function renderJetzt(k){
   links.append(btn(tagText(D,'morgenFertig')?'Morgen ansehen':'Mein Morgen',()=>{ state.ritual='morgen'; state.ritualSchritt=0; renderTag(); },'btn leise'));
   links.append(btn(tagText(D,'geschlossen')?'Abschluss ansehen':'Tagesabschluss',()=>{ state.ritual='abend'; state.ritualSchritt=0; state.examenBegonnen=false; renderTag(); },'btn leise'));
   if(istHeute()&&typeof nextAngelus==='function'){ try{ const nx=nextAngelus(); if(nx&&nx.today) links.append(btn('Angelus '+nx.time,()=>zeige('gebet'),'btn leise')); }catch(e){} }
+  links.append(btn('✎ Metascript',()=>openNotizen(),'btn leise'));
   if(istHeute()) k.append(akt); k.append(links);
 }
 
@@ -1446,7 +1448,7 @@ function gesten(z,x,D){
     if(modus==='wisch'){ e.preventDefault(); wischZeig(ddx); return; }
     if(modus==='zug'){ e.preventDefault(); setzen(e.clientX,e.clientY); return; }
     if(halt){ if(Math.abs(ddx)>14&&Math.abs(ddx)>Math.abs(ddy)*1.6){ clearTimeout(halt); halt=null; modus='wisch'; try{ z.setPointerCapture(pid); }catch(_){ } wischZeig(ddx); } else if(Math.hypot(ddx,ddy)>8){ clearTimeout(halt); halt=null; pid=null; } return; }
-    if(e.pointerType==='mouse'&&Math.hypot(ddx,ddy)>6) los(e.clientX,e.clientY); });
+    if(e.pointerType==='mouse'&&Math.hypot(ddx,ddy)>6){ if(Math.abs(ddx)>Math.abs(ddy)*1.6){ modus='wisch'; try{ z.setPointerCapture(pid); }catch(_){ } wischZeig(ddx); } else los(e.clientX,e.clientY); } });
   const ende=e=>{ if(pid===null) return; const m=modus; const cx=e.clientX, cy=e.clientY; const t=m==='zug'?zielAn(cx,cy):null; aufraeumen();
     if(m==='wisch'){ sperre=true; setTimeout(()=>sperre=false,400); wischEnde(); return; }
     if(m==='zug'){ sperre=true; setTimeout(()=>sperre=false,400); if(t) ablegen(x,D,t); } };
@@ -1659,6 +1661,28 @@ function renderExamen(k,D){
   if(i===3) k.append(feld(D,'reue','Was dir leidtut …',{l:'Nur für dich',ablegbar:true,ro}));
   if(i===4) k.append(feld(D,'vorsatz','Für morgen …',{l:'Vorsatz',ro}));
   navKn(k,()=>{ state.ritualSchritt=i+1; renderTag(); },()=>{ if(i===0){ state.examenBegonnen=false; } else state.ritualSchritt=i-1; renderTag(); },i===4?'Zum Abschluss':'Weiter');
+}
+
+/* ---------- Spontane Metascripts: ein Knopf, ein Blatt, ablegbar ---------- */
+function notizen(){ privat.notizen=privat.notizen||[]; return privat.notizen; }
+function openNotizen(neu){
+  const f=el('div','notizen'); const L=el('div');
+  const malen=()=>{ L.replaceChildren(); const list=notizen().slice().sort((a,b)=>(b.at||0)-(a.at||0)); if(!list.length) L.append(el('p','leer','Noch nichts festgehalten. Was gerade zieht – roh, ohne Ordnung.'));
+    list.forEach(n=>{ const box=el('div','notiz-z'); const kopf=el('div','notiz-k'); kopf.append(el('span','fl',(n.d?fmtKurz(n.d):'')+(n.at?' · '+new Date(n.at).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}):''))); box.append(kopf);
+      const k='nz|'+n.id;
+      if(isEnc(n.t)&&!offen.has(k)){ const m=el('div','maske'); m.append(el('span','','· · · · ·'),el('span','fl','abgelegt')); box.append(m); const akt=el('div','akt klein'); akt.append(btn('öffnen',async()=>{ const t=await entschluesseln(n.t); if(t==null) return; offen.set(k,t); malen(); },'chip'),btn('löschen',async()=>{ if(await askConfirm('Notiz löschen?','','Löschen')){ privat.notizen=notizen().filter(x=>x!==n); savePrivat(); malen(); } },'chip rot')); box.append(akt); L.append(box); return; }
+      const ta=el('textarea','ta'); ta.rows=2; ta.placeholder=metaPh('scan',3); ta.value=isEnc(n.t)?offen.get(k):(n.t||''); let t=null;
+      ta.addEventListener('input',()=>{ wachsen(ta); clearTimeout(t); t=setTimeout(async()=>{ if(isEnc(n.t)||offen.has(k)){ offen.set(k,ta.value); if(sitzungsPw) n.t=await encWith(sitzungsPw,unb64(cryptoRec.salt),ta.value); } else n.t=ta.value; savePrivat(); },350); });
+      box.append(ta); setTimeout(()=>wachsen(ta),0);
+      const akt=el('div','akt klein');
+      if(!isEnc(n.t)) akt.append(btn('ablegen',async()=>{ if(!ta.value.trim()){ toast('Hier steht noch nichts.'); return; } const e=await verschluesseln(ta.value); if(!e) return; n.t=e; offen.set(k,ta.value); savePrivat(); toast('Abgelegt.'); malen(); },'chip')); else akt.append(btn('schließen',()=>{ offen.delete(k); malen(); },'chip'));
+      akt.append(btn('löschen',async()=>{ if(await askConfirm('Notiz löschen?','','Löschen')){ privat.notizen=notizen().filter(x=>x!==n); savePrivat(); malen(); } },'chip rot'));
+      box.append(akt); L.append(box); if(n.id===neuId) setTimeout(()=>ta.focus(),40); });
+  };
+  let neuId=null;
+  const plus=btn('+ Neu',()=>{ const n={id:uid(),d:today,at:Date.now(),t:''}; notizen().unshift(n); savePrivat(); neuId=n.id; malen(); },'chip');
+  f.append(plus,L); if(neu||!notizen().length){ plus.click(); } else malen();
+  blatt('Metascript',f,{cls:'hoch'});
 }
 
 
@@ -3659,7 +3683,7 @@ function start(){
   $$('.tabs button').forEach(b=>b.addEventListener('click',()=>zeige(b.dataset.blick)));
   const form=$('#form'); form.addEventListener('submit',e=>{ e.preventDefault(); eingabeAbsenden(); }); $('#neu').addEventListener('input',eingabeLesen);
   $('#fab').addEventListener('click',()=>{ const inp=$('#neu'); inp.focus(); });
-  document.addEventListener('keydown',e=>{ if(e.target&&/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return; if(e.key==='q'||e.key==='n'){ e.preventDefault(); $('#neu').focus(); } if(e.key==='1') zeige('tag'); if(e.key==='2') zeige('woche'); if(e.key==='3') zeige('horizont'); if(e.key==='4') zeige('gebet'); });
+  document.addEventListener('keydown',e=>{ if(e.target&&/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return; if(e.key==='q'||e.key==='n'){ e.preventDefault(); $('#neu').focus(); } if(e.key==='m'){ e.preventDefault(); openNotizen(); } if(e.key==='1') zeige('tag'); if(e.key==='2') zeige('woche'); if(e.key==='3') zeige('horizont'); if(e.key==='4') zeige('gebet'); });
   renderAlles();
   // Abgleich und Kalender im Hintergrund
   syncReady=true; if(syncOn()){ setSyncStatus('bereit'); syncPull().then(()=>{ if(syncOn()) syncPush(false); }); }

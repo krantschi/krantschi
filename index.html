@@ -102,7 +102,9 @@ a{color:var(--brass)}
 .wisch{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:12px;font-weight:600;color:#fff;background:var(--sky);z-index:0}.wisch.r{background:var(--mint)}.wisch.scharf{font-size:13px}
 .zeile.ziel{box-shadow:inset 0 -2px 0 var(--rose)}.zeile.haelt{opacity:.45}
 .jetztlinie{height:0;border-top:1.5px solid var(--rose);position:relative;margin:0 0 0 58px}.jetztlinie::before{content:"";position:absolute;left:-5px;top:-4px;width:7px;height:7px;border-radius:50%;background:var(--rose)}
-.luecke{display:flex;align-items:center;gap:12px;padding:4px 14px 4px 12px;color:var(--ink-faint);font-size:11.5px;border-top:1px dashed var(--line)}.luecke .zeit{width:44px;text-align:right}.luecke.ziel{background:var(--rose-tint);color:var(--rose)}
+.luecke{position:relative;display:flex;align-items:center;gap:12px;padding:4px 14px 4px 12px;color:var(--ink-faint);font-size:11.5px;border-top:1px dashed var(--line);box-sizing:border-box;transition:min-height .18s ease}.luecke .zeit{width:44px;text-align:right;font-variant-numeric:tabular-nums}.luecke.still{display:none}
+body.zieht .luecke{min-height:calc(30px + var(--std,1)*20px);align-items:flex-start}body.zieht .luecke.still{display:flex}.luecke.ziel{background:var(--rose-tint);color:var(--rose)}.luecke.ziel .zeit{position:absolute;left:12px;top:var(--pos,50%);transform:translateY(-50%);font-weight:600;font-size:13px;line-height:1;padding:3px 0;background:var(--rose-tint)}.luecke.ziel .frei{margin-left:56px}
+.luecke.ziel::after{content:'';position:absolute;left:66px;right:12px;top:var(--pos,50%);height:2px;margin-top:-1px;background:var(--rose);border-radius:1px;pointer-events:none}
 .fertig{border-top:1px solid var(--line)}.fertig summary{padding:10px 14px;font-size:12.5px;color:var(--ink-faint);cursor:pointer;list-style:none}.fertig summary::-webkit-details-marker{display:none}.fertig summary::before{content:"▸ ";font-size:10px}.fertig[open] summary::before{content:"▾ "}
 .fliegt{position:fixed;z-index:120;transform:translate(-50%,-140%);pointer-events:none;background:var(--ink);color:var(--bg);font-size:13px;padding:7px 12px;border-radius:10px;max-width:72vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 10px 24px -8px rgba(0,0,0,.5)}
 body.zieht,body.zieht *{cursor:grabbing!important}
@@ -160,6 +162,14 @@ body.zieht,body.zieht *{cursor:grabbing!important}
 .toast{position:fixed;left:50%;bottom:calc(160px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(10px);background:var(--ink);color:var(--bg);padding:9px 14px;border-radius:10px;font-size:13px;opacity:0;transition:all .2s;z-index:300;pointer-events:none;max-width:90vw;text-align:center}.toast.an{opacity:1;transform:translateX(-50%)}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 @media print{.unten,.fab{display:none}}
+
+/* Ideenbox */
+.idee-eingabe{padding:0 0 10px;border-bottom:1px solid var(--line);margin-bottom:8px}.idee-eingabe .ta{font-size:16px}.idee-eingabe .reihe{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px}.idee-eingabe .chips{margin:0}
+.idee-filter{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 6px}.idee-filter .suche{flex:1;min-width:90px;border:0;border-bottom:1px dashed var(--line);background:transparent;font:inherit;font-size:13px;padding:4px 0;outline:none;color:var(--ink)}
+.idee-z{display:block;width:100%;text-align:left;padding:10px 0;border-top:1px solid var(--line);border-radius:0}.idee-z:first-child{border-top:0}.idee-z .it b{display:block;font-family:var(--serif);font-weight:500;font-size:16.5px;line-height:1.45;overflow-wrap:anywhere}.idee-z small{display:flex;gap:8px;flex-wrap:wrap;color:var(--ink-faint);font-size:11.5px;margin-top:3px}.idee-z small .a{color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em;font-size:10.5px}.idee-z small .s{color:var(--brass)}
+.idee-x{padding:10px 12px;margin:6px -12px;border-radius:12px;background:var(--bg)}.idee-x .ta{font-family:var(--serif);font-size:16.5px}.idee-x .ta.notiz{font-family:var(--ui);font-size:14px;color:var(--ink-soft)}.idee-x .chips{margin:8px 0 2px}
+.ideen-karte{background:var(--card);border-radius:16px;padding:14px 16px;margin:14px 0}.ideen-karte .zk{display:flex;justify-content:space-between;align-items:baseline}.ideen-karte h4{margin:0}.ideen-karte .ik-z{display:block;width:100%;text-align:left;padding:7px 0;border-top:1px solid var(--line);font-family:var(--serif);font-size:16px;line-height:1.4;overflow-wrap:anywhere}.ideen-karte .ik-z:nth-of-type(1){border-top:0;margin-top:6px}
+.chip.idee{background:var(--brass-tint);color:var(--brass)}
 
   /* ---------- Gebetszeile und Gebetsort ---------- */
   .ang-line{width:100%; display:flex; align-items:center; gap:9px; margin-bottom:10px; padding:11px 16px;
@@ -732,7 +742,7 @@ body.zieht,body.zieht *{cursor:grabbing!important}
 'use strict';
 /* ===== kern.js ===== */
 /* ===================== KERN: Werkzeuge, Speicher, Verschlüsselung, Dialoge ===================== */
-const APP_VERSION="2026-11-02-centrala2d";
+const APP_VERSION="2026-11-02-centrala2f";
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const pad=n=>String(n).padStart(2,'0');
 const ymd=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
@@ -756,7 +766,7 @@ function btn(txt,fn,cls){ const b=el('button',cls||'',txt); b.type='button'; if(
 const uNode=(tag,cls,txt)=>el(tag,cls,txt), uButton=(txt,fn,cls)=>btn(txt,fn,cls||'u-secondary');
 
 /* ---------- Speicher ---------- */
-const K={items:'cz_items',log:'cz_log',tage:'cz_tage',privat:'cz_privat',vision:'cz_vision',cc:'cz_cc',schatz:'cz_schatz',cfg:'cz_cfg',sync:'cz_sync',crypto:'cz_crypto',caldone:'cz_caldone',gospel:'cz_gospel',meta:'cz_meta',archiv:'cz_archiv'};
+const K={items:'cz_items',log:'cz_log',tage:'cz_tage',privat:'cz_privat',vision:'cz_vision',cc:'cz_cc',schatz:'cz_schatz',cfg:'cz_cfg',sync:'cz_sync',crypto:'cz_crypto',caldone:'cz_caldone',gospel:'cz_gospel',meta:'cz_meta',archiv:'cz_archiv',ideen:'cz_ideen'};
 // Was das Gerät nicht verlässt: private Texte, Schlüssel, Abgleich-Zugang
 const LOKAL=[K.privat,K.sync,K.crypto,K.cc,K.meta];
 // Alte Schlüssel der Gebetsmodule, die bleiben und mitwandern
@@ -1165,7 +1175,7 @@ async function ladeKalender(force){
 let items=[], log={}, tage={}, privat={}, vision={stern:[],jahr:[],quartal:[]}, schatz=[], archiv=[];
 function ladeAlles(){
   items=(read(K.items,{all:[]})||{}).all||[]; log=read(K.log,{}); tage=read(K.tage,{}); privat=read(K.privat,{});
-  vision=Object.assign({stern:[],jahr:[],quartal:[]},read(K.vision,{})); schatz=read(K.schatz,[]); archiv=read(K.archiv,[]); cfg=read(K.cfg,cfg||{});
+  vision=Object.assign({stern:[],jahr:[],quartal:[]},read(K.vision,{})); schatz=read(K.schatz,[]); archiv=read(K.archiv,[]); cfg=read(K.cfg,cfg||{}); ladeIdeen();
 }
 const saveItems=()=>write(K.items,{all:items});
 const saveLog=()=>write(K.log,log);
@@ -1346,6 +1356,7 @@ function renderJetzt(k){
   links.append(btn(tagText(D,'geschlossen')?'Abschluss ansehen':'Tagesabschluss',()=>{ state.ritual='abend'; state.ritualSchritt=0; state.examenBegonnen=false; renderTag(); },'btn leise'));
   if(istHeute()&&typeof nextAngelus==='function'){ try{ const nx=nextAngelus(); if(nx&&nx.today) links.append(btn('Angelus '+nx.time,()=>zeige('gebet'),'btn leise')); }catch(e){} }
   links.append(btn('✎ Metascript',()=>openNotizen(),'btn leise'));
+  links.append(btn('💡 Idee',()=>openIdeen(),'btn leise'));
   if(istHeute()) k.append(akt); k.append(links);
 }
 
@@ -1389,6 +1400,7 @@ function renderUeberfaellig(ue){
   ue.filter(sichtbar).sort((a,b)=>a.day.localeCompare(b.day)).forEach(x=>box.append(zeile(x,x.day,{ueberf:true})));
   return box;
 }
+const TAG_VON=7*60, TAG_BIS=21*60; // Spanne, in der freie Zeit beim Ziehen angeboten wird
 function renderListe(D,liste){
   const L=el('div','liste'); L.id='liste';
   const now=istHeute()?nowMin():-1;
@@ -1399,13 +1411,20 @@ function renderListe(D,liste){
   mit.sort((a,b)=>a.start-b.start);
   const fertig=sicht.filter(x=>istErledigt(x,D)); const kalFertig=(calEvents[D]||[]).filter(ev=>calIstDone(D,ev));
   const ohneBox=el('div','ohnezeit'); ohneBox.dataset.drop='ohne'; ohne.forEach(x=>ohneBox.append(zeile(x,D))); if(!ohne.length&&!mit.length){ ohneBox.append(el('p','leer',istHeute()?'Nichts geplant. Unten eintippen oder eine Zeile hierher ziehen.':'Nichts geplant.')); } L.append(ohneBox);
+  // Freie Spannen: innen immer sichtbar, Rand-Spannen (vor dem ersten, nach dem letzten, leerer Tag) nur beim Ziehen.
+  // Beim Ziehen wird die Zeit innerhalb der Spanne fein aus der Fingerposition gelesen (siehe zielAn).
+  const luecke=(von,bis,still)=>{ const lk=el('div','luecke'+(still?' still':'')); lk.dataset.drop='zeit'; lk.dataset.min=String(von); lk.dataset.bis=String(bis); lk.style.setProperty('--std',String(Math.min(8,(bis-von)/60))); lk.append(el('span','zeit',''),el('span','frei',String(Math.round((bis-von)/6)/10).replace('.',',')+' h frei')); return lk; };
+  const anfang=istHeute()?Math.max(TAG_VON,Math.ceil(now/15)*15):TAG_VON;
   let linie=false;
+  if(!mit.length&&ohne.length&&TAG_BIS-anfang>=60) L.append(luecke(anfang,TAG_BIS,true));
   mit.forEach((m,i)=>{
     if(!linie&&now>=0&&now<m.start){ const j=el('div','jetztlinie'); j.title='jetzt · '+uhr(now); L.append(j); linie=true; }
-    const prev=mit[i-1]; if(prev&&m.start-(prev.start+prev.dur)>=90){ const lk=el('div','luecke'); lk.dataset.drop='zeit'; lk.dataset.min=String(prev.start+prev.dur); lk.append(el('span','zeit',''),el('span','',Math.round((m.start-(prev.start+prev.dur))/6)/10+' h frei')); L.append(lk); }
+    const von=i?mit[i-1].start+mit[i-1].dur:anfang;
+    if(m.start-von>=(i?90:60)) L.append(luecke(von,m.start,!i));
     if(m.kal) L.append(kalZeile(D,m.kal)); else L.append(zeile(m.x,D));
   });
   if(!linie&&now>=0&&mit.length&&now>=mit[mit.length-1].start){ const j=el('div','jetztlinie'); L.append(j); }
+  if(mit.length){ const l=mit[mit.length-1]; const von=Math.max(l.start+l.dur,anfang); if(TAG_BIS-von>=60) L.append(luecke(von,TAG_BIS,true)); }
   if(fertig.length||kalFertig.length){ const d=el('details','fertig'); d.open=!!state.fertigAuf; d.addEventListener('toggle',()=>{ state.fertigAuf=d.open; }); d.append(el('summary','',(fertig.length+kalFertig.length)+' erledigt')); fertig.forEach(x=>d.append(zeile(x,D))); kalFertig.forEach(ev=>d.append(kalZeile(D,ev))); L.append(d); }
   return L;
 }
@@ -1437,12 +1456,12 @@ function gesten(z,x,D){
   const line=z.querySelector('.inhalt');
   const wischZeig=d=>{ dx=Math.max(-150,Math.min(150,d)); if(!bg){ bg=el('div','wisch'); bg.innerHTML='<span>✓ erledigt</span><span>neu planen</span>'; z.prepend(bg); z.classList.add('wischt'); } bg.classList.toggle('r',dx>0); bg.classList.toggle('scharf',Math.abs(dx)>=72); line.style.transform='translateX('+dx+'px)'; };
   const wischEnde=()=>{ const w=dx; dx=0; line.style.transition='transform .18s ease'; line.style.transform=''; setTimeout(()=>{ line.style.transition=''; },200); if(bg){ bg.remove(); bg=null; } z.classList.remove('wischt'); if(w>=72){ setzeErledigt(x,D,!istErledigt(x,D)); if(navigator.vibrate) try{navigator.vibrate(8);}catch(e){} renderAlles(); } else if(w<=-72) planen(x); };
-  const zielAn=(cx,cy)=>{ const e=document.elementFromPoint(cx,cy); if(!e) return null; const zl=e.closest('.zeile:not(.kal)'); if(zl&&zl!==z&&zl.dataset.day){ const r=zl.getBoundingClientRect(); const it=byId(zl.dataset.id); return {art:'zeile',el:zl,day:zl.dataset.day,it,oben:cy<r.top+r.height/2}; } const lk=e.closest('.luecke'); if(lk) return {art:'luecke',el:lk,min:Number(lk.dataset.min)}; const ohne=e.closest('.ohnezeit'); if(ohne) return {art:'ohne',el:ohne}; const tagG=e.closest('.wtag'); if(tagG&&tagG.dataset.day) return {art:'tag',el:tagG,day:tagG.dataset.day}; const tab=e.closest('.tabs button'); if(tab&&tab.dataset.blick==='woche') return {art:'woche',el:tab}; return null; };
+  const zielAn=(cx,cy)=>{ const e=document.elementFromPoint(cx,cy); if(!e) return null; const zl=e.closest('.zeile:not(.kal)'); if(zl&&zl!==z&&zl.dataset.day){ const r=zl.getBoundingClientRect(); const it=byId(zl.dataset.id); return {art:'zeile',el:zl,day:zl.dataset.day,it,oben:cy<r.top+r.height/2}; } const lk=e.closest('.luecke'); if(lk){ const r=lk.getBoundingClientRect(); const von=Number(lk.dataset.min), bis=Number(lk.dataset.bis||von); const spann=Math.max(0,bis-(x.dur||30)-von); const f=r.height>0?Math.max(0,Math.min(1,(cy-r.top)/r.height)):0; return {art:'luecke',el:lk,min:von+Math.round(spann*f/15)*15,pos:f}; } const ohne=e.closest('.ohnezeit'); if(ohne) return {art:'ohne',el:ohne}; const tagG=e.closest('.wtag'); if(tagG&&tagG.dataset.day) return {art:'tag',el:tagG,day:tagG.dataset.day}; const tab=e.closest('.tabs button'); if(tab&&tab.dataset.blick==='woche') return {art:'woche',el:tab}; return null; };
   const los=(cx,cy)=>{ modus='zug'; z.classList.add('haelt'); document.body.classList.add('zieht'); ghost=el('div','fliegt',x.text); document.body.append(ghost); try{ z.setPointerCapture(pid); }catch(e){} setzen(cx,cy); if(navigator.vibrate) try{navigator.vibrate(10);}catch(e){} };
-  const setzen=(cx,cy)=>{ if(!ghost) return; ghost.style.left=cx+'px'; ghost.style.top=cy+'px'; const t=zielAn(cx,cy); if(ziel&&(!t||t.el!==ziel.el)) ziel.el.classList.remove('ziel'); ziel=t; if(t) t.el.classList.add('ziel');
+  const setzen=(cx,cy)=>{ if(!ghost) return; ghost.style.left=cx+'px'; ghost.style.top=cy+'px'; const t=zielAn(cx,cy); if(ziel&&(!t||t.el!==ziel.el)){ ziel.el.classList.remove('ziel'); if(ziel.art==='luecke'){ ziel.el.style.removeProperty('--pos'); const s=ziel.el.querySelector('.zeit'); if(s) s.textContent=''; } } ziel=t; if(t){ t.el.classList.add('ziel'); if(t.art==='luecke'){ t.el.style.setProperty('--pos',(t.pos*100).toFixed(1)+'%'); const s=t.el.querySelector('.zeit'); if(s&&s.textContent!==uhr(t.min)){ s.textContent=uhr(t.min); if(navigator.vibrate) try{navigator.vibrate(3);}catch(_){ } } } }
     let hint=''; if(t){ if(t.art==='zeile'&&t.it) hint=typeof t.it.start==='number'?' · '+(t.oben?'vor ':'nach ')+uhr(t.it.start):' · ohne Zeit'; else if(t.art==='luecke') hint=' · '+uhr(t.min); else if(t.art==='ohne') hint=' · ohne Zeit'; else if(t.art==='tag') hint=' · '+fmtKurz(t.day); else if(t.art==='woche') hint=' · Woche'; } ghost.textContent=x.text+hint;
     const H=window.innerHeight, dy=cy>H-100?Math.ceil((cy-(H-100))/6):cy<110?-Math.ceil((110-cy)/6):0; if(rollen){ clearInterval(rollen); rollen=null; } if(dy) rollen=setInterval(()=>window.scrollBy(0,dy),30); };
-  const aufraeumen=()=>{ if(halt){ clearTimeout(halt); halt=null; } if(rollen){ clearInterval(rollen); rollen=null; } if(ziel){ ziel.el.classList.remove('ziel'); ziel=null; } if(ghost){ ghost.remove(); ghost=null; } z.classList.remove('haelt'); document.body.classList.remove('zieht'); modus=null; pid=null; };
+  const aufraeumen=()=>{ if(halt){ clearTimeout(halt); halt=null; } if(rollen){ clearInterval(rollen); rollen=null; } if(ziel){ ziel.el.classList.remove('ziel'); if(ziel.art==='luecke'){ ziel.el.style.removeProperty('--pos'); const s=ziel.el.querySelector('.zeit'); if(s) s.textContent=''; } ziel=null; } if(ghost){ ghost.remove(); ghost=null; } z.classList.remove('haelt'); document.body.classList.remove('zieht'); modus=null; pid=null; };
   z.addEventListener('pointerdown',e=>{ if(e.button&&e.button!==0) return; if(e.target.closest('.ck,.play,.chip,a,input')) return; x0=e.clientX; y0=e.clientY; pid=e.pointerId; dx=0; modus=null; if(e.pointerType!=='mouse') halt=setTimeout(()=>{ halt=null; los(x0,y0); },300); });
   z.addEventListener('pointermove',e=>{ if(pid===null) return; const ddx=e.clientX-x0, ddy=e.clientY-y0;
     if(modus==='wisch'){ e.preventDefault(); wischZeig(ddx); return; }
@@ -1519,13 +1538,16 @@ function eingabeLesen(){
   const inp=$('#neu'); if(!inp) return null; const raw=inp.value; const basis=state.blick==='tag'?state.viewDate:today;
   const p=Schnell.parse(raw,{heute:basis,projekte:[],jetztMin:istHeute()?nowMin():undefined,ignoriere});
   const E=$('#erkannt'); E.replaceChildren(); if(!raw.trim()){ ignoriere=new Set(); return p; }
+  if(istIdee(raw)&&!ignoriere.has('idee')){ const q=ideeLesen(raw); p.idee=q; E.append(btn('💡 Ideenbox'+(q.art?' · '+ideeArtName(q.art):''),()=>{ ignoriere.add('idee'); eingabeLesen(); },'chip idee')); E.append(el('span','rest',q.text?'→ „'+q.text+'“':'→ (noch kein Text)')); return p; }
   p.tokens.forEach(tk=>{ const b=btn(tk.label,()=>{ ignoriere.add(tk.key); eingabeLesen(); },'chip '+tk.typ); b.title='Antippen: als Text behalten'; E.append(b); });
   if(p.tokens.length) E.append(el('span','rest',p.text?'→ „'+p.text+'“':'→ (kein Aufgabentext)'));
   p.warn.forEach(w=>E.append(el('span','warn',w)));
   return p;
 }
+const istIdee=raw=>/^\s*(idee|idea)\s*[:\-–]?\s+\S/i.test(raw);
 function eingabeAbsenden(){
-  const inp=$('#neu'); const p=eingabeLesen(); if(!p) return; if(!p.text){ if(inp.value.trim()) toast('Da fehlt noch der Aufgabentext.'); return; }
+  const inp=$('#neu'); const p=eingabeLesen(); if(!p) return;
+  if(p.idee){ if(!p.idee.text){ toast('Da fehlt noch die Idee.'); return; } ideeNeu(p.idee.text,p.idee.art); inp.value=''; ignoriere=new Set(); $('#erkannt').replaceChildren(); toast('In der Ideenbox.'); if(state.blick==='horizont') renderHorizont(); return; } if(!p.text){ if(inp.value.trim()) toast('Da fehlt noch der Aufgabentext.'); return; }
   const basis=state.blick==='tag'?state.viewDate:today;
   const o={text:p.text,day:p.day!==undefined?p.day:(p.rep?Schnell.naechstes(p.rep,basis,true):basis)};
   if(p.prio) o.prio=true; if(p.fest) o.fest=true; if(p.labels.length) o.labels=p.labels; if(p.rep) o.rep=p.rep;
@@ -1686,6 +1708,74 @@ function openNotizen(neu){
 }
 
 
+/* ===== ideen.js ===== */
+/* ===================== IDEENBOX: schnell hinein, Struktur nur wenn nötig ===================== */
+// idee: {id,text,art?('projekt'|'text'|'konzept'|'sonst'),note?,stern?,archiv?,at,created}
+const IDEE_ARTEN=[['projekt','Projekt'],['text','Text'],['konzept','Konzept'],['sonst','Sonstiges']];
+const ideeArtName=a=>{ const f=IDEE_ARTEN.find(x=>x[0]===a); return f?f[1]:''; };
+let ideen=[];
+function ladeIdeen(){ ideen=read(K.ideen,[]); if(!Array.isArray(ideen)) ideen=[]; }
+const saveIdeen=()=>write(K.ideen,ideen);
+// „projekt: …“, „text …“, „konzept – …“ am Anfang setzen die Art; „idee …“ wird nur abgestreift
+function ideeLesen(raw){
+  let t=String(raw||'').trim(), art=null;
+  t=t.replace(/^(idee|idea)\s*[:\-–]?\s+/i,'');
+  const m=t.match(/^(projekt|text|konzept|sonst(?:iges)?)\s*[:\-–]\s*(.+)$/is); if(m){ art=m[1].toLowerCase().startsWith('sonst')?'sonst':m[1].toLowerCase(); t=m[2].trim(); }
+  return {text:t,art};
+}
+function ideeNeu(text,art,note){ const i={id:uid(),text:text.trim(),at:Date.now(),created:new Date().toISOString()}; if(art) i.art=art; if(note) i.note=note; ideen.unshift(i); saveIdeen(); return i; }
+function ideenOffen(){ return ideen.filter(i=>!i.archiv); }
+
+function openIdeen(vorText){
+  const f=el('div','ideen'); let filter='alle', archivAn=false, offenId=null, suche='';
+  // Eingabe
+  const eing=el('div','idee-eingabe'); const ta=el('textarea','ta'); ta.rows=1; ta.placeholder='Neue Idee … (Enter legt ab)'; ta.value=vorText||'';
+  let artWahl=null; const arten=el('div','chips klein');
+  const malArten=()=>{ arten.replaceChildren(); IDEE_ARTEN.forEach(([a,n])=>{ const b=btn(n,()=>{ artWahl=artWahl===a?null:a; malArten(); ta.focus(); },'chip'); if(artWahl===a) b.setAttribute('aria-pressed','true'); arten.append(b); }); };
+  malArten();
+  const ablegen=()=>{ const p=ideeLesen(ta.value); if(!p.text){ return; } ideeNeu(p.text,p.art||artWahl); ta.value=''; artWahl=null; malArten(); wachsen(ta); toast('In der Ideenbox.'); malen(); if(state.blick==='horizont') renderHorizont(); };
+  ta.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); ablegen(); } });
+  ta.addEventListener('input',()=>wachsen(ta));
+  const plus=btn('Ablegen',ablegen,'btn primär klein');
+  const reihe=el('div','reihe'); reihe.append(arten,plus); eing.append(ta,reihe); f.append(eing);
+  // Filter
+  const fz=el('div','chips klein idee-filter'); f.append(fz);
+  const L=el('div','idee-liste'); f.append(L);
+  const malFilter=()=>{ fz.replaceChildren(); const alle=ideenOffen(); const mk=(key,label,n)=>{ if(key!=='alle'&&key!=='stern'&&!n) return; const b=btn(label+(n?' '+n:''),()=>{ filter=key; malen(); },'chip'); if(filter===key) b.setAttribute('aria-pressed','true'); fz.append(b); };
+    mk('alle','Alle',alle.length); IDEE_ARTEN.forEach(([a,n])=>mk(a,n,alle.filter(i=>i.art===a).length)); if(alle.some(i=>i.stern)) mk('stern','★',alle.filter(i=>i.stern).length);
+    const na=ideen.filter(i=>i.archiv).length; if(na){ const b=btn('Archiv '+na,()=>{ archivAn=!archivAn; malen(); },'chip'); if(archivAn) b.setAttribute('aria-pressed','true'); fz.append(b); }
+    if(ideen.length>=8){ const s=el('input','suche'); s.type='search'; s.placeholder='suchen'; s.value=suche; s.addEventListener('input',()=>{ suche=s.value.trim().toLowerCase(); malListe(); }); fz.append(s); } };
+  const sicht=()=>{ let l=archivAn?ideen.filter(i=>i.archiv):ideenOffen(); if(filter==='stern') l=l.filter(i=>i.stern); else if(filter!=='alle') l=l.filter(i=>i.art===filter); if(suche) l=l.filter(i=>(i.text+' '+(i.note||'')).toLowerCase().includes(suche)); return l.slice().sort((a,b)=>(b.stern?1:0)-(a.stern?1:0)||(b.at||0)-(a.at||0)); };
+  const malListe=()=>{ L.replaceChildren(); const l=sicht(); if(!l.length){ L.append(el('p','leer',ideen.length?'Nichts in dieser Auswahl.':'Leer. Alles, was dir einfällt – Projekt, Textidee, Konzept – kommt hier hinein. Ordnen kannst du später.')); return; }
+    l.forEach(i=>L.append(i.id===offenId?ideeOffenZeile(i):ideeZeile(i))); };
+  const malen=()=>{ malFilter(); malListe(); };
+  const ideeZeile=i=>{ const z=btn('',()=>{ offenId=i.id; malListe(); },'idee-z'+(i.stern?' stern':'')); const t=el('div','it'); t.append(el('b','',i.text)); const m=el('small'); if(i.stern) m.append(el('span','s','★')); if(i.art) m.append(el('span','a',ideeArtName(i.art))); m.append(el('span','d',fmtKurz(ymd(new Date(i.at||Date.parse(i.created)))))); if(i.note) m.append(el('span','d','…'+i.note.split('\n')[0].slice(0,40))); t.append(m); z.append(t); return z; };
+  const ideeOffenZeile=i=>{ const box=el('div','idee-x'); const tt=el('textarea','ta'); tt.value=i.text; tt.rows=1; tt.placeholder='Idee'; const nt=el('textarea','ta notiz'); nt.value=i.note||''; nt.rows=2; nt.placeholder='Ausführung – nur wenn nötig: worum geht es, erster Schritt, Bezug …';
+    let t=null; const speichern=()=>{ i.text=tt.value.trim()||i.text; i.note=nt.value.trim(); if(!i.note) delete i.note; saveIdeen(); };
+    [tt,nt].forEach(x=>{ x.addEventListener('input',()=>{ wachsen(x); clearTimeout(t); t=setTimeout(speichern,300); }); setTimeout(()=>wachsen(x),0); });
+    tt.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); nt.focus(); } });
+    const ac=el('div','chips klein'); IDEE_ARTEN.forEach(([a,n])=>{ const b=btn(n,()=>{ i.art=i.art===a?undefined:a; if(!i.art) delete i.art; saveIdeen(); malen(); },'chip'); if(i.art===a) b.setAttribute('aria-pressed','true'); ac.append(b); });
+    const akt=el('div','akt klein');
+    akt.append(btn(i.stern?'★ gesetzt':'☆ markieren',()=>{ i.stern=!i.stern; if(!i.stern) delete i.stern; saveIdeen(); malen(); },'chip'));
+    akt.append(btn('→ Aufgabe',()=>{ speichern(); const o={text:i.text,day:null}; if(i.note) o.note=i.note; addItem(o); toast('Als Aufgabe ohne Tag angelegt.'); renderAlles(); },'chip'));
+    akt.append(btn(i.archiv?'zurückholen':'ins Archiv',()=>{ speichern(); i.archiv=!i.archiv; if(!i.archiv) delete i.archiv; saveIdeen(); offenId=null; malen(); if(state.blick==='horizont') renderHorizont(); },'chip'));
+    akt.append(btn('löschen',async()=>{ if(await askConfirm('Idee löschen?',i.text,'Löschen')){ ideen=ideen.filter(x=>x!==i); saveIdeen(); offenId=null; malen(); if(state.blick==='horizont') renderHorizont(); } },'chip rot'));
+    akt.append(btn('fertig',()=>{ speichern(); offenId=null; malen(); if(state.blick==='horizont') renderHorizont(); },'chip'));
+    box.append(tt,nt,ac,akt); return box; };
+  malen();
+  blatt('Ideenbox',f,{cls:'hoch',onClose:()=>{ if(state.blick==='horizont') renderHorizont(); }});
+  if(vorText||!ideen.length) setTimeout(()=>ta.focus(),60);
+}
+// Karte im Horizont: Zahl, die drei jüngsten, öffnen
+function ideenKarte(){
+  const k=el('div','ideen-karte'); const alle=ideenOffen(); const kopf=el('div','zk'); kopf.append(el('h4','','Ideenbox'),el('span','fl',alle.length?alle.length+(alle.length===1?' Idee':' Ideen'):'')); k.append(kopf);
+  if(!alle.length) k.append(el('p','leer','Noch leer. Was dir einfällt, kommt hier hinein – auch unten in der Eingabe mit „idee …“.'));
+  alle.slice().sort((a,b)=>(b.stern?1:0)-(a.stern?1:0)||(b.at||0)-(a.at||0)).slice(0,3).forEach(i=>{ const z=btn((i.stern?'★ ':'')+i.text,()=>openIdeen(),'ik-z'); k.append(z); });
+  const akt=el('div','akt klein'); akt.append(btn(alle.length?'Ideenbox öffnen':'+ Idee',()=>openIdeen(),'chip')); k.append(akt);
+  return k;
+}
+
+
 /* ===== woche.js ===== */
 /* ===================== WOCHE: sieben Tage, drei Ziele, sonntags das Command Center ===================== */
 function wocheKey(){ return addDays(wochenStart(today),state.wocheOffset*7); }
@@ -1729,6 +1819,7 @@ function renderHorizont(){
   const sa=el('div','akt klein'); sa.append(btn('+ Satz',()=>sternEdit(null),'chip')); if(vision.prosa) sa.append(btn('Vision lesen',prosaLesen,'chip')); else sa.append(btn('Vision schreiben',prosaLesen,'chip')); st.append(sa); root.append(st);
   const ebene=(titel,liste,art)=>{ const e=el('div','ebene'); e.append(el('h4','',titel)); if(!liste.length) e.append(el('p','leer','noch nichts festgelegt')); liste.forEach(p=>{ const z=el('div','ziel'+(p.done?' ok':'')); z.append(btn('',()=>{ p.done=!p.done; saveVision(); renderHorizont(); },'zi'),btn(p.text,()=>zielEditH(p,art),'zt')); e.append(z); }); e.append(btn('+ Ziel',()=>zielEditH(null,art),'chip')); root.append(e); };
   ebene('Jahr '+today.slice(0,4),vision.jahr,'jahr'); ebene('Quartal '+qi.q,vision.quartal,'quartal');
+  root.append(ideenKarte());
   root.append(el('p','leise','Wochenziele leben im Woche-Blick. Hier steht nur, wohin es geht.'));
 }
 function sternEdit(p){ askText({title:p?'Nordstern':'Ein Satz für den Nordstern',value:p?p.text:'',mehrzeilig:true,ok:'Speichern'}).then(r=>{ if(!r) return; const v=r.text.trim(); if(p){ if(v) p.text=v; else vision.stern=vision.stern.filter(x=>x!==p); } else if(v) vision.stern.push({id:uid(),text:v}); saveVision(); renderHorizont(); }); }
@@ -3683,7 +3774,7 @@ function start(){
   $$('.tabs button').forEach(b=>b.addEventListener('click',()=>zeige(b.dataset.blick)));
   const form=$('#form'); form.addEventListener('submit',e=>{ e.preventDefault(); eingabeAbsenden(); }); $('#neu').addEventListener('input',eingabeLesen);
   $('#fab').addEventListener('click',()=>{ const inp=$('#neu'); inp.focus(); });
-  document.addEventListener('keydown',e=>{ if(e.target&&/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return; if(e.key==='q'||e.key==='n'){ e.preventDefault(); $('#neu').focus(); } if(e.key==='m'){ e.preventDefault(); openNotizen(); } if(e.key==='1') zeige('tag'); if(e.key==='2') zeige('woche'); if(e.key==='3') zeige('horizont'); if(e.key==='4') zeige('gebet'); });
+  document.addEventListener('keydown',e=>{ if(e.target&&/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return; if(e.key==='q'||e.key==='n'){ e.preventDefault(); $('#neu').focus(); } if(e.key==='m'){ e.preventDefault(); openNotizen(); } if(e.key==='i'){ e.preventDefault(); openIdeen(); } if(e.key==='1') zeige('tag'); if(e.key==='2') zeige('woche'); if(e.key==='3') zeige('horizont'); if(e.key==='4') zeige('gebet'); });
   renderAlles();
   // Abgleich und Kalender im Hintergrund
   syncReady=true; if(syncOn()){ setSyncStatus('bereit'); syncPull().then(()=>{ if(syncOn()) syncPush(false); }); }
